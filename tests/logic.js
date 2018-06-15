@@ -79,7 +79,7 @@ describe("Parser", function() {
     });
    });
 
-  it("&&s, ||s and =>s", function() {
+  it("&&s and ||s", function() {
     assertThat(logic.parse("a && b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -99,16 +99,6 @@ describe("Parser", function() {
         }]
      });
 
-    assertThat(logic.parse("a => b")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": "a",
-       "op": "=>",
-       "right": "b"
-      }]
-     });
-
     assertThat(logic.parse("a ^ b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -116,6 +106,24 @@ describe("Parser", function() {
        "left": "a",
        "op": "^",
        "right": "b"
+      }]
+     });
+   });
+
+  it("=>", function() {
+    assertThat(logic.parse("a => b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": {
+         "@type": "Literal",
+         "name": "a"        
+       },
+       "op": "=>",
+       "right": {
+         "@type": "Literal",
+         "name": "b"
+       }
       }]
      });
    });
@@ -128,6 +136,26 @@ describe("Parser", function() {
         "name": "~",
         "expression": "a"
        }]
+     });
+   });
+
+  it("Composites", function() {
+    assertThat(logic.parse("a => b && c")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": {
+         "@type": "Literal",
+         "name": "a"        
+       },
+       "op": "=>",
+       "right": {
+         "@type": "BinaryOperator",
+         "op": "&&",
+         "left": "b",
+         "right": "c",
+       }
+      }]
      });
    });
 
@@ -199,6 +227,26 @@ describe("Parser", function() {
 
   it("Multiple statements", function() {
     assertThat(logic.parse("\na\nb\nc\n")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+         "@type": "Literal", 
+         "name": "a"
+        }, {
+         "@type": "Literal", 
+         "name": "b"
+        }, {
+         "@type": "Literal", 
+         "name": "c"
+      }]
+    });
+  });
+
+  it.skip("Example program", function() {
+    assertThat(logic.parse(`
+
+    forall (x) man(x) => mortal(x)
+
+    `)).equalsTo({
       "@type": "Program", 
       "statements": [{
          "@type": "Literal", 

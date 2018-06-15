@@ -8,14 +8,9 @@ statement = expression
 expression =
   quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
      return {"@type": "Quantifier", name: quantifier, variable: id, expression: expression} } 
-  / left:identifier op:OPLOGIC right:identifier {
-    return {"@type": "BinaryOperator", left:left, op:op, right:right};
-   }
-  / NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
   / predicate
-  / "true" { return {"@type": "Constant", name: "true"} }
-  / "false" { return {"@type": "Constant", name: "false"} }
-  / id:identifier { return {"@type": "Literal", name: id} } 
+  / implication
+  / negation
 
 predicate =
   id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
@@ -24,27 +19,29 @@ predicate =
     return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
   }
 
-additive
-  = left:multiplicative op:OPADD right:additive {
-    return {left:left, op:op, right:right};
+negation
+  =  NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
+
+implication
+  = left:logical op:IMPLICATION right:expression {
+    return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
-  / multiplicative
+  / logical
  
-multiplicative
-  = left:primary op:OPMULTI right:multiplicative {
-    return {left:left, op:op, right:right}; 
-  }
+logical
+  = left:identifier op:OPLOGIC right:identifier {
+    return {"@type": "BinaryOperator", left:left, op:op, right:right};
+   }
   / primary
  
 primary
-  = integer
-  / OPENPAREN additive:additive CLOSEPAREN {
-    return additive; 
+  = "true" { return {"@type": "Constant", name: "true"} }
+  / "false" { return {"@type": "Constant", name: "false"} }
+  / id:identifier { return {"@type": "Literal", name: id} }
+  / OPENPAREN expression:expression CLOSEPAREN {
+    return expression;
    }
   
-integer "integer"
-  = _ digits:[0-9]+ _ { return parseInt(digits.join(''), 10); }
-
 identifier "identifier"
   = _ id:[a-zA-Z]+ _ { return id.join('');}
 
@@ -62,8 +59,10 @@ OPADD
 OPLOGIC
   = _ c:"&&" _ { return c; }
   / _ c:"||" _ { return c; }
-  / _ c:"=>" _ { return c; }
   / _ c:"^" _ { return c; }
+
+IMPLICATION
+  = _ c:"=>" _ { return c; }
 
 NEGATION
   = _ "~" _
@@ -74,7 +73,7 @@ OPMULTI
 _
   = [ ]*
 
-NL = [\n]*
+NL = [ \n]*
 
 QUANTIFIER = 
      "forall"
