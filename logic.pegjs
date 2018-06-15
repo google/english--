@@ -29,7 +29,7 @@ implication
   / logical
  
 logical
-  = left:identifier op:OPLOGIC right:identifier {
+  = left:primary op:OPLOGIC right:expression {
     return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
   / primary

@@ -84,18 +84,30 @@ describe("Parser", function() {
       "@type": "Program", 
       "statements": [{
         "@type": "BinaryOperator", 
-        "left": "a",
+        "left": {
+          "@type": "Literal",
+          "name" : "a"
+        },
         "op": "&&",
-        "right": "b"
+        "right": {
+          "@type": "Literal",
+          "name" : "b"
+        }
        }]
      });
     assertThat(logic.parse("a || b")).equalsTo({
       "@type": "Program", 
       "statements": [{
          "@type": "BinaryOperator", 
-         "left": "a",
+         "left": {
+          "@type": "Literal",
+          "name" : "a"
+         },
          "op": "||",
-         "right": "b"
+         "right": {
+          "@type": "Literal",
+          "name" : "b"
+         }
         }]
      });
 
@@ -103,9 +115,15 @@ describe("Parser", function() {
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
-       "left": "a",
+       "left": {
+          "@type": "Literal",
+          "name" : "a"
+        },
        "op": "^",
-       "right": "b"
+       "right": {
+          "@type": "Literal",
+          "name" : "b"
+        }
       }]
      });
    });
@@ -139,7 +157,7 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites", function() {
+  it("Composites =>", function() {
     assertThat(logic.parse("a => b && c")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -152,8 +170,40 @@ describe("Parser", function() {
        "right": {
          "@type": "BinaryOperator",
          "op": "&&",
-         "left": "b",
-         "right": "c",
+         "left": {
+           "@type": "Literal",
+           "name" : "b"
+         },
+         "right": {
+           "@type": "Literal",
+           "name" : "c"
+         }
+       }
+      }]
+     });
+   });
+
+  it("Composites &&", function() {
+    assertThat(logic.parse("a && b && c")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": {
+         "@type": "Literal",
+         "name": "a"        
+       },
+       "op": "&&",
+       "right": {
+         "@type": "BinaryOperator",
+         "op": "&&",
+         "left": {
+           "@type": "Literal",
+           "name": "b"
+         },
+         "right": {
+           "@type": "Literal",
+           "name": "c"
+         }
        }
       }]
      });
@@ -169,8 +219,14 @@ describe("Parser", function() {
         "expression": {
           "@type": "BinaryOperator", 
           "op": "&&",
-          "left": "a",
-          "right": "b"
+          "left": {
+            "@type": "Literal",
+            "name" : "a"
+          },
+          "right": {
+            "@type": "Literal",
+            "name" : "b"
+          }
          }
        }]
      });
@@ -186,8 +242,14 @@ describe("Parser", function() {
         "expression": {
           "@type": "BinaryOperator", 
           "op": "&&",
-          "left": "a",
-          "right": "b"
+          "left": {
+            "@type": "Literal",
+            "name" : "a"
+          },
+          "right": {
+            "@type": "Literal",
+            "name" : "b"
+          }
          }
        }]
      });
