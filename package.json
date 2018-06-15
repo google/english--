@@ -1,0 +1,20 @@
+{
+  "name": "english--",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -w tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelgoto/english.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/samuelgoto/english/issues"
+  },
+  "homepage": "https://github.com/samuelgoto/english",
+  "dependencies": {
+  }
+}
