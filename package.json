@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -w tests"
+    "test": "mocha -w tests",
+    "build": "pegjs logic.pegjs"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,6 @@
   },
   "homepage": "https://github.com/samuelgoto/english",
   "dependencies": {
+    "pegjs": "^0.10.0"
   }
 }

@@ -1,7 +1,8 @@
 const Assert = require("assert");
+const logic = require("../logic.js");
 
-describe("Logic", function(done) {  
-  it("First order logic", function() {
+describe("Parser", function() {
+  it("Examples", function() {
     // Logical symbols.
     // binary connectives.
     "a || b"; // conjunction
@@ -48,6 +49,87 @@ describe("Logic", function(done) {
     // Free and bound variables
     "forall(y) P(x, y)"; // y is bound, x is free
   });
+
+  it("Literals", function() {
+    assertThat(logic.parse("a")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "Literal", 
+       "name": "a"
+      }]
+    });
+   });
+
+  it("Binary operators", function() {
+    assertThat(logic.parse("a && b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "BinaryOperator", 
+        "left": "a",
+        "op": "&&",
+        "right": "b"
+       }]
+     });
+    assertThat(logic.parse("a || b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+         "@type": "BinaryOperator", 
+         "left": "a",
+         "op": "||",
+         "right": "b"
+        }]
+     });
+
+    assertThat(logic.parse("a => b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": "a",
+       "op": "=>",
+       "right": "b"
+      }]
+     });
+
+    assertThat(logic.parse("a ^ b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": "a",
+       "op": "^",
+       "right": "b"
+      }]
+     });
+   });
+
+  it("Multiple statements", function() {
+    assertThat(logic.parse("a\nb\nc")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+         "@type": "Literal", 
+         "name": "a"
+        }, {
+         "@type": "Literal", 
+         "name": "b"
+        }, {
+         "@type": "Literal", 
+         "name": "c"
+      }]
+    });
+  });
+
+  function assertThat(x) {
+   return {
+    equalsTo(y) {
+     Assert.deepEqual(x, y);
+    }
+   }
+  }
+
+});
+
+return;
+
+describe("Logic", function(done) {  
 
   function* lexer(code) {
    // console.log("hi");
@@ -288,13 +370,4 @@ describe("Logic", function(done) {
       "name": "a"
     });
    });
-
-
-  function assertThat(x) {
-   return {
-    equalsTo(y) {
-     Assert.deepEqual(x, y);
-    }
-   }
-  }
 });
