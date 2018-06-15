@@ -327,6 +327,7 @@ describe("Parser", function() {
     assertThat(logic.parse(`
 
     forall (x) man(x) => mortal(x)
+    man(Socrates)
 
     `)).equalsTo({
       "@type": "Program", 
@@ -348,7 +349,11 @@ describe("Parser", function() {
             "arguments": ["x"]
           } 
         }
-      }]
+     }, {
+       "@type": "Predicate",
+       "name": "man",
+       "arguments": ["Socrates"]
+     }]
     });
   });
 
