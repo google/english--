@@ -5,28 +5,23 @@ program = statements:(NL statement NL)* {
 
 statement = expression
 
-expression =
-  quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
-     return {"@type": "Quantifier", name: quantifier, variable: id, expression: expression} } 
-  / predicate
+expression
+  = quantifier
   / implication
+  / logical
   / negation
 
-predicate =
-  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
-  / id:identifier OPENPAREN head:identifier tail:("," identifier)* CLOSEPAREN { 
-    let rest = tail.map(x => x[1]);
-    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
-  }
-
-negation
-  =  NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
+quantifier
+  = quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
+     return {"@type": "Quantifier", name: quantifier, variable: id, expression: expression} }
 
 implication
   = left:logical op:IMPLICATION right:expression {
     return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
-  / logical
+
+negation
+  =  NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
  
 logical
   = left:primary op:OPLOGIC right:expression {
@@ -35,12 +30,20 @@ logical
   / primary
  
 primary
-  = "true" { return {"@type": "Constant", name: "true"} }
+  = predicate
+  / "true" { return {"@type": "Constant", name: "true"} }
   / "false" { return {"@type": "Constant", name: "false"} }
   / id:identifier { return {"@type": "Literal", name: id} }
   / OPENPAREN expression:expression CLOSEPAREN {
     return expression;
    }
+
+predicate =
+  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
+  / id:identifier OPENPAREN head:identifier tail:("," identifier)* CLOSEPAREN { 
+    let rest = tail.map(x => x[1]);
+    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+  }
   
 identifier "identifier"
   = _ id:[a-zA-Z]+ _ { return id.join('');}
@@ -52,10 +55,6 @@ identifier "identifier"
 OPENPAREN = _ '(' _
 CLOSEPAREN = _ ')' _
  
-OPADD
-  = _ c:"+" _ { return c; }
-  / _ c:"-" _ { return c; }
-
 OPLOGIC
   = _ c:"&&" _ { return c; }
   / _ c:"||" _ { return c; }
@@ -66,10 +65,6 @@ IMPLICATION
 
 NEGATION
   = _ "~" _
-
-OPMULTI
-  = _ c:"*" _ { return c; }
-  / _ c:"/" _ { return c; }
 _
   = [ ]*
 

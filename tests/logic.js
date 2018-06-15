@@ -157,7 +157,7 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites =>", function() {
+  it("Composites =>s and &&s", function() {
     assertThat(logic.parse("a => b && c")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -183,8 +183,8 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites &&", function() {
-    assertThat(logic.parse("a && b && c")).equalsTo({
+  it("Composites &&s and ||", function() {
+    assertThat(logic.parse("a && b || c")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -195,7 +195,7 @@ describe("Parser", function() {
        "op": "&&",
        "right": {
          "@type": "BinaryOperator",
-         "op": "&&",
+         "op": "||",
          "left": {
            "@type": "Literal",
            "name": "b"
@@ -205,6 +205,26 @@ describe("Parser", function() {
            "name": "c"
          }
        }
+      }]
+     });
+   });
+
+  it("Composites =>s and P()s", function() {
+    assertThat(logic.parse("P(a) => Q(a)")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "BinaryOperator", 
+       "left": {
+         "@type": "Predicate",
+          "name": "P",
+         "arguments": ["a"],        
+       },
+       "op": "=>",
+       "right": {
+         "@type": "Predicate",
+         "name": "Q",
+         "arguments": ["a"]
+        }
       }]
      });
    });
@@ -303,7 +323,7 @@ describe("Parser", function() {
     });
   });
 
-  it.skip("Example program", function() {
+  it("Example program", function() {
     assertThat(logic.parse(`
 
     forall (x) man(x) => mortal(x)
@@ -311,14 +331,23 @@ describe("Parser", function() {
     `)).equalsTo({
       "@type": "Program", 
       "statements": [{
-         "@type": "Literal", 
-         "name": "a"
-        }, {
-         "@type": "Literal", 
-         "name": "b"
-        }, {
-         "@type": "Literal", 
-         "name": "c"
+        "@type": "Quantifier", 
+        "name": "forall",
+        "variable" : "x",
+        "expression": {
+          "@type": "BinaryOperator",
+          "op": "=>",
+          "left": {
+            "@type": "Predicate",
+            "name": "man",
+            "arguments": ["x"]
+          },
+          "right": {
+            "@type": "Predicate",
+            "name": "mortal",
+            "arguments": ["x"]
+          } 
+        }
       }]
     });
   });
