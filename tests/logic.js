@@ -50,7 +50,7 @@ describe("Parser", function() {
     "forall(y) P(x, y)"; // y is bound, x is free
   });
 
-  it("true and false", function() {
+  it("true", function() {
     assertThat(logic.parse("true")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -58,7 +58,9 @@ describe("Parser", function() {
        "name": "true"
       }]
     });
+   });
 
+  it("false", function() {
     assertThat(logic.parse("false")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -67,7 +69,6 @@ describe("Parser", function() {
       }]
     });
    });
-
 
   it("a", function() {
     assertThat(logic.parse("a")).equalsTo({
@@ -79,7 +80,8 @@ describe("Parser", function() {
     });
    });
 
-  it("&&s and ||s", function() {
+
+  it("a && b", function() {
     assertThat(logic.parse("a && b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -95,6 +97,9 @@ describe("Parser", function() {
         }
        }]
      });
+   });
+
+  it("a || b", function() {
     assertThat(logic.parse("a || b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -110,7 +115,9 @@ describe("Parser", function() {
          }
         }]
      });
+   });
 
+  it("a ^ b", function() {
     assertThat(logic.parse("a ^ b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -128,7 +135,7 @@ describe("Parser", function() {
      });
    });
 
-  it("=>", function() {
+  it("a => b", function() {
     assertThat(logic.parse("a => b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -157,7 +164,7 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites =>s and &&s", function() {
+  it("a => b && c", function() {
     assertThat(logic.parse("a => b && c")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -183,7 +190,7 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites &&s and ||", function() {
+  it("a && b || c", function() {
     assertThat(logic.parse("a && b || c")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -209,7 +216,7 @@ describe("Parser", function() {
      });
    });
 
-  it("Composites =>s and P()s", function() {
+  it("P(a) => Q(a)", function() {
     assertThat(logic.parse("P(a) => Q(a)")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -275,6 +282,98 @@ describe("Parser", function() {
      });
    });
 
+  function literal(x) {
+   return {"@type": "Literal", "name": x};
+  };
+
+  function binary(op, left, right) {
+   return {"@type": "BinaryOperator", "op": op, left: left, right: right};
+  };
+
+  function program(statements) {
+   return {"@type": "Program", statements: statements};
+  }
+
+  it("(a && b) && c", function() {
+    assertThat(logic.parse("(a && b) && c"))
+     .equalsTo(program([and(and(literal("a"), literal("b")), literal("c"))]));
+   });
+
+  it("a && (b && c)", function() {
+    assertThat(logic.parse("a && (b && c)"))
+     .equalsTo(program([and(literal("a"), and(literal("b"), literal("c")))]));
+   });
+
+  it("(a => b) && (b && c)", function() {
+    assertThat(logic.parse("(a => b) && (b && c)"))
+     .equalsTo(program([
+       and(
+         implies(
+           literal("a"),
+           literal("b")
+         ),
+         and(
+           literal("b"),
+           literal("c")
+         )
+       )
+     ]));
+   });
+
+  function constant(value) {
+   return {"@type": "Constant", name: value};
+  }
+
+  function forall(x, expression) {
+   return {"@type": "Quantifier", name: "forall", variable: x, expression: expression};
+  }
+
+  function exists(x, expression) {
+   return {"@type": "Quantifier", name: "exists", variable: x, expression: expression};
+  }
+
+  function predicate(name, arguments) {
+   return {"@type": "Predicate", name: name, arguments: arguments};
+  }
+
+  function and(left, right) {
+   return binary("&&", left, right);
+  }
+
+  function implies(left, right) {
+   return binary("=>", left, right);
+  }
+
+  it("(forall (x) P(x)) && (true)", function() {
+    assertThat(logic.parse("(forall (x) P(x)) && (true)"))
+     .equalsTo(program([
+       and(
+         forall("x", predicate("P", ["x"])),
+         constant("true")
+       )
+     ]));
+   });
+
+  it("(exists (x) P(x, a)) && (exists (y) Q(y, b))", function() {
+    assertThat(logic.parse("(exists (x) P(a, x)) && (exists (x) Q(b, x))"))
+     .equalsTo(program([
+       and(
+         exists("x", predicate("P", ["a", "x"])),
+         exists("x", predicate("Q", ["b", "x"])),
+       )
+     ]));
+   });
+
+  it("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))", function() {
+    assertThat(logic.parse("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))"))
+     .equalsTo(program([
+       and(
+         exists("x", predicate("father", ["Joe", "x"])),
+         exists("x", predicate("mother", ["Joe", "x"]))
+       )
+     ]));
+   });
+
   it("P()", function() {
     assertThat(logic.parse("P()")).equalsTo({
       "@type": "Program", 
@@ -323,7 +422,7 @@ describe("Parser", function() {
     });
   });
 
-  it("Example program", function() {
+  it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
     assertThat(logic.parse(`
 
     forall (x) man(x) => mortal(x)
@@ -357,7 +456,7 @@ describe("Parser", function() {
     });
   });
 
-  it("Invalid syntax", function() {
+  it("1+1", function() {
     try {
      logic.parse("1+1");
      fail("blargh");
