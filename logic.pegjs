@@ -1,6 +1,6 @@
-program = head:statement tail:(NL statement)* {
-  let rest = tail.map(x => x[1]);
-  return {"@type": "Program", statements: [head, ...rest]}
+program = statements:(NL statement NL)* {
+  let rest = statements.map(x => x.filter(y => !Array.isArray(y)));
+  return {"@type": "Program", statements: [...rest.map(x => x[0])]}
 }
 
 statement = expression
@@ -49,8 +49,8 @@ identifier "identifier"
   = _ id:[a-zA-Z]+ _ { return id.join('');}
 
 /**
-* Define tokens
-*/
+ * Define tokens
+ */
  
 OPENPAREN = _ '(' _
 CLOSEPAREN = _ ')' _

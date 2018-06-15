@@ -198,7 +198,7 @@ describe("Parser", function() {
    });
 
   it("Multiple statements", function() {
-    assertThat(logic.parse("a\nb\nc")).equalsTo({
+    assertThat(logic.parse("\na\nb\nc\n")).equalsTo({
       "@type": "Program", 
       "statements": [{
          "@type": "Literal", 
