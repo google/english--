@@ -50,7 +50,26 @@ describe("Parser", function() {
     "forall(y) P(x, y)"; // y is bound, x is free
   });
 
-  it("Literals", function() {
+  it("true and false", function() {
+    assertThat(logic.parse("true")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "Constant", 
+       "name": "true"
+      }]
+    });
+
+    assertThat(logic.parse("false")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+       "@type": "Constant", 
+       "name": "false"
+      }]
+    });
+   });
+
+
+  it("a", function() {
     assertThat(logic.parse("a")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -60,7 +79,7 @@ describe("Parser", function() {
     });
    });
 
-  it("Binary operators", function() {
+  it("&&s, ||s and =>s", function() {
     assertThat(logic.parse("a && b")).equalsTo({
       "@type": "Program", 
       "statements": [{
@@ -101,6 +120,83 @@ describe("Parser", function() {
      });
    });
 
+  it("~a", function() {
+    assertThat(logic.parse("~a")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "UnaryOperator", 
+        "name": "~",
+        "expression": "a"
+       }]
+     });
+   });
+
+  it("forall (a) a && b", function() {
+    assertThat(logic.parse("forall (a) a && b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "Quantifier",
+        "name": "forall",
+        "variable": "a",
+        "expression": {
+          "@type": "BinaryOperator", 
+          "op": "&&",
+          "left": "a",
+          "right": "b"
+         }
+       }]
+     });
+   });
+
+  it("exists (a) a && b", function() {
+    assertThat(logic.parse("exists (a) a && b")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "Quantifier",
+        "name": "exists",
+        "variable": "a",
+        "expression": {
+          "@type": "BinaryOperator", 
+          "op": "&&",
+          "left": "a",
+          "right": "b"
+         }
+       }]
+     });
+   });
+
+  it("P()", function() {
+    assertThat(logic.parse("P()")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "Predicate",
+        "name": "P"
+       }]
+     });
+   });
+
+  it("P(a)", function() {
+    assertThat(logic.parse("P(a)")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "Predicate",
+        "name": "P",
+        "arguments": ["a"]
+       }]
+     });
+   });
+
+  it("P(a, b, c)", function() {
+    assertThat(logic.parse("P(a, b, c)")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+        "@type": "Predicate",
+        "name": "P",
+        "arguments": ["a", "b", "c"]
+       }]
+     });
+   });
+
   it("Multiple statements", function() {
     assertThat(logic.parse("a\nb\nc")).equalsTo({
       "@type": "Program", 
@@ -116,6 +212,15 @@ describe("Parser", function() {
       }]
     });
   });
+
+  it("Invalid syntax", function() {
+    try {
+     logic.parse("1+1");
+     fail("blargh");
+    } catch (e) {
+     // expected error;
+    }
+   });
 
   function assertThat(x) {
    return {

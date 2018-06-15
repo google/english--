@@ -1,17 +1,28 @@
 program = head:statement tail:(NL statement)* {
-  // console.log(tail);
   let rest = tail.map(x => x[1]);
   return {"@type": "Program", statements: [head, ...rest]}
 }
 
-statement = logical
-    / id:identifier { return {"@type": "Literal", name: id} } 
+statement = expression
 
-logical
-  = left:identifier op:OPLOGIC right:identifier {
+expression =
+  quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
+     return {"@type": "Quantifier", name: quantifier, variable: id, expression: expression} } 
+  / left:identifier op:OPLOGIC right:identifier {
     return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
-  / additive
+  / NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
+  / predicate
+  / "true" { return {"@type": "Constant", name: "true"} }
+  / "false" { return {"@type": "Constant", name: "false"} }
+  / id:identifier { return {"@type": "Literal", name: id} } 
+
+predicate =
+  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
+  / id:identifier OPENPAREN head:identifier tail:("," identifier)* CLOSEPAREN { 
+    let rest = tail.map(x => x[1]);
+    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+  }
 
 additive
   = left:multiplicative op:OPADD right:additive {
@@ -35,7 +46,7 @@ integer "integer"
   = _ digits:[0-9]+ _ { return parseInt(digits.join(''), 10); }
 
 identifier "identifier"
-  = _ id:[a-z]+ _ { return id.join('');}
+  = _ id:[a-zA-Z]+ _ { return id.join('');}
 
 /**
 * Define tokens
@@ -54,6 +65,9 @@ OPLOGIC
   / _ c:"=>" _ { return c; }
   / _ c:"^" _ { return c; }
 
+NEGATION
+  = _ "~" _
+
 OPMULTI
   = _ c:"*" _ { return c; }
   / _ c:"/" _ { return c; }
@@ -61,3 +75,7 @@ _
   = [ ]*
 
 NL = [\n]*
+
+QUANTIFIER = 
+     "forall"
+   / "exists"
