@@ -530,87 +530,220 @@ describe("Parser", function() {
   });
 
   function modusPonens({statements}) {
+   let result = [];
    // modus ponen: a => b, a |= b
    for (let implication of statements.filter(x => x.op == "=>")) {
     if (statements.find(y => equals(implication.left, y))) {
-     statements.push(implication.right);
+     result.push(implication.right);
     }
    }
+   return result;
   }
 
   function modusTollens({statements}) {
+   let result = [];
    // modus tollens: a => b, ~b |= ~a
    for (let implication of statements.filter(x => x.op == "=>")) {
     if (statements.find(y => equals(negation(implication.right), y))) {
-     statements.push(negation(implication.left));
+     result.push(negation(implication.left));
     }
    }
+   return result;
+  }
+
+  function disjunctiveSyllogism({statements}) {
+   let result = [];
+   // disjunctive syllogism: a || b, ~a |= ~b and a || b, ~b |= a
+   for (let disjunction of statements.filter(x => x.op == "||")) {
+    if (statements.find(y => equals(negation(disjunction.left), y))) {
+     result.push(disjunction.right);
+    }
+    if (statements.find(y => equals(negation(disjunction.right), y))) {
+     result.push(disjunction.left);
+    }
+   }
+   return result;
   }
 
   it("a => b, a |= b", function() {
-    let code = logic.parse(`
+    assertThat(modusPonens(logic.parse(`
       a => b
       a
-    `);
-    assertThat(code)
-     .equalsTo(program([
-       implies(literal("a"), literal("b")),
-       literal("a")
-     ]));
-
-    modusPonens(code);
-
-    assertThat(code)
-     .equalsTo(program([
-       implies(literal("a"), literal("b")),
-       literal("a"),
-       // code now contains b
-       literal("b")
-     ]));
+    `)))
+     .equalsTo([literal("b")]);
   });
 
   it("a && b => c || d, a & b |= c || d", function() {
-    let code = logic.parse(`
+    assertThat(modusPonens(logic.parse(`
       (a && b) => (c || d)
       a && b
-    `);
-    assertThat(code)
-     .equalsTo(program([
-       implies(and(literal("a"), literal("b")), or(literal("c"), literal("d"))),
-       and(literal("a"), literal("b"))
-     ]));
-
-    modusPonens(code);
-
-    assertThat(code)
-     .equalsTo(program([
-       implies(and(literal("a"), literal("b")), or(literal("c"), literal("d"))),
-       and(literal("a"), literal("b")),
-       // code now contains c || d
+    `)))
+     .equalsTo([
        or(literal("c"), literal("d"))
-     ]));
+     ]);
   });
 
   it("a => b, ~b |= ~a", function() {
-    let code = logic.parse(`
+    assertThat(modusTollens(logic.parse(`
       a => b
       ~b
+    `)))
+    .equalsTo([negation(literal("a"))]);
+  });
+
+  it("a || b, ~a |= b", function() {
+    let code = logic.parse(`
+      a || b
+      ~a
     `);
-    assertThat(code)
-     .equalsTo(program([
-       implies(literal("a"), literal("b")),
-       negation(literal("b"))
-     ]));
 
-    modusTollens(code);
+    assertThat(disjunctiveSyllogism(code)).equalsTo([
+      literal("b")
+    ]);
+  });
 
-    assertThat(code)
-     .equalsTo(program([
-       implies(literal("a"), literal("b")),
-       negation(literal("b")),
-       // code now contains ~a
-       negation(literal("a"))
-     ]));
+  it("a || b, ~b |= a", function() {
+    let code = logic.parse(`
+      a || b
+      ~b
+    `);
+
+    assertThat(disjunctiveSyllogism(code)).equalsTo([
+      literal("a")
+    ]);
+  });
+
+  function disjunctiveIntroduction({statements}, term) {
+   let result = [];
+   for (let statement of statements) {
+    result.push(or(statement, term));
+    result.push(or(term, statement));
+   }
+   return result;
+  }
+
+  it("a |= a || b", function() {
+    let code = logic.parse(`
+      a
+    `);
+
+    assertThat(disjunctiveIntroduction(code, literal("b")))
+     .equalsTo([
+       or(literal("a"), literal("b")),
+       or(literal("b"), literal("a"))
+    ]);
+  });
+
+  function conjunctionElimination({statements}) {
+   let result = [];
+   for (let statement of statements.filter(x => x.op == "&&")) {
+    result.push(statement.left);
+    result.push(statement.right);
+   }
+   return result;
+  }
+
+  it("a && b |= a, b", function() {
+    assertThat(conjunctionElimination(logic.parse(`
+      a && b
+     `)))
+     .equalsTo([
+       literal("a"), literal("b")
+    ]);
+  });
+
+  function conjunctionIntroduction({statements}) {
+   let result = [];
+   for (let statement of statements) {
+    // console.log(statement);
+    for (let other of statements) {
+     if (!equals(statement, other)) {
+      result.push(and(statement, other));
+     }
+    }
+   }
+   return result;
+  }
+
+  it("a, b |= a && b", function() {
+    assertThat(conjunctionIntroduction(logic.parse(`
+      a
+      b
+     `)))
+     .equalsTo([
+       and(literal("a"), literal("b")),
+       and(literal("b"), literal("a"))
+    ]);
+  });
+
+  function hypotheticalSyllogism({statements}) {
+   let result = [];
+   // a => b, b => c |= a => c
+   let implications = statements.filter(x => x.op == "=>");
+   for (let implication of implications) {
+    let match = implications.find(x => equals(x.left, implication.right));
+    if (match) {
+     result.push(implies(implication.left, match.right));
+    }
+   }
+   return result;
+  }
+
+  it("a => b, b => c |= a => c", function() {
+    assertThat(hypotheticalSyllogism(logic.parse(`
+      a => b
+      b => c
+     `)))
+     .equalsTo([
+       implies(literal("a"), literal("c"))
+    ]);
+  });
+
+  function constructiveDillema({statements}) {
+   let result = [];
+   // (a => c) && (b => d), a || b |= c || d
+   let disjunctions = statements.filter(x => x.op == "&&");
+   let conjunctions = statements.filter(x => x.op == "||");
+   for (let disjunction of disjunctions) {
+    if (disjunction.left.op == "=>" &&
+        disjunction.right.op == "=>") {
+     let match = conjunctions.find(x =>
+                                   equals(x.left, disjunction.left.left) &&
+                                   equals(x.right, disjunction.right.left));
+     result.push(or(disjunction.left.right, disjunction.right.right));
+    }
+   }
+   return result;
+  }
+
+  it("(a => c) && (b => d), a || b |= c || d", function() {
+    assertThat(constructiveDillema(logic.parse(`
+      (a => c) && (b => d)
+      a || b
+     `)))
+     .equalsTo([
+       or(literal("c"), literal("d"))
+    ]);
+  });
+
+
+  function absorption({statements}) {
+   let result = [];
+   // a => b |= a => (a & b)
+   let implications = statements.filter(x => x.op == "=>");
+   for (let implication of implications) {
+    result.push(implies(implication.left, and(implication.left, implication.right)));
+   }
+   return result;
+  }
+
+  it("a => b |= a => (a & b)", function() {
+    assertThat(absorption(logic.parse(`
+      a => b
+     `)))
+     .equalsTo([
+       implies(literal("a"), and(literal("a"), literal("b")))
+    ]);
   });
 
   function equals(a, b) {
