@@ -726,7 +726,6 @@ describe("Parser", function() {
     ]);
   });
 
-
   function absorption({statements}) {
    let result = [];
    // a => b |= a => (a & b)
