@@ -21,7 +21,7 @@ implication
    }
 
 negation
-  =  NEGATION id:identifier { return {"@type": "UnaryOperator", name: "~", expression: id} }
+  =  NEGATION expression:expression { return {"@type": "UnaryOperator", name: "~", expression: expression} }
  
 logical
   = left:primary op:OPLOGIC right:expression {
@@ -46,7 +46,7 @@ predicate =
   }
   
 identifier "identifier"
-  = _ id:[a-zA-Z]+ _ { return id.join('');}
+  = _ id:[a-zA-Z_]+ _ { return id.join('');}
 
 /**
  * Define tokens

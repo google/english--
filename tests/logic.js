@@ -154,14 +154,8 @@ describe("Parser", function() {
    });
 
   it("~a", function() {
-    assertThat(logic.parse("~a")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "UnaryOperator", 
-        "name": "~",
-        "expression": "a"
-       }]
-     });
+    assertThat(logic.parse("~a"))
+     .equalsTo(program([negation(literal("a"))]));
    });
 
   it("a => b && c", function() {
@@ -340,6 +334,10 @@ describe("Parser", function() {
    return binary("&&", left, right);
   }
 
+  function or(left, right) {
+   return binary("||", left, right);
+  }
+
   function implies(left, right) {
    return binary("=>", left, right);
   }
@@ -422,38 +420,56 @@ describe("Parser", function() {
     });
   });
 
+  function xor(a, b) {
+   return binary("^", a, b);
+  }
+
+  function negation(a) {
+   return {"@type": "UnaryOperator", name: "~", expression: a};
+  }
+
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
-    assertThat(logic.parse(`
+    let code = logic.parse(`
 
-    forall (x) man(x) => mortal(x)
-    man(Socrates)
+     forall (x) man(x) => mortal(x)
+     man(Socrates)
 
-    `)).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Quantifier", 
-        "name": "forall",
-        "variable" : "x",
-        "expression": {
-          "@type": "BinaryOperator",
-          "op": "=>",
-          "left": {
-            "@type": "Predicate",
-            "name": "man",
-            "arguments": ["x"]
-          },
-          "right": {
-            "@type": "Predicate",
-            "name": "mortal",
-            "arguments": ["x"]
-          } 
-        }
-     }, {
-       "@type": "Predicate",
-       "name": "man",
-       "arguments": ["Socrates"]
-     }]
-    });
+    `);
+
+    assertThat(code).equalsTo(program([
+      forall("x", implies(predicate("man", ["x"]), predicate("mortal", ["x"]))),
+      predicate("man", ["Socrates"])
+    ]));
+
+    // Can we infer mortal(Socrates)?
+    // for (let statement of code.statements) {
+    // console.log(statement);
+    // }
+  });
+
+  it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
+    // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
+    let knowledge = `
+     PersonInFrontOfCar => Brake
+     (YelloLight && Policeman && ~Slippery) => Brake
+     Policecar => Policeman
+     Snow => Slippery
+     Slippery => ~Dry
+     RedLight => Brake
+     Winter => Snow    
+    `;
+    let observations = `
+     YellowLight
+     ~RedLight
+     ~Snow
+     Dry
+     Policecar
+     ~PersonInFrontOfCar
+    `
+    let kb = logic.parse(knowledge + observations);
+    // console.log(kb);
+
+    // Can we infer "Brake"?
   });
 
   it("1+1", function() {
@@ -463,7 +479,143 @@ describe("Parser", function() {
     } catch (e) {
      // expected error;
     }
-   });
+  });
+
+  it("crime scene program", function() {
+    // https://www.iep.utm.edu/prop-log/#SH5a
+
+    let code = logic.parse(`
+      cat_fur ^ dog_fur
+      dog_fur => thompson_allergy
+      cat_fur => macavity_criminal
+      ~thompson_allergy
+    `);
+
+    assertThat(code).equalsTo(program([
+      xor(literal("cat_fur"), literal("dog_fur")),
+      implies(literal("dog_fur"), literal("thompson_allergy")),
+      implies(literal("cat_fur"), literal("macavity_criminal")),
+      negation(literal("thompson_allergy"))
+    ]));
+
+    // 5) Can we infer ~dog_fur from 2 and 4?
+    // 6) Can we infer cat_fur from 1 and 5?
+    // 7) Can we infer macavity_criminal from 3 and 6?
+
+    // Propositional Logic
+    //
+    // Rules of inference
+    //
+    // Modus Ponens: a => b, a |= b
+    // Modus Tollens: a => b, ~b |= ~a
+    // Modus Tollendo Ponens (Disjunctive Syllogism): a || b, ~a |= b and a || b, ~b |= a
+    // Disjunction Introduction (Addition): a |= a || b, b |= a || b
+    // Conjunction Introduction (Simplification): a && b |= a and a && b |= b
+    // Hypothetical Syllogism: a => b, b => c |= a => c
+    // Constructive Dilemma: (a => c) && (b => d), a || b |= c || d
+    // Absorption: a => b |= a => (a & b)
+
+    // Rules of replacement: rewriting, no new information
+    //
+    // Double negation: ~~a |= a
+    // Communitativity: a && b |= b && a
+    // Associativity: (a && b) && c |= a && (b && c)
+    // Tautology: a |= a && a, a |= a || a
+    // DeMorgan's Law: ~(a && b) |= ~a || ~b, ~(a || b) |= ~a && ~b
+    // Tranposition (contraposition): a => b, ~b => ~a
+    // Material implication: a => b |= ~a || b
+    // Exportation: a => (b => c) |= (a && b) => c
+    // Distribution: a && (b || c) |= (a && b) || (a && c), a || (b && c) |= (a || b) && (a || c)
+    // Material equivalence: a <=> b |= (a => b) && (b => a) |= (a && b) || (~a & ~b)
+  });
+
+  function modusPonens({statements}) {
+   // modus ponen: a => b, a |= b
+   for (let implication of statements.filter(x => x.op == "=>")) {
+    if (statements.find(y => equals(implication.left, y))) {
+     statements.push(implication.right);
+    }
+   }
+  }
+
+  function modusTollens({statements}) {
+   // modus tollens: a => b, ~b |= ~a
+   for (let implication of statements.filter(x => x.op == "=>")) {
+    if (statements.find(y => equals(negation(implication.right), y))) {
+     statements.push(negation(implication.left));
+    }
+   }
+  }
+
+  it("a => b, a |= b", function() {
+    let code = logic.parse(`
+      a => b
+      a
+    `);
+    assertThat(code)
+     .equalsTo(program([
+       implies(literal("a"), literal("b")),
+       literal("a")
+     ]));
+
+    modusPonens(code);
+
+    assertThat(code)
+     .equalsTo(program([
+       implies(literal("a"), literal("b")),
+       literal("a"),
+       // code now contains b
+       literal("b")
+     ]));
+  });
+
+  it("a && b => c || d, a & b |= c || d", function() {
+    let code = logic.parse(`
+      (a && b) => (c || d)
+      a && b
+    `);
+    assertThat(code)
+     .equalsTo(program([
+       implies(and(literal("a"), literal("b")), or(literal("c"), literal("d"))),
+       and(literal("a"), literal("b"))
+     ]));
+
+    modusPonens(code);
+
+    assertThat(code)
+     .equalsTo(program([
+       implies(and(literal("a"), literal("b")), or(literal("c"), literal("d"))),
+       and(literal("a"), literal("b")),
+       // code now contains c || d
+       or(literal("c"), literal("d"))
+     ]));
+  });
+
+  it("a => b, ~b |= ~a", function() {
+    let code = logic.parse(`
+      a => b
+      ~b
+    `);
+    assertThat(code)
+     .equalsTo(program([
+       implies(literal("a"), literal("b")),
+       negation(literal("b"))
+     ]));
+
+    modusTollens(code);
+
+    assertThat(code)
+     .equalsTo(program([
+       implies(literal("a"), literal("b")),
+       negation(literal("b")),
+       // code now contains ~a
+       negation(literal("a"))
+     ]));
+  });
+
+  function equals(a, b) {
+   return JSON.stringify(a) === JSON.stringify(b);
+  }
 
   function assertThat(x) {
    return {
