@@ -481,54 +481,6 @@ describe("Parser", function() {
     }
   });
 
-  it("crime scene program", function() {
-    // https://www.iep.utm.edu/prop-log/#SH5a
-
-    let code = logic.parse(`
-      cat_fur ^ dog_fur
-      dog_fur => thompson_allergy
-      cat_fur => macavity_criminal
-      ~thompson_allergy
-    `);
-
-    assertThat(code).equalsTo(program([
-      xor(literal("cat_fur"), literal("dog_fur")),
-      implies(literal("dog_fur"), literal("thompson_allergy")),
-      implies(literal("cat_fur"), literal("macavity_criminal")),
-      negation(literal("thompson_allergy"))
-    ]));
-
-    // 5) Can we infer ~dog_fur from 2 and 4?
-    // 6) Can we infer cat_fur from 1 and 5?
-    // 7) Can we infer macavity_criminal from 3 and 6?
-
-    // Propositional Logic
-    //
-    // Rules of inference
-    //
-    // Modus Ponens: a => b, a |= b
-    // Modus Tollens: a => b, ~b |= ~a
-    // Modus Tollendo Ponens (Disjunctive Syllogism): a || b, ~a |= b and a || b, ~b |= a
-    // Disjunction Introduction (Addition): a |= a || b, b |= a || b
-    // Conjunction Introduction (Simplification): a && b |= a and a && b |= b
-    // Hypothetical Syllogism: a => b, b => c |= a => c
-    // Constructive Dilemma: (a => c) && (b => d), a || b |= c || d
-    // Absorption: a => b |= a => (a & b)
-
-    // Rules of replacement: rewriting, no new information
-    //
-    // Double negation: ~~a |= a
-    // Communitativity: a && b |= b && a
-    // Associativity: (a && b) && c |= a && (b && c)
-    // Tautology: a |= a && a, a |= a || a
-    // DeMorgan's Law: ~(a && b) |= ~a || ~b, ~(a || b) |= ~a && ~b
-    // Tranposition (contraposition): a => b, ~b => ~a
-    // Material implication: a => b |= ~a || b
-    // Exportation: a => (b => c) |= (a && b) => c
-    // Distribution: a && (b || c) |= (a && b) || (a && c), a || (b && c) |= (a || b) && (a || c)
-    // Material equivalence: a <=> b |= (a => b) && (b => a) |= (a && b) || (~a & ~b)
-  });
-
   function modusPonens({statements}) {
    let result = [];
    // modus ponen: a => b, a |= b
@@ -744,6 +696,105 @@ describe("Parser", function() {
        implies(literal("a"), and(literal("a"), literal("b")))
     ]);
   });
+
+  // Propositional Logic
+  //
+  // Rules of inference
+  //
+  // Modus Ponens: a => b, a |= b
+  // Modus Tollens: a => b, ~b |= ~a
+  // Modus Tollendo Ponens (Disjunctive Syllogism): a || b, ~a |= b and a || b, ~b |= a
+  // Disjunction Introduction (Addition): a |= a || b, b |= a || b
+  // Conjunction Introduction (Simplification): a && b |= a and a && b |= b
+  // Hypothetical Syllogism: a => b, b => c |= a => c
+  // Constructive Dilemma: (a => c) && (b => d), a || b |= c || d
+  // Absorption: a => b |= a => (a & b)
+  //
+  // Rules of replacement: rewriting, no new information
+  //
+  // Double negation: ~~a |= a
+  // Communitativity: a && b |= b && a
+  // Associativity: (a && b) && c |= a && (b && c)
+  // Tautology: a |= a && a, a |= a || a
+  // DeMorgan's Law: ~(a && b) |= ~a || ~b, ~(a || b) |= ~a && ~b
+  // Tranposition (contraposition): a => b, ~b => ~a
+  // Material implication: a => b |= ~a || b
+  // Exportation: a => (b => c) |= (a && b) => c
+  // Distribution: a && (b || c) |= (a && b) || (a && c), a || (b && c) |= (a || b) && (a || c)
+  // Material equivalence: a <=> b |= (a => b) && (b => a) |= (a && b) || (~a & ~b)
+
+  function forward(program) {
+   let result = [];
+   result = result.concat(modusPonens(program));
+   result = result.concat(modusTollens(program));
+   result = result.concat(disjunctiveSyllogism(program));
+   // This expands a lot. We probably want to use this more carefully.
+   // disjunctiveIntroduction(program);
+   result = result.concat(conjunctionElimination(program));
+   // This expands a lot too.
+   // result = result.concat(conjunctionIntroduction(program));
+   result = result.concat(hypotheticalSyllogism(program));
+   result = result.concat(constructiveDillema(program));
+   // This expands a lot too.
+   // result = result.concat(absorption(program));
+   return result;
+  }
+
+  it("forward chaining", function() {
+    // https://www.iep.utm.edu/prop-log/#SH5a
+
+    let code = logic.parse(`
+      cat_fur || dog_fur
+      dog_fur => thompson_allergy
+      cat_fur => macavity_criminal
+      ~thompson_allergy
+    `);
+
+    assertThat(code).equalsTo(program([
+      or(literal("cat_fur"), literal("dog_fur")),
+      implies(literal("dog_fur"), literal("thompson_allergy")),
+      implies(literal("cat_fur"), literal("macavity_criminal")),
+      negation(literal("thompson_allergy"))
+    ]));
+
+    // 5) Can we infer ~dog_fur from 2 and 4?
+    // 6) Can we infer cat_fur from 1 and 5?
+    // 7) Can we infer macavity_criminal from 3 and 6?
+
+    // Not immediately obvious whether ~dog_fur is true.
+    assertThat(entails(code, negation(literal("dog_fur"))))
+     .equalsTo(false);
+    
+    assertThat(deduce(code, negation(literal("dog_fur"))))
+     .equalsTo(true);
+
+    assertThat(deduce(code, literal("cat_fur")))
+     .equalsTo(true);
+
+    assertThat(deduce(code, literal("macavity_criminal")))
+     .equalsTo(true);
+  });
+
+  function deduce(program, assumption) {
+   do {
+    if (entails(program, assumption)) {
+     return true;
+    }
+    let inference = forward(program);
+    // console.log(inference.length);
+    program.statements.splice(
+        program.statements.length, 0, ...inference);
+   } while (true);
+  }
+
+  function entails({statements}, assumption) {
+   for (statement of statements) {
+    if (equals(statement, assumption)) {
+     return true;
+    }
+   }
+   return false;
+  }
 
   function equals(a, b) {
    return JSON.stringify(a) === JSON.stringify(b);
