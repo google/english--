@@ -988,6 +988,32 @@ describe("Parser", function() {
    }
   }
 
+  function stringify(rule) {
+   if (rule["@type"] == "Literal") {
+    return rule.name;
+   } else if (rule.op == "~") {
+    return `~${stringify(rule.expression)}`;
+   } else if (rule.op) {
+    // NOTE(goto): by not parenthesizing we loose some information
+    // but on the other hand we gain readability. Not sure if that's
+    // the right trade-off but works for now.
+    return `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`;
+   }
+   throw new Error("Unknown rule type" + JSON.stringify(rule));
+  }
+
+  it("stringify", function() {
+    assertThat(stringify(Rule.of("~a"))).equalsTo("~a");
+    assertThat(stringify(Rule.of("a && b"))).equalsTo("a && b");
+    assertThat(stringify(Rule.of("a || b"))).equalsTo("a || b");
+    assertThat(stringify(Rule.of("a => b"))).equalsTo("a => b");
+    assertThat(stringify(Rule.of("a ^ b"))).equalsTo("a ^ b");
+    assertThat(stringify(Rule.of("a && b && c"))).equalsTo("a && b && c");
+    assertThat(stringify(Rule.of("a && (b && c)"))).equalsTo("a && b && c");
+    assertThat(stringify(Rule.of("a && b => c"))).equalsTo("a && b => c");
+    assertThat(stringify(Rule.of("a => b => c"))).equalsTo("a => b => c");
+   });
+
   it("backward chaining", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
@@ -1012,10 +1038,11 @@ describe("Parser", function() {
      // the goal on the right hand side (modus ponens).
      for (let statement of op(code, "=>")) {
       if (equals(statement.right, goal)) {
-       // console.log(statement);
-       // goal.push();
-       // console.log("hi");
-       return backward(statement.left);
+       let subgoal = backward(statement.left);
+       if (subgoal.length > 0) {
+        return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
+       }
+       //return backward(statement.left);
       }
      }
 
@@ -1024,7 +1051,11 @@ describe("Parser", function() {
      // side (modus tollens).
      for (let statement of op(code, "=>")) {
        if (equals(statement.left, negation(goal))) {
-        return backward(negation(statement.right));
+        let subgoal = backward(negation(statement.right));
+        if (subgoal.length > 0) {
+         return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+        }
+       // return backward(negation(statement.right));
        }
      }
 
@@ -1032,24 +1063,53 @@ describe("Parser", function() {
       // console.log(statement);
       if (equals(statement.left, goal)) {
        // console.log(statement);
-       return backward(negation(statement.right));
+       let subgoal = backward(negation(statement.right));
+       if (subgoal.length > 0) {
+        return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+       }
       } else if (equals(statement.right, goal)) {
        // console.log(statement);
-       return backward(negation(statement.left));
+       let subgoal = backward(negation(statement.left));
+       if (subgoal.length > 0) {
+        return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
+       }
       }
      }
 
      for (let statement of code.statements) {
       if (equals(statement, goal)) {
-       return true;
+       return [{given: statement, goal: goal}];
       }
      };
 
-     return false;
+     return [];
     }
 
-    assertThat(backward(Rule.of("macavity_criminal")))
-     .equalsTo(true);
+    function explain(reasons) {
+     let result = [];
+     for (let reason of reasons) {
+      // console.log(reason);
+      if (equals(reason.given, reason.goal)) {
+       result.push("take that " + stringify(reason.given) + ". ");
+      } else {
+       let line = [];
+       line.push("if " + stringify(reason.given) + " ");
+       let ands = reason.and || [];
+       for (let and of ands) {
+        line.push("and " + stringify(and) + " ");
+       }
+       line.push("then " + stringify(reason.goal) + ". ");
+       result.push(line.join(""));
+      }
+     }
+     return result.join("\n");
+    }
+
+    assertThat(explain(backward(Rule.of("macavity_criminal"))))
+     .equalsTo(`take that ~thompson_allergy. 
+if dog_fur => thompson_allergy and ~thompson_allergy then ~dog_fur. 
+if cat_fur || dog_fur and ~dog_fur then cat_fur. 
+if cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
 
    });
 
