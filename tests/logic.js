@@ -865,6 +865,23 @@ describe("Parser", function() {
     // conjunctive distribution.
     return or(result.left.left,
               and(result.left.right, result.right.right));
+   } else if ((result.op == "&&" && result.left.op == "&&") ||
+              (result.op == "||" && result.left.op == "||")) {
+    // associativity.
+    return binary(result.left.op, 
+                  result.left.left, 
+                  binary(result.op, result.left.right, result.right));
+   } else if (result.op == "&&" ||
+              result.op == "||") {
+    // commutativity.
+    let left = JSON.stringify(result.left);
+    let right = JSON.stringify(result.right);
+    if (right < left) {
+     // If the right arm is greater than (alphabetically)
+     // than the left arm, switch orders.
+     // We compare alphabetically, e.g. "a" < "b".
+     return binary(result.op, result.right, result.left);
+    }
    }
    
    return result;
@@ -928,20 +945,27 @@ describe("Parser", function() {
      .equalsTo(Rule.of("a || (b && c)"));
    });
 
-  it.skip("b && a == a && b", function() {
+  it("b && a == a && b", function() {
     // Commutativity
     // Sorts parameters alphabetically
-    // assertThat(rewrite(Rule.of("b & a")))
-    // .equalsTo(Rule.of("a & b"));
+    assertThat(normalize(Rule.of("b && a")))
+     .equalsTo(Rule.of("a && b"));
+    assertThat(normalize(Rule.of("a && b")))
+     .equalsTo(Rule.of("a && b"));
+
+    assertThat(normalize(Rule.of("b || a")))
+     .equalsTo(Rule.of("a || b"));
+    assertThat(normalize(Rule.of("a || b")))
+     .equalsTo(Rule.of("a || b"));
    });
 
-  it.skip("(a && b) && c == a && (b && c)", function() {
+  it("(a && b) && c == a && (b && c)", function() {
     // Associativity
-    // Sorts parameters alphabetically
-    // assertThat(rewrite(Rule.of("(a && b) && c")))
-    // .equalsTo(Rule.of("a && (b && c)"));
-    // assertThat(rewrite(Rule.of("(a || b) || c")))
-    // .equalsTo(Rule.of("a || (b || c)"));
+    // Sorts parameters by size
+    assertThat(normalize(Rule.of("(a && b) && c")))
+     .equalsTo(Rule.of("a && (b && c)"));
+    assertThat(normalize(Rule.of("(a || b) || c")))
+     .equalsTo(Rule.of("a || (b || c)"));
    });
 
   it("a && ~~a == a", function() {
