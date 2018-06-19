@@ -80,6 +80,15 @@ describe("Parser", function() {
     });
    });
 
+  it("~a", function() {
+    assertThat(logic.parse("~a"))
+     .equalsTo(program([negation(literal("a"))]));
+   });
+
+  it("~~a", function() {
+    assertThat(logic.parse("~~a"))
+     .equalsTo(program([negation(negation(literal("a")))]));
+   });
 
   it("a && b", function() {
     assertThat(logic.parse("a && b")).equalsTo({
@@ -447,31 +456,6 @@ describe("Parser", function() {
     // }
   });
 
-  it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
-    // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
-    let knowledge = `
-     PersonInFrontOfCar => Brake
-     (YelloLight && Policeman && ~Slippery) => Brake
-     Policecar => Policeman
-     Snow => Slippery
-     Slippery => ~Dry
-     RedLight => Brake
-     Winter => Snow    
-    `;
-    let observations = `
-     YellowLight
-     ~RedLight
-     ~Snow
-     Dry
-     Policecar
-     ~PersonInFrontOfCar
-    `
-    let kb = logic.parse(knowledge + observations);
-    // console.log(kb);
-
-    // Can we infer "Brake"?
-  });
-
   it("1+1", function() {
     try {
      logic.parse("1+1");
@@ -781,7 +765,6 @@ describe("Parser", function() {
      return true;
     }
     let inference = forward(program);
-    // console.log(inference.length);
     program.statements.splice(
         program.statements.length, 0, ...inference);
    } while (true);
@@ -796,9 +779,246 @@ describe("Parser", function() {
    return false;
   }
 
+  it("backward chaining", function() {
+    // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
+    let knowledge = `
+     PersonInFrontOfCar => Brake
+     (YelloLight && Policeman && ~Slippery) => Brake
+     Policecar => Policeman
+     Snow => Slippery
+     Slippery => ~Dry
+     RedLight => Brake
+     Winter => Snow    
+    `;
+    let observations = `
+     YellowLight
+     ~RedLight
+     ~Snow
+     Dry
+     Policecar
+     ~PersonInFrontOfCar
+    `
+    let kb = logic.parse(knowledge + observations);
+
+    // Can we infer "Brake"?
+  });
+
   function equals(a, b) {
    return JSON.stringify(a) === JSON.stringify(b);
   }
+
+  function normalize(node) {
+   // https://www.iep.utm.edu/prop-log/#SH5a
+   let result = Object.assign(node);
+   if (node.name == "~") {
+    result.expression = normalize(node.expression);
+   } else if (node.op == "&&" || 
+              node.op == "||" ||
+              node.op == "=>") {
+    result.left = normalize(node.left);
+    result.right = normalize(node.right);
+   }
+
+   if (result.name == "~" &&
+       result.expression.name == "~") {
+    // double-negation
+    return result.expression.expression;
+   } else if ((result.op == "&&" || result.op == "||") &&
+              equals(result.left, result.right)) {
+    return result.left;
+   } else if (result.name == "~" &&
+              result.expression.op == "&&") {
+    // demorgan's law
+    return or(negation(result.expression.left),
+              negation(result.expression.right));
+   } else if (result.name == "~" &&
+              result.expression.op == "||") {
+    // demorgan's law
+    return and(negation(result.expression.left), 
+               negation(result.expression.right));
+   } else if (result.op == "=>" && 
+              result.left.name == "~" &&
+              result.right.name == "~") {
+    // tranposition / contraposition
+    return implies(result.right.expression,
+                   result.left.expression);
+   } else if (result.op == "||" &&
+              result.left.name == "~") {
+    return implies(result.left.expression,
+                   result.right);
+    // material implication
+   } else if (result.op == "=>" &&
+              result.right.op == "=>") {
+    return implies(and(result.left, result.right.left),
+                   result.right.right);
+   } else if (result.op == "||" &&
+              result.left.op == "&&" &&
+              result.right.op == "&&" &&
+              equals(result.left.left, result.right.left)) {
+    // distribution.
+    return and(result.left.left,
+               or(result.left.right, result.right.right));
+   } else if (result.op == "&&" &&
+              result.left.op == "||" &&
+              result.right.op == "||" &&
+              equals(result.left.left, result.right.left)) {
+    // distribution.
+    return or(result.left.left,
+              and(result.left.right, result.right.right));
+   }
+   
+   return result;
+  }
+
+  it("~~a == a", function() {
+    // double negatives
+    assertThat(normalize(Rule.of("~~a")))
+     .equalsTo(Rule.of("a"));
+
+    assertThat(normalize(Rule.of("~~~a")))
+     .equalsTo(Rule.of("~a"));
+
+    assertThat(normalize(Rule.of("~~~~a")))
+     .equalsTo(Rule.of("a"));
+
+    assertThat(normalize(Rule.of("~~~~~a")))
+     .equalsTo(Rule.of("~a"));
+   });
+
+  it("a && a == a, a || a == a", function() {
+    // Tautologies
+    assertThat(normalize(Rule.of("a && a")))
+     .equalsTo(Rule.of("a"));
+    assertThat(normalize(Rule.of("a || a")))
+     .equalsTo(Rule.of("a"));
+   });
+
+  it("~(a && b) == (~a) || (~b)", function() {
+    // DeMorgan's Law
+    assertThat(normalize(Rule.of("~(a && b)")))
+     .equalsTo(Rule.of("(~a) || (~b)"));
+    assertThat(normalize(Rule.of("~(a || b)")))
+     .equalsTo(Rule.of("(~a) && (~b)"));
+
+   });
+
+  it("~b => ~a == a => b", function() {
+    // Transposition
+    assertThat(normalize(Rule.of("(~b) => (~a)")))
+     .equalsTo(Rule.of("a => b"));
+   });
+
+  it("~a || b == a => b", function() {
+    // Material implication
+    assertThat(normalize(Rule.of("(~a) || b")))
+     .equalsTo(Rule.of("a => b"));
+   });
+
+  it("a => (b => c) == (a && b) => c", function() {
+    // Exportation
+    assertThat(normalize(Rule.of("a => (b => c)")))
+     .equalsTo(Rule.of("(a && b) => c"));
+   });
+
+  it("(a && b) || (a && c) == a && (b || c)", function() {
+    // Distribution
+    assertThat(normalize(Rule.of("(a && b) || (a && c)")))
+     .equalsTo(Rule.of("a && (b || c)"));
+    assertThat(normalize(Rule.of("(a || b) && (a || c)")))
+     .equalsTo(Rule.of("a || (b && c)"));
+   });
+
+  it.skip("b && a == a && b", function() {
+    // Commutativity
+    // Sorts parameters alphabetically
+    // assertThat(rewrite(Rule.of("b & a")))
+    // .equalsTo(Rule.of("a & b"));
+   });
+
+  it.skip("(a && b) && c == a && (b && c)", function() {
+    // Associativity
+    // Sorts parameters alphabetically
+    // assertThat(rewrite(Rule.of("(a && b) && c")))
+    // .equalsTo(Rule.of("a && (b && c)"));
+    // assertThat(rewrite(Rule.of("(a || b) || c")))
+    // .equalsTo(Rule.of("a || (b || c)"));
+   });
+
+  it("a && ~~a == a", function() {
+    // Intermingling
+    // Tautology with double negative
+    assertThat(normalize(Rule.of("a && (~~a)")))
+     .equalsTo(Rule.of("a"));
+   });
+
+  it("a => (b => (c && c))", function() {
+    // Intermingling
+    // Exportation and tautology.
+    assertThat(normalize(Rule.of("a => (b => (c && c))")))
+     .equalsTo(Rule.of("(a && b) => c"));
+   });
+
+  class Rule {
+   static of(str) {
+    return logic.parse(str).statements[0];
+   }
+  }
+
+  it.skip("backward chaining", function() {
+    // https://www.iep.utm.edu/prop-log/#SH5a
+
+    let code = logic.parse(`
+      cat_fur || dog_fur
+      dog_fur => thompson_allergy
+      cat_fur => macavity_criminal
+      ~thompson_allergy
+    `);
+
+    function foreach(kb, op, body) {
+     for (let statement of kb.statements.filter(x => x.op == op)) {
+      body(statement);
+     }
+    }
+
+    function backward(goal) {
+     console.log("proving: " + JSON.stringify(goal));
+
+     // Searches the KB for implications with
+     // the goal on the right hand side (modus ponens).
+     foreach (code, "=>", (statement) => {
+       if (equals(statement.right, goal)) {
+        // console.log(statement);
+        // goal.push();
+        // console.log("hi");
+        backward(statement.left);
+       }
+      });
+
+     // Searches the KB for implications with
+     // the negation of the goal on the left hand
+     // side (modus tollens).
+     foreach (code, "=>", (statement) => {
+       // console.log(negation(goal));
+       if (equals(statement.left, negation(goal))) {
+        backward(negation(statement.right));
+       }
+      });
+
+     foreach (code, "||", (statement) => {
+       // console.log(statement);
+       if (equals(statement.left, goal)) {
+        // console.log(statement);
+        backward(negation(statement.right));
+       } else if (equals(statement.right, goal)) {
+        // console.log(statement);
+        backward(negation(statement.left));
+       }
+      });
+    }
+
+    backward(literal("macavity_criminal"));
+
+   });
 
   function assertThat(x) {
    return {
