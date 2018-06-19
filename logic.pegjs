@@ -13,7 +13,7 @@ expression
 
 quantifier
   = quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
-     return {"@type": "Quantifier", name: quantifier, variable: id, expression: expression} }
+     return {"@type": "Quantifier", op: quantifier, variable: id, expression: expression} }
 
 implication
   = left:logical op:IMPLICATION right:expression {
@@ -21,7 +21,7 @@ implication
    }
 
 negation
-  =  NEGATION expression:expression { return {"@type": "UnaryOperator", name: "~", expression: expression} }
+  =  NEGATION expression:expression { return {"@type": "UnaryOperator", op: "~", expression: expression} }
  
 logical
   = left:primary op:OPLOGIC right:expression {

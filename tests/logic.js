@@ -244,7 +244,7 @@ describe("Parser", function() {
       "@type": "Program", 
       "statements": [{
         "@type": "Quantifier",
-        "name": "forall",
+        "op": "forall",
         "variable": "a",
         "expression": {
           "@type": "BinaryOperator", 
@@ -267,7 +267,7 @@ describe("Parser", function() {
       "@type": "Program", 
       "statements": [{
         "@type": "Quantifier",
-        "name": "exists",
+        "op": "exists",
         "variable": "a",
         "expression": {
           "@type": "BinaryOperator", 
@@ -328,11 +328,11 @@ describe("Parser", function() {
   }
 
   function forall(x, expression) {
-   return {"@type": "Quantifier", name: "forall", variable: x, expression: expression};
+   return {"@type": "Quantifier", op: "forall", variable: x, expression: expression};
   }
 
   function exists(x, expression) {
-   return {"@type": "Quantifier", name: "exists", variable: x, expression: expression};
+   return {"@type": "Quantifier", op: "exists", variable: x, expression: expression};
   }
 
   function predicate(name, arguments) {
@@ -434,7 +434,7 @@ describe("Parser", function() {
   }
 
   function negation(a) {
-   return {"@type": "UnaryOperator", name: "~", expression: a};
+   return {"@type": "UnaryOperator", op: "~", expression: a};
   }
 
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
@@ -810,7 +810,7 @@ describe("Parser", function() {
   function normalize(node) {
    // https://www.iep.utm.edu/prop-log/#SH5a
    let result = Object.assign(node);
-   if (node.name == "~") {
+   if (node.op == "~") {
     result.expression = normalize(node.expression);
    } else if (node.op == "&&" || 
               node.op == "||" ||
@@ -819,31 +819,31 @@ describe("Parser", function() {
     result.right = normalize(node.right);
    }
 
-   if (result.name == "~" &&
-       result.expression.name == "~") {
+   if (result.op == "~" &&
+       result.expression.op == "~") {
     // double-negation
     return result.expression.expression;
    } else if ((result.op == "&&" || result.op == "||") &&
               equals(result.left, result.right)) {
     return result.left;
-   } else if (result.name == "~" &&
+   } else if (result.op == "~" &&
               result.expression.op == "&&") {
     // demorgan's law
     return or(negation(result.expression.left),
               negation(result.expression.right));
-   } else if (result.name == "~" &&
+   } else if (result.op == "~" &&
               result.expression.op == "||") {
     // demorgan's law
     return and(negation(result.expression.left), 
                negation(result.expression.right));
    } else if (result.op == "=>" && 
-              result.left.name == "~" &&
-              result.right.name == "~") {
+              result.left.op == "~" &&
+              result.right.op == "~") {
     // tranposition / contraposition
     return implies(result.right.expression,
                    result.left.expression);
    } else if (result.op == "||" &&
-              result.left.name == "~") {
+              result.left.op == "~") {
     return implies(result.left.expression,
                    result.right);
     // material implication
