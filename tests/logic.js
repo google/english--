@@ -855,14 +855,14 @@ describe("Parser", function() {
               result.left.op == "&&" &&
               result.right.op == "&&" &&
               equals(result.left.left, result.right.left)) {
-    // distribution.
+    // disjunctive distribution.
     return and(result.left.left,
                or(result.left.right, result.right.right));
    } else if (result.op == "&&" &&
               result.left.op == "||" &&
               result.right.op == "||" &&
               equals(result.left.left, result.right.left)) {
-    // distribution.
+    // conjunctive distribution.
     return or(result.left.left,
               and(result.left.right, result.right.right));
    }
