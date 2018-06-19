@@ -2,7 +2,7 @@ const Assert = require("assert");
 const logic = require("../logic.js");
 
 describe("Parser", function() {
-  it("Examples", function() {
+  it("examples", function() {
     // Logical symbols.
     // binary connectives.
     "a || b"; // conjunction
@@ -804,7 +804,7 @@ describe("Parser", function() {
   });
 
   function equals(a, b) {
-   return JSON.stringify(a) === JSON.stringify(b);
+   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
   }
 
   function normalize(node) {
@@ -988,7 +988,7 @@ describe("Parser", function() {
    }
   }
 
-  it.skip("backward chaining", function() {
+  it("backward chaining", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
     let code = logic.parse(`
@@ -998,49 +998,58 @@ describe("Parser", function() {
       ~thompson_allergy
     `);
 
-    function foreach(kb, op, body) {
+    function* op(kb, op) {
      for (let statement of kb.statements.filter(x => x.op == op)) {
-      body(statement);
+      // body(statement);
+      yield statement;
      }
     }
 
-    function backward(goal) {
-     console.log("proving: " + JSON.stringify(goal));
+    function backward(goal, reason) {
+     // console.log("proving: " + JSON.stringify(goal));
 
      // Searches the KB for implications with
      // the goal on the right hand side (modus ponens).
-     foreach (code, "=>", (statement) => {
-       if (equals(statement.right, goal)) {
-        // console.log(statement);
-        // goal.push();
-        // console.log("hi");
-        backward(statement.left);
-       }
-      });
+     for (let statement of op(code, "=>")) {
+      if (equals(statement.right, goal)) {
+       // console.log(statement);
+       // goal.push();
+       // console.log("hi");
+       return backward(statement.left);
+      }
+     }
 
      // Searches the KB for implications with
      // the negation of the goal on the left hand
      // side (modus tollens).
-     foreach (code, "=>", (statement) => {
-       // console.log(negation(goal));
+     for (let statement of op(code, "=>")) {
        if (equals(statement.left, negation(goal))) {
-        backward(negation(statement.right));
+        return backward(negation(statement.right));
        }
-      });
+     }
 
-     foreach (code, "||", (statement) => {
+     for (let statement of op(code, "||")) {
+      // console.log(statement);
+      if (equals(statement.left, goal)) {
        // console.log(statement);
-       if (equals(statement.left, goal)) {
-        // console.log(statement);
-        backward(negation(statement.right));
-       } else if (equals(statement.right, goal)) {
-        // console.log(statement);
-        backward(negation(statement.left));
-       }
-      });
+       return backward(negation(statement.right));
+      } else if (equals(statement.right, goal)) {
+       // console.log(statement);
+       return backward(negation(statement.left));
+      }
+     }
+
+     for (let statement of code.statements) {
+      if (equals(statement, goal)) {
+       return true;
+      }
+     };
+
+     return false;
     }
 
-    backward(literal("macavity_criminal"));
+    assertThat(backward(Rule.of("macavity_criminal")))
+     .equalsTo(true);
 
    });
 
