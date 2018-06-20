@@ -1014,6 +1014,87 @@ describe("Parser", function() {
     assertThat(stringify(Rule.of("a => b => c"))).equalsTo("a => b => c");
    });
 
+  function* op(kb, op) {
+   for (let statement of kb.statements.filter(x => x.op == op)) {
+    // body(statement);
+    yield statement;
+   }
+  }
+
+  function backward(kb, goal) {
+   // console.log("proving: " + JSON.stringify(goal));
+
+   // Searches the KB for implications with
+   // the goal on the right hand side (modus ponens).
+   for (let statement of op(kb, "=>")) {
+    if (equals(statement.right, goal)) {
+     let subgoal = backward(kb, statement.left);
+     if (subgoal.length > 0) {
+      return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
+     }
+     //return backward(statement.left);
+    }
+   }
+   
+   // Searches the KB for implications with
+   // the negation of the goal on the left hand
+   // side (modus tollens).
+   for (let statement of op(kb, "=>")) {
+    if (equals(statement.left, negation(goal))) {
+     let subgoal = backward(kb, negation(statement.right));
+     if (subgoal.length > 0) {
+      return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+     }
+     // return backward(negation(statement.right));
+    }
+   }
+   
+   for (let statement of op(kb, "||")) {
+    // console.log(statement);
+    if (equals(statement.left, goal)) {
+     // console.log(statement);
+     let subgoal = backward(kb, negation(statement.right));
+     if (subgoal.length > 0) {
+      return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+     }
+    } else if (equals(statement.right, goal)) {
+     // console.log(statement);
+     let subgoal = backward(kb, negation(statement.left));
+     if (subgoal.length > 0) {
+      return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
+     }
+    }
+   }
+   
+   for (let statement of kb.statements) {
+    if (equals(statement, goal)) {
+     return [{given: statement, goal: goal}];
+    }
+   };
+
+   return [];
+  }
+
+  function explain(reasons) {
+   let result = [];
+   for (let reason of reasons) {
+    // console.log(reason);
+    if (equals(reason.given, reason.goal)) {
+     result.push("take that " + stringify(reason.given) + ". ");
+    } else {
+     let line = [];
+     line.push("if " + stringify(reason.given) + " ");
+     let ands = reason.and || [];
+     for (let and of ands) {
+      line.push("and " + stringify(and) + " ");
+     }
+     line.push("then " + stringify(reason.goal) + ". ");
+     result.push(line.join(""));
+    }
+   }
+   return result.join("\n");
+  }
+
   it("backward chaining", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
@@ -1024,88 +1105,7 @@ describe("Parser", function() {
       ~thompson_allergy
     `);
 
-    function* op(kb, op) {
-     for (let statement of kb.statements.filter(x => x.op == op)) {
-      // body(statement);
-      yield statement;
-     }
-    }
-
-    function backward(goal, reason) {
-     // console.log("proving: " + JSON.stringify(goal));
-
-     // Searches the KB for implications with
-     // the goal on the right hand side (modus ponens).
-     for (let statement of op(code, "=>")) {
-      if (equals(statement.right, goal)) {
-       let subgoal = backward(statement.left);
-       if (subgoal.length > 0) {
-        return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
-       }
-       //return backward(statement.left);
-      }
-     }
-
-     // Searches the KB for implications with
-     // the negation of the goal on the left hand
-     // side (modus tollens).
-     for (let statement of op(code, "=>")) {
-       if (equals(statement.left, negation(goal))) {
-        let subgoal = backward(negation(statement.right));
-        if (subgoal.length > 0) {
-         return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
-        }
-       // return backward(negation(statement.right));
-       }
-     }
-
-     for (let statement of op(code, "||")) {
-      // console.log(statement);
-      if (equals(statement.left, goal)) {
-       // console.log(statement);
-       let subgoal = backward(negation(statement.right));
-       if (subgoal.length > 0) {
-        return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
-       }
-      } else if (equals(statement.right, goal)) {
-       // console.log(statement);
-       let subgoal = backward(negation(statement.left));
-       if (subgoal.length > 0) {
-        return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
-       }
-      }
-     }
-
-     for (let statement of code.statements) {
-      if (equals(statement, goal)) {
-       return [{given: statement, goal: goal}];
-      }
-     };
-
-     return [];
-    }
-
-    function explain(reasons) {
-     let result = [];
-     for (let reason of reasons) {
-      // console.log(reason);
-      if (equals(reason.given, reason.goal)) {
-       result.push("take that " + stringify(reason.given) + ". ");
-      } else {
-       let line = [];
-       line.push("if " + stringify(reason.given) + " ");
-       let ands = reason.and || [];
-       for (let and of ands) {
-        line.push("and " + stringify(and) + " ");
-       }
-       line.push("then " + stringify(reason.goal) + ". ");
-       result.push(line.join(""));
-      }
-     }
-     return result.join("\n");
-    }
-
-    assertThat(explain(backward(Rule.of("macavity_criminal"))))
+    assertThat(explain(backward(code, Rule.of("macavity_criminal"))))
      .equalsTo(`take that ~thompson_allergy. 
 if dog_fur => thompson_allergy and ~thompson_allergy then ~dog_fur. 
 if cat_fur || dog_fur and ~dog_fur then cat_fur. 
