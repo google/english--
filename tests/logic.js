@@ -779,30 +779,6 @@ describe("Parser", function() {
    return false;
   }
 
-  it("backward chaining", function() {
-    // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
-    let knowledge = `
-     PersonInFrontOfCar => Brake
-     (YelloLight && Policeman && ~Slippery) => Brake
-     Policecar => Policeman
-     Snow => Slippery
-     Slippery => ~Dry
-     RedLight => Brake
-     Winter => Snow    
-    `;
-    let observations = `
-     YellowLight
-     ~RedLight
-     ~Snow
-     Dry
-     Policecar
-     ~PersonInFrontOfCar
-    `
-    let kb = logic.parse(knowledge + observations);
-
-    // Can we infer "Brake"?
-  });
-
   function equals(a, b) {
    return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
   }
@@ -1048,7 +1024,8 @@ describe("Parser", function() {
      // return backward(negation(statement.right));
     }
    }
-   
+
+   // Disjunctive Syllogism
    for (let statement of op(kb, "||")) {
     // console.log(statement);
     if (equals(statement.left, goal)) {
@@ -1062,6 +1039,18 @@ describe("Parser", function() {
      let subgoal = backward(kb, negation(statement.left));
      if (subgoal.length > 0) {
       return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
+     }
+    }
+   }
+
+   // Conjunction introduction
+   if (goal.op == "&&") {
+    // console.log("hi");
+    let left = backward(kb, goal.left);
+    if (left.length > 0) {
+     let right = backward(kb, goal.right);
+     if (right.length > 0) {
+      return [...left, ...right];
      }
     }
    }
@@ -1080,10 +1069,10 @@ describe("Parser", function() {
    for (let reason of reasons) {
     // console.log(reason);
     if (equals(reason.given, reason.goal)) {
-     result.push("take that " + stringify(reason.given) + ". ");
+     result.push("Take that " + stringify(reason.given) + ". ");
     } else {
      let line = [];
-     line.push("if " + stringify(reason.given) + " ");
+     line.push("If " + stringify(reason.given) + " ");
      let ands = reason.and || [];
      for (let and of ands) {
       line.push("and " + stringify(and) + " ");
@@ -1095,7 +1084,7 @@ describe("Parser", function() {
    return result.join("\n");
   }
 
-  it("backward chaining", function() {
+  it("criminal?", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
     let code = logic.parse(`
@@ -1106,12 +1095,41 @@ describe("Parser", function() {
     `);
 
     assertThat(explain(backward(code, Rule.of("macavity_criminal"))))
-     .equalsTo(`take that ~thompson_allergy. 
-if dog_fur => thompson_allergy and ~thompson_allergy then ~dog_fur. 
-if cat_fur || dog_fur and ~dog_fur then cat_fur. 
-if cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
+     .equalsTo(`Take that ~thompson_allergy. 
+If dog_fur => thompson_allergy and ~thompson_allergy then ~dog_fur. 
+If cat_fur || dog_fur and ~dog_fur then cat_fur. 
+If cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
 
    });
+
+  it("brake?", function() {
+    // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
+    let kb = logic.parse(`
+     PersonInFrontOfCar => Brake
+     (YellowLight && Policeman && ~Slippery) => Brake
+     Policecar => Policeman
+     Snow => Slippery
+     Slippery => ~Dry
+     RedLight => Brake
+     Winter => Snow    
+     YellowLight
+     ~RedLight
+     ~Snow
+     Dry
+     Policecar
+     ~PersonInFrontOfCar
+    `);
+
+    // Can we infer "Brake"?
+    assertThat(explain(backward(kb, Rule.of("Brake"))))
+     .equalsTo(`Take that Policecar. 
+If Policecar => Policeman and Policecar then Policeman. 
+Take that Dry. 
+If Slippery => ~Dry and ~~Dry then ~Slippery. 
+Take that YellowLight. 
+If Policeman && ~Slippery && YellowLight => Brake and YellowLight && Policeman && ~Slippery then Brake. `);
+
+  });
 
   function assertThat(x) {
    return {
