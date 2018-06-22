@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const logic = require("../logic.js");
+const logic = require("../grammar.js");
 
 describe("Parser", function() {
   it("examples", function() {

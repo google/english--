@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -w tests",
-    "build": "pegjs logic.pegjs"
+    "build": "pegjs grammar.pegjs"
   },
   "repository": {
     "type": "git",
