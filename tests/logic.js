@@ -1084,6 +1084,133 @@ describe("Parser", function() {
    return result.join("\n");
   }
 
+  it("a => b, a |= b?", function() {
+    let code = logic.parse(`
+      a => b
+      a
+    `);
+
+    assertThat(explain(backward(code, Rule.of("b"))))
+     .equalsTo(`Take that a. 
+If a => b and a then b. `);
+   });
+
+  it("a => b, ~b |= ~a?", function() {
+    let code = logic.parse(`
+      a => b
+      ~b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("~a"))))
+     .equalsTo(`Take that ~b. 
+If a => b and ~b then ~a. `);
+   });
+
+  it("a || b, ~a |= b?", function() {
+    let code = logic.parse(`
+      a || b
+      ~a
+    `);
+
+    assertThat(explain(backward(code, Rule.of("b"))))
+     .equalsTo(`Take that ~a. 
+If a || b and ~a then b. `);
+   });
+
+  it("a || b, ~b |= a?", function() {
+    let code = logic.parse(`
+      a || b
+      ~b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a"))))
+     .equalsTo(`Take that ~b. 
+If a || b and ~b then a. `);
+   });
+
+  it.skip("a |= a || b?", function() {
+    let code = logic.parse(`
+      a
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a || b"))))
+     .equalsTo(`Take that ~b. 
+If a || b and ~b then a. `);
+   });
+
+  it.skip("a |= b || a?", function() {
+    let code = logic.parse(`
+      a
+    `);
+
+    assertThat(explain(backward(code, Rule.of("b || a"))))
+     .equalsTo(`Take that ~b. 
+If a || b and ~b then a. `);
+   });
+
+  it.skip("a && b |= a?", function() {
+    let code = logic.parse(`
+      a && b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a"))))
+     .equalsTo(`Take that ~b. 
+If a || b and ~b then a. `);
+   });
+
+  it.skip("b && a |= a?", function() {
+    let code = logic.parse(`
+      a && b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a"))))
+     .equalsTo(`Take that ~b. 
+If a || b and ~b then a. `);
+   });
+
+  it.skip("a, b |= a && b?", function() {
+    let code = logic.parse(`
+      a
+      b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a && b"))))
+     .equalsTo(`Take that a. 
+Take that b. 
+If a && b and a and b then a && b. `);
+   });
+
+  it.skip("a => b, b => c |= a => c?", function() {
+    let code = logic.parse(`
+      a
+      b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a => c"))))
+     .equalsTo(`Take that a. 
+Take that b. 
+If a && b and a and b then a && b. `);
+   });
+
+  it.skip("(a => c) && (b => d), a || b |= c || d", function() {
+    let code = logic.parse(`
+      (a =>c) && (b => d)
+      a || b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("c || d"))))
+     .equalsTo(``);
+   });
+
+  it.skip("a => b |= a => (a && b)", function() {
+    let code = logic.parse(`
+      a => b
+    `);
+
+    assertThat(explain(backward(code, Rule.of("a => (a && b)"))))
+     .equalsTo(``);
+   });
+
   it("criminal?", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
@@ -1128,6 +1255,27 @@ Take that Dry.
 If Slippery => ~Dry and ~~Dry then ~Slippery. 
 Take that YellowLight. 
 If Policeman && ~Slippery && YellowLight => Brake and YellowLight && Policeman && ~Slippery then Brake. `);
+
+  });
+
+  // TODO(goto): check if a && b => c has the precedence there
+
+  it.skip("q?", function() {
+    // http://pages.cs.wisc.edu/~bgibson/cs540/handouts/pl.pdf
+    // TODO(goto): 
+    let kb = logic.parse(`
+      p => q
+      (l && m) => p
+      (b && l) => m
+      (a && p) => l
+      (a && b) => l
+      a
+      b
+    `);
+
+    // Can we infer "Brake"?
+    assertThat(explain(backward(kb, Rule.of("q"))))
+     .equalsTo(``);
 
   });
 
