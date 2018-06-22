@@ -54,6 +54,14 @@ class Parser {
  }
 }
 
+class Rule {
+ static of(str) {
+  return logic.parse(str).statements[0];
+ }
+}
+
 module.exports = {
- Parser: Parser
+ Parser: Parser,
+ Rule: Rule
 };
+

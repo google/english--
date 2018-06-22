@@ -1,6 +1,7 @@
 const Assert = require("assert");
 const logic = require("../grammar.js");
-const {Parser} = require("../parser.js");
+const {Reasoner, normalize, stringify, equals} = require("../reasoner.js");
+const {Parser, Rule} = require("../parser.js");
 
 const {
  program, 
@@ -16,44 +17,8 @@ const {
  negation} = Parser;
 
 describe("Logic", function() {
-  function modusPonens({statements}) {
-   let result = [];
-   // modus ponen: a => b, a |= b
-   for (let implication of statements.filter(x => x.op == "=>")) {
-    if (statements.find(y => equals(implication.left, y))) {
-     result.push(implication.right);
-    }
-   }
-   return result;
-  }
-
-  function modusTollens({statements}) {
-   let result = [];
-   // modus tollens: a => b, ~b |= ~a
-   for (let implication of statements.filter(x => x.op == "=>")) {
-    if (statements.find(y => equals(negation(implication.right), y))) {
-     result.push(negation(implication.left));
-    }
-   }
-   return result;
-  }
-
-  function disjunctiveSyllogism({statements}) {
-   let result = [];
-   // disjunctive syllogism: a || b, ~a |= ~b and a || b, ~b |= a
-   for (let disjunction of statements.filter(x => x.op == "||")) {
-    if (statements.find(y => equals(negation(disjunction.left), y))) {
-     result.push(disjunction.right);
-    }
-    if (statements.find(y => equals(negation(disjunction.right), y))) {
-     result.push(disjunction.left);
-    }
-   }
-   return result;
-  }
-
   it("a => b, a |= b", function() {
-    assertThat(modusPonens(logic.parse(`
+    assertThat(Reasoner.modusPonens(Parser.parse(`
       a => b
       a
     `)))
@@ -61,7 +26,7 @@ describe("Logic", function() {
   });
 
   it("a && b => c || d, a & b |= c || d", function() {
-    assertThat(modusPonens(logic.parse(`
+    assertThat(Reasoner.modusPonens(Parser.parse(`
       (a && b) => (c || d)
       a && b
     `)))
@@ -71,7 +36,7 @@ describe("Logic", function() {
   });
 
   it("a => b, ~b |= ~a", function() {
-    assertThat(modusTollens(logic.parse(`
+    assertThat(Reasoner.modusTollens(logic.parse(`
       a => b
       ~b
     `)))
@@ -79,59 +44,41 @@ describe("Logic", function() {
   });
 
   it("a || b, ~a |= b", function() {
-    let code = logic.parse(`
+    let code = Parser.parse(`
       a || b
       ~a
     `);
 
-    assertThat(disjunctiveSyllogism(code)).equalsTo([
+    assertThat(Reasoner.disjunctiveSyllogism(code)).equalsTo([
       literal("b")
     ]);
   });
 
   it("a || b, ~b |= a", function() {
-    let code = logic.parse(`
+    let code = Parser.parse(`
       a || b
       ~b
     `);
 
-    assertThat(disjunctiveSyllogism(code)).equalsTo([
+    assertThat(Reasoner.disjunctiveSyllogism(code)).equalsTo([
       literal("a")
     ]);
   });
 
-  function disjunctiveIntroduction({statements}, term) {
-   let result = [];
-   for (let statement of statements) {
-    result.push(or(statement, term));
-    result.push(or(term, statement));
-   }
-   return result;
-  }
-
   it("a |= a || b", function() {
-    let code = logic.parse(`
+    let code = Parser.parse(`
       a
     `);
 
-    assertThat(disjunctiveIntroduction(code, literal("b")))
+    assertThat(Reasoner.disjunctiveIntroduction(code, literal("b")))
      .equalsTo([
        or(literal("a"), literal("b")),
        or(literal("b"), literal("a"))
     ]);
   });
 
-  function conjunctionElimination({statements}) {
-   let result = [];
-   for (let statement of statements.filter(x => x.op == "&&")) {
-    result.push(statement.left);
-    result.push(statement.right);
-   }
-   return result;
-  }
-
   it("a && b |= a, b", function() {
-    assertThat(conjunctionElimination(logic.parse(`
+    assertThat(Reasoner.conjunctionElimination(Parser.parse(`
       a && b
      `)))
      .equalsTo([
@@ -139,21 +86,8 @@ describe("Logic", function() {
     ]);
   });
 
-  function conjunctionIntroduction({statements}) {
-   let result = [];
-   for (let statement of statements) {
-    // console.log(statement);
-    for (let other of statements) {
-     if (!equals(statement, other)) {
-      result.push(and(statement, other));
-     }
-    }
-   }
-   return result;
-  }
-
   it("a, b |= a && b", function() {
-    assertThat(conjunctionIntroduction(logic.parse(`
+    assertThat(Reasoner.conjunctionIntroduction(Parser.parse(`
       a
       b
      `)))
@@ -163,21 +97,8 @@ describe("Logic", function() {
     ]);
   });
 
-  function hypotheticalSyllogism({statements}) {
-   let result = [];
-   // a => b, b => c |= a => c
-   let implications = statements.filter(x => x.op == "=>");
-   for (let implication of implications) {
-    let match = implications.find(x => equals(x.left, implication.right));
-    if (match) {
-     result.push(implies(implication.left, match.right));
-    }
-   }
-   return result;
-  }
-
   it("a => b, b => c |= a => c", function() {
-    assertThat(hypotheticalSyllogism(logic.parse(`
+    assertThat(Reasoner.hypotheticalSyllogism(Parser.parse(`
       a => b
       b => c
      `)))
@@ -186,25 +107,8 @@ describe("Logic", function() {
     ]);
   });
 
-  function constructiveDillema({statements}) {
-   let result = [];
-   // (a => c) && (b => d), a || b |= c || d
-   let disjunctions = statements.filter(x => x.op == "&&");
-   let conjunctions = statements.filter(x => x.op == "||");
-   for (let disjunction of disjunctions) {
-    if (disjunction.left.op == "=>" &&
-        disjunction.right.op == "=>") {
-     let match = conjunctions.find(x =>
-                                   equals(x.left, disjunction.left.left) &&
-                                   equals(x.right, disjunction.right.left));
-     result.push(or(disjunction.left.right, disjunction.right.right));
-    }
-   }
-   return result;
-  }
-
   it("(a => c) && (b => d), a || b |= c || d", function() {
-    assertThat(constructiveDillema(logic.parse(`
+    assertThat(Reasoner.constructiveDillema(Parser.parse(`
       (a => c) && (b => d)
       a || b
      `)))
@@ -213,18 +117,8 @@ describe("Logic", function() {
     ]);
   });
 
-  function absorption({statements}) {
-   let result = [];
-   // a => b |= a => (a & b)
-   let implications = statements.filter(x => x.op == "=>");
-   for (let implication of implications) {
-    result.push(implies(implication.left, and(implication.left, implication.right)));
-   }
-   return result;
-  }
-
   it("a => b |= a => (a & b)", function() {
-    assertThat(absorption(logic.parse(`
+    assertThat(Reasoner.absorption(Parser.parse(`
       a => b
      `)))
      .equalsTo([
@@ -232,53 +126,10 @@ describe("Logic", function() {
     ]);
   });
 
-  // Propositional Logic
-  //
-  // Rules of inference
-  //
-  // Modus Ponens: a => b, a |= b
-  // Modus Tollens: a => b, ~b |= ~a
-  // Modus Tollendo Ponens (Disjunctive Syllogism): a || b, ~a |= b and a || b, ~b |= a
-  // Disjunction Introduction (Addition): a |= a || b, b |= a || b
-  // Conjunction Introduction (Simplification): a && b |= a and a && b |= b
-  // Hypothetical Syllogism: a => b, b => c |= a => c
-  // Constructive Dilemma: (a => c) && (b => d), a || b |= c || d
-  // Absorption: a => b |= a => (a & b)
-  //
-  // Rules of replacement: rewriting, no new information
-  //
-  // Double negation: ~~a |= a
-  // Communitativity: a && b |= b && a
-  // Associativity: (a && b) && c |= a && (b && c)
-  // Tautology: a |= a && a, a |= a || a
-  // DeMorgan's Law: ~(a && b) |= ~a || ~b, ~(a || b) |= ~a && ~b
-  // Tranposition (contraposition): a => b, ~b => ~a
-  // Material implication: a => b |= ~a || b
-  // Exportation: a => (b => c) |= (a && b) => c
-  // Distribution: a && (b || c) |= (a && b) || (a && c), a || (b && c) |= (a || b) && (a || c)
-  // Material equivalence: a <=> b |= (a => b) && (b => a) |= (a && b) || (~a & ~b)
-
-  function forward(program) {
-   let result = [];
-   result = result.concat(modusPonens(program));
-   result = result.concat(modusTollens(program));
-   result = result.concat(disjunctiveSyllogism(program));
-   // This expands a lot. We probably want to use this more carefully.
-   // disjunctiveIntroduction(program);
-   result = result.concat(conjunctionElimination(program));
-   // This expands a lot too.
-   // result = result.concat(conjunctionIntroduction(program));
-   result = result.concat(hypotheticalSyllogism(program));
-   result = result.concat(constructiveDillema(program));
-   // This expands a lot too.
-   // result = result.concat(absorption(program));
-   return result;
-  }
-
   it("forward chaining", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
-    let code = logic.parse(`
+    let code = Parser.parse(`
       cat_fur || dog_fur
       dog_fur => thompson_allergy
       cat_fur => macavity_criminal
@@ -297,122 +148,18 @@ describe("Logic", function() {
     // 7) Can we infer macavity_criminal from 3 and 6?
 
     // Not immediately obvious whether ~dog_fur is true.
-    assertThat(entails(code, negation(literal("dog_fur"))))
+    assertThat(Reasoner.entails(code, negation(literal("dog_fur"))))
      .equalsTo(false);
     
-    assertThat(deduce(code, negation(literal("dog_fur"))))
+    assertThat(Reasoner.deduce(code, negation(literal("dog_fur"))))
      .equalsTo(true);
 
-    assertThat(deduce(code, literal("cat_fur")))
+    assertThat(Reasoner.deduce(code, literal("cat_fur")))
      .equalsTo(true);
 
-    assertThat(deduce(code, literal("macavity_criminal")))
+    assertThat(Reasoner.deduce(code, literal("macavity_criminal")))
      .equalsTo(true);
   });
-
-  function deduce(program, assumption) {
-   do {
-    if (entails(program, assumption)) {
-     return true;
-    }
-    let inference = forward(program);
-    program.statements.splice(
-        program.statements.length, 0, ...inference);
-   } while (true);
-  }
-
-  function entails({statements}, assumption) {
-   for (statement of statements) {
-    if (equals(statement, assumption)) {
-     return true;
-    }
-   }
-   return false;
-  }
-
-  function equals(a, b) {
-   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
-  }
-
-  function normalize(node) {
-   // https://www.iep.utm.edu/prop-log/#SH5a
-   let result = Object.assign(node);
-   if (node.op == "~") {
-    result.expression = normalize(node.expression);
-   } else if (node.op == "&&" || 
-              node.op == "||" ||
-              node.op == "=>") {
-    result.left = normalize(node.left);
-    result.right = normalize(node.right);
-   }
-
-   if (result.op == "~" &&
-       result.expression.op == "~") {
-    // double-negation
-    return result.expression.expression;
-   } else if ((result.op == "&&" || result.op == "||") &&
-              equals(result.left, result.right)) {
-    return result.left;
-   } else if (result.op == "~" &&
-              result.expression.op == "&&") {
-    // demorgan's law
-    return or(negation(result.expression.left),
-              negation(result.expression.right));
-   } else if (result.op == "~" &&
-              result.expression.op == "||") {
-    // demorgan's law
-    return and(negation(result.expression.left), 
-               negation(result.expression.right));
-   } else if (result.op == "=>" && 
-              result.left.op == "~" &&
-              result.right.op == "~") {
-    // tranposition / contraposition
-    return implies(result.right.expression,
-                   result.left.expression);
-   } else if (result.op == "||" &&
-              result.left.op == "~") {
-    return implies(result.left.expression,
-                   result.right);
-    // material implication
-   } else if (result.op == "=>" &&
-              result.right.op == "=>") {
-    return implies(and(result.left, result.right.left),
-                   result.right.right);
-   } else if (result.op == "||" &&
-              result.left.op == "&&" &&
-              result.right.op == "&&" &&
-              equals(result.left.left, result.right.left)) {
-    // disjunctive distribution.
-    return and(result.left.left,
-               or(result.left.right, result.right.right));
-   } else if (result.op == "&&" &&
-              result.left.op == "||" &&
-              result.right.op == "||" &&
-              equals(result.left.left, result.right.left)) {
-    // conjunctive distribution.
-    return or(result.left.left,
-              and(result.left.right, result.right.right));
-   } else if ((result.op == "&&" && result.left.op == "&&") ||
-              (result.op == "||" && result.left.op == "||")) {
-    // associativity.
-    return binary(result.left.op, 
-                  result.left.left, 
-                  binary(result.op, result.left.right, result.right));
-   } else if (result.op == "&&" ||
-              result.op == "||") {
-    // commutativity.
-    let left = JSON.stringify(result.left);
-    let right = JSON.stringify(result.right);
-    if (right < left) {
-     // If the right arm is greater than (alphabetically)
-     // than the left arm, switch orders.
-     // We compare alphabetically, e.g. "a" < "b".
-     return binary(result.op, result.right, result.left);
-    }
-   }
-   
-   return result;
-  }
 
   it("~~a == a", function() {
     // double negatives
@@ -508,26 +255,6 @@ describe("Logic", function() {
     assertThat(normalize(Rule.of("a => (b => (c && c))")))
      .equalsTo(Rule.of("(a && b) => c"));
    });
-
-  class Rule {
-   static of(str) {
-    return logic.parse(str).statements[0];
-   }
-  }
-
-  function stringify(rule) {
-   if (rule["@type"] == "Literal") {
-    return rule.name;
-   } else if (rule.op == "~") {
-    return `~${stringify(rule.expression)}`;
-   } else if (rule.op) {
-    // NOTE(goto): by not parenthesizing we loose some information
-    // but on the other hand we gain readability. Not sure if that's
-    // the right trade-off but works for now.
-    return `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`;
-   }
-   throw new Error("Unknown rule type" + JSON.stringify(rule));
-  }
 
   it("stringify", function() {
     assertThat(stringify(Rule.of("~a"))).equalsTo("~a");
