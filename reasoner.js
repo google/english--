@@ -1,0 +1,292 @@
+const {Parser} = require("./parser.js");
+
+const {
+ program,
+  forall,
+  exists,
+  implies,
+  predicate,
+  binary,
+  literal,
+  constant,
+  and,
+  or,
+  negation} = Parser;
+
+
+// Propositional Logic                                                                                                     
+//                                                                                                                         
+// Rules of inference                                                                                                      
+//                                                                                                                         
+// Modus Ponens: a => b, a |= b                                                                                            
+// Modus Tollens: a => b, ~b |= ~a                                                                                         
+// Modus Tollendo Ponens (Disjunctive Syllogism): a || b, ~a |= b and a || b, ~b |= a                                      
+// Disjunction Introduction (Addition): a |= a || b, b |= a || b                                                           
+// Conjunction Introduction (Simplification): a && b |= a and a && b |= b                                                  
+// Hypothetical Syllogism: a => b, b => c |= a => c                                                                        
+// Constructive Dilemma: (a => c) && (b => d), a || b |= c || d                                                            
+// Absorption: a => b |= a => (a & b)                                                                                      
+//                                                                                                                         
+// Rules of replacement: rewriting, no new information                                                                     
+//                                                                                                                         
+// Double negation: ~~a |= a                                                                                               
+// Communitativity: a && b |= b && a                                                                                       
+// Associativity: (a && b) && c |= a && (b && c)                                                                           
+// Tautology: a |= a && a, a |= a || a                                                                                     
+// DeMorgan's Law: ~(a && b) |= ~a || ~b, ~(a || b) |= ~a && ~b                                                            
+// Tranposition (contraposition): a => b, ~b => ~a 
+// Material implication: a => b |= ~a || b                                                                                 
+// Exportation: a => (b => c) |= (a && b) => c                                                                             
+// Distribution: a && (b || c) |= (a && b) || (a && c), a || (b && c) |= (a || b) && (a || c)                              
+// Material equivalence: a <=> b |= (a => b) && (b => a) |= (a && b) || (~a & ~b)   
+
+function equals(a, b) {
+ return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+}
+
+function normalize(node) {
+ // https://www.iep.utm.edu/prop-log/#SH5a                                                                                 
+ let result = Object.assign(node);
+ if (node.op == "~") {
+  result.expression = normalize(node.expression);
+ } else if (node.op == "&&" ||
+            node.op == "||" ||
+            node.op == "=>") {
+  result.left = normalize(node.left);
+  result.right = normalize(node.right);
+ }
+ 
+ if (result.op == "~" &&
+     result.expression.op == "~") {
+  // double-negation                                                                                                       
+  return result.expression.expression;
+ } else if ((result.op == "&&" || result.op == "||") &&
+            equals(result.left, result.right)) {
+  return result.left;
+ } else if (result.op == "~" &&
+            result.expression.op == "&&") {
+  // demorgan's law                                                                                                        
+  return or(negation(result.expression.left),
+            negation(result.expression.right));
+ } else if (result.op == "~" &&
+            result.expression.op == "||") {
+  // demorgan's law                                                                                                        
+  return and(negation(result.expression.left),
+             negation(result.expression.right));
+ } else if (result.op == "=>" &&
+            result.left.op == "~" &&
+            result.right.op == "~") {
+  // tranposition / contraposition                                                                                         
+  return implies(result.right.expression,
+                 result.left.expression);
+ } else if (result.op == "||" &&
+            result.left.op == "~") {
+  return implies(result.left.expression,
+                 result.right);
+  // material implication                                                                                                  
+ } else if (result.op == "=>" &&
+            result.right.op == "=>") {
+  return implies(and(result.left, result.right.left),
+                 result.right.right);
+  } else if (result.op == "||" &&
+             result.left.op == "&&" &&
+             result.right.op == "&&" &&
+             equals(result.left.left, result.right.left)) {
+  // disjunctive distribution.                                                                                             
+  return and(result.left.left,
+             or(result.left.right, result.right.right));
+ } else if (result.op == "&&" &&
+            result.left.op == "||" &&
+            result.right.op == "||" &&
+            equals(result.left.left, result.right.left)) {
+  // conjunctive distribution.                                                                                             
+  return or(result.left.left,
+            and(result.left.right, result.right.right));
+ } else if ((result.op == "&&" && result.left.op == "&&") ||
+            (result.op == "||" && result.left.op == "||")) {
+  // associativity.                                                                                                        
+  return binary(result.left.op,
+                result.left.left,
+                binary(result.op, result.left.right, result.right));
+ } else if (result.op == "&&" ||
+            result.op == "||") {
+  // commutativity.                                                                                                        
+  let left = JSON.stringify(result.left);
+  let right = JSON.stringify(result.right);
+  if (right < left) {
+   // If the right arm is greater than (alphabetically)                                                                    
+    // than the left arm, switch orders.                                                                                    
+    // We compare alphabetically, e.g. "a" < "b".                                                                           
+   return binary(result.op, result.right, result.left);
+  }
+ }
+
+ return result;
+}
+
+class Reasoner {
+ static modusPonens({statements}) {
+  let result = [];
+  // modus ponen: a => b, a |= b                                                                                            
+  for (let implication of statements.filter(x => x.op == "=>")) {
+   if (statements.find(y => equals(implication.left, y))) {
+    result.push(implication.right);
+   }
+  }
+  return result;
+ }
+
+ static modusTollens({statements}) {
+  let result = [];
+  // modus tollens: a => b, ~b |= ~a                                                                                        
+  for (let implication of statements.filter(x => x.op == "=>")) {
+   if (statements.find(y => equals(negation(implication.right), y))) {
+    result.push(negation(implication.left));
+   }
+  }
+  return result;
+ }
+
+ static disjunctiveSyllogism({statements}) {
+  let result = [];
+  // disjunctive syllogism: a || b, ~a |= ~b and a || b, ~b |= a                                                            
+  for (let disjunction of statements.filter(x => x.op == "||")) {
+   if (statements.find(y => equals(negation(disjunction.left), y))) {
+    result.push(disjunction.right);
+   }
+   if (statements.find(y => equals(negation(disjunction.right), y))) {
+    result.push(disjunction.left);
+   }
+  }
+  return result;
+ }
+
+ static disjunctiveIntroduction({statements}, term) {
+  let result = [];
+  for (let statement of statements) {
+   result.push(or(statement, term));
+   result.push(or(term, statement));
+  }
+  return result;
+ }
+
+ static conjunctionElimination({statements}) {
+  let result = [];
+  for (let statement of statements.filter(x => x.op == "&&")) {
+   result.push(statement.left);
+   result.push(statement.right);
+  }
+  return result;
+ }
+
+ static conjunctionIntroduction({statements}) {
+  let result = [];
+  for (let statement of statements) {
+   // console.log(statement);                                                                                               
+   for (let other of statements) {
+    if (!equals(statement, other)) {
+     result.push(and(statement, other));
+    }
+   }
+  }
+  return result;
+ }
+
+ static hypotheticalSyllogism({statements}) {
+  let result = [];
+  // a => b, b => c |= a => c                                                                                               
+  let implications = statements.filter(x => x.op == "=>");
+  for (let implication of implications) {
+   let match = implications.find(x => equals(x.left, implication.right));
+   if (match) {
+    result.push(implies(implication.left, match.right));
+   }
+  }
+  return result;
+ }
+
+ static constructiveDillema({statements}) {
+  let result = [];
+  // (a => c) && (b => d), a || b |= c || d                                                                                 
+  let disjunctions = statements.filter(x => x.op == "&&");
+  let conjunctions = statements.filter(x => x.op == "||");
+  for (let disjunction of disjunctions) {
+   if (disjunction.left.op == "=>" &&
+       disjunction.right.op == "=>") {
+    let match = conjunctions.find(x =>
+                                  equals(x.left, disjunction.left.left) &&
+                                  equals(x.right, disjunction.right.left));
+    result.push(or(disjunction.left.right, disjunction.right.right));
+   }
+  }
+  return result;
+ }
+
+ static absorption({statements}) {
+  let result = [];
+  // a => b |= a => (a & b)                                                                                                 
+  let implications = statements.filter(x => x.op == "=>");
+  for (let implication of implications) {
+   result.push(implies(implication.left, and(implication.left, implication.right)));
+  }
+  return result;
+ }
+
+ static forward(program) {
+  let result = [];
+  result = result.concat(Reasoner.modusPonens(program));
+  result = result.concat(Reasoner.modusTollens(program));
+  result = result.concat(Reasoner.disjunctiveSyllogism(program));
+  // This expands a lot. We probably want to use this more carefully.                                                       
+  // disjunctiveIntroduction(program);                                                                                      
+  result = result.concat(Reasoner.conjunctionElimination(program));
+  // This expands a lot too.                                                                                                
+  // result = result.concat(conjunctionIntroduction(program)); 
+  result = result.concat(Reasoner.hypotheticalSyllogism(program));
+  result = result.concat(Reasoner.constructiveDillema(program));
+  // This expands a lot too.                                                                                                
+  // result = result.concat(absorption(program));                                                                           
+  return result;
+ }
+
+ static deduce(program, assumption) {
+  do {
+   if (Reasoner.entails(program, assumption)) {
+    return true;
+   }
+   let inference = Reasoner.forward(program);
+   program.statements.splice(program.statements.length, 0, ...inference);
+  } while (true);
+ }
+
+ static entails({statements}, assumption) {
+  for (let statement of statements) {
+   if (equals(statement, assumption)) {
+    return true;
+   }
+  }
+  return false;
+ }
+
+}
+
+function stringify(rule) {
+ if (rule["@type"] == "Literal") {
+  return rule.name;
+ } else if (rule.op == "~") {
+  return `~${stringify(rule.expression)}`;
+ } else if (rule.op) {
+  // NOTE(goto): by not parenthesizing we loose some information                                                           
+  // but on the other hand we gain readability. Not sure if that's                                                         
+  // the right trade-off but works for now.                                                                                
+  return `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`;
+ }
+ throw new Error("Unknown rule type" + JSON.stringify(rule));
+}
+
+module.exports = {
+ Reasoner: Reasoner,
+ normalize: normalize,
+ stringify: stringify,
+ equals: equals
+};
