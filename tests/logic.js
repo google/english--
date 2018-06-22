@@ -1078,6 +1078,22 @@ describe("Parser", function() {
     }
    }
    
+   // Hypothetical Syllogysm
+   if (goal.op == "=>") {
+    // TODO(goto): this only deals with a single
+    // level of recursion. Generalize this to
+    // multiple levels.
+    for (let right of op(kb, "=>")) {
+     if (equals(right.right, goal.right)) {
+      for (let left of op(kb, "=>")) {
+       if (equals(left.right, right.left)) {
+        return [{given: left, and: [right], goal: goal}];
+       }
+      }
+     }
+    }
+   }
+   
    for (let statement of kb.statements) {
     if (equals(statement, goal)) {
      return [{given: statement, goal: goal}];
@@ -1201,16 +1217,14 @@ Take that b.
 If a and b then a && b. `);
    });
 
-  it.skip("a => b, b => c |= a => c?", function() {
+  it("a => b, b => c |= a => c?", function() {
     let code = logic.parse(`
-      a
-      b
+      a => b
+      b => c
     `);
 
     assertThat(explain(backward(code, Rule.of("a => c"))))
-     .equalsTo(`Take that a. 
-Take that b. 
-If a and b then a && b. `);
+     .equalsTo(`If a => b and b => c then a => c. `);
    });
 
   it.skip("(a => c) && (b => d), a || b |= c || d", function() {
