@@ -290,7 +290,7 @@ describe("Parser", function() {
   };
 
   function binary(op, left, right) {
-   return {"@type": "BinaryOperator", "op": op, left: left, right: right};
+   return {"@type": "BinaryOperator", left: left, "op": op, right: right};
   };
 
   function program(statements) {
@@ -1093,11 +1093,56 @@ describe("Parser", function() {
      }
     }
    }
+
+   // Absorption.
+   if (goal.op == "=>") {
+    if (goal.right.op == "&&") {
+     if (equals(goal.right.left, goal.left)) {
+      let result = backward(kb, implies(goal.left, goal.right.right));
+      if (result.length > 0) {
+       return [{given: implies(goal.left, goal.right.right), goal: goal}];
+      }
+     } else if (equals(goal.right.right, goal.left)) {
+      let result = backward(kb, implies(goal.left, goal.right.left));
+      if (result.length > 0) {
+       return [{given: implies(goal.left, goal.right.left), goal: goal}];
+      }
+     }
+    }
+   }
+
+   // Constructive dilemma.
+   if (goal.op == "||") {
+    // TODO(goto): this is a shallow implementation
+    // too of the constructive dilemma. Specifically
+    // it doens't look recursively for implications
+    // nor enables implications to be written as
+    // conjunctions, disjunctions and negations.
+    for (let first of op(kb, "=>")) {
+     if (equals(first.right, goal.left)) {
+      for (let second of op(kb, "=>")) {
+       if (equals(second.right, goal.right)) {
+        for (let third of op(kb, "||")) {
+         if (equals(third.left, first.left) &&
+             equals(third.right, second.left)) {
+          // console.log("found");
+          return [{given: first, and: [second, third], goal: goal}];
+         }
+        }
+       }
+      }      
+     }
+    }    
+   }
+
+   // console.log("hello");
+   // console.log(goal);
+   // console.log(kb.statements);
    
    for (let statement of kb.statements) {
+    // console.log(statement);
     if (equals(statement, goal)) {
      return [{given: statement, goal: goal}];
-     // return [goal];
     }
    };
 
@@ -1227,23 +1272,24 @@ If a and b then a && b. `);
      .equalsTo(`If a => b and b => c then a => c. `);
    });
 
-  it.skip("(a => c) && (b => d), a || b |= c || d", function() {
+  it("(a => c) && (b => d), a || b |= c || d", function() {
     let code = logic.parse(`
-      (a =>c) && (b => d)
+      a => c
+      b => d
       a || b
     `);
 
     assertThat(explain(backward(code, Rule.of("c || d"))))
-     .equalsTo(``);
+     .equalsTo(`If a => c and b => d and a || b then c || d. `);
    });
 
-  it.skip("a => b |= a => (a && b)", function() {
+  it("a => b |= a => (a && b)", function() {
     let code = logic.parse(`
       a => b
     `);
 
     assertThat(explain(backward(code, Rule.of("a => (a && b)"))))
-     .equalsTo(``);
+     .equalsTo(`If a => b then a => a && b. `);
    });
 
   it("criminal?", function() {
