@@ -124,7 +124,7 @@ function normalize(node) {
  return result;
 }
 
-class Reasoner {
+class Forward {
  static modusPonens({statements}) {
   let result = [];
   // modus ponen: a => b, a |= b                                                                                            
@@ -234,16 +234,16 @@ class Reasoner {
 
  static forward(program) {
   let result = [];
-  result = result.concat(Reasoner.modusPonens(program));
-  result = result.concat(Reasoner.modusTollens(program));
-  result = result.concat(Reasoner.disjunctiveSyllogism(program));
+  result = result.concat(Forward.modusPonens(program));
+  result = result.concat(Forward.modusTollens(program));
+  result = result.concat(Forward.disjunctiveSyllogism(program));
   // This expands a lot. We probably want to use this more carefully.                                                       
   // disjunctiveIntroduction(program);                                                                                      
-  result = result.concat(Reasoner.conjunctionElimination(program));
+  result = result.concat(Forward.conjunctionElimination(program));
   // This expands a lot too.                                                                                                
   // result = result.concat(conjunctionIntroduction(program)); 
-  result = result.concat(Reasoner.hypotheticalSyllogism(program));
-  result = result.concat(Reasoner.constructiveDillema(program));
+  result = result.concat(Forward.hypotheticalSyllogism(program));
+  result = result.concat(Forward.constructiveDillema(program));
   // This expands a lot too.                                                                                                
   // result = result.concat(absorption(program));                                                                           
   return result;
@@ -251,10 +251,10 @@ class Reasoner {
 
  static deduce(program, assumption) {
   do {
-   if (Reasoner.entails(program, assumption)) {
+   if (Forward.entails(program, assumption)) {
     return true;
    }
-   let inference = Reasoner.forward(program);
+   let inference = Forward.forward(program);
    program.statements.splice(program.statements.length, 0, ...inference);
   } while (true);
  }
@@ -285,7 +285,7 @@ function stringify(rule) {
 }
 
 module.exports = {
- Reasoner: Reasoner,
+ Forward: Forward,
  normalize: normalize,
  stringify: stringify,
  equals: equals

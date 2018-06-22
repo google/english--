@@ -1,6 +1,6 @@
 const Assert = require("assert");
 const logic = require("../grammar.js");
-const {Reasoner, normalize, stringify, equals} = require("../reasoner.js");
+const {Forward, normalize, stringify, equals} = require("../forward.js");
 const {Parser, Rule} = require("../parser.js");
 
 const {
@@ -18,7 +18,7 @@ const {
 
 describe("Logic", function() {
   it("a => b, a |= b", function() {
-    assertThat(Reasoner.modusPonens(Parser.parse(`
+    assertThat(Forward.modusPonens(Parser.parse(`
       a => b
       a
     `)))
@@ -26,7 +26,7 @@ describe("Logic", function() {
   });
 
   it("a && b => c || d, a & b |= c || d", function() {
-    assertThat(Reasoner.modusPonens(Parser.parse(`
+    assertThat(Forward.modusPonens(Parser.parse(`
       (a && b) => (c || d)
       a && b
     `)))
@@ -36,7 +36,7 @@ describe("Logic", function() {
   });
 
   it("a => b, ~b |= ~a", function() {
-    assertThat(Reasoner.modusTollens(logic.parse(`
+    assertThat(Forward.modusTollens(logic.parse(`
       a => b
       ~b
     `)))
@@ -49,7 +49,7 @@ describe("Logic", function() {
       ~a
     `);
 
-    assertThat(Reasoner.disjunctiveSyllogism(code)).equalsTo([
+    assertThat(Forward.disjunctiveSyllogism(code)).equalsTo([
       literal("b")
     ]);
   });
@@ -60,7 +60,7 @@ describe("Logic", function() {
       ~b
     `);
 
-    assertThat(Reasoner.disjunctiveSyllogism(code)).equalsTo([
+    assertThat(Forward.disjunctiveSyllogism(code)).equalsTo([
       literal("a")
     ]);
   });
@@ -70,7 +70,7 @@ describe("Logic", function() {
       a
     `);
 
-    assertThat(Reasoner.disjunctiveIntroduction(code, literal("b")))
+    assertThat(Forward.disjunctiveIntroduction(code, literal("b")))
      .equalsTo([
        or(literal("a"), literal("b")),
        or(literal("b"), literal("a"))
@@ -78,7 +78,7 @@ describe("Logic", function() {
   });
 
   it("a && b |= a, b", function() {
-    assertThat(Reasoner.conjunctionElimination(Parser.parse(`
+    assertThat(Forward.conjunctionElimination(Parser.parse(`
       a && b
      `)))
      .equalsTo([
@@ -87,7 +87,7 @@ describe("Logic", function() {
   });
 
   it("a, b |= a && b", function() {
-    assertThat(Reasoner.conjunctionIntroduction(Parser.parse(`
+    assertThat(Forward.conjunctionIntroduction(Parser.parse(`
       a
       b
      `)))
@@ -98,7 +98,7 @@ describe("Logic", function() {
   });
 
   it("a => b, b => c |= a => c", function() {
-    assertThat(Reasoner.hypotheticalSyllogism(Parser.parse(`
+    assertThat(Forward.hypotheticalSyllogism(Parser.parse(`
       a => b
       b => c
      `)))
@@ -108,7 +108,7 @@ describe("Logic", function() {
   });
 
   it("(a => c) && (b => d), a || b |= c || d", function() {
-    assertThat(Reasoner.constructiveDillema(Parser.parse(`
+    assertThat(Forward.constructiveDillema(Parser.parse(`
       (a => c) && (b => d)
       a || b
      `)))
@@ -118,7 +118,7 @@ describe("Logic", function() {
   });
 
   it("a => b |= a => (a & b)", function() {
-    assertThat(Reasoner.absorption(Parser.parse(`
+    assertThat(Forward.absorption(Parser.parse(`
       a => b
      `)))
      .equalsTo([
@@ -148,16 +148,16 @@ describe("Logic", function() {
     // 7) Can we infer macavity_criminal from 3 and 6?
 
     // Not immediately obvious whether ~dog_fur is true.
-    assertThat(Reasoner.entails(code, negation(literal("dog_fur"))))
+    assertThat(Forward.entails(code, negation(literal("dog_fur"))))
      .equalsTo(false);
     
-    assertThat(Reasoner.deduce(code, negation(literal("dog_fur"))))
+    assertThat(Forward.deduce(code, negation(literal("dog_fur"))))
      .equalsTo(true);
 
-    assertThat(Reasoner.deduce(code, literal("cat_fur")))
+    assertThat(Forward.deduce(code, literal("cat_fur")))
      .equalsTo(true);
 
-    assertThat(Reasoner.deduce(code, literal("macavity_criminal")))
+    assertThat(Forward.deduce(code, literal("macavity_criminal")))
      .equalsTo(true);
   });
 
