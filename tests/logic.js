@@ -1043,6 +1043,17 @@ describe("Parser", function() {
     }
    }
 
+   // Conjunction elimination
+   for (let statement of op(kb, "&&")) {
+    if (equals(statement.left, goal)) {
+     return [{given: statement, goal: goal}];
+    }
+
+    if (equals(statement.right, goal)) {
+     return [{given: statement, goal: goal}];
+    }
+   }
+
    // Conjunction introduction
    if (goal.op == "&&") {
     // console.log("hi");
@@ -1050,14 +1061,27 @@ describe("Parser", function() {
     if (left.length > 0) {
      let right = backward(kb, goal.right);
      if (right.length > 0) {
-      return [...left, ...right];
+      return [...left, ...right, {given: goal.left, and: [goal.right], goal: goal}];
      }
+    }
+   }
+
+   // Disjunction introduction
+   if (goal.op == "||") {
+    let left = backward(kb, goal.left);
+    if (left.length > 0) {
+     return [{given: goal.left, goal: goal}];
+    }
+    let right = backward(kb, goal.right);
+    if (right.length > 0) {
+     return [{given: goal.right, goal: goal}];
     }
    }
    
    for (let statement of kb.statements) {
     if (equals(statement, goal)) {
      return [{given: statement, goal: goal}];
+     // return [goal];
     }
    };
 
@@ -1066,6 +1090,7 @@ describe("Parser", function() {
 
   function explain(reasons) {
    let result = [];
+   // console.log(JSON.stringify(reasons));
    for (let reason of reasons) {
     // console.log(reason);
     if (equals(reason.given, reason.goal)) {
@@ -1128,47 +1153,43 @@ If a || b and ~a then b. `);
 If a || b and ~b then a. `);
    });
 
-  it.skip("a |= a || b?", function() {
+  it("a |= a || b?", function() {
     let code = logic.parse(`
       a
     `);
 
     assertThat(explain(backward(code, Rule.of("a || b"))))
-     .equalsTo(`Take that ~b. 
-If a || b and ~b then a. `);
+     .equalsTo(`If a then a || b. `);
    });
 
-  it.skip("a |= b || a?", function() {
+  it("a |= b || a?", function() {
     let code = logic.parse(`
       a
     `);
 
     assertThat(explain(backward(code, Rule.of("b || a"))))
-     .equalsTo(`Take that ~b. 
-If a || b and ~b then a. `);
+     .equalsTo(`If a then b || a. `);
    });
 
-  it.skip("a && b |= a?", function() {
+  it("a && b |= a?", function() {
     let code = logic.parse(`
       a && b
     `);
 
     assertThat(explain(backward(code, Rule.of("a"))))
-     .equalsTo(`Take that ~b. 
-If a || b and ~b then a. `);
+     .equalsTo(`If a && b then a. `);
    });
 
-  it.skip("b && a |= a?", function() {
+  it("b && a |= a?", function() {
     let code = logic.parse(`
-      a && b
+      b && a
     `);
 
     assertThat(explain(backward(code, Rule.of("a"))))
-     .equalsTo(`Take that ~b. 
-If a || b and ~b then a. `);
+     .equalsTo(`If b && a then a. `);
    });
 
-  it.skip("a, b |= a && b?", function() {
+  it("a, b |= a && b?", function() {
     let code = logic.parse(`
       a
       b
@@ -1177,7 +1198,7 @@ If a || b and ~b then a. `);
     assertThat(explain(backward(code, Rule.of("a && b"))))
      .equalsTo(`Take that a. 
 Take that b. 
-If a && b and a and b then a && b. `);
+If a and b then a && b. `);
    });
 
   it.skip("a => b, b => c |= a => c?", function() {
@@ -1189,7 +1210,7 @@ If a && b and a and b then a && b. `);
     assertThat(explain(backward(code, Rule.of("a => c"))))
      .equalsTo(`Take that a. 
 Take that b. 
-If a && b and a and b then a && b. `);
+If a and b then a && b. `);
    });
 
   it.skip("(a => c) && (b => d), a || b |= c || d", function() {
@@ -1253,7 +1274,9 @@ If cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
 If Policecar => Policeman and Policecar then Policeman. 
 Take that Dry. 
 If Slippery => ~Dry and ~~Dry then ~Slippery. 
+If Policeman and ~Slippery then Policeman && ~Slippery. 
 Take that YellowLight. 
+If Policeman && ~Slippery and YellowLight then Policeman && ~Slippery && YellowLight. 
 If Policeman && ~Slippery && YellowLight => Brake and YellowLight && Policeman && ~Slippery then Brake. `);
 
   });
