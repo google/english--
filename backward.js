@@ -2,7 +2,7 @@ const {normalize, stringify, equals} = require("./forward.js");
 const {Parser, Rule} = require("./parser.js");
 
 const {
- program,
+  program,
   forall,
   exists,
   implies,
@@ -17,25 +17,58 @@ const {
 
 class Backward {
  constructor(kb) {
-  this.kb = kb;
+  this.kb = kb.statements;
  }
 
  * op(op) {
-  for (let statement of this.kb.statements.filter(x => x.op == op)) {
+  for (let statement of this.kb.filter(x => x.op == op)) {
    // body(statement);                                                                                                      
    yield statement;
   }
  }
 
- backward(goal) {
- // console.log("proving: " + JSON.stringify(goal));                                                                       
+ backward(goal, stack = []) {
+  // console.log(`${Rule.from(goal)}?`);
 
- // Searches the KB for implications with                                                                                  
+  for (let subgoal of stack) {
+   if (equals(goal, subgoal)) {
+    return false;
+   }
+  }
+
+  // for (let subgoal of stack) {
+  //   console.log(`${Rule.from(subgoal)}`);
+  // }
+
+  for (let statement of this.kb) {
+   // console.log(statement);                                                                                               
+   if (equals(statement, goal)) {
+    return [{given: statement, goal: goal}];
+   }
+  };
+
+  // Conjunction elimination                                                                                                
+  for (let statement of this.op("&&")) {
+   if (equals(statement.left, goal)) {
+    this.kb.push(goal);
+    return [{given: statement, goal: goal}];
+   }
+
+   if (equals(statement.right, goal)) {
+    this.kb.push(goal);
+    return [{given: statement, goal: goal}];
+   }
+  }
+
+  // Searches the KB for implications with                                                                                  
   // the goal on the right hand side (modus ponens). 
   for (let statement of this.op("=>")) {
    if (equals(statement.right, goal)) {
-    let subgoal = this.backward(statement.left);
+    stack.push(goal);
+    let subgoal = this.backward(statement.left, stack);
+    stack.pop();
     if (subgoal.length > 0) {
+     this.kb.push(goal);
      return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
     }
     //return backward(statement.left);                                                                           
@@ -47,8 +80,11 @@ class Backward {
   // side (modus tollens).                                                                                                  
   for (let statement of this.op("=>")) {
    if (equals(statement.left, negation(goal))) {
-    let subgoal = this.backward(negation(statement.right));
+    stack.push(goal);
+    let subgoal = this.backward(negation(statement.right), stack);
+    stack.pop();
     if (subgoal.length > 0) {
+     this.kb.push(goal);
      return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
     }
     // return backward(negation(statement.right));                                                                          
@@ -60,37 +96,37 @@ class Backward {
    // console.log(statement);                                                                                               
    if (equals(statement.left, goal)) {
     // console.log(statement); 
-    let subgoal = this.backward(negation(statement.right));
+    stack.push(goal);
+    let subgoal = this.backward(negation(statement.right), stack);
+    stack.pop();
     if (subgoal.length > 0) {
+     this.kb.push(goal);
      return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
     }
    } else if (equals(statement.right, goal)) {
     // console.log(statement);                                                                                              
-    let subgoal = this.backward(negation(statement.left));
+    stack.push(goal);
+    let subgoal = this.backward(negation(statement.left), stack);
+    stack.pop();
     if (subgoal.length > 0) {
+     this.kb.push(goal);
      return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
     }
-   }
-  }
-
-  // Conjunction elimination                                                                                                
-  for (let statement of this.op("&&")) {
-   if (equals(statement.left, goal)) {
-    return [{given: statement, goal: goal}];
-   }
-
-   if (equals(statement.right, goal)) {
-    return [{given: statement, goal: goal}];
    }
   }
 
   // Conjunction introduction                                                                                               
   if (goal.op == "&&") {
    // console.log("hi");                                                                                                    
-   let left = this.backward(goal.left);
+   stack.push(goal);
+   let left = this.backward(goal.left, stack);
+   stack.pop();
    if (left.length > 0) {
-    let right = this.backward(goal.right);
+    stack.push(goal);
+    let right = this.backward(goal.right, stack);
+    stack.pop();
     if (right.length > 0) {
+     this.kb.push(goal);
      return [...left, ...right, {given: goal.left, and: [goal.right], goal: goal}];
     }
    }
@@ -98,12 +134,18 @@ class Backward {
 
   // Disjunction introduction                                                                                               
   if (goal.op == "||") {
-   let left = this.backward(goal.left);
+   stack.push(goal);
+   let left = this.backward(goal.left, stack);
+   stack.pop();
    if (left.length > 0) {
+    this.kb.push(goal);
     return [{given: goal.left, goal: goal}];
    }
-   let right = this.backward(goal.right);
+   stack.push(goal);
+   let right = this.backward(goal.right, stack);
+   stack.pop()
    if (right.length > 0) {
+    this.kb.push(goal);
     return [{given: goal.right, goal: goal}];
    }
   }
@@ -117,6 +159,7 @@ class Backward {
     if (equals(right.right, goal.right)) {
      for (let left of this.op("=>")) {
       if (equals(left.right, right.left)) {
+       this.kb.push(goal);
        return [{given: left, and: [right], goal: goal}];
       }
      }
@@ -128,13 +171,19 @@ class Backward {
   if (goal.op == "=>") {
    if (goal.right.op == "&&") {
     if (equals(goal.right.left, goal.left)) {
-     let result = this.backward(implies(goal.left, goal.right.right));
+     stack.push(goal);
+     let result = this.backward(implies(goal.left, goal.right.right), stack);
+     stack.pop();
      if (result.length > 0) {
+      this.kb.push(goal);
       return [{given: implies(goal.left, goal.right.right), goal: goal}];
      }
     } else if (equals(goal.right.right, goal.left)) {
-     let result = this.backward(implies(goal.left, goal.right.left));
+     stack.push(goal);
+     let result = this.backward(implies(goal.left, goal.right.left), stack);
+     stack.pop();
      if (result.length > 0) {
+      this.kb.push(goal);
       return [{given: implies(goal.left, goal.right.left), goal: goal}];
      }
     }
@@ -156,6 +205,7 @@ class Backward {
         if (equals(third.left, first.left) &&
             equals(third.right, second.left)) {
          // console.log("found");                                                                                           
+         this.kb.push(goal);
          return [{given: first, and: [second, third], goal: goal}];
         }
        }
@@ -168,13 +218,6 @@ class Backward {
   // console.log("hello");                                                                                                  
   // console.log(goal);                                                                                                     
   // console.log(kb.statements);                                                                                            
-
-  for (let statement of this.kb.statements) {
-   // console.log(statement);                                                                                               
-   if (equals(statement, goal)) {
-    return [{given: statement, goal: goal}];
-   }
-  };
 
   return [];
  }

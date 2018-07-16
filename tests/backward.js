@@ -17,46 +17,23 @@ const {
  negation} = Parser;
 
 describe("Backward", function() {
-  
-  function explain(reasons) {
-   let result = [];
-   // console.log(JSON.stringify(reasons));                                                                                  
-   for (let reason of reasons) {
-    // console.log(reason);                                                                                                  
-    if (equals(reason.given, reason.goal)) {
-     result.push("Take that " + stringify(reason.given) + ". ");
-    } else {
-     let line = [];
-     line.push("If " + stringify(reason.given) + " ");
-     let ands = reason.and || [];
-     for (let and of ands) {
-      line.push("and " + stringify(and) + " ");
-     }
-     line.push("then " + stringify(reason.goal) + ". ");
-     result.push(line.join(""));
-    }
-   }
-   return result.join("\n");
-  }
-  
+    
   it("a => b, a |= b?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a => b
       a
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("b"))))
+    `)
+     .proving("b")
      .equalsTo(`Take that a. 
 If a => b and a then b. `);
    });
 
   it("a => b, ~b |= ~a?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a => b
       ~b
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("~a"))))
+    `)
+     .proving("~a")
      .equalsTo(`Take that ~b. 
 If a => b and ~b then ~a. `);
    });
@@ -201,21 +178,21 @@ If cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
     assertThat(explain(new Backward(kb).backward(Rule.of("Brake"))))
      .equalsTo(`Take that Policecar. 
 If Policecar => Policeman and Policecar then Policeman. 
+Take that YellowLight. 
 Take that Dry. 
 If Slippery => ~Dry and ~~Dry then ~Slippery. 
-If Policeman and ~Slippery then Policeman && ~Slippery. 
-Take that YellowLight. 
-If Policeman && ~Slippery and YellowLight then Policeman && ~Slippery && YellowLight. 
-If Policeman && ~Slippery && YellowLight => Brake and YellowLight && Policeman && ~Slippery then Brake. `);
+If YellowLight and ~Slippery then YellowLight && ~Slippery. 
+If Policeman and YellowLight && ~Slippery then Policeman && YellowLight && ~Slippery. 
+If Policeman && ~Slippery && YellowLight => Brake and Policeman && ~Slippery && YellowLight then Brake. `);
 
   });
 
   // TODO(goto): check if a && b => c has the precedence there
 
-  it.skip("q?", function() {
+  it("q?", function() {
     // http://pages.cs.wisc.edu/~bgibson/cs540/handouts/pl.pdf
     // TODO(goto): 
-    let kb = logic.parse(`
+    let kb = Parser.parse(`
       p => q
       (l && m) => p
       (b && l) => m
@@ -225,16 +202,59 @@ If Policeman && ~Slippery && YellowLight => Brake and YellowLight && Policeman &
       b
     `);
 
+    // console.log(kb);
+    // return;
+
     // Can we infer "Brake"?
-    assertThat(explain(backward(kb, Rule.of("q"))))
-     .equalsTo(``);
+    assertThat(explain(new Backward(kb).backward(Rule.of("q"))))
+     .equalsTo(`Take that a. 
+Take that b. 
+If a and b then a && b. 
+If a && b => l and a && b then l. 
+Take that b. 
+Take that l. 
+If b and l then b && l. 
+If b && l => m and b && l then m. 
+If l and m then l && m. 
+If l && m => p and l && m then p. 
+If p => q and p then q. `);
 
   });
+
+  function explain(reasons) {
+   let result = [];
+   // console.log(JSON.stringify(reasons));                                                                                  
+   for (let reason of reasons) {
+    // console.log(reason);                                                                                                  
+    if (equals(reason.given, reason.goal)) {
+     result.push("Take that " + stringify(reason.given) + ". ");
+    } else {
+     let line = [];
+     line.push("If " + stringify(reason.given) + " ");
+     let ands = reason.and || [];
+     for (let and of ands) {
+      line.push("and " + stringify(and) + " ");
+     }
+     line.push("then " + stringify(reason.goal) + ". ");
+     result.push(line.join(""));
+    }
+   }
+   return result.join("\n");
+  }
 
   function assertThat(x) {
    return {
     equalsTo(y) {
      Assert.deepEqual(x, y);
+    },
+    proving(y) {
+     return {
+      equalsTo(z) {
+       let kb = Parser.parse(x);
+       assertThat(explain(new Backward(kb).backward(Rule.of(y))))
+        .equalsTo(z);
+      }
+     }
     }
    }
   }

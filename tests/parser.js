@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Parser} = require("../parser.js");
+const {Parser, Rule} = require("../parser.js");
 
 const {
  program, 
@@ -403,6 +403,17 @@ describe("Parser", function() {
     } catch (e) {
      // expected error;
     }
+  });
+
+  it("toString", function() {
+    assertThat(Rule.from(Rule.of("a"))).equalsTo("a");
+    assertThat(Rule.from(Rule.of("a && b"))).equalsTo("a && b");
+    assertThat(Rule.from(Rule.of("a || b"))).equalsTo("a || b");
+    assertThat(Rule.from(Rule.of("a => b"))).equalsTo("a => b");
+    assertThat(Rule.from(Rule.of("~a"))).equalsTo("~a");
+    assertThat(Rule.from(Rule.of("a && ~b"))).equalsTo("a && ~b");
+    assertThat(Rule.from(Rule.of("a && ~b || c"))).equalsTo("a && ~b || c");
+    assertThat(Rule.from(Rule.of("a && ~b || c => d"))).equalsTo("a && ~b || c => d");
   });
 
   function assertThat(x) {

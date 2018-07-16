@@ -58,6 +58,16 @@ class Rule {
  static of(str) {
   return logic.parse(str).statements[0];
  }
+ static from(node) {
+  // console.log(node);
+  if (node["@type"] == "Literal") {
+   return `${node.name}`;
+  } else if (node["@type"] == "BinaryOperator") {
+   return `${Rule.from(node.left)} ${node.op} ${Rule.from(node.right)}`;
+  } else if (node["@type"] == "UnaryOperator") {
+   return `${node.op}${Rule.from(node.expression)}`;
+  }
+ }
 }
 
 module.exports = {
