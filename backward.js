@@ -27,6 +27,15 @@ class Backward {
   }
  }
 
+ direct(goal) {
+  for (let statement of this.kb) {
+   if (equals(statement, goal)) {
+    return {statement: statement, match: true};
+   }
+  }
+  return {match: false};
+ }
+
  backward(goal, stack = []) {
   // console.log(`${Rule.from(goal)}?`);
 
@@ -36,16 +45,10 @@ class Backward {
    }
   }
 
-  // for (let subgoal of stack) {
-  //   console.log(`${Rule.from(subgoal)}`);
-  // }
-
-  for (let statement of this.kb) {
-   // console.log(statement);                                                                                               
-   if (equals(statement, goal)) {
-    return [{given: statement, goal: goal}];
-   }
-  };
+  let {statement, match} = this.direct(goal);
+  if (match) {
+   return [{given: statement, goal: goal}];
+  }
 
   // Conjunction elimination                                                                                                
   for (let statement of this.op("&&")) {
