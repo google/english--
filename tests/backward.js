@@ -134,7 +134,7 @@ describe("Backward", function() {
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("c || d"))))
-     .equalsTo(`((a => c) && (b => d) && (a || b)) => (c || d) `);
+     .equalsTo(`((a => c) and (b => d) and (a || b)) then (c || d) `);
    });
 
   it("a => b |= a => (a && b)", function() {
@@ -143,7 +143,7 @@ describe("Backward", function() {
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a => (a && b)"))))
-     .equalsTo(`(a => b) => (a => a && b)`);
+     .equalsTo(`(a => b) then (a => a && b)`);
    });
 
   it("criminal?", function() {
@@ -159,9 +159,9 @@ describe("Backward", function() {
     assertThat(explain(new Backward(code).backward(Rule.of("macavity_criminal"))))
      .equalsTo(`
       ~thompson_allergy
-      (dog_fur => thompson_allergy && ~thompson_allergy) => ~dog_fur
-      (cat_fur || dog_fur && ~dog_fur) => cat_fur
-      (cat_fur => macavity_criminal && cat_fur) => macavity_criminal
+      (dog_fur => thompson_allergy and ~thompson_allergy) then ~dog_fur
+      (cat_fur || dog_fur and ~dog_fur) then cat_fur
+      (cat_fur => macavity_criminal and cat_fur) then macavity_criminal
       `);
 
    });
@@ -188,13 +188,13 @@ describe("Backward", function() {
     assertThat(explain(new Backward(kb).backward(Rule.of("Brake"))))
      .equalsTo(`
       Policecar
-      (Policecar => Policeman && Policecar) => Policeman
+      (Policecar => Policeman && Policecar) then Policeman
       YellowLight
       Dry
-      (Slippery => ~Dry && ~~Dry) => ~Slippery
-      (YellowLight && ~Slippery) => YellowLight && ~Slippery
+      (Slippery => ~Dry and ~~Dry) then ~Slippery
+      (YellowLight and ~Slippery) => YellowLight and ~Slippery
       (Policeman && YellowLight && ~Slippery) => Policeman && YellowLight && ~Slippery
-      (Policeman && ~Slippery && (YellowLight => Brake) && Policeman && ~Slippery && YellowLight) => Brake
+      (Policeman && ~Slippery && (YellowLight => Brake) && Policeman && ~Slippery && YellowLight) then Brake
       `);
 
   });
@@ -222,15 +222,15 @@ describe("Backward", function() {
      .equalsTo(`
       a
       b
-      (a && b) => (a && b)
-      ((a && b => l) && (a && b)) => l
+      (a && b) then (a && b)
+      ((a && b => l) and (a && b)) then l
       b
       l
-      (b && l) => b && l
-      ((b && l) => m && (b && l)) => m
+      (b and l) => b and l
+      ((b && l) => m && (b && l)) then m
       (l && m) => l && m
-      ((l && m) => p && (l && m)) => p
-      (p => q && p) => q `);
+      ((l && m) => p && (l && m)) then p
+      (p => q && p) then q `);
 
   });
 

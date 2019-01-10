@@ -57,11 +57,14 @@ CLOSEPAREN = _ ')' _
  
 OPLOGIC
   = _ c:"&&" _ { return c; }
+  / _ c:"and" _ { return "&&"; }
   / _ c:"||" _ { return c; }
+  / _ c:"or" _ { return "||"; }
   / _ c:"^" _ { return c; }
 
 IMPLICATION
   = _ c:"=>" _ { return c; }
+  / _ c:"then" _ { return "=>"; }
 
 NEGATION
   = _ "~" _
