@@ -24,8 +24,9 @@ describe("Backward", function() {
       a
     `)
      .proving("b")
-     .equalsTo(`Take that a. 
-If a => b and a then b. `);
+     .equalsTo(`
+      a
+      a => b && a => b`);
    });
 
   it("a => b, ~b |= ~a?", function() {
@@ -34,8 +35,10 @@ If a => b and a then b. `);
       ~b
     `)
      .proving("~a")
-     .equalsTo(`Take that ~b. 
-If a => b and ~b then ~a. `);
+     .equalsTo(`
+      ~b
+      a => b && ~b => ~a
+    `);
    });
 
   it("a || b, ~a |= b?", function() {
@@ -45,8 +48,10 @@ If a => b and ~b then ~a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("b"))))
-     .equalsTo(`Take that ~a. 
-If a || b and ~a then b. `);
+     .equalsTo(`
+      ~a
+      a || b && ~a => b
+    `);
    });
 
   it("a || b, ~b |= a?", function() {
@@ -56,8 +61,10 @@ If a || b and ~a then b. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a"))))
-     .equalsTo(`Take that ~b. 
-If a || b and ~b then a. `);
+     .equalsTo(`
+      ~b
+      a || b && ~b => a
+    `);
    });
 
   it("a |= a || b?", function() {
@@ -66,7 +73,7 @@ If a || b and ~b then a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a || b"))))
-     .equalsTo(`If a then a || b. `);
+     .equalsTo(`a => a || b`);
    });
 
   it("a |= b || a?", function() {
@@ -75,7 +82,7 @@ If a || b and ~b then a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("b || a"))))
-     .equalsTo(`If a then b || a. `);
+     .equalsTo(`a => b || a`);
    });
 
   it("a && b |= a?", function() {
@@ -84,7 +91,7 @@ If a || b and ~b then a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a"))))
-     .equalsTo(`If a && b then a. `);
+     .equalsTo(`a && b => a`);
    });
 
   it("b && a |= a?", function() {
@@ -93,7 +100,7 @@ If a || b and ~b then a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a"))))
-     .equalsTo(`If b && a then a. `);
+     .equalsTo(`b && a => a`);
    });
 
   it("a, b |= a && b?", function() {
@@ -103,9 +110,10 @@ If a || b and ~b then a. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a && b"))))
-     .equalsTo(`Take that a. 
-Take that b. 
-If a and b then a && b. `);
+     .equalsTo(`
+      a 
+      b 
+      a && b => a && b`);
    });
 
   it("a => b, b => c |= a => c?", function() {
@@ -115,7 +123,7 @@ If a and b then a && b. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a => c"))))
-     .equalsTo(`If a => b and b => c then a => c. `);
+     .equalsTo(`((a => b) && (b => c)) => (a => c) `);
    });
 
   it("(a => c) && (b => d), a || b |= c || d", function() {
@@ -126,7 +134,7 @@ If a and b then a && b. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("c || d"))))
-     .equalsTo(`If a => c and b => d and a || b then c || d. `);
+     .equalsTo(`((a => c) && (b => d) && (a || b)) => (c || d) `);
    });
 
   it("a => b |= a => (a && b)", function() {
@@ -135,7 +143,7 @@ If a and b then a && b. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a => (a && b)"))))
-     .equalsTo(`If a => b then a => a && b. `);
+     .equalsTo(`(a => b) => (a => a && b)`);
    });
 
   it("criminal?", function() {
@@ -149,10 +157,12 @@ If a and b then a && b. `);
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("macavity_criminal"))))
-     .equalsTo(`Take that ~thompson_allergy. 
-If dog_fur => thompson_allergy and ~thompson_allergy then ~dog_fur. 
-If cat_fur || dog_fur and ~dog_fur then cat_fur. 
-If cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
+     .equalsTo(`
+      ~thompson_allergy
+      (dog_fur => thompson_allergy && ~thompson_allergy) => ~dog_fur
+      (cat_fur || dog_fur && ~dog_fur) => cat_fur
+      (cat_fur => macavity_criminal && cat_fur) => macavity_criminal
+      `);
 
    });
 
@@ -176,14 +186,16 @@ If cat_fur => macavity_criminal and cat_fur then macavity_criminal. `);
 
     // Can we infer "Brake"?
     assertThat(explain(new Backward(kb).backward(Rule.of("Brake"))))
-     .equalsTo(`Take that Policecar. 
-If Policecar => Policeman and Policecar then Policeman. 
-Take that YellowLight. 
-Take that Dry. 
-If Slippery => ~Dry and ~~Dry then ~Slippery. 
-If YellowLight and ~Slippery then YellowLight && ~Slippery. 
-If Policeman and YellowLight && ~Slippery then Policeman && YellowLight && ~Slippery. 
-If Policeman && ~Slippery && YellowLight => Brake and Policeman && ~Slippery && YellowLight then Brake. `);
+     .equalsTo(`
+      Policecar
+      (Policecar => Policeman && Policecar) => Policeman
+      YellowLight
+      Dry
+      (Slippery => ~Dry && ~~Dry) => ~Slippery
+      (YellowLight && ~Slippery) => YellowLight && ~Slippery
+      (Policeman && YellowLight && ~Slippery) => Policeman && YellowLight && ~Slippery
+      (Policeman && ~Slippery && (YellowLight => Brake) && Policeman && ~Slippery && YellowLight) => Brake
+      `);
 
   });
 
@@ -207,17 +219,18 @@ If Policeman && ~Slippery && YellowLight => Brake and Policeman && ~Slippery && 
 
     // Can we infer "Brake"?
     assertThat(explain(new Backward(kb).backward(Rule.of("q"))))
-     .equalsTo(`Take that a. 
-Take that b. 
-If a and b then a && b. 
-If a && b => l and a && b then l. 
-Take that b. 
-Take that l. 
-If b and l then b && l. 
-If b && l => m and b && l then m. 
-If l and m then l && m. 
-If l && m => p and l && m then p. 
-If p => q and p then q. `);
+     .equalsTo(`
+      a
+      b
+      (a && b) => (a && b)
+      ((a && b => l) && (a && b)) => l
+      b
+      l
+      (b && l) => b && l
+      ((b && l) => m && (b && l)) => m
+      (l && m) => l && m
+      ((l && m) => p && (l && m)) => p
+      (p => q && p) => q `);
 
   });
 
@@ -227,32 +240,47 @@ If p => q and p then q. `);
    for (let reason of reasons) {
     // console.log(reason);                                                                                                  
     if (equals(reason.given, reason.goal)) {
-     result.push("Take that " + stringify(reason.given) + ". ");
+     result.push(stringify(reason.given) + "\n");
     } else {
      let line = [];
-     line.push("If " + stringify(reason.given) + " ");
+     line.push("(");
+     line.push(stringify(reason.given));     
+     line.push(" ");
      let ands = reason.and || [];
      for (let and of ands) {
-      line.push("and " + stringify(and) + " ");
+      line.push("&& " + stringify(and) + " ");
      }
-     line.push("then " + stringify(reason.goal) + ". ");
+     line.push(")");
+     line.push("=> (" + stringify(reason.goal) + ")\n");
      result.push(line.join(""));
     }
    }
    return result.join("\n");
   }
 
+  function toString(program) {
+    let result = "";
+    for (let statement of program.statements) {
+      result += stringify(statement) + "\n";
+    }
+    return result;
+  }
+
   function assertThat(x) {
    return {
     equalsTo(y) {
-     Assert.deepEqual(x, y);
+      let given = Parser.parse(x);
+      let expected = Parser.parse(y);
+      Assert.deepEqual(toString(expected), toString(given));
     },
     proving(y) {
      return {
       equalsTo(z) {
        let kb = Parser.parse(x);
-       assertThat(explain(new Backward(kb).backward(Rule.of(y))))
-        .equalsTo(z);
+       let result = new Backward(kb).backward(Rule.of(y));
+       let explanation = Parser.parse(explain(result));
+       let expected = Parser.parse(z);
+       assertThat(toString(expected)).equalsTo(toString(explanation));
       }
      }
     }
