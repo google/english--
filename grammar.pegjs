@@ -1,4 +1,4 @@
-program = statements:(NL statement NL)* {
+program = statements:(NL* statement EOL)* NL* {
   let rest = statements.map(x => x.filter(y => !Array.isArray(y)));
   return {"@type": "Program", statements: [...rest.map(x => x[0])]}
 }
@@ -19,6 +19,9 @@ implication
   = left:logical op:IMPLICATION right:expression {
     return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
+  / head:IF left:logical op:THEN right:expression {
+    return {"@type": "BinaryOperator", left:left, op:op, right:right};
+   }
 
 negation
   =  NEGATION expression:expression { return {"@type": "UnaryOperator", op: "~", expression: expression} }
@@ -33,10 +36,10 @@ primary
   = predicate
   / "true" { return {"@type": "Constant", name: "true"} }
   / "false" { return {"@type": "Constant", name: "false"} }
-  / id:identifier { return {"@type": "Literal", name: id} }
   / OPENPAREN expression:expression CLOSEPAREN {
     return expression;
    }
+  / id:identifier { return {"@type": "Literal", name: id} }
 
 predicate =
   id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
@@ -64,14 +67,27 @@ OPLOGIC
 
 IMPLICATION
   = _ c:"=>" _ { return c; }
-  / _ c:"then" _ { return "=>"; }
+
+IF
+  = _ c:"if" _ { return c; }
+
+THEN
+  = _ c:"then" _ { return "=>"; }
+
 
 NEGATION
   = _ "~" _
 _
   = [ ]*
 
-NL = [ \n]*
+NL = [ \n]+
+PERIOD = _ "." _
+QUESTION = _ "?" _
+
+EOL
+  = PERIOD
+  / QUESTION
+
 
 QUANTIFIER = 
      "forall"

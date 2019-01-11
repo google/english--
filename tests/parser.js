@@ -65,7 +65,7 @@ describe("Parser", function() {
   });
 
   it("true", function() {
-    assertThat(Parser.parse("true")).equalsTo({
+    assertThat(Parser.parse("true.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "Constant", 
@@ -75,7 +75,7 @@ describe("Parser", function() {
    });
 
   it("false", function() {
-    assertThat(Parser.parse("false")).equalsTo({
+    assertThat(Parser.parse("false.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "Constant", 
@@ -85,7 +85,7 @@ describe("Parser", function() {
    });
 
   it("a", function() {
-    assertThat(Parser.parse("a")).equalsTo({
+    assertThat(Parser.parse("a.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "Literal", 
@@ -95,17 +95,17 @@ describe("Parser", function() {
    });
 
   it("~a", function() {
-    assertThat(Parser.parse("~a"))
+    assertThat(Parser.parse("~a."))
      .equalsTo(program([negation(literal("a"))]));
    });
 
   it("~~a", function() {
-    assertThat(Parser.parse("~~a"))
+    assertThat(Parser.parse("~~a."))
      .equalsTo(program([negation(negation(literal("a")))]));
    });
 
   it("a && b", function() {
-    assertThat(Parser.parse("a && b")).equalsTo({
+    assertThat(Parser.parse("a && b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "BinaryOperator", 
@@ -123,7 +123,7 @@ describe("Parser", function() {
    });
 
   it("a || b", function() {
-    assertThat(Parser.parse("a || b")).equalsTo({
+    assertThat(Parser.parse("a || b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
          "@type": "BinaryOperator", 
@@ -141,7 +141,7 @@ describe("Parser", function() {
    });
 
   it("a ^ b", function() {
-    assertThat(Parser.parse("a ^ b")).equalsTo({
+    assertThat(Parser.parse("a ^ b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -159,7 +159,7 @@ describe("Parser", function() {
    });
 
   it("a => b", function() {
-    assertThat(Parser.parse("a => b")).equalsTo({
+    assertThat(Parser.parse("a => b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -177,12 +177,35 @@ describe("Parser", function() {
    });
 
   it("~a", function() {
-    assertThat(Parser.parse("~a"))
+    assertThat(Parser.parse("~a."))
      .equalsTo(program([negation(literal("a"))]));
    });
 
+   it("a => b. a.", function() {
+    assertThat(Parser.parse("a => b. a."))
+     .equalsTo(program([implies(literal("a"), literal("b")), literal("a")]));
+   });
+
+   it("space at the beginning", function() {
+    assertThat(Parser.parse("    a."))
+     .equalsTo(program([literal("a")]));
+   });
+
+   it("space at the end", function() {
+    assertThat(Parser.parse("a.    "))
+     .equalsTo(program([literal("a")]));
+   });
+
+   it("space at the beginning and end", function() {
+    assertThat(Parser.parse(`
+    a => b.
+    a.
+  `))
+  .equalsTo(program([implies(literal("a"), literal("b")), literal("a")]));
+  });
+
   it("a => b && c", function() {
-    assertThat(Parser.parse("a => b && c")).equalsTo({
+    assertThat(Parser.parse("a => b && c.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -208,7 +231,7 @@ describe("Parser", function() {
    });
 
   it("a && b || c", function() {
-    assertThat(Parser.parse("a && b || c")).equalsTo({
+    assertThat(Parser.parse("a && b || c.")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -234,7 +257,7 @@ describe("Parser", function() {
    });
 
   it("P(a) => Q(a)", function() {
-    assertThat(Parser.parse("P(a) => Q(a)")).equalsTo({
+    assertThat(Parser.parse("P(a) => Q(a).")).equalsTo({
       "@type": "Program", 
       "statements": [{
        "@type": "BinaryOperator", 
@@ -254,7 +277,7 @@ describe("Parser", function() {
    });
 
   it("forall (a) a && b", function() {
-    assertThat(Parser.parse("forall (a) a && b")).equalsTo({
+    assertThat(Parser.parse("forall (a) a && b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "Quantifier",
@@ -277,7 +300,7 @@ describe("Parser", function() {
    });
 
   it("exists (a) a && b", function() {
-    assertThat(Parser.parse("exists (a) a && b")).equalsTo({
+    assertThat(Parser.parse("exists (a) a && b.")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "Quantifier",
@@ -300,7 +323,7 @@ describe("Parser", function() {
    });
 
   it("(forall (x) P(x)) && (true)", function() {
-    assertThat(Parser.parse("(forall (x) P(x)) && (true)"))
+    assertThat(Parser.parse("(forall (x) P(x)) && (true)."))
      .equalsTo(program([
        and(
          forall("x", predicate("P", ["x"])),
@@ -310,7 +333,7 @@ describe("Parser", function() {
    });
 
   it("(exists (x) P(x, a)) && (exists (y) Q(y, b))", function() {
-    assertThat(Parser.parse("(exists (x) P(a, x)) && (exists (x) Q(b, x))"))
+    assertThat(Parser.parse("(exists (x) P(a, x)) && (exists (x) Q(b, x))."))
      .equalsTo(program([
        and(
          exists("x", predicate("P", ["a", "x"])),
@@ -320,7 +343,7 @@ describe("Parser", function() {
    });
 
   it("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))", function() {
-    assertThat(Parser.parse("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))"))
+    assertThat(Parser.parse("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))."))
      .equalsTo(program([
        and(
          exists("x", predicate("father", ["Joe", "x"])),
@@ -330,7 +353,7 @@ describe("Parser", function() {
    });
 
   it("P()", function() {
-    assertThat(Parser.parse("P()")).equalsTo({
+    assertThat(Parser.parse("P().")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "Predicate",
@@ -340,7 +363,7 @@ describe("Parser", function() {
    });
 
   it("P(a)", function() {
-    assertThat(Parser.parse("P(a)")).equalsTo({
+    assertThat(Parser.parse("P(a).")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "Predicate",
@@ -351,7 +374,7 @@ describe("Parser", function() {
    });
 
   it("P(a, b, c)", function() {
-    assertThat(Parser.parse("P(a, b, c)")).equalsTo({
+    assertThat(Parser.parse("P(a, b, c).")).equalsTo({
       "@type": "Program", 
       "statements": [{
         "@type": "Predicate",
@@ -361,8 +384,28 @@ describe("Parser", function() {
      });
    });
 
+   it("line breaks at the end", function() {
+    assertThat(Parser.parse("a.\n\n")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+         "@type": "Literal", 
+         "name": "a"
+        }]
+    });
+  });
+
+  it("line breaks at the beginning", function() {
+    assertThat(Parser.parse("\n\na.")).equalsTo({
+      "@type": "Program", 
+      "statements": [{
+         "@type": "Literal", 
+         "name": "a"
+        }]
+    });
+  });
+
   it("Multiple statements", function() {
-    assertThat(Parser.parse("\na\nb\nc\n")).equalsTo({
+    assertThat(Parser.parse("\na.\nb.\nc.\n")).equalsTo({
       "@type": "Program", 
       "statements": [{
          "@type": "Literal", 
@@ -380,8 +423,8 @@ describe("Parser", function() {
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
     let code = Parser.parse(`
 
-     forall (x) man(x) => mortal(x)
-     man(Socrates)
+     forall (x) man(x) => mortal(x).
+     man(Socrates).
 
     `);
 
@@ -399,22 +442,46 @@ describe("Parser", function() {
   it("1+1", function() {
     try {
      Parser.parse("1+1");
-     fail("blargh");
     } catch (e) {
-     // expected error;
+      // assertThat(message).equalsTo("");
+      // expected
+    }
+  });
+
+  it("if a then b", function() {
+    assertThat(Parser.parse("if a then b."))
+     .equalsTo(program([implies(literal("a"), literal("b"))]));
+  });
+
+  it("a a a", function() {
+    try {
+      Parser.parse("a a a");
+    } catch ({message}) {
+      // expected failure
+      // TODO(goto): i need to find a better way to verify this.
+    }
+  });
+
+  it("a then: syntax error", function() {
+    // we should probably enforce a line break or . between statements.
+    try {
+      Parser.parse("a then b.");
+    } catch (e) {
     }
   });
 
   it("toString", function() {
-    assertThat(Rule.from(Rule.of("a"))).equalsTo("a");
-    assertThat(Rule.from(Rule.of("a && b"))).equalsTo("a && b");
-    assertThat(Rule.from(Rule.of("a || b"))).equalsTo("a || b");
-    assertThat(Rule.from(Rule.of("a => b"))).equalsTo("a => b");
-    assertThat(Rule.from(Rule.of("~a"))).equalsTo("~a");
-    assertThat(Rule.from(Rule.of("a && ~b"))).equalsTo("a && ~b");
-    assertThat(Rule.from(Rule.of("a && ~b || c"))).equalsTo("a && ~b || c");
-    assertThat(Rule.from(Rule.of("a && ~b || c => d"))).equalsTo("a && ~b || c => d");
+    assertThat(Rule.from(Rule.of("a."))).equalsTo("a");
+    assertThat(Rule.from(Rule.of("a && b."))).equalsTo("a && b");
+    assertThat(Rule.from(Rule.of("a || b."))).equalsTo("a || b");
+    assertThat(Rule.from(Rule.of("a => b."))).equalsTo("a => b");
+    assertThat(Rule.from(Rule.of("~a."))).equalsTo("~a");
+    assertThat(Rule.from(Rule.of("a && ~b."))).equalsTo("a && ~b");
+    assertThat(Rule.from(Rule.of("a && ~b || c."))).equalsTo("a && ~b || c");
+    assertThat(Rule.from(Rule.of("a && ~b || c => d."))).equalsTo("a && ~b || c => d");
   });
+
+
 
   function assertThat(x) {
    return {
