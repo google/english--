@@ -86,20 +86,33 @@ describe("first order logic", function() {
   });
 
   function unify(a, b) {
-   if (a["@type"] == "Predicate" &&
-       b["@type"] == "Predicate" &&
+   if (a["@type"] == "Literal" && b["@type"] == "Literal" &&
+       a.name == b.name) {
+    return {};
+   } if ((a["@type"] == "Predicate" && b["@type"] == "Predicate" ||
+          a["@type"] == "Function" && b["@type"] == "Function") &&
        a.name == b.name &&
        a.arguments.length == b.arguments.length) {
     let result = {};
     for (let i = 0; i < a.arguments.length; i++) {
-     if (!a.arguments[i].free && !b.arguments[i].free &&
-         a.arguments[i].name != b.arguments[i].name) {
+     if (!a.arguments[i].free && !b.arguments[i].free) {
+      // if (a.arguments[i].name != b.arguments[i].name) {
+      // }
+      // console.log(a.arguments[i]);
+      // console.log(b.arguments[i]);
+      let inner = unify(a.arguments[i].literal || a.arguments[i].call, 
+                      b.arguments[i].literal || b.arguments[i].call);
+      // console.log(foo);
       // can't unify.
-      return false;
+      if (!inner) {
+       return false;
+      }
+      // return false;
+      result = {...result, ...inner};
      } else if (a.arguments[i].free && !b.arguments[i].free) {
-      result[a.arguments[i].literal.name] = b.arguments[i].literal;
+      result[a.arguments[i].literal.name] = b.arguments[i].literal || b.arguments[i].call;
      } else if (!a.arguments[i].free && b.arguments[i].free) {
-      result[b.arguments[i].literal.name] = a.arguments[i].literal;
+      result[b.arguments[i].literal.name] = a.arguments[i].literal || a.arguments[i].call;
      } else if (a.arguments[i].free && b.arguments[i].free) {
       // sanity check if this is correct.
       result[a.arguments[i].name] = b.arguments[i].name;
@@ -111,6 +124,11 @@ describe("first order logic", function() {
   }
 
   let literal = (x) => {return {"@type": "Literal", "name": x}};
+
+  it("Unify(P(a), P(a))", function() {
+    assertThat(unify(Rule.of("P(a)."), Rule.of("P(a).")))
+     .equalsTo({});
+  });
 
   it("Unify(P(a), P(x?))", function() {
     assertThat(unify(Rule.of("P(a)."), Rule.of("P(x?).")))
@@ -132,9 +150,25 @@ describe("first order logic", function() {
      .equalsTo({"p": literal("x"), "q": literal("y")});
   });
 
-  it.skip("Unify(P(Q(a)), P(x?))", function() {
+  it("Unify(P(Q(a)), P(x?))", function() {
     assertThat(unify(Rule.of("P(Q(a))."), Rule.of("P(x?).")))
-     .equalsTo({"x": "Q(a)"});
+     .equalsTo({"x": {
+        "@type": "Function",
+        "name": "Q",
+        "arguments": [{
+          "@type": "Argument",
+          "literal": {
+           "@type": "Literal",
+            "name": "a"
+          }
+        }] 
+      }
+     });
+  });
+
+  it("Unify(P(Q(a)), P(Q(x?)))", function() {
+    assertThat(unify(Rule.of("P(Q(a))."), Rule.of("P(Q(x?)).")))
+     .equalsTo({"x": literal("a")});
   });
 
   it("Unify failures", function() {
