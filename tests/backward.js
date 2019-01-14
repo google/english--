@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {normalize, stringify, equals} = require("../forward.js");
+const {normalize, stringify, equals, explain} = require("../forward.js");
 const {Parser, Rule} = require("../parser.js");
 const {Backward} = require("../backward.js");
 
@@ -233,30 +233,6 @@ describe("Backward", function() {
       if ((l && m) => p && (l && m)) then p.
       if (p => q && p) then q.`);
   });
-
-  function explain(reasons) {
-   let result = [];
-   // console.log(JSON.stringify(reasons));                                                                                  
-   for (let reason of reasons) {
-    // console.log(reason);                                                                                                  
-    if (equals(reason.given, reason.goal)) {
-     result.push(stringify(reason.given) + ".\n");
-    } else {
-     let line = [];
-     line.push("if (");
-     line.push(stringify(reason.given));     
-     line.push(" ");
-     let ands = reason.and || [];
-     for (let and of ands) {
-      line.push("and " + stringify(and) + " ");
-     }
-     line.push(")");
-     line.push("then (" + stringify(reason.goal) + ").\n");
-     result.push(line.join(""));
-    }
-   }
-   return result.join("\n");
-  }
 
   function toString(program) {
     let result = "";

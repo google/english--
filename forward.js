@@ -271,22 +271,55 @@ class Forward {
 }
 
 function stringify(rule) {
+ // console.log(rule);
  if (rule["@type"] == "Literal") {
   return rule.name;
+ } else if (rule["@type"] == "Quantifier") {
+  return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {
   return `~${stringify(rule.expression)}`;
+ } else if (rule["@type"] == "Predicate") {
+  // console.log(rule.arguments);
+  return `${rule.name}(${rule.arguments.map(x => x.literal.name).join(", ")})`;
  } else if (rule.op) {
-  // NOTE(goto): by not parenthesizing we loose some information                                                           
-  // but on the other hand we gain readability. Not sure if that's                                                         
-  // the right trade-off but works for now.                                                                                
+  // NOTE(goto): by not parenthesizing we loose some information
+  // but on the other hand we gain readability. Not sure if that's
+  // the right trade-off but works for now.
+  // console.log(rule);
   return `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`;
  }
  throw new Error("Unknown rule type" + JSON.stringify(rule));
+}
+
+function explain(reasons) {
+ let result = [];
+ // console.log(JSON.stringify(reasons));                                                                                  
+ for (let reason of reasons) {
+  // console.log(reason);
+  if (equals(reason.given, reason.goal)) {
+   result.push(stringify(reason.given) + ".\n");
+  } else {
+   let line = [];
+   line.push("if (");
+   line.push(stringify(reason.given));     
+   // line.push(" ");
+   let ands = reason.and || [];
+   for (let and of ands) {
+    line.push(" and " + stringify(and));
+   }
+   line.push(")");
+   line.push(" ");
+   line.push("then (" + stringify(reason.goal) + ").\n");
+   result.push(line.join(""));
+  }
+ }
+ return result.join("\n");
 }
 
 module.exports = {
  Forward: Forward,
  normalize: normalize,
  stringify: stringify,
- equals: equals
+ equals: equals,
+ explain: explain
 };

@@ -1,6 +1,6 @@
 const Assert = require("assert");
 const logic = require("../grammar.js");
-const {Forward, normalize, stringify, equals} = require("../forward.js");
+const {Forward, normalize, stringify, equals, explain} = require("../forward.js");
 const {Parser, Rule} = require("../parser.js");
 
 const {
@@ -85,6 +85,23 @@ describe("first order logic", function() {
     `);
   });
 
+  function fill(rule, map) {
+   // clones rule.
+   let result = JSON.parse(JSON.stringify(rule));
+   if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+    for (let arg of result.arguments.filter(y => y.free)) {
+     // console.log(arg);
+     if (!map[arg.literal.name]) {
+      // there is non-unified free variable
+      return false;
+     }
+     delete arg.free;
+     arg.literal = map[arg.literal.name];
+    }
+   }
+   return result;
+  }
+
   function unify(a, b) {
    // Find all substitutions.
    let result = reduce(a, b);
@@ -93,24 +110,11 @@ describe("first order logic", function() {
     return false;
    }
 
-   // Fill the substitutions.
-   let fill = (x) => {
-    if (x["@type"] == "Function") {
-     for (let arg of x.arguments.filter(y => y.free)) {
-      // console.log(arg);
-      if (!result[arg.literal.name]) {
-       // there is non-unified free variable
-       return false;
-      }
-      delete arg.free;
-      arg.literal = result[arg.literal.name];
-     }
-    }
-   };
-
    for (let [key, value] of Object.entries(result)) {
     // console.log(value);
-    fill(value);
+    // fill(value);
+    // result[key] = fill(value);
+    result[key] = fill(value, result);
    }
    return result;
   }
@@ -217,19 +221,63 @@ describe("first order logic", function() {
        .equalsTo(false);
   });
 
-  it.skip("modus ponens", function() {
+  it("generalized modus ponens", function() {
     // doesn't throw a parse exception.
     let kb = Parser.parse(`
-        forall(x) men(x) => mortal(x). 
+        forall(x) men(x?) => mortal(x?). 
         men(socrates).
     `);
 
-    let q = Parser.parse(`mortal(socrates)?`);
+    let q = Rule.of(`mortal(socrates)?`);
 
-    console.log(kb);
-    console.log(q);
+    // console.log(kb);
+    // console.log(q);
 
-    
+    function backward(goal) {
+     if (goal["@type"] == "Predicate") {
+      for (let predicate of kb.statements.filter(x => x["@type"] == "Predicate")) {
+       if (predicate.name == goal.name &&
+           predicate.arguments.length == goal.arguments.length) {
+        // console.log("checking predicates");
+        let matches = true;
+        for (let i = 0; i < predicate.arguments.length; i++) {
+         if (!equals(predicate.arguments[i], goal.arguments[i])) {
+          matches = false;
+          break;
+         }
+        }
+        if (matches) {
+         return [predicate];
+        }
+       }
+      }
+     }
+     // Searches for something that implies goal.
+     for (let statement of kb.statements) {
+      // console.log(statement);
+      if (statement["@type"] == "Quantifier" &&
+          statement.expression.op == "=>") {
+       let implication = statement.expression.right;
+       // console.log(implication);
+       let unifies = unify(implication, goal);
+       if (unifies) {
+        // console.log(unifies);
+        let left = fill(statement.expression.left, unifies);
+        // console.log(JSON.stringify(left));
+        let dep = backward(left);
+        if (dep) {
+         return [{given: statement, and: [...dep], goal: goal}];
+        }
+       }
+      }
+     }
+
+     return false;
+    }
+
+    let result = explain(backward(q));
+    assertThat(result)
+     .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).\n");
   });
 
   function assertThat(x) {
