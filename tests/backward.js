@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {normalize, stringify, equals, explain} = require("../forward.js");
+const {normalize, stringify, equals, explain, toString} = require("../forward.js");
 const {Parser, Rule} = require("../parser.js");
 const {Backward} = require("../backward.js");
 
@@ -233,14 +233,6 @@ describe("Backward", function() {
       if ((l && m) => p && (l && m)) then p.
       if (p => q && p) then q.`);
   });
-
-  function toString(program) {
-    let result = "";
-    for (let statement of program.statements) {
-      result += stringify(statement) + ".\n";
-    }
-    return result;
-  }
 
   function assertThat(x) {
    return {

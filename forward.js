@@ -316,10 +316,19 @@ function explain(reasons) {
  return result.join("\n");
 }
 
+function toString(program) {
+ let result = "";
+ for (let statement of program.statements) {
+  result += stringify(statement) + ".\n";
+ }
+ return result;
+}
+
 module.exports = {
  Forward: Forward,
  normalize: normalize,
  stringify: stringify,
  equals: equals,
- explain: explain
+ explain: explain,
+ toString: toString
 };

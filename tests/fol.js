@@ -1,6 +1,6 @@
 const Assert = require("assert");
 const logic = require("../grammar.js");
-const {Forward, normalize, stringify, equals, explain} = require("../forward.js");
+const {Forward, normalize, stringify, equals, explain, toString} = require("../forward.js");
 const {Parser, Rule} = require("../parser.js");
 const {Reasoner, fill, unify} = require("../fol.js");
 
@@ -166,6 +166,14 @@ describe("first order logic", function() {
     let q = Rule.of(`mortal(socrates)?`);
 
     let result = explain(new Reasoner(kb).backward(q));
+
+
+    let p = Parser.parse(`
+      if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).
+    `);
+
+    // console.log(toString(p));
+
     assertThat(result)
      .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).\n");
   });
