@@ -264,13 +264,13 @@ describe("Parser", function() {
        "left": {
          "@type": "Predicate",
           "name": "P",
-         "arguments": ["a"],        
+         "arguments": [{"@type": "Argument", name: "a"}],
        },
        "op": "=>",
        "right": {
          "@type": "Predicate",
          "name": "Q",
-         "arguments": ["a"]
+         "arguments": [{"@type": "Argument", name: "a"}]
         }
       }]
      });
@@ -326,7 +326,7 @@ describe("Parser", function() {
     assertThat(Parser.parse("(forall (x) P(x)) && (true)."))
      .equalsTo(program([
        and(
-         forall("x", predicate("P", ["x"])),
+         forall("x", predicate("P", [arg("x")])),
          constant("true")
        )
      ]));
@@ -336,8 +336,8 @@ describe("Parser", function() {
     assertThat(Parser.parse("(exists (x) P(a, x)) && (exists (x) Q(b, x))."))
      .equalsTo(program([
        and(
-         exists("x", predicate("P", ["a", "x"])),
-         exists("x", predicate("Q", ["b", "x"])),
+         exists("x", predicate("P", [arg("a"), arg("x")])),
+         exists("x", predicate("Q", [arg("b"), arg("x")])),
        )
      ]));
    });
@@ -346,8 +346,8 @@ describe("Parser", function() {
     assertThat(Parser.parse("(exists (x) father(Joe, x)) && (exists (x) mother(Joe, x))."))
      .equalsTo(program([
        and(
-         exists("x", predicate("father", ["Joe", "x"])),
-         exists("x", predicate("mother", ["Joe", "x"]))
+           exists("x", predicate("father", [arg("Joe"), arg("x")])),
+           exists("x", predicate("mother", [arg("Joe"), arg("x")]))
        )
      ]));
    });
@@ -368,7 +368,7 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Predicate",
         "name": "P",
-        "arguments": ["a"]
+        "arguments": [{"@type": "Argument", "name": "a"}]
        }]
      });
    });
@@ -379,7 +379,10 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Predicate",
         "name": "P",
-        "arguments": ["a", "b", "c"]
+        "arguments": [
+          {"@type": "Argument", "name": "a"},
+          {"@type": "Argument", "name": "b"},
+          {"@type": "Argument", "name": "c"}]
        }]
      });
    });
@@ -420,6 +423,17 @@ describe("Parser", function() {
     });
   });
 
+  let arg = (x, free) => {
+   let result = {
+    "@type": "Argument",
+    "name": x
+   };
+   if (free) {
+    result["free"] = true
+   }
+   return result;
+  }
+
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
     let code = Parser.parse(`
 
@@ -429,8 +443,8 @@ describe("Parser", function() {
     `);
 
     assertThat(code).equalsTo(program([
-      forall("x", implies(predicate("man", ["x"]), predicate("mortal", ["x"]))),
-      predicate("man", ["Socrates"])
+      forall("x", implies(predicate("man", [arg("x")]), predicate("mortal", [arg("x")]))),
+      predicate("man", [arg("Socrates")])
     ]));
 
     // Can we infer mortal(Socrates)?

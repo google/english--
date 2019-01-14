@@ -43,9 +43,17 @@ primary
 
 predicate =
   id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
-  / id:identifier OPENPAREN head:identifier tail:("," identifier)* CLOSEPAREN { 
-    let rest = tail.map(x => x[1]);
-    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+  / id:identifier OPENPAREN head:identifier free:QUESTION? tail:("," identifier QUESTION?)* CLOSEPAREN { 
+    // console.log(tail);
+    let arg = (name, free) => {
+      let result = {"@type": "Argument", name: name}; 
+      if (free == "?") {
+        result.free = true; 
+      }
+      return result;
+    };
+    let rest = tail.map(x => arg(x[1], x[2]));
+    return {"@type": "Predicate", name: id, arguments: [arg(head, free), ...rest]}
   }
   
 identifier "identifier"
@@ -81,8 +89,8 @@ _
   = [ ]*
 
 NL = [ \n]+
-PERIOD = _ "." _
-QUESTION = _ "?" _
+PERIOD = _ "." _ { return "."; }
+QUESTION = _ "?" _ { return "?"; }
 
 EOL
   = PERIOD
