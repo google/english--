@@ -31,7 +31,7 @@ logical
     return {"@type": "BinaryOperator", left:left, op:op, right:right};
    }
   / primary
- 
+
 primary
   = predicate
   / "true" { return {"@type": "Constant", name: "true"} }
@@ -43,17 +43,26 @@ primary
 
 predicate =
   id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
-  / id:identifier OPENPAREN head:identifier free:QUESTION? tail:("," identifier QUESTION?)* CLOSEPAREN { 
-    // console.log(tail);
-    let arg = (name, free) => {
-      let result = {"@type": "Argument", name: name}; 
-      if (free == "?") {
-        result.free = true; 
-      }
-      return result;
-    };
-    let rest = tail.map(x => arg(x[1], x[2]));
-    return {"@type": "Predicate", name: id, arguments: [arg(head, free), ...rest]}
+  / id:identifier OPENPAREN head:argument tail:("," argument)* CLOSEPAREN { 
+    let rest = tail.map(x => x[1]);
+    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+  }
+
+argument =
+  call:function { return {"@type": "Argument", "call" : call} }
+  / name:identifier free:QUESTION? {
+    let result = {"@type": "Argument", name: name}; 
+    if (free == "?") {
+      result.free = true;
+    }
+    return result;
+  }
+
+function =
+  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Function", name: id} }
+  / id:identifier OPENPAREN head:argument tail:("," argument)* CLOSEPAREN { 
+    let rest = tail.map(x => x[1]);
+    return {"@type": "Function", name: id, arguments: [head, ...rest]}
   }
   
 identifier "identifier"

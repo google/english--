@@ -25,7 +25,7 @@ describe("first order logic", function() {
     `);
   });
 
-  it("free variables", function() {
+  it("parser - free variables", function() {
     assertThat(Rule.of("P(x?).")).equalsTo({
       "@type": "Predicate",
       "name": "P",
@@ -37,7 +37,7 @@ describe("first order logic", function() {
     });
   });
 
-  it("multiple free variables", function() {
+  it("parser - multiple free variables", function() {
     assertThat(Rule.of("P(x?, y?).").arguments).equalsTo([{
         "@type": "Argument",
         "name": "x",
@@ -49,7 +49,7 @@ describe("first order logic", function() {
       }]);
   });
 
-  it("mixed variables", function() {
+  it("parser - mixed variables", function() {
     assertThat(Rule.of("P(x, y?, z).").arguments).equalsTo([{
         "@type": "Argument",
         "name": "x"
@@ -61,6 +61,20 @@ describe("first order logic", function() {
         "@type": "Argument",
         "name": "z"
       }]);
+  });
+
+  it("parser - function args", function() {
+    assertThat(Rule.of("P(Q(x)).").arguments[0]).equalsTo({
+      "@type": "Argument",
+      "call": {
+       "@type": "Function",
+       "name": "Q",
+       "arguments": [{
+         "@type": "Argument",
+         "name": "x"
+       }]
+      }
+    });
   });
 
   it.skip("multiple variables", function() {
