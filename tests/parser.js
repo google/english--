@@ -264,13 +264,13 @@ describe("Parser", function() {
        "left": {
          "@type": "Predicate",
           "name": "P",
-         "arguments": [{"@type": "Argument", name: "a"}],
+          "arguments": [arg("a")],
        },
        "op": "=>",
        "right": {
          "@type": "Predicate",
          "name": "Q",
-         "arguments": [{"@type": "Argument", name: "a"}]
+         "arguments": [arg("a")]
         }
       }]
      });
@@ -368,7 +368,7 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Predicate",
         "name": "P",
-        "arguments": [{"@type": "Argument", "name": "a"}]
+        "arguments": [arg("a")]
        }]
      });
    });
@@ -379,10 +379,7 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Predicate",
         "name": "P",
-        "arguments": [
-          {"@type": "Argument", "name": "a"},
-          {"@type": "Argument", "name": "b"},
-          {"@type": "Argument", "name": "c"}]
+        "arguments": [arg("a"), arg("b"), arg("c")]
        }]
      });
    });
@@ -426,7 +423,10 @@ describe("Parser", function() {
   let arg = (x, free) => {
    let result = {
     "@type": "Argument",
-    "name": x
+    "literal": {
+      "@type": "Literal",
+      "name": x
+    }
    };
    if (free) {
     result["free"] = true

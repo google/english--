@@ -173,7 +173,7 @@ function peg$parse(input, options) {
         },
       peg$c17 = function(call) { return {"@type": "Argument", "call" : call} },
       peg$c18 = function(name, free) {
-          let result = {"@type": "Argument", name: name}; 
+          let result = {"@type": "Argument", literal: {"@type": "Literal", name: name}}; 
           if (free == "?") {
             result.free = true;
           }

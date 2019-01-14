@@ -31,7 +31,7 @@ describe("first order logic", function() {
       "name": "P",
       "arguments": [{
         "@type": "Argument",
-        "name": "x",
+        "literal": {"@type": "Literal", "name": "x"},
         free: true
       }]
     });
@@ -40,11 +40,11 @@ describe("first order logic", function() {
   it("parser - multiple free variables", function() {
     assertThat(Rule.of("P(x?, y?).").arguments).equalsTo([{
         "@type": "Argument",
-        "name": "x",
+        "literal": {"@type": "Literal", "name": "x"},
         free: true
       }, {
         "@type": "Argument",
-        "name": "y",
+        "literal": {"@type": "Literal", "name": "y"},
         free: true
       }]);
   });
@@ -52,14 +52,14 @@ describe("first order logic", function() {
   it("parser - mixed variables", function() {
     assertThat(Rule.of("P(x, y?, z).").arguments).equalsTo([{
         "@type": "Argument",
-        "name": "x"
+        "literal": {"@type": "Literal", "name": "x"},
       }, {
         "@type": "Argument",
-        "name": "y",
+        "literal": {"@type": "Literal", "name": "y"},
         free: true
       }, {
         "@type": "Argument",
-        "name": "z"
+        "literal": {"@type": "Literal", "name": "z"}
       }]);
   });
 
@@ -71,7 +71,7 @@ describe("first order logic", function() {
        "name": "Q",
        "arguments": [{
          "@type": "Argument",
-         "name": "x"
+         "literal": {"@type": "Literal", "name": "x"},
        }]
       }
     });
@@ -97,9 +97,9 @@ describe("first order logic", function() {
       // can't unify.
       return false;
      } else if (a.arguments[i].free && !b.arguments[i].free) {
-      result[a.arguments[i].name] = b.arguments[i].name;
+      result[a.arguments[i].literal.name] = b.arguments[i].literal;
      } else if (!a.arguments[i].free && b.arguments[i].free) {
-      result[b.arguments[i].name] = a.arguments[i].name;
+      result[b.arguments[i].literal.name] = a.arguments[i].literal;
      } else if (a.arguments[i].free && b.arguments[i].free) {
       // sanity check if this is correct.
       result[a.arguments[i].name] = b.arguments[i].name;
@@ -110,24 +110,31 @@ describe("first order logic", function() {
    return false;
   }
 
+  let literal = (x) => {return {"@type": "Literal", "name": x}};
+
   it("Unify(P(a), P(x?))", function() {
     assertThat(unify(Rule.of("P(a)."), Rule.of("P(x?).")))
-     .equalsTo({"x": "a"});
+     .equalsTo({"x": literal("a")});
   });
 
   it("Unify(P(a, b), P(a, x?))", function() {
     assertThat(unify(Rule.of("P(a, b)."), Rule.of("P(a, x?).")))
-     .equalsTo({"x": "b"});
+     .equalsTo({"x": literal("b")});
   });
 
   it("Unify(P(y?, b), P(a, x?))", function() {
     assertThat(unify(Rule.of("P(y?, b)."), Rule.of("P(a, x?).")))
-     .equalsTo({"x": "b", "y": "a"});
+     .equalsTo({"x": literal("b"), "y": literal("a")});
   });
 
   it("Unify(P(p?, q?), P(x, y))", function() {
     assertThat(unify(Rule.of("a(p?, q?)."), Rule.of("a(x, y).")))
-     .equalsTo({"p": "x", "q": "y"});
+     .equalsTo({"p": literal("x"), "q": literal("y")});
+  });
+
+  it.skip("Unify(P(Q(a)), P(x?))", function() {
+    assertThat(unify(Rule.of("P(Q(a))."), Rule.of("P(x?).")))
+     .equalsTo({"x": "Q(a)"});
   });
 
   it("Unify failures", function() {
