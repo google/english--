@@ -156,30 +156,32 @@ describe("first order logic", function() {
        .equalsTo(false);
   });
 
+  it("universal introduction", function() {
+    assertThat("forall(x) P(x?).")
+     .proving("P(a)?")
+     .equalsTo("if (forall (x) P(x)) then (P(a)).");
+  });
+
   it("generalized modus ponens", function() {
-    // doesn't throw a parse exception.
-    let kb = Parser.parse(`
+    assertThat(`
         forall(x) men(x?) => mortal(x?). 
         men(socrates).
-    `);
-
-    let q = Rule.of(`mortal(socrates)?`);
-
-    let result = explain(new Reasoner(kb).backward(q));
-
-
-    let p = Parser.parse(`
-      if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).
-    `);
-
-    // console.log(toString(p));
-
-    assertThat(result)
-     .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).\n");
+    `)
+     .proving(`mortal(socrates)?`)
+     .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).");
   });
 
   function assertThat(x) {
    return {
+    proving(z) {
+     let result = explain(new Reasoner(Parser.parse(x)).backward(Rule.of(z)));
+     return {
+      equalsTo(y) {
+       assertThat(toString(Parser.parse(result)))
+        .equalsTo(toString(Parser.parse(y)));
+      }
+     };
+    },
     equalsTo(y) {
      Assert.deepEqual(x, y);
     }

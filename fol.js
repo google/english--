@@ -4,12 +4,14 @@ class Reasoner {
  constructor(kb) {
   this.kb = kb;
  }
+ find(predicate) {
+  return this.kb.statements.filter(statement => (statement["@type"] == predicate));
+ }
  backward(goal) {
   if (goal["@type"] == "Predicate") {
-   for (let predicate of this.kb.statements.filter(x => x["@type"] == "Predicate")) {
+   for (let predicate of this.find("Predicate")) {
     if (predicate.name == goal.name &&
         predicate.arguments.length == goal.arguments.length) {
-     // console.log("checking predicates");
      let matches = true;
      for (let i = 0; i < predicate.arguments.length; i++) {
       if (!equals(predicate.arguments[i], goal.arguments[i])) {
@@ -23,18 +25,29 @@ class Reasoner {
     }
    }
   }
+
+  // Universal introduction
+  for (let statement of this.find("Quantifier")) {
+   if (statement.op != "forall") {
+    continue;
+   }
+   // console.log(goal);
+   let unifies = unify(statement.expression, goal);
+   if (unifies) {
+    // console.log(unifies);
+    return [{given: statement, goal: goal}];
+   }
+  }
+
   // Searches for something that implies goal.
   for (let statement of this.kb.statements) {
-   // console.log(statement);
    if (statement["@type"] == "Quantifier" &&
+       statement.op == "forall" &&
        statement.expression.op == "=>") {
     let implication = statement.expression.right;
-    // console.log(implication);
     let unifies = unify(implication, goal);
     if (unifies) {
-     // console.log(unifies);
      let left = fill(statement.expression.left, unifies);
-     // console.log(JSON.stringify(left));
      let dep = this.backward(left);
      if (dep) {
       return [{given: statement, and: [...dep], goal: goal}];
