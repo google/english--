@@ -86,6 +86,36 @@ describe("first order logic", function() {
   });
 
   function unify(a, b) {
+   // Find all substitutions.
+   let result = reduce(a, b);
+
+   if (!result) {
+    return false;
+   }
+
+   // Fill the substitutions.
+   let fill = (x) => {
+    if (x["@type"] == "Function") {
+     for (let arg of x.arguments.filter(y => y.free)) {
+      // console.log(arg);
+      if (!result[arg.literal.name]) {
+       // there is non-unified free variable
+       return false;
+      }
+      delete arg.free;
+      arg.literal = result[arg.literal.name];
+     }
+    }
+   };
+
+   for (let [key, value] of Object.entries(result)) {
+    // console.log(value);
+    fill(value);
+   }
+   return result;
+  }
+
+  function reduce(a, b) {
    if (a["@type"] == "Literal" && b["@type"] == "Literal" &&
        a.name == b.name) {
     return {};
@@ -96,18 +126,12 @@ describe("first order logic", function() {
     let result = {};
     for (let i = 0; i < a.arguments.length; i++) {
      if (!a.arguments[i].free && !b.arguments[i].free) {
-      // if (a.arguments[i].name != b.arguments[i].name) {
-      // }
-      // console.log(a.arguments[i]);
-      // console.log(b.arguments[i]);
       let inner = unify(a.arguments[i].literal || a.arguments[i].call, 
                       b.arguments[i].literal || b.arguments[i].call);
-      // console.log(foo);
-      // can't unify.
+      // can't unify inner.
       if (!inner) {
        return false;
       }
-      // return false;
       result = {...result, ...inner};
      } else if (a.arguments[i].free && !b.arguments[i].free) {
       result[a.arguments[i].literal.name] = b.arguments[i].literal || b.arguments[i].call;
@@ -171,7 +195,22 @@ describe("first order logic", function() {
      .equalsTo({"x": literal("a")});
   });
 
-  it("Unify failures", function() {
+  it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
+    assertThat(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")))
+     .equalsTo({"y": literal("a"), "x": {
+        "@type": "Function",
+        "name": "Q",
+        "arguments": [{
+          "@type": "Argument",
+          "literal": {
+           "@type": "Literal",
+            "name": "a"
+          }
+        }]
+     }});
+  });
+
+  it("Unify fails", function() {
     assertThat(unify(Rule.of("a(x?)."), Rule.of("b(y).")))
        .equalsTo(false);
     assertThat(unify(Rule.of("a(x?)."), Rule.of("a(y, z).")))
