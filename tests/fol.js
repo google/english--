@@ -78,22 +78,49 @@ describe("first order logic", function() {
        a.arguments.length == b.arguments.length) {
     let result = {};
     for (let i = 0; i < a.arguments.length; i++) {
-       result[a.arguments[i].name] = b.arguments[i].name;
+     if (!a.arguments[i].free && !b.arguments[i].free &&
+         a.arguments[i].name != b.arguments[i].name) {
+      // can't unify.
+      return false;
+     } else if (a.arguments[i].free && !b.arguments[i].free) {
+      result[a.arguments[i].name] = b.arguments[i].name;
+     } else if (!a.arguments[i].free && b.arguments[i].free) {
+      result[b.arguments[i].name] = a.arguments[i].name;
+     } else if (a.arguments[i].free && b.arguments[i].free) {
+      // sanity check if this is correct.
+      result[a.arguments[i].name] = b.arguments[i].name;
+     }
     }
     return result;
    }
    return false;
   }
 
-  it("unification", function() {
-    assertThat(unify(Rule.of("a(x?)."), Rule.of("a(y).")))
-       .equalsTo({"x": "y"});
+  it("Unify(P(a), P(x?))", function() {
+    assertThat(unify(Rule.of("P(a)."), Rule.of("P(x?).")))
+     .equalsTo({"x": "a"});
+  });
+
+  it("Unify(P(a, b), P(a, x?))", function() {
+    assertThat(unify(Rule.of("P(a, b)."), Rule.of("P(a, x?).")))
+     .equalsTo({"x": "b"});
+  });
+
+  it("Unify(P(y?, b), P(a, x?))", function() {
+    assertThat(unify(Rule.of("P(y?, b)."), Rule.of("P(a, x?).")))
+     .equalsTo({"x": "b", "y": "a"});
+  });
+
+  it("Unify(P(p?, q?), P(x, y))", function() {
+    assertThat(unify(Rule.of("a(p?, q?)."), Rule.of("a(x, y).")))
+     .equalsTo({"p": "x", "q": "y"});
+  });
+
+  it("Unify failures", function() {
     assertThat(unify(Rule.of("a(x?)."), Rule.of("b(y).")))
        .equalsTo(false);
     assertThat(unify(Rule.of("a(x?)."), Rule.of("a(y, z).")))
        .equalsTo(false);
-    assertThat(unify(Rule.of("a(p?, q?)."), Rule.of("a(x, y).")))
-     .equalsTo({"p": "x", "q": "y"});
   });
 
   it.skip("modus ponens", function() {
