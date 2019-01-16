@@ -15,24 +15,6 @@ class Reasoner extends Backward {
    return propositional;
   }
 
-  if (goal["@type"] == "Predicate") {
-   for (let predicate of this.find("Predicate")) {
-    if (predicate.name == goal.name &&
-        predicate.arguments.length == goal.arguments.length) {
-     let matches = true;
-     for (let i = 0; i < predicate.arguments.length; i++) {
-      if (!equals(predicate.arguments[i], goal.arguments[i])) {
-       matches = false;
-       break;
-      }
-     }
-     if (matches) {
-      return [{given: predicate, goal: goal}];
-     }
-    }
-   }
-  }
-
   // Universal introduction
   for (let statement of this.find("Quantifier")) {
    if (statement.op != "forall") {
@@ -54,10 +36,11 @@ class Reasoner extends Backward {
     // console.log(implication);
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
-     console.log(left);
+     // console.log(left);
      let dep = this.backward(left);
      if (dep) {
-      return [{given: statement, and: [...dep], goal: goal}];
+      // console.log(dep);
+      return [...dep, {given: statement, and: dep.map(d => d.goal), goal: goal}];
      }
     }
    }

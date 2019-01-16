@@ -27,7 +27,7 @@ describe("Backward", function() {
      .equalsTo(`
       a.
       if (a => b && a) then b.
-      `);
+    `);
    });
 
   it("a => b, ~b |= ~a?", function() {

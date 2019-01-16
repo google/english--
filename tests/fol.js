@@ -167,13 +167,16 @@ describe("First order logic", function() {
      .equalsTo("if (forall (x) P(x)) then (P(a)).");
   });
 
-  it.skip("Generalized modus ponens", function() {
+  it("Generalized modus ponens", function() {
     assertThat(`
         forall(x) men(x?) => mortal(x?). 
         men(socrates).
     `)
-     .proving(`mortal(socrates)?`)
-     .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).");
+     .proving("mortal(socrates)?")
+     .equalsTo(`
+        men(socrates). 
+        (forall (x) men(x) => mortal(x) and men(socrates)) => mortal(socrates).
+     `);
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
@@ -183,11 +186,6 @@ describe("First order logic", function() {
     let kb = Parser.parse("a(x) => b(x). a(x).");
     let result = new Backward(kb)
      .backward(Rule.of("b(x)?"));
-    console.log(explain(result));
-    return;
-    assertThat("a(x) => b(x). a(x).")
-     .proving("b(x)?")
-     .equalsTo("a(x) => b(x). if (a(x) => b(x) and a(x)) then b(x).");
   });
 
   it("a(x) => b(x). a(x). |= b(x)", function() {
@@ -210,6 +208,84 @@ describe("First order logic", function() {
      .proving("a(x) || b(x)?")
      .equalsTo("a(x). if (a(x)) then a(x) || b(x).");
   });
+
+  it("a(x) => b(x), ~b(x) |= ~a(x)?", function() {
+    assertThat(`
+      a(x) => b(x).
+      ~b(x).
+    `)
+     .proving("~a(x)?")
+     .equalsTo(`
+      ~b(x).
+      a(x) => b(x) && ~b(x) => ~a(x).
+    `);
+   });
+
+  it("a(x) || b(x), ~a(x) |= b(x)?", function() {
+    assertThat(`
+       a(x) || b(x).
+       ~a(x).
+    `)
+     .proving("b(x)?")
+     .equalsTo(`
+       ~a(x).
+       a(x) || b(x) && ~a(x) => b(x).
+    `);
+   });
+
+  it("a(x) || b(x), ~b(x) |= a(x)?", function() {
+    assertThat("a(x) || b(x). ~b(x).")
+    .proving("a(x)?")
+    .equalsTo("~b(x). a(x) || b(x) && ~b(x) => a(x).");
+   });
+
+  it("a(x) |= a(x) || b(x)?", function() {
+    assertThat("a(x).")
+     .proving("a(x) || b(x)?")
+     .equalsTo("a(x). a(x) => a(x) || b(x).");
+   });
+
+  it("a(x) |= b(x) || a(x)?", function() {
+    assertThat("a(x).")
+    .proving("b(x) || a(x)?")
+    .equalsTo("a(x). a(x) => b(x) || a(x).");
+   });
+
+  it("a(x) && b(x) |= a(x)?", function() {
+    assertThat("a(x) && b(x).")
+    .proving("a(x).")
+    .equalsTo("a(x) && b(x) => a(x).");
+   });
+
+  it("b(x) && a(x) |= a(x)?", function() {
+    assertThat("b(x) && a(x).")
+     .proving("a(x).")
+     .equalsTo("b(x) && a(x) => a(x).");
+   });
+
+  it("a(x), b(x) |= a(x) && b(x)?", function() {
+    assertThat("a(x). b(x).")
+    .proving("a(x) && b(x)?")
+    .equalsTo("a(x). b(x). a(x) && b(x) => a(x) && b(x).");
+   });
+
+  it("a(x) => b(x), b(x) => c(x) |= a(x) => c(x)?", function() {
+    assertThat("a(x) => b(x). b(x) => c(x).")
+     .proving("a(x) => c(x)?")
+     .equalsTo("((a(x) => b(x)) && (b(x) => c(x))) => (a(x) => c(x)).");
+   });
+
+  it("(a(x) => c(x)) && (b(x) => d(x)), a(x) || b(x) |= c(x) || d(x)", function() {
+    assertThat("a(x) => c(x). b(x) => d(x). a(x) || b(x).")
+     .proving("c(x) || d(x)?")
+     .equalsTo("if ((a(x) => c(x)) and (b(x) => d(x)) and (a(x) || b(x))) then c(x) || d(x).");
+   });
+
+  it("a(x) => b(x) |= a(x) => (a(x) && b(x))", function() {
+    assertThat("a(x) => b(x).")
+     .proving("a(x) => (a(x) && b(x))?")
+     .equalsTo("if (a(x) => b(x)) then a(x) => a(x) && b(x).");
+   });
 
   function assertThat(x) {
    return {

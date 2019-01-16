@@ -306,6 +306,7 @@ function explain(reasons) {
    // line.push(" ");
    let ands = reason.and || [];
    for (let and of ands) {
+    // console.log(and);
     line.push(" and " + stringify(and));
    }
    line.push(")");
