@@ -1,13 +1,20 @@
 const {equals} = require("./forward.js");
+const {Backward} = require("./backward.js");
 
-class Reasoner {
+class Reasoner extends Backward {
  constructor(kb) {
-  this.kb = kb;
+  super(kb);
+  // this.kb = kb;
  }
  find(predicate) {
-  return this.kb.statements.filter(statement => (statement["@type"] == predicate));
+  return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal) {
+  let propositional = super.backward(goal);
+  if (propositional.length > 0) {
+   return propositional;
+  }
+
   if (goal["@type"] == "Predicate") {
    for (let predicate of this.find("Predicate")) {
     if (predicate.name == goal.name &&
@@ -20,7 +27,7 @@ class Reasoner {
       }
      }
      if (matches) {
-      return [predicate];
+      return [{given: predicate, goal: goal}];
      }
     }
    }
@@ -31,23 +38,23 @@ class Reasoner {
    if (statement.op != "forall") {
     continue;
    }
-   // console.log(goal);
    let unifies = unify(statement.expression, goal);
    if (unifies) {
-    // console.log(unifies);
     return [{given: statement, goal: goal}];
    }
   }
 
   // Searches for something that implies goal.
-  for (let statement of this.kb.statements) {
-   if (statement["@type"] == "Quantifier" &&
-       statement.op == "forall" &&
+  for (let statement of this.find("Quantifier")) {
+   // console.log(statement.expression.op);
+   if (statement.op == "forall" &&
        statement.expression.op == "=>") {
     let implication = statement.expression.right;
     let unifies = unify(implication, goal);
+    // console.log(implication);
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
+     console.log(left);
      let dep = this.backward(left);
      if (dep) {
       return [{given: statement, and: [...dep], goal: goal}];
@@ -56,7 +63,7 @@ class Reasoner {
    }
   }
 
-  return false;
+  return [];
  }
 }
 

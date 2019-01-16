@@ -74,7 +74,7 @@ describe("Backward", function() {
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("a || b?"))))
-     .equalsTo(`a => a || b.`);
+     .equalsTo(`a. a => a || b.`);
    });
 
   it("a |= b || a?", function() {
@@ -83,7 +83,7 @@ describe("Backward", function() {
     `);
 
     assertThat(explain(new Backward(code).backward(Rule.of("b || a?"))))
-     .equalsTo(`a => b || a.`);
+     .equalsTo(`a. a => b || a.`);
    });
 
   it("a && b |= a?", function() {

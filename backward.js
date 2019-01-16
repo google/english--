@@ -142,14 +142,14 @@ class Backward {
    stack.pop();
    if (left.length > 0) {
     this.kb.push(goal);
-    return [{given: goal.left, goal: goal}];
+    return [...left, {given: goal.left, goal: goal}];
    }
    stack.push(goal);
    let right = this.backward(goal.right, stack);
    stack.pop()
    if (right.length > 0) {
     this.kb.push(goal);
-    return [{given: goal.right, goal: goal}];
+    return [...right, {given: goal.right, goal: goal}];
    }
   }
 

@@ -296,6 +296,7 @@ function explain(reasons) {
  // console.log(JSON.stringify(reasons));                                                                                  
  for (let reason of reasons) {
   // console.log(reason);
+  // console.log(reason);
   if (equals(reason.given, reason.goal)) {
    result.push(stringify(reason.given) + ".\n");
   } else {

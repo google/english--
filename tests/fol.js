@@ -17,13 +17,18 @@ const {
  or, 
  negation} = Parser;
 
-describe("first order logic", function() {
+describe("First order logic", function() {
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse(`
         forall(x) mortal(x). 
         exists(x) men(x).
     `);
+  });
+
+  it("parser", function() {
+    // doesn't throw a parse exception.
+    Parser.parse("forall(x) (king(x) && greedy(x) => evil(x)).");
   });
 
   it("parser - free variables", function() {
@@ -156,19 +161,54 @@ describe("first order logic", function() {
        .equalsTo(false);
   });
 
-  it("universal introduction", function() {
+  it("Universal introduction", function() {
     assertThat("forall(x) P(x?).")
      .proving("P(a)?")
      .equalsTo("if (forall (x) P(x)) then (P(a)).");
   });
 
-  it("generalized modus ponens", function() {
+  it.skip("Generalized modus ponens", function() {
     assertThat(`
         forall(x) men(x?) => mortal(x?). 
         men(socrates).
     `)
      .proving(`mortal(socrates)?`)
      .equalsTo("if (forall (x) men(x) => mortal(x) and men(socrates)) then (mortal(socrates)).");
+  });
+
+  it("a(x) => b(x), a(x) |= b(x)", function() {
+    // modus ponens.
+    let {Backward} = require("../backward.js");
+    let {explain} = require("../forward.js");
+    let kb = Parser.parse("a(x) => b(x). a(x).");
+    let result = new Backward(kb)
+     .backward(Rule.of("b(x)?"));
+    console.log(explain(result));
+    return;
+    assertThat("a(x) => b(x). a(x).")
+     .proving("b(x)?")
+     .equalsTo("a(x) => b(x). if (a(x) => b(x) and a(x)) then b(x).");
+  });
+
+  it("a(x) => b(x). a(x). |= b(x)", function() {
+    // modus ponens.
+    assertThat("a(x) => b(x). a(x).")
+     .proving("b(x)?")
+     .equalsTo("a(x). if (a(x) => b(x) and a(x)) then b(x).");
+  });
+
+  it("a(x), b(x) |= a(x) && b(x)", function() {
+    // conjunction introduction.
+    assertThat("a(x). b(x).")
+     .proving("a(x) && b(x)?")
+     .equalsTo("a(x). b(x). if (a(x) and b(x)) then a(x) && b(x).");
+  });
+
+  it("a(x) |= a(x) || b(x)", function() {
+    // disjunction introduction.
+    assertThat("a(x).")
+     .proving("a(x) || b(x)?")
+     .equalsTo("a(x). if (a(x)) then a(x) || b(x).");
   });
 
   function assertThat(x) {
