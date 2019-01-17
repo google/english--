@@ -221,6 +221,18 @@ describe("First order logic", function() {
        .equalsTo(false);
   });
 
+  it("Fill(P(a), P(x?))", function() {
+    let rule = Rule.of("P(x?).");
+    assertThat(fill(rule, unify(Rule.of("P(a)."), rule)))
+     .equalsTo(Rule.of("P(a)."));
+  });
+
+  it("Fill(P(a) && Q(b), P(x?) && Q(b))", function() {
+    let rule = Rule.of("P(x?) && Q(b).");
+    assertThat(fill(rule, unify(Rule.of("P(a) && Q(b)."), rule)))
+     .equalsTo(Rule.of("P(a) && Q(b)."));
+  });
+
   it("Universal introduction", function() {
     assertThat("forall(x) P(x?).")
      .proving("P(a)?")
@@ -347,6 +359,20 @@ describe("First order logic", function() {
      .equalsTo("if (a(x) => b(x)) then a(x) => a(x) && b(x).");
    });
 
+  it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
+    assertThat(`
+        forall(x) ((greedy(x?) && king(x?)) => evil(x?)).
+        greedy(john).
+        king(john).
+    `)
+     .proving("evil(john)?")
+     .equalsTo(`
+        greedy(john).
+        king(john).
+        greedy(john) && king(john) => greedy(john) && king(john).
+        if (forall (x) greedy(x) && king(x) => evil(x) and greedy(john) and king(john) and greedy(john) && king(john)) then evil(john).
+     `);
+  });
 
   function assertThat(x) {
    return {

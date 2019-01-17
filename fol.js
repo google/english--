@@ -1,10 +1,9 @@
-const {equals} = require("./forward.js");
+const {equals, toString} = require("./forward.js");
 const {Backward} = require("./backward.js");
 
 class Reasoner extends Backward {
  constructor(kb) {
   super(kb);
-  // this.kb = kb;
  }
  find(predicate) {
   return this.kb.filter(statement => (statement["@type"] == predicate));
@@ -28,15 +27,15 @@ class Reasoner extends Backward {
 
   // Searches for something that implies goal.
   for (let statement of this.find("Quantifier")) {
-   // console.log(statement.expression.op);
    if (statement.op == "forall" &&
        statement.expression.op == "=>") {
     let implication = statement.expression.right;
     let unifies = unify(implication, goal);
     // console.log(implication);
+    // console.log(unifies);
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
-     // console.log(left);
+     // console.log(toString({statements: [left]}));
      let dep = this.backward(left);
      if (dep) {
       // console.log(dep);
@@ -51,20 +50,25 @@ class Reasoner extends Backward {
 }
 
 function fill(rule, map) {
- // clones rule.
- let result = JSON.parse(JSON.stringify(rule));
- if (result["@type"] == "Function" || result["@type"] == "Predicate") {
-  for (let arg of result.arguments.filter(y => y.free)) {
-   // console.log(arg);
-   if (!map[arg.literal.name]) {
-    // there is non-unified free variable
-    return false;
+  // clones rule.
+  let result = JSON.parse(JSON.stringify(rule));
+  if (result["@type"] == "UnaryOperator") {
+    result.expression = fill(result.expression, map);
+  } else if (result["@type"] == "BinaryOperator") {
+    result.left = fill(result.left, map);
+    result.right = fill(result.right, map);
+  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+    for (let arg of result.arguments.filter(y => y.free)) {
+    // console.log(arg);
+    if (!map[arg.literal.name]) {
+     // there is non-unified free variable
+     return false;
+    }
+    delete arg.free;
+    arg.literal = map[arg.literal.name];
    }
-   delete arg.free;
-   arg.literal = map[arg.literal.name];
   }
- }
- return result;
+  return result;
 }
 
 function unify(a, b) {
