@@ -134,9 +134,59 @@ describe("First order logic", function() {
      });
   });
 
+  // disjunctions
   it("Unify(P(Q(a)), P(Q(x?)))", function() {
     assertThat(unify(Rule.of("P(Q(a))."), Rule.of("P(Q(x?)).")))
      .equalsTo({"x": literal("a")});
+  });
+
+  it("Unify(P(a) && Q(b), P(x?) && Q(b))", function() {
+    assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(x?) && Q(b).")))
+     .equalsTo({"x": literal("a")});
+  });
+
+  it("Unify(P(a) && Q(b), P(a) && Q(x?))", function() {
+    assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(a) && Q(x?).")))
+     .equalsTo({"x": literal("b")});
+  });
+
+  // conjunctions
+  it("Unify(P(a) || Q(b), P(x?) || Q(b))", function() {
+    assertThat(unify(Rule.of("P(a) || Q(b)."), Rule.of("P(x?) || Q(b).")))
+     .equalsTo({"x": literal("a")});
+  });
+
+  it("Unify(P(a) || Q(b), P(a) || Q(x?))", function() {
+    assertThat(unify(Rule.of("P(a) || Q(b)."), Rule.of("P(a) || Q(x?).")))
+     .equalsTo({"x": literal("b")});
+  });
+
+  // implication
+  it("Unify(P(a) => Q(b), P(x?) => Q(b))", function() {
+    assertThat(unify(Rule.of("P(a) => Q(b)."), Rule.of("P(x?) => Q(b).")))
+     .equalsTo({"x": literal("a")});
+  });
+
+  it("Unify(P(a) => Q(b), P(a) => Q(x?))", function() {
+    assertThat(unify(Rule.of("P(a) => Q(b)."), Rule.of("P(a) => Q(x?).")))
+     .equalsTo({"x": literal("b")});
+  });
+
+  // unary
+  it("Unify(~P(a), ~P(x?))", function() {
+    assertThat(unify(Rule.of("~P(a)."), Rule.of("~P(x?).")))
+     .equalsTo({"x": literal("a")});
+  });
+
+  // composition
+  it("Unify(P(a) && Q(~R(b)), P(a) && Q(R(x?))", function() {
+    assertThat(unify(Rule.of("P(a) && Q(R(b))."), Rule.of("P(a) && Q(R(x?)).")))
+     .equalsTo({"x": literal("b")});
+  });
+
+  it("Unify(P(a) && Q(b) => ~R(c), P(a) && Q(x?) => ~R(y?)", function() {
+    assertThat(unify(Rule.of("P(a) && Q(b) => ~R(c)."), Rule.of("P(a) && Q(x?) => ~R(y?).")))
+     .equalsTo({"x": literal("b"), "y": literal("c")});
   });
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
@@ -152,6 +202,16 @@ describe("First order logic", function() {
           }
         }]
      }});
+  });
+
+  it("Unity fails: Unify(P(a) && Q(b), P(x?) && Q(c))", function() {
+    assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(x?) && Q(c).")))
+     .equalsTo(false);
+  });
+
+  it("Unity fails: Unify(P(a) && Q(b), P(x?) && Q(x?))", function() {
+    assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(x?) && Q(x?).")))
+     .equalsTo(false);
   });
 
   it("Unify fails", function() {
@@ -286,6 +346,7 @@ describe("First order logic", function() {
      .proving("a(x) => (a(x) && b(x))?")
      .equalsTo("if (a(x) => b(x)) then a(x) => a(x) && b(x).");
    });
+
 
   function assertThat(x) {
    return {

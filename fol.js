@@ -81,6 +81,7 @@ function unify(a, b) {
   // result[key] = fill(value);
   result[key] = fill(value, result);
  }
+
  return result;
 }
 
@@ -88,10 +89,26 @@ function reduce(a, b) {
  if (a["@type"] == "Literal" && b["@type"] == "Literal" &&
      a.name == b.name) {
   return {};
- } if ((a["@type"] == "Predicate" && b["@type"] == "Predicate" ||
-        a["@type"] == "Function" && b["@type"] == "Function") &&
-       a.name == b.name &&
-       a.arguments.length == b.arguments.length) {
+} else if (a["@type"] == "UnaryOperator" && b["@type"] == "UnaryOperator") {
+  return unify(a.expression, b.expression);
+} else if (a["@type"] == "BinaryOperator" && b["@type"] == "BinaryOperator") {
+  let left = unify(a.left, b.left);
+  let right = unify(a.right, b.right);
+  if (left && right) {
+    for (let variable of Object.keys(left)) {
+        if (right[variable] && !equals(right[variable], left[variable])) {            
+            // There is a unification that happened on the left side of the
+            // equation that is inconsistent with the unification of the right
+            // side.
+            return false;
+        }
+    }
+    return Object.assign(left, right);
+  }
+} else if ((a["@type"] == "Predicate" && b["@type"] == "Predicate" ||
+             a["@type"] == "Function" && b["@type"] == "Function") &&
+             a.name == b.name &&
+             a.arguments.length == b.arguments.length) {
   let result = {};
   for (let i = 0; i < a.arguments.length; i++) {
    if (!a.arguments[i].free && !b.arguments[i].free) {
