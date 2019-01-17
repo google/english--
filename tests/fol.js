@@ -369,8 +369,8 @@ describe("First order logic", function() {
      .equalsTo(`
         greedy(john).
         king(john).
-        greedy(john) && king(john) => greedy(john) && king(john).
-        if (forall (x) greedy(x) && king(x) => evil(x) and greedy(john) and king(john) and greedy(john) && king(john)) then evil(john).
+        if (greedy(john) && king(john)) then greedy(john) && king(john).
+        if (forall (x) greedy(x) && king(x) => evil(x) and greedy(john) && king(john)) then evil(john).
      `);
   });
 

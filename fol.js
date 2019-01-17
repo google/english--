@@ -9,6 +9,7 @@ class Reasoner extends Backward {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal) {
+  // console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
   if (propositional.length > 0) {
    return propositional;
@@ -35,11 +36,9 @@ class Reasoner extends Backward {
     // console.log(unifies);
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
-     // console.log(toString({statements: [left]}));
      let dep = this.backward(left);
      if (dep) {
-      // console.log(dep);
-      return [...dep, {given: statement, and: dep.map(d => d.goal), goal: goal}];
+      return [...dep, {given: statement, and: [left], goal: goal}];
      }
     }
    }
