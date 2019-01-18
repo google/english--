@@ -268,6 +268,24 @@ describe("First order logic", function() {
      `);
   });
 
+  it.skip("forall (x) P(x?) && Q(x?). P(a)?", function() {
+    assertThat(`
+        forall (x) P(x?) && Q(x?).
+    `)
+     .proving("P(a)?")
+     .equalsTo(`
+     `);
+  });
+
+  it.skip("forall (x) forall (y) P(x?, y?). P(a, b)?", function() {
+    assertThat(`
+        forall (x) forall (y) P(x?, y?).
+    `)
+     .proving("P(a, b)?")
+     .equalsTo(`
+     `);
+  });
+
   it("a(x) => b(x), a(x) |= b(x)", function() {
     // modus ponens.
     let {Backward} = require("../backward.js");
@@ -409,12 +427,12 @@ describe("First order logic", function() {
   it.skip("students and professors", function() {
     assertThat(`
       professor(lucy).
-      forall (x) professor(x) => person(x).
+      forall (x) professor(x?) => person(x?).
       dean(john).
-      forall (x) dean(x) => professor(x).
-      forall (x) forall(y) (professor(x) && dean(y)) => (friends(x, y) || ~knows(x, y)).
-      forall (x) exists (y) friends(y, x).
-      forall (x) forall (y) (person(x) && person(y) && criticize(x, y)) => ~friends(y, x).
+      forall (x) dean(x?) => professor(x?).
+      forall (x) forall(y) (professor(x?) && dean(y?)) => (friends(x?, y?) || ~knows(x?, y?)).
+      forall (x) exists (y) friends(y?, x?).
+      forall (x) forall (y) (person(x?) && person(y?) && criticize(x?, y?)) => ~friends(y?, x?).
       criticized(lucy, john).
     `)
      .proving("~friends(john, lucy)?")

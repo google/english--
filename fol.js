@@ -10,7 +10,7 @@ class Reasoner extends Backward {
  }
  backward(goal) {
   //console.log(JSON.stringify(goal));
-  //console.log(toString({statements: [goal]}));
+  // console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
   if (propositional.length > 0) {
    return propositional;
