@@ -37,6 +37,10 @@ class Parser {
   return {"@type": "UnaryOperator", op: "~", expression: a};
  }
 
+ static func(name, args) {
+   return {"@type": "Function", name: name, arguments: args};
+ }
+  
  static and(left, right) {
   return Parser.binary("&&", left, right);
  }
@@ -52,6 +56,18 @@ class Parser {
  static xor(a, b) {
   return Parser.binary("^", a, b);
  }
+
+ static argument(a) {
+    let result = {"@type": "Argument"};
+    if (a["@type"] == "Literal") {
+        result.literal = a;
+    } else if (a["@type"] == "Function") {
+        result.call = a;
+    } else {
+        throw new Error("unknown argument type: " + a["@type"]);
+    }
+    return result;
+ } 
 }
 
 class Rule {

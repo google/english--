@@ -10,12 +10,14 @@ const {
  exists, 
  implies, 
  predicate, 
+ func,
  binary, 
  literal, 
  constant, 
  and, 
  or, 
- negation} = Parser;
+ negation,
+ argument} = Parser;
 
 describe("First order logic", function() {
   it("parser", function() {
@@ -26,21 +28,27 @@ describe("First order logic", function() {
     `);
   });
 
+  it("parser: forall (x) forall (y) P(x, y).", function() {
+    assertThat(Parser.parse("forall(x) forall(y) P(x, y)."))
+      .equalsTo(program([
+          forall("x",
+                 forall("y", 
+                        predicate("P", [argument(literal("x")), argument(literal("y"))])))
+      ]));
+  });
+
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse("forall(x) (king(x) && greedy(x) => evil(x)).");
   });
 
   it("parser - free variables", function() {
-    assertThat(Rule.of("P(x?).")).equalsTo({
-      "@type": "Predicate",
-      "name": "P",
-      "arguments": [{
+    assertThat(Rule.of("P(x?).")).equalsTo(
+      predicate("P", [{
         "@type": "Argument",
         "literal": {"@type": "Literal", "name": "x"},
         free: true
-      }]
-    });
+      }]));
   });
 
   it("parser - multiple free variables", function() {
@@ -70,17 +78,8 @@ describe("First order logic", function() {
   });
 
   it("parser - function args", function() {
-    assertThat(Rule.of("P(Q(x)).").arguments[0]).equalsTo({
-      "@type": "Argument",
-      "call": {
-       "@type": "Function",
-       "name": "Q",
-       "arguments": [{
-         "@type": "Argument",
-         "literal": {"@type": "Literal", "name": "x"},
-       }]
-      }
-    });
+    assertThat(Rule.of("P(Q(x)).")).equalsTo(
+      predicate("P", [argument(func("Q", [argument(literal("x"))]))]));
   });
 
   it.skip("multiple variables", function() {
@@ -132,6 +131,11 @@ describe("First order logic", function() {
         }] 
       }
      });
+  });
+
+  it("Unify(P(Q(a)), P(x?))", function() {
+    assertThat(unify(Rule.of("P(Q(a))."), Rule.of("P(x?).")))
+     .equalsTo({"x": func("Q", [argument(literal("a"))])});
   });
 
   // disjunctions
@@ -231,6 +235,19 @@ describe("First order logic", function() {
     let rule = Rule.of("P(x?) && Q(b).");
     assertThat(fill(rule, unify(Rule.of("P(a) && Q(b)."), rule)))
      .equalsTo(Rule.of("P(a) && Q(b)."));
+  });
+
+  it("Fill(P(Q(a)), P(Q(x?)))", function() {
+    let rule = Rule.of("P(Q(x?)).");
+    assertThat(fill(rule, unify(Rule.of("P(Q(a))."), rule)))
+     .equalsTo(Rule.of("P(Q(a))."));
+  });
+
+  it("Fills from unification", function() {
+    let unifies = unify(Rule.of("P(x?)."), Rule.of("P(Q(a))."));
+    assertThat(fill(Rule.of("R(x?)."), unifies)).equalsTo(
+        predicate("R", [argument(func("Q", [argument(literal("a"))]))]));
+    return;
   });
 
   it("Universal introduction", function() {
@@ -371,6 +388,38 @@ describe("First order logic", function() {
         king(john).
         if (greedy(john) && king(john)) then greedy(john) && king(john).
         if (forall (x) greedy(x) && king(x) => evil(x) and greedy(john) && king(john)) then evil(john).
+     `);
+  });
+
+  it("greedy(x) && king(x) => evil(x). greedy(father(john)). king(father(john)). evil(father(john))?", function() {
+    assertThat(`
+        forall(x) (greedy(x?) && king(x?)) => evil(x?).
+        greedy(father(john)).
+        king(father(john)).
+    `)
+     .proving("evil(father(john))?")
+     .equalsTo(`
+        greedy(father(john)).
+        king(father(john)).
+        if (greedy(father(john)) && king(father(john))) then greedy(father(john)) && king(father(john)).
+        if (forall (x) greedy(x) && king(x) => evil(x) and greedy(father(john)) && king(father(john))) then evil(father(john)).
+     `);
+  });
+
+  it.skip("students and professors", function() {
+    assertThat(`
+      professor(lucy).
+      forall (x) professor(x) => person(x).
+      dean(john).
+      forall (x) dean(x) => professor(x).
+      forall (x) forall(y) (professor(x) && dean(y)) => (friends(x, y) || ~knows(x, y)).
+      forall (x) exists (y) friends(y, x).
+      forall (x) forall (y) (person(x) && person(y) && criticize(x, y)) => ~friends(y, x).
+      criticized(lucy, john).
+    `)
+     .proving("~friends(john, lucy)?")
+     .equalsTo(`
+       professor(lucy).
      `);
   });
 

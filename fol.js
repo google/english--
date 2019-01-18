@@ -9,7 +9,8 @@ class Reasoner extends Backward {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal) {
-  // console.log(toString({statements: [goal]}));
+  //console.log(JSON.stringify(goal));
+  //console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
   if (propositional.length > 0) {
    return propositional;
@@ -30,14 +31,17 @@ class Reasoner extends Backward {
   for (let statement of this.find("Quantifier")) {
    if (statement.op == "forall" &&
        statement.expression.op == "=>") {
-    let implication = statement.expression.right;
+    // console.log("hello");
+        let implication = statement.expression.right;
     let unifies = unify(implication, goal);
     // console.log(implication);
-    // console.log(unifies);
+    // console.log(JSON.stringify(unifies));
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
+     // console.log(JSON.stringify(left));
      let dep = this.backward(left);
      if (dep) {
+      // console.log("hi");
       return [...dep, {given: statement, and: [left], goal: goal}];
      }
     }
@@ -50,22 +54,45 @@ class Reasoner extends Backward {
 
 function fill(rule, map) {
   // clones rule.
+  // console.log(rule);
   let result = JSON.parse(JSON.stringify(rule));
   if (result["@type"] == "UnaryOperator") {
     result.expression = fill(result.expression, map);
   } else if (result["@type"] == "BinaryOperator") {
     result.left = fill(result.left, map);
     result.right = fill(result.right, map);
-  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
-    for (let arg of result.arguments.filter(y => y.free)) {
-    // console.log(arg);
-    if (!map[arg.literal.name]) {
-     // there is non-unified free variable
-     return false;
+  } else if (result["@type"] == "Argument") {
+      // console.log("hello world");
+      if (result.call) {
+        result.call = fill(result.call, map);
+      }
+      if (result.literal && result.free) {
+        let mapping = map[result.literal.name];
+        if (!mapping) {
+            // console.log(result);
+            // console.log(map);
+            // there is non-unified free variable
+          return false;
+        }
+        delete result.free;
+        if (mapping["@type"] == "Function") {
+            // NOTE(goto): this is a mess, causing a lot of
+            // trouble. redo this.
+            result.call = mapping;
+            delete result.literal;
+        } else {
+            result.literal = mapping;
+        }
     }
-    delete arg.free;
-    arg.literal = map[arg.literal.name];
-   }
+  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+    result.arguments = result.arguments.map(x => {
+        //if (x.free) {
+        //  console.log(x);
+        //}
+        //console.log(x);
+        //console.log(map);
+        return fill(x, map);
+    });
   }
   return result;
 }
@@ -77,6 +104,8 @@ function unify(a, b) {
  if (!result) {
   return false;
  }
+
+ // console.log(result);
 
  for (let [key, value] of Object.entries(result)) {
   // console.log(value);

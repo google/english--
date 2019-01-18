@@ -279,8 +279,17 @@ function stringify(rule) {
  } else if (rule.op == "~") {
   return `~${stringify(rule.expression)}`;
  } else if (rule["@type"] == "Predicate") {
-  // console.log(rule.arguments);
-  return `${rule.name}(${rule.arguments.map(x => x.literal.name).join(", ")})`;
+  // console.log(JSON.stringify(rule.arguments, undefined, 2));
+  // console.log(rule.arguments.map(x => x.literal));
+  // console.log(JSON.stringify(rule));
+  let arg = (x) => {
+    if (x.literal) {
+        return x.literal.name;
+    } else if (x.call) {
+        return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
+    }
+  }
+  return `${rule.name}(${rule.arguments.map(arg).join(", ")})`;
  } else if (rule.op) {
   // NOTE(goto): by not parenthesizing we loose some information
   // but on the other hand we gain readability. Not sure if that's
