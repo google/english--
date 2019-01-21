@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Parser, Rule} = require("../parser.js");
+const {Parser, Rule} = require("../src/parser.js");
 
 const {
  program, 

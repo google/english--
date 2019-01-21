@@ -1,7 +1,7 @@
 const Assert = require("assert");
-const {normalize, stringify, equals, explain, toString} = require("../forward.js");
-const {Parser, Rule} = require("../parser.js");
-const {Backward} = require("../backward.js");
+const {normalize, stringify, equals, explain, toString} = require("../src/forward.js");
+const {Parser, Rule} = require("../src/parser.js");
+const {Backward} = require("../src/backward.js");
 
 const {
  program, 
