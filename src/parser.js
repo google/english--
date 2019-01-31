@@ -22,7 +22,11 @@ class Parser {
  }
 
  static forall(x, expression) {
-  return {"@type": "Quantifier", op: "forall", variable: x, expression: expression};
+  let result =  {"@type": "Quantifier", op: "forall", variable: x};
+  if (expression) {
+   result.expression = expression;
+  }
+  return result;
  }
 
  static exists(x, expression) {

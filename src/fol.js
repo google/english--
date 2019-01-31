@@ -62,8 +62,17 @@ function rewrite(expression, vars = []) {
   // entire program.
   return {statements: expression.statements.map(x => rewrite(x))};
  } else if (expression.op == "forall") {
+  // vars.push(expression.variable);
+  let result = expression.expression;
+  // console.log(expression);
+  result.quantifiers = expression.quantifiers || [];
+  result.quantifiers.push({
+   "@type": expression["@type"],
+   "op": expression.op,
+   "variable": expression.variable
+  });
   vars.push(expression.variable);
-  return rewrite(expression.expression, vars);
+  return rewrite(result, vars);
  } else if (expression["@type"] == "Predicate") {
   for (let arg of expression.arguments) {
    // console.log(vars);
