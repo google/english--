@@ -270,14 +270,25 @@ class Forward {
 
 }
 
+function quantify(rule, expression) {
+ if (!rule.quantifiers) {
+  return expression;
+ }
+
+ let prefix = rule.quantifiers.map(x => {
+   return `${x.op} (${x.variable}) `;
+ }).join("");
+
+ return `${prefix} ${expression}`;
+}
+
 function stringify(rule) {
- // console.log(rule);
  if (rule["@type"] == "Literal") {
-  return rule.name;
+  return quantify(rule, rule.name);
  } else if (rule["@type"] == "Quantifier") {
   return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {
-  return `~${stringify(rule.expression)}`;
+  return quantify(rule, `~${stringify(rule.expression)}`);
  } else if (rule["@type"] == "Predicate") {
   // console.log(JSON.stringify(rule.arguments, undefined, 2));
   // console.log(rule.arguments.map(x => x.literal));
@@ -290,13 +301,13 @@ function stringify(rule) {
     return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
    }
   }
-  return `${rule.name}(${rule.arguments.map(arg).join(", ")})`;
+  return quantify(rule, `${rule.name}(${rule.arguments.map(arg).join(", ")})`);
  } else if (rule.op) {
   // NOTE(goto): by not parenthesizing we loose some information
   // but on the other hand we gain readability. Not sure if that's
   // the right trade-off but works for now.
   // console.log(rule);
-  return `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`;
+  return quantify(rule, `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`);
  }
  throw new Error("Unknown rule type" + JSON.stringify(rule));
 }
