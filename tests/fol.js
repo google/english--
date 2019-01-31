@@ -117,6 +117,11 @@ describe("First order logic", function() {
     assertThat(rewrite(statements[0])).equalsTo(Rule.of("~P(x?, y?, c)."));
   });
 
+  it.skip("Rewrite: exists (x) P(x) == P(x)", function() {
+    let {statements} = Parser.parse("exists (x) P(x).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x)."));
+  });
+
   it.skip("multiple variables", function() {
     // TODO(goto): the following fails, figure out
     // why.

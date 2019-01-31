@@ -16,12 +16,15 @@ class Reasoner extends Backward {
    return propositional;
   }
 
+  // for (let statement of this.kb) {
+  // }
+
   // Universal introduction
   for (let statement of this.find("Quantifier")) {
    if (statement.op != "forall") {
     continue;
    }
-   let unifies = unify(statement.expression, goal);
+   let unifies = unify(statement, goal);
    if (unifies) {
     return [{given: statement, goal: goal}];
    }
@@ -54,7 +57,11 @@ class Reasoner extends Backward {
 
 function rewrite(expression, vars = []) {
  // if (statement.op == "forall") {
- if (expression.op == "forall") {
+ if (expression["@type"] == "Program") {
+  // covers the case where we are rewriting the
+  // entire program.
+  return {statements: expression.statements.map(x => rewrite(x))};
+ } else if (expression.op == "forall") {
   vars.push(expression.variable);
   return rewrite(expression.expression, vars);
  } else if (expression["@type"] == "Predicate") {
@@ -73,6 +80,7 @@ function rewrite(expression, vars = []) {
   expression.expression = rewrite(expression.expression, vars);
   return expression;
  } else {
+  console.log(expression);
   throw new Error("unknown type");
  }
 }

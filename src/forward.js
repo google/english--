@@ -283,11 +283,12 @@ function stringify(rule) {
   // console.log(rule.arguments.map(x => x.literal));
   // console.log(JSON.stringify(rule));
   let arg = (x) => {
-    if (x.literal) {
-        return x.literal.name;
-    } else if (x.call) {
-        return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
-    }
+   if (x.literal) {
+    // return x.literal.name + (x.free ? "?" : "");
+    return x.literal.name;
+   } else if (x.call) {
+    return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
+   }
   }
   return `${rule.name}(${rule.arguments.map(arg).join(", ")})`;
  } else if (rule.op) {
