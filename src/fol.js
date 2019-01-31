@@ -12,6 +12,7 @@ class Reasoner extends Backward {
   //console.log(JSON.stringify(goal));
   // console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
+  // console.log(propositional);
   if (propositional.length > 0) {
    return propositional;
   }
@@ -22,9 +23,13 @@ class Reasoner extends Backward {
   // Universal introduction
   for (let statement of this.kb) {
    let unifies = unify(statement, goal);
-   if (unifies) {
-    return [{given: statement, goal: goal}];
+   // console.log(statement);
+   // console.log(unifies);
+   if (!unifies) {
+    continue;
    }
+   // console.log("hi");
+   return [{given: statement, goal: goal}];
   }
 
   // Searches for something that implies goal.
@@ -46,7 +51,8 @@ class Reasoner extends Backward {
    }
   }
 
-  return [];
+  // console.log("hello");
+  return false;
  }
 }
 

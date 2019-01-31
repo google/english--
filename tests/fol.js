@@ -151,6 +151,11 @@ describe("First order logic", function() {
      .equalsTo({});
   });
 
+  it("Unify(P(a, b), P(a, b))", function() {
+    assertThat(unify(Rule.of("P(a, b)."), Rule.of("P(a, b).")))
+     .equalsTo({});
+  });
+
   it("Unify(P(a), P(x?))", function() {
     assertThat(unify(Rule.of("P(a)."), Rule.of("P(x?).")))
      .equalsTo({"x": literal("a")});
@@ -465,6 +470,12 @@ describe("First order logic", function() {
      .equalsTo("if (a(x) => b(x)) then a(x) => a(x) && b(x).");
    });
 
+  it("p(x) |~ p(y)?", function() {
+    assertThat("p(x).")
+     .proving("p(y)?")
+     .equalsTo("");
+   });
+
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
     assertThat(`
         forall(x) ((greedy(x?) && king(x?)) => evil(x?)).
@@ -495,20 +506,52 @@ describe("First order logic", function() {
      `);
   });
 
-  it.skip("students and professors", function() {
-    assertThat(`
+  it("students and professors", function() {
+    // skips this statement, until we support the
+    // exists () quantifier.
+    // forall (x) exists (y) friends(y?, x?).
+
+    const kb = `
       professor(lucy).
       forall (x) professor(x?) => person(x?).
       dean(john).
       forall (x) dean(x?) => professor(x?).
       forall (x) forall(y) (professor(x?) && dean(y?)) => (friends(x?, y?) || ~knows(x?, y?)).
-      forall (x) exists (y) friends(y?, x?).
-      forall (x) forall (y) (person(x?) && person(y?) && criticize(x?, y?)) => ~friends(y?, x?).
+      forall (x) forall (y) (person(x?) && person(y?) && criticized(x?, y?)) => ~friends(y?, x?).
       criticized(lucy, john).
-    `)
+     `;
+
+    assertThat(kb)
      .proving("~friends(john, lucy)?")
      .equalsTo(`
+       criticized(lucy, john).
+       dean(john).
+       forall (x) dean(x) => professor(x) && dean(john) => professor(john).
+       forall (x) professor(x) => person(x) && professor(john) => person(john).
+       criticized(lucy, john) && person(john) => criticized(lucy, john) && person(john).
        professor(lucy).
+       forall (x) professor(x) => person(x) && professor(lucy) => person(lucy).
+       criticized(lucy, john) && person(john) && person(lucy) => criticized(lucy, john) && person(john) && person(lucy).
+       forall (x) forall (y) person(x) && person(y) && criticized(x, y) => ~friends(y, x) && criticized(lucy, john) && person(john) && person(lucy) => ~friends(john, lucy).
+     `);
+
+    assertThat(kb)
+      .proving("person(sam)?")
+      .equalsTo("");
+
+    assertThat(kb)
+     .proving("person(john)?")
+     .equalsTo(`
+       dean(john).
+       forall (x) dean(x) => professor(x) && dean(john) => professor(john).
+       forall (x) professor(x) => person(x) && professor(john) => person(john).
+     `);
+
+    assertThat(kb)
+     .proving("person(lucy)?")
+     .equalsTo(`
+       professor(lucy).
+       forall (x) professor(x) => person(x) && professor(lucy) => person(lucy).
      `);
   });
 

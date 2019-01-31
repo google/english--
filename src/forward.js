@@ -314,7 +314,11 @@ function stringify(rule) {
 
 function explain(reasons) {
  let result = [];
- // console.log(JSON.stringify(reasons));                                                                                  
+ // console.log(JSON.stringify(reasons));
+ // console.log("hi");
+ if (!reasons) {
+  return "";
+ }
  for (let reason of reasons) {
   // console.log(reason);
   // console.log(reason);
