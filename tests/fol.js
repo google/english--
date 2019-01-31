@@ -566,10 +566,13 @@ describe("First order logic", function() {
       .equalsTo("");
   });
 
-  it.skip("big bertha", function() {
-    assertThat("forall (x?) (on(x?, table)). forall (x?) on(bertha, x?) => collapses(x?).")
+  it("big bertha", function() {
+    assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
      .proving("collapses(table)?")
-     .equalsTo("");
+     .equalsTo(`
+       forall (x) on(x, table) => on(bertha, table).
+       forall (x) on(bertha, x) => collapses(x) && on(bertha, table) => collapses(table).
+     `);
     // it would also be interesting to ask: collapses(x?)? and get x = table.
    });
 
