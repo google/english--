@@ -32,10 +32,10 @@ class Reasoner extends Backward {
    if (statement.op == "forall" &&
        statement.expression.op == "=>") {
     // console.log("hello");
-        let implication = statement.expression.right;
+    let implication = statement.expression.right;
     let unifies = unify(implication, goal);
-    // console.log(implication);
-    // console.log(JSON.stringify(unifies));
+    console.log(implication);
+    console.log(JSON.stringify(unifies));
     if (unifies) {
      let left = fill(statement.expression.left, unifies);
      // console.log(JSON.stringify(left));
@@ -49,6 +49,31 @@ class Reasoner extends Backward {
   }
 
   return [];
+ }
+}
+
+function rewrite(expression, vars = []) {
+ // if (statement.op == "forall") {
+ if (expression.op == "forall") {
+  vars.push(expression.variable);
+  return rewrite(expression.expression, vars);
+ } else if (expression["@type"] == "Predicate") {
+  for (let arg of expression.arguments) {
+   // console.log(vars);
+   if (arg.literal && vars.includes(arg.literal.name)) {
+    arg.free = true;
+   }
+  }
+  return expression;
+ } else if (expression["@type"] == "BinaryOperator") {
+  expression.left = rewrite(expression.left, vars);
+  expression.right = rewrite(expression.right, vars);
+  return expression;
+   } else if (expression["@type"] == "UnaryOperator") {
+  expression.expression = rewrite(expression.expression, vars);
+  return expression;
+ } else {
+  throw new Error("unknown type");
  }
 }
 
@@ -98,19 +123,13 @@ function fill(rule, map) {
 }
 
 function unify(a, b) {
- // Find all substitutions.
  let result = reduce(a, b);
 
  if (!result) {
   return false;
  }
 
- // console.log(result);
-
  for (let [key, value] of Object.entries(result)) {
-  // console.log(value);
-  // fill(value);
-  // result[key] = fill(value);
   result[key] = fill(value, result);
  }
 
@@ -121,26 +140,30 @@ function reduce(a, b) {
  if (a["@type"] == "Literal" && b["@type"] == "Literal" &&
      a.name == b.name) {
   return {};
-} else if (a["@type"] == "UnaryOperator" && b["@type"] == "UnaryOperator") {
+ } else if (a["@type"] == "UnaryOperator" && b["@type"] == "UnaryOperator") {
   return unify(a.expression, b.expression);
-} else if (a["@type"] == "BinaryOperator" && b["@type"] == "BinaryOperator") {
+ } else if (a.op == "forall") {
+  return reduce(a.expression, b);
+ } else if (b.op == "forall") {
+  return reduce(a, b.expression);
+ } else if (a["@type"] == "BinaryOperator" && b["@type"] == "BinaryOperator") {
   let left = unify(a.left, b.left);
   let right = unify(a.right, b.right);
   if (left && right) {
-    for (let variable of Object.keys(left)) {
-        if (right[variable] && !equals(right[variable], left[variable])) {            
-            // There is a unification that happened on the left side of the
-            // equation that is inconsistent with the unification of the right
-            // side.
-            return false;
-        }
+   for (let variable of Object.keys(left)) {
+    if (right[variable] && !equals(right[variable], left[variable])) {            
+     // There is a unification that happened on the left side of the
+     // equation that is inconsistent with the unification of the right
+     // side.
+     return false;
     }
-    return Object.assign(left, right);
+   }
+   return Object.assign(left, right);
   }
-} else if ((a["@type"] == "Predicate" && b["@type"] == "Predicate" ||
+ } else if ((a["@type"] == "Predicate" && b["@type"] == "Predicate" ||
              a["@type"] == "Function" && b["@type"] == "Function") &&
-             a.name == b.name &&
-             a.arguments.length == b.arguments.length) {
+            a.name == b.name &&
+            a.arguments.length == b.arguments.length) {
   let result = {};
   for (let i = 0; i < a.arguments.length; i++) {
    if (!a.arguments[i].free && !b.arguments[i].free) {
@@ -168,5 +191,6 @@ function reduce(a, b) {
 module.exports = {
  Reasoner: Reasoner,
  unify: unify,
- fill: fill
+ fill: fill,
+ rewrite: rewrite
 };

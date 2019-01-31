@@ -2,7 +2,7 @@ const Assert = require("assert");
 const logic = require("../src/grammar.js");
 const {Forward, normalize, stringify, equals, explain, toString} = require("../src/forward.js");
 const {Parser, Rule} = require("../src/parser.js");
-const {Reasoner, fill, unify} = require("../src/fol.js");
+const {Reasoner, fill, unify, rewrite} = require("../src/fol.js");
 
 const {
  program, 
@@ -80,6 +80,41 @@ describe("First order logic", function() {
   it("parser - function args", function() {
     assertThat(Rule.of("P(Q(x)).")).equalsTo(
       predicate("P", [argument(func("Q", [argument(literal("x"))]))]));
+  });
+
+  it("Rewrite: forall(x) P(x) == P(x?)", function() {
+    let {statements} = Parser.parse("forall (x) P(x).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x?)."));
+  });
+
+  it("Rewrite: forall(x) P(x) && Q(x) == P(x?) && Q(x?)", function() {
+    let {statements} = Parser.parse("forall (x) P(x) && Q(x).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x?) && Q(x?)."));
+  });
+
+  it("Rewrite: forall(x) P(x) => Q(x) == P(x?) => Q(x?)", function() {
+    let {statements} = Parser.parse("forall (x) P(x) => Q(x).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x?) => Q(x?)."));
+  });
+
+  it("Rewrite: forall(x) ~P(x) == ~P(x?)", function() {
+    let {statements} = Parser.parse("forall (x) ~P(x).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("~P(x?)."));
+  });
+
+  it("Rewrite: forall(x) P(x, y) == P(x?, y)", function() {
+    let {statements} = Parser.parse("forall (x) P(x, y).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x?, y)."));
+  });
+
+  it("Rewrite: forall(x) forall (y) P(x, y) == P(x?, y?)", function() {
+    let {statements} = Parser.parse("forall (x) forall (y) P(x, y).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x?, y?)."));
+  });
+
+  it("Rewrite: forall(x) forall (y) ~P(x, y, c) == ~P(x?, y?, c)", function() {
+    let {statements} = Parser.parse("forall (x) forall (y) ~P(x, y, c).");
+    assertThat(rewrite(statements[0])).equalsTo(Rule.of("~P(x?, y?, c)."));
   });
 
   it.skip("multiple variables", function() {
@@ -208,6 +243,17 @@ describe("First order logic", function() {
      }});
   });
 
+  // syntax forall
+  it("Unify(P(a) => Q(b), forall (x) P(x?) => Q(b))", function() {
+    assertThat(unify(Rule.of("P(a) => Q(b)."), Rule.of("forall (x) P(x?) => Q(b).")))
+     .equalsTo({"x": literal("a")});
+  });
+
+  it("Unify(P(a, b), forall (x) forall (y) P(x?, y?))", function() {
+    assertThat(unify(Rule.of("P(a, b)."), Rule.of("forall (x) forall (y) P(x?, y?).")))
+     .equalsTo({"x": literal("a"), "y": literal("b")});
+  });
+
   it("Unity fails: Unify(P(a) && Q(b), P(x?) && Q(c))", function() {
     assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(x?) && Q(c).")))
      .equalsTo(false);
@@ -268,22 +314,28 @@ describe("First order logic", function() {
      `);
   });
 
-  it.skip("forall (x) P(x?) && Q(x?). P(a)?", function() {
-    assertThat(`
-        forall (x) P(x?) && Q(x?).
-    `)
+  it("forall (x) P(x?). P(a)?", function() {
+    assertThat("forall (x) P(x?).")
      .proving("P(a)?")
-     .equalsTo(`
-     `);
+     .equalsTo("forall (x) P(x) => P(a).");
   });
 
-  it.skip("forall (x) forall (y) P(x?, y?). P(a, b)?", function() {
-    assertThat(`
-        forall (x) forall (y) P(x?, y?).
-    `)
+  it("forall (x) P(x?, b). P(a, b)?", function() {
+    assertThat("forall (x) P(x?, b).")
      .proving("P(a, b)?")
-     .equalsTo(`
-     `);
+     .equalsTo("forall (x) P(x, b) => P(a, b).");
+  });
+
+  it.skip("forall (x) P(x?) && Q(x?). P(a)?", function() {
+    assertThat("forall (x) P(x?) && Q(x?).")
+     .proving("P(a)?")
+     .equalsTo("");
+  });
+
+  it("forall (x) forall (y) P(x?, y?). P(a, b)?", function() {
+    assertThat("forall (x) forall (y) P(x?, y?).")
+     .proving("P(a, b)?")
+     .equalsTo("forall (x) forall (y) P(x, y) => P(a, b).");
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
@@ -440,6 +492,21 @@ describe("First order logic", function() {
        professor(lucy).
      `);
   });
+
+  it.skip("big bertha", function() {
+    assertThat("forall (x?) (on(x?, table)). forall (x?) on(bertha, x?) => collapses(x?).")
+     .proving("collapses(table)?")
+     .equalsTo("");
+    // it would also be interesting to ask: collapses(x?)? and get x = table.
+   });
+
+  it.skip("diet", function() {
+    // nobody can see oneself. 
+    assertThat("forall(x?) (~sees(x?, x?)). forall(x?) (~sees(x?, feet(x?)) => diet(x?)).")
+     .proving("forall(x?) diet(x?)?")
+     .equalsTo("");
+    // should be false, since feet(x?) isn't necessarily x?.
+   });
 
   function assertThat(x) {
    return {

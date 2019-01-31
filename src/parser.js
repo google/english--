@@ -57,7 +57,7 @@ class Parser {
   return Parser.binary("^", a, b);
  }
 
- static argument(a) {
+ static argument(a, free) {
     let result = {"@type": "Argument"};
     if (a["@type"] == "Literal") {
         result.literal = a;
@@ -65,6 +65,9 @@ class Parser {
         result.call = a;
     } else {
         throw new Error("unknown argument type: " + a["@type"]);
+    }
+    if (free) {
+     result.free = true;
     }
     return result;
  } 

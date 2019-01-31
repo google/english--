@@ -147,6 +147,18 @@ describe("Backward", function() {
      .equalsTo(`if (a => b) then a => a && b.`);
    });
 
+  it.skip("a => b && c |= a => c", function() {
+    // TODO(goto): this should probably be possible. figure out how
+    // to address this.
+    let code = Parser.parse(`
+      a => b && c.
+      a.
+    `);
+
+    assertThat(explain(new Backward(code).backward(Rule.of("c?"))))
+     .equalsTo(``);
+   });
+
   it("criminal?", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
