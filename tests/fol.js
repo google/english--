@@ -513,13 +513,19 @@ describe("First order logic", function() {
 
     const kb = `
       professor(lucy).
-      forall (x) professor(x?) => person(x?).
+      forall (x) professor(x) => person(x).
       dean(john).
-      forall (x) dean(x?) => professor(x?).
-      forall (x) forall(y) (professor(x?) && dean(y?)) => (friends(x?, y?) || ~knows(x?, y?)).
-      forall (x) forall (y) (person(x?) && person(y?) && criticized(x?, y?)) => ~friends(y?, x?).
+      forall (x) dean(x) => professor(x).
+      forall (x) forall(y) (professor(x) && dean(y)) => (friends(x, y) || ~knows(x, y)).
+      forall (x) forall (y) (person(x) && person(y) && criticized(x, y)) => ~friends(y, x).
       criticized(lucy, john).
      `;
+
+    // TODO(goto): add this case.
+    // assertThat(kb)
+    // .proving("knows(lucy, john)?")
+    // .equalsTo("");
+    // return;
 
     assertThat(kb)
      .proving("~friends(john, lucy)?")
@@ -553,6 +559,11 @@ describe("First order logic", function() {
        professor(lucy).
        forall (x) professor(x) => person(x) && professor(lucy) => person(lucy).
      `);
+
+    // TODO(goto): this is an interesting query that we should support. 
+    assertThat(kb)
+      .proving("critized(x?, john)?")
+      .equalsTo("");
   });
 
   it.skip("big bertha", function() {

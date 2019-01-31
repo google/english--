@@ -323,6 +323,7 @@ function explain(reasons) {
   // console.log(reason);
   // console.log(reason);
   if (equals(reason.given, reason.goal)) {
+   // console.log("hi");
    result.push(stringify(reason.given) + ".\n");
   } else {
    let line = [];
