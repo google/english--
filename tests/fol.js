@@ -147,9 +147,12 @@ describe("First order logic", function() {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it.skip("Rewrite: exists (x) P(x) == P(x)", function() {
+  it("Rewrite: exists (x) P(x) == P(x)", function() {
     let {statements} = Parser.parse("exists (x) P(x).");
-    assertThat(rewrite(statements[0])).equalsTo(Rule.of("P(x)."));
+    let expects = Rule.of("P(x).");
+    expects.arguments[0].free = true;
+    expects.quantifiers = [exists("x")];
+    assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
   it.skip("multiple variables", function() {

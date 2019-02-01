@@ -30,7 +30,11 @@ class Parser {
  }
 
  static exists(x, expression) {
-  return {"@type": "Quantifier", op: "exists", variable: x, expression: expression};
+  let result = {"@type": "Quantifier", op: "exists", variable: x};
+  if (expression) {
+   result.expression = expression;
+  }
+  return result;
  }
 
  static predicate(name, args) {
@@ -64,11 +68,11 @@ class Parser {
  static argument(a, value, free) {
     let result = {"@type": "Argument"};
     if (a["@type"] == "Literal") {
-        result.literal = a;
+     result.literal = a;
     } else if (a["@type"] == "Function") {
-        result.call = a;
+     result.call = a;
     } else {
-        throw new Error("unknown argument type: " + a["@type"]);
+     throw new Error("unknown argument type: " + a["@type"]);
     }
     if (value) {
      result.value = value;
