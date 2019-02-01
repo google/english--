@@ -695,14 +695,13 @@ describe("First order logic", function() {
    });
 
   it("mother", function() {
-    let kb = `
+    assertThat(`
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).
       forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
       female(dani).
       child(leo, dani).
-    `;
-    assertThat(kb)
+    `)
      .proving("mother(dani, leo).")
      .equalsTo(`
        female(dani).
@@ -712,6 +711,22 @@ describe("First order logic", function() {
        forall (x) forall (y) female(x) && parent(x, y) => mother(x, y) && female(dani) && parent(dani, leo) => mother(dani, leo).
      `);
   });
+
+  it("grandparent", function() {
+    assertThat(`
+      forall (x) forall (y) parent(x, y) => child(y, x).
+      forall (x) forall (y) child(x, y) => parent(y, x).
+
+      forall (g) forall (c) (grandparent(g, c) => exists (p) parent(g, p) && parent(p, c)).
+      forall (g) forall (c) (exists (p) parent(g, p) && parent(p, c) => grandparent(g, c)).
+
+      parent(maura, mel).
+      child(anna, mel).
+     `)
+     .proving("grandparent(maura, anna)?")
+     .equalsTo(`
+     `);
+   });
 
   it("kinships", function() {
     // logic from:
@@ -733,15 +748,15 @@ describe("First order logic", function() {
      forall (x) forall (y) ((parent(x, y) && male(x)) => father(x, y)).
      forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
 
-     spouse(sam, dani).
+     spouse(mel, dani).
 
-     parent(sam, leo).
-     child(anna, sam).
+     parent(mel, leo).
+     child(anna, mel).
 
      child(leo, dani).
      parent(dani, anna).
 
-     male(sam).
+     male(mel).
      female(dani).
 
      male(leo).
@@ -749,46 +764,46 @@ describe("First order logic", function() {
     `;
 
     assertThat(kb)
-     .proving("child(leo, sam)?")
+     .proving("child(leo, mel)?")
      .equalsTo(`
-       parent(sam, leo).
-       forall (x) forall (y) parent(x, y) => child(y, x) && parent(sam, leo) => child(leo, sam).
+       parent(mel, leo).
+       forall (x) forall (y) parent(x, y) => child(y, x) && parent(mel, leo) => child(leo, mel).
      `);
 
     assertThat(kb)
-     .proving("parent(sam, anna)?")
+     .proving("parent(mel, anna)?")
      .equalsTo(`
-       child(anna, sam).
-       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
+       child(anna, mel).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
      `);
 
     assertThat(kb)
-      .proving("son(leo, sam)?")
+      .proving("son(leo, mel)?")
       .equalsTo(`
         male(leo).
-        parent(sam, leo).
-        male(leo) && parent(sam, leo) => male(leo) && parent(sam, leo).
-        forall (x) forall (y) male(y) && parent(x, y) => son(y, x) && male(leo) && parent(sam, leo) => son(leo, sam).
+        parent(mel, leo).
+        male(leo) && parent(mel, leo) => male(leo) && parent(mel, leo).
+        forall (x) forall (y) male(y) && parent(x, y) => son(y, x) && male(leo) && parent(mel, leo) => son(leo, mel).
      `);
 
     assertThat(kb)
-      .proving("daughter(anna, sam)?")
+      .proving("daughter(anna, mel)?")
       .equalsTo(`
         female(anna).
-        child(anna, sam).
-        forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
-        female(anna) && parent(sam, anna) => female(anna) && parent(sam, anna).
-        forall (x) forall (y) female(y) && parent(x, y) => daughter(y, x) && female(anna) && parent(sam, anna) => daughter(anna, sam).
+        child(anna, mel).
+        forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
+        female(anna) && parent(mel, anna) => female(anna) && parent(mel, anna).
+        forall (x) forall (y) female(y) && parent(x, y) => daughter(y, x) && female(anna) && parent(mel, anna) => daughter(anna, mel).
      `);
 
-    // TODO(goto): this makes x = sam, which isn't right.
+    // TODO(goto): this makes x = mel, which isn't right.
     // assertThat(kb)
-    // .proving("daughter(x?, sam)?")
+    // .proving("daughter(x?, mel)?")
     // .equalsTo("");
 
     // TODO(goto): this too.
     // assertThat(kb)
-    // .proving("son(x?, sam)?")
+    // .proving("son(x?, mel)?")
     // .equalsTo("");
 
     // TODO(goto): this fails.
@@ -810,33 +825,33 @@ describe("First order logic", function() {
      .equalsTo("");
 
     assertThat(kb)
-     .proving("spouse(sam, x?).")
-     .equalsTo("spouse(sam, dani). spouse(sam, x = dani).");
+     .proving("spouse(mel, x?).")
+     .equalsTo("spouse(mel, dani). spouse(mel, x = dani).");
 
     assertThat(kb)
-     .proving("spouse(dani, sam).")
+     .proving("spouse(dani, mel).")
      .equalsTo(`
-       spouse(sam, dani).
-       forall (x) forall (y) spouse(x, y) => spouse(y, x) && spouse(sam, dani) => spouse(dani, sam).
+       spouse(mel, dani).
+       forall (x) forall (y) spouse(x, y) => spouse(y, x) && spouse(mel, dani) => spouse(dani, mel).
      `);
 
     assertThat(kb)
-     .proving("father(sam, leo).")
+     .proving("father(mel, leo).")
      .equalsTo(`
-       male(sam).
-       parent(sam, leo).
-       male(sam) && parent(sam, leo) => male(sam) && parent(sam, leo).
-       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(sam) && parent(sam, leo) => father(sam, leo).
+       male(mel).
+       parent(mel, leo).
+       male(mel) && parent(mel, leo) => male(mel) && parent(mel, leo).
+       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(mel) && parent(mel, leo) => father(mel, leo).
      `);
 
     assertThat(kb)
-     .proving("father(sam, anna).")
+     .proving("father(mel, anna).")
      .equalsTo(`
-       male(sam).
-       child(anna, sam).
-       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
-       male(sam) && parent(sam, anna) => male(sam) && parent(sam, anna).
-       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(sam) && parent(sam, anna) => father(sam, anna).
+       male(mel).
+       child(anna, mel).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
+       male(mel) && parent(mel, anna) => male(mel) && parent(mel, anna).
+       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(mel) && parent(mel, anna) => father(mel, anna).
      `);
 
     assertThat(kb)
@@ -852,17 +867,6 @@ describe("First order logic", function() {
     // assertThat(kb)
     // .proving("spouse(dani, x?).")
     // .equalsTo("");
-
-    // parent(maura, sam).
-    // forall (g) forall (c) (grandparent(g, c) => exists (p) parent(g, p) && parent(p, c)).
-    // forall (g) forall (c) (exists (p) parent(g, p) && parent(p, c) => grandparent(g, c)).
-
-    //assertThat(kb)
-    // .proving("grandparent(maura, anna)?")
-    // .equalsTo(`
-    //   child(anna, sam).
-    //   forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
-    // `);
    });
 
   function assertThat(x) {
