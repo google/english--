@@ -408,6 +408,15 @@ describe("First order logic", function() {
      `);
   });
 
+  it.skip("p(a). p(b). |= p(x?)?", function() {
+    // we want to find a way to get x = [a, b] rather than
+    // stop on the first match. may be useful to use a
+    // generator here.
+    assertThat("p(a). p(b).")
+     .proving("p(x?).")
+     .equalsTo("p(a). p(x = a).");
+   });
+
   it.skip("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
     // existential conjunction introduction.
     // TODO(goto): it is probably hard to do conjunction
