@@ -10,7 +10,7 @@ class Reasoner extends Backward {
  }
  backward(goal) {
   //console.log(JSON.stringify(goal));
-  console.log(toString({statements: [goal]}));
+  // console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
   // console.log(propositional);
   if (propositional.length > 0) {
@@ -42,7 +42,7 @@ class Reasoner extends Backward {
    }
    let left = fill(statement.left, unifies, true);
    let dep = this.backward(left);
-   console.log(unifies);
+   // console.log(unifies);
    if (dep) {
     // console.log(toString({statements: [fill(statement, unifies)]}));
     //console.log(dep);
