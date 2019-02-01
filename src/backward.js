@@ -38,7 +38,6 @@ class Backward {
 
  backward(goal, stack = []) {
   // console.log(`${Rule.from(goal)}?`);
-
   for (let subgoal of stack) {
    if (equals(goal, subgoal)) {
     return false;

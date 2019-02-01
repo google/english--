@@ -82,6 +82,11 @@ describe("First order logic", function() {
       predicate("P", [argument(func("Q", [argument(literal("x"))]))]));
   });
 
+  it("parser - arg values", function() {
+    assertThat(Rule.of("P(x = a)."))
+     .equalsTo(predicate("P", [argument(literal("x"), literal("a"))]));
+  });
+
   it("Rewrite: forall(x) P(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x).");
     let expects = Rule.of("P(x).");
@@ -272,6 +277,10 @@ describe("First order logic", function() {
           "@type": "Argument",
           "literal": {
            "@type": "Literal",
+           "name": "y"
+          },
+          "value": {
+           "@type": "Literal",
             "name": "a"
           }
         }]
@@ -309,26 +318,25 @@ describe("First order logic", function() {
   it("Fill(P(a), P(x?))", function() {
     let rule = Rule.of("P(x?).");
     assertThat(fill(rule, unify(Rule.of("P(a)."), rule)))
-     .equalsTo(Rule.of("P(a)."));
+     .equalsTo(Rule.of("P(x = a)."));
   });
 
   it("Fill(P(a) && Q(b), P(x?) && Q(b))", function() {
     let rule = Rule.of("P(x?) && Q(b).");
     assertThat(fill(rule, unify(Rule.of("P(a) && Q(b)."), rule)))
-     .equalsTo(Rule.of("P(a) && Q(b)."));
+     .equalsTo(Rule.of("P(x = a) && Q(b)."));
   });
 
   it("Fill(P(Q(a)), P(Q(x?)))", function() {
     let rule = Rule.of("P(Q(x?)).");
     assertThat(fill(rule, unify(Rule.of("P(Q(a))."), rule)))
-     .equalsTo(Rule.of("P(Q(a))."));
+     .equalsTo(Rule.of("P(Q(x = a))."));
   });
 
   it("Fills from unification", function() {
     let unifies = unify(Rule.of("P(x?)."), Rule.of("P(Q(a))."));
-    assertThat(fill(Rule.of("R(x?)."), unifies)).equalsTo(
-        predicate("R", [argument(func("Q", [argument(literal("a"))]))]));
-    return;
+    assertThat(fill(Rule.of("R(x?)."), unifies))
+     .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
   });
 
   it("Universal introduction", function() {
@@ -338,7 +346,7 @@ describe("First order logic", function() {
   });
 
   it("Generalized modus ponens", function() {
-    assertThat("forall(x) men(x?) => mortal(x?). men(socrates).")
+    assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")
      .equalsTo(`
         men(socrates). 
@@ -487,12 +495,18 @@ describe("First order logic", function() {
   it("p(a) |= exists (x) p(x).", function() {
     assertThat("p(a).")
      .proving("exists (x) p(x)?")
-     .equalsTo("p(a) => exists (x) p(x).");
+     .equalsTo("p(a) => exists (x) p(x = a).");
+   });
+
+  it("p(a) |= p(x?).", function() {
+    assertThat("p(a).")
+     .proving("p(x?)?")
+     .equalsTo("if p(a) then p(x = a).");
    });
 
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
     assertThat(`
-        forall(x) ((greedy(x?) && king(x?)) => evil(x?)).
+        forall(x) ((greedy(x) && king(x)) => evil(x)).
         greedy(john).
         king(john).
     `)
@@ -507,7 +521,7 @@ describe("First order logic", function() {
 
   it("greedy(x) && king(x) => evil(x). greedy(father(john)). king(father(john)). evil(father(john))?", function() {
     assertThat(`
-        forall(x) (greedy(x?) && king(x?)) => evil(x?).
+        forall(x) (greedy(x) && king(x)) => evil(x).
         greedy(father(john)).
         king(father(john)).
     `)

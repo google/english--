@@ -10,7 +10,7 @@ class Reasoner extends Backward {
  }
  backward(goal) {
   //console.log(JSON.stringify(goal));
-  // console.log(toString({statements: [goal]}));
+  console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
   // console.log(propositional);
   if (propositional.length > 0) {
@@ -44,7 +44,7 @@ class Reasoner extends Backward {
    //}];
    //}
    // console.log("hi");
-   return [{given: statement, goal: goal}];
+   return [{given: statement, goal: fill(goal, unifies)}];
   }
 
   // Searches for something that implies goal.
@@ -57,7 +57,7 @@ class Reasoner extends Backward {
    if (!unifies || Object.entries(unifies).length == 0) {
     continue;
    }
-   let left = fill(statement.left, unifies);
+   let left = fill(statement.left, unifies, true);
    // console.log(JSON.stringify(left));
    let dep = this.backward(left);
    if (dep) {
@@ -113,49 +113,42 @@ function rewrite(expression, vars = []) {
  }
 }
 
-function fill(rule, map) {
+function fill(rule, map, override) {
   // clones rule.
   // console.log(rule);
-  let result = JSON.parse(JSON.stringify(rule));
-  if (result["@type"] == "UnaryOperator") {
-    result.expression = fill(result.expression, map);
-  } else if (result["@type"] == "BinaryOperator") {
-    result.left = fill(result.left, map);
-    result.right = fill(result.right, map);
-  } else if (result["@type"] == "Argument") {
-      // console.log("hello world");
-      if (result.call) {
-        result.call = fill(result.call, map);
-      }
-      if (result.literal && result.free) {
-        let mapping = map[result.literal.name];
-        if (!mapping) {
-            // console.log(result);
-            // console.log(map);
-            // there is non-unified free variable
-          return false;
-        }
-        delete result.free;
-        if (mapping["@type"] == "Function") {
-            // NOTE(goto): this is a mess, causing a lot of
-            // trouble. redo this.
-            result.call = mapping;
-            delete result.literal;
-        } else {
-            result.literal = mapping;
-        }
-    }
-  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
-    result.arguments = result.arguments.map(x => {
-        //if (x.free) {
-        //  console.log(x);
-        //}
-        //console.log(x);
-        //console.log(map);
-        return fill(x, map);
-    });
+ let result = JSON.parse(JSON.stringify(rule));
+ if (result["@type"] == "UnaryOperator") {
+  result.expression = fill(result.expression, map, override);
+ } else if (result["@type"] == "BinaryOperator") {
+  result.left = fill(result.left, map, override);
+  result.right = fill(result.right, map, override);
+ } else if (result["@type"] == "Argument") {
+  // console.log("hello world");
+  if (result.call) {
+   result.call = fill(result.call, map, override);
   }
-  return result;
+  if (result.literal && result.free) {
+   let mapping = map[result.literal.name];
+   if (!mapping) {
+    return false;
+   }
+   delete result.free;
+   // console.log(override);
+   if (!override) {
+    result.value = mapping;
+   } else if (mapping["@type"] == "Function") {
+    result.call = mapping;
+    delete result.literal;
+   } else {
+    result.literal = mapping;
+   }
+  }
+ } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+  result.arguments = result.arguments.map(x => {
+    return fill(x, map, override);
+   });
+ }
+ return result;
 }
 
 function unify(a, b) {

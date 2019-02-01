@@ -1,7 +1,7 @@
 const {Parser} = require("./parser.js");
 
 const {
- program,
+  program,
   forall,
   exists,
   implies,
@@ -296,7 +296,7 @@ function stringify(rule) {
   let arg = (x) => {
    if (x.literal) {
     // return x.literal.name + (x.free ? "?" : "");
-    return x.literal.name;
+    return x.literal.name + (x.value ? ` = ${stringify(x.value)}` : "");
    } else if (x.call) {
     return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
    }
