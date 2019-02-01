@@ -377,10 +377,35 @@ describe("First order logic", function() {
      .equalsTo("forall (x) P(x, b). P(a, b).");
   });
 
-  it.skip("forall (x) P(x?) && Q(x). P(a)?", function() {
-    assertThat("forall (x) P(x?) && Q(x?).")
+  it("forall (x) P(x) && Q(x). P(a)?", function() {
+    // conjunction elimination.
+    assertThat("forall (x) P(x) && Q(x).")
      .proving("P(a)?")
-     .equalsTo("");
+     .equalsTo("forall (x) P(x = a) && Q(x = a). P(a).");
+    assertThat("forall (x) P(x) && Q(x).")
+     .proving("Q(a)?")
+     .equalsTo("forall (x) P(x = a) && Q(x = a). Q(a).");
+  });
+
+  it("forall (x) P(x) || Q(x). ~Q(a). P(a)?", function() {
+    // disjunctive syllogistm.
+    assertThat("forall (x) P(x) || Q(x). ~Q(a).")
+     .proving("P(a)?")
+     .equalsTo(`
+         ~Q(a). 
+         ~Q(x = a). 
+         forall (x) P(x) || Q(x) => P(a) || Q(a).
+         P(a).
+     `);
+
+    assertThat("forall (x) P(x) || Q(x). ~P(a).")
+     .proving("Q(a)?")
+     .equalsTo(`
+         ~P(a). 
+         ~P(x = a). 
+         forall (x) P(x) || Q(x) => P(a) || Q(a).
+         Q(a).
+     `);
   });
 
   it("forall (x) forall (y) P(x, y). P(a, b)?", function() {

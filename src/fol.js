@@ -1,5 +1,19 @@
 const {equals, toString} = require("./forward.js");
 const {Backward} = require("./backward.js");
+const {Parser, Rule} = require("./parser.js");
+
+const {
+  program,
+  forall,
+  exists,
+  implies,
+  predicate,
+  binary,
+  literal,
+  constant,
+  and,
+  or,
+  negation} = Parser;
 
 class Reasoner extends Backward {
  constructor(kb) {
@@ -12,13 +26,9 @@ class Reasoner extends Backward {
   //console.log(JSON.stringify(goal));
   // console.log(toString({statements: [goal]}));
   let propositional = super.backward(goal);
-  // console.log(propositional);
   if (propositional.length > 0) {
    return propositional;
   }
-
-  // for (let statement of this.kb) {
-  // }
 
   // Universal introduction
   for (let statement of this.kb) {
@@ -27,13 +37,10 @@ class Reasoner extends Backward {
     continue;
    }
 
-   // console.log(statement);
-   // console.log(toString({statements: [fill(statement, unifies)]}));
-
    return [{given: statement}, {given: fill(goal, unifies)}];
   }
 
-  // Searches for something that implies goal.
+  // Modus ponens.
   for (let statement of this.op("=>")) {
    let implication = statement.right;
    let unifies = unify(implication, goal);
@@ -42,11 +49,45 @@ class Reasoner extends Backward {
    }
    let left = fill(statement.left, unifies, true);
    let dep = this.backward(left);
-   // console.log(unifies);
    if (dep) {
-    // console.log(toString({statements: [fill(statement, unifies)]}));
-    //console.log(dep);
     return [...dep, {given: statement, and: [left], goal: fill(goal, unifies)}];
+   }
+  }
+
+  // Conjunction elimination.
+  for (let statement of this.op("&&")) {
+   let left = unify(statement.left, goal);
+   if (left) {
+    return [{given: fill(statement, left)}, {given: goal}];
+   }
+   let right = unify(statement.right, goal);
+   if (right) {
+    return [{given: fill(statement, right)}, {given: goal}];
+   }
+  }
+
+  // Disjunction syllogism
+  for (let statement of this.op("||")) {
+   let left = unify(statement.left, goal);
+   if (left) {
+    let right = negation(statement.right);
+    let result = this.backward(right);
+    if (result) {
+     let explanation = JSON.parse(JSON.stringify(statement));
+     delete explanation.quantifiers;
+     return [...result, {given: statement, goal: fill(explanation, left, true)}, {given: goal}];
+    }
+   }
+
+   let right = unify(statement.right, goal);
+   if (right) {
+    let left = negation(statement.left);
+    let result = this.backward(left);
+    if (result) {
+     let explanation = JSON.parse(JSON.stringify(statement));
+     delete explanation.quantifiers;
+     return [...result, {given: statement, goal: fill(explanation, right, true)}, {given: goal}];
+    }
    }
   }
 

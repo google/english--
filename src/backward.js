@@ -73,7 +73,6 @@ class Backward {
      this.kb.push(goal);
      return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
     }
-    //return backward(statement.left);
    }
   }
 
