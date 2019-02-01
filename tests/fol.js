@@ -713,22 +713,28 @@ describe("First order logic", function() {
   });
 
   it("grandparent", function() {
-    assertThat(`
+    let kb = `
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).
 
-      forall (g) forall (c) (grandparent(g, c) => exists (p) parent(g, p) && parent(p, c)).
-      forall (g) forall (c) (exists (p) parent(g, p) && parent(p, c) => grandparent(g, c)).
+      forall (g) forall (c) (grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c)))).
+      forall (g) forall (c) ((exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c)).
 
       parent(maura, mel).
       child(anna, mel).
-     `)
+    `;
+    assertThat(kb)
+     .proving("exists (x) parent(maura, x?).")
+     .equalsTo("parent(maura, mel). exists (x) parent(maura, x = mel).");
+    // TODO(goto): we need to resolve the existential conjunction introduction
+    // before this can be made to work.
+    assertThat(kb)
      .proving("grandparent(maura, anna)?")
      .equalsTo(`
      `);
    });
 
-  it("kinships", function() {
+  it("my family", function() {
     // logic from:
     // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
     let kb = `

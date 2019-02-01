@@ -23,19 +23,21 @@ class Reasoner extends Backward {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal, stack = []) {
-  //console.log(JSON.stringify(goal));
-  // console.log(toString({statements: [goal]}));
+  // console.log(JSON.stringify(goal));
+  // console.log("goal: " + toString({statements: [goal]}));
 
   // console.log(`${Rule.from(goal)}?`);
   for (let subgoal of stack) {
    if (equals(goal, subgoal)) {
     // console.log(goal);
-    // console.log("quit?");
+    // console.log("duplicate!");
     return false;
    }
   }
 
   if (!goal.quantifiers) {
+   // console.log("propositional!");
+   // console.log(goal);
    let propositional = super.backward(goal, stack);
    if (propositional.length > 0) {
     return propositional;
@@ -114,6 +116,7 @@ class Reasoner extends Backward {
       goal.quantifiers.length == 1 &&
       goal.quantifiers[0].op == "exists" &&
       goal.op == "&&") {
+   // console.log("hello world");
    stack.push(goal);
    let left = this.backward(goal.left, stack);
    stack.pop();
