@@ -700,17 +700,31 @@ describe("First order logic", function() {
     let kb = `
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).
+
      forall (x) male(x) => ~female(x).
      forall (x) female(x) => ~male(x).
 
+     forall (x) forall (y) spouse(x, y) => spouse(y, x).
+
+     forall (x) forall (y) parent(x, y) => child(y, x).
+
      forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
+     forall (x) forall (y) ((parent(x, y) && female(y)) => daughter(y, x)).
+
+     forall (x) forall (y) ((parent(x, y) && male(x)) => father(x, y)).
+     forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
+
+     spouse(sam, dani).
 
      parent(sam, leo).
      child(anna, sam).
 
+     male(sam).
+     female(dani).
+
      male(leo).
      female(anna).
-     `;
+    `;
 
     assertThat(kb)
      .proving("child(leo, sam)?")
@@ -736,12 +750,86 @@ describe("First order logic", function() {
      `);
 
     assertThat(kb)
+      .proving("daughter(anna, sam)?")
+      .equalsTo(`
+        female(anna).
+        child(anna, sam).
+        forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
+        female(anna) && parent(sam, anna) => female(anna) && parent(sam, anna).
+        forall (x) forall (y) female(y) && parent(x, y) => daughter(y, x) && female(anna) && parent(sam, anna) => daughter(anna, sam).
+     `);
+
+    // TODO(goto): this makes x = sam, which isn't right.
+    // assertThat(kb)
+    // .proving("daughter(x?, sam)?")
+    // .equalsTo("");
+
+    // TODO(goto): this too.
+    // assertThat(kb)
+    // .proving("son(x?, sam)?")
+    // .equalsTo("");
+
+    // TODO(goto): this causes an infinite loop.
+    // assertThat(kb)
+    // .proving("son(leo, x?)?")
+    // .equalsTo("");
+
+    // TODO(goto): this causes an infinite loop.
+    // assertThat(kb)
+    //  .proving("daughter(anna, x?)?")
+    //  .equalsTo("");
+
+    assertThat(kb)
      .proving("female(leo)?")
      .equalsTo("");
 
     assertThat(kb)
      .proving("male(anna)?")
      .equalsTo("");
+
+    assertThat(kb)
+     .proving("spouse(sam, x?).")
+     .equalsTo("spouse(sam, dani). spouse(sam, x = dani).");
+
+    assertThat(kb)
+     .proving("spouse(dani, sam).")
+     .equalsTo(`
+       spouse(sam, dani).
+       forall (x) forall (y) spouse(x, y) => spouse(y, x) && spouse(sam, dani) => spouse(dani, sam).
+     `);
+
+    assertThat(kb)
+     .proving("father(sam, leo).")
+     .equalsTo(`
+       male(sam).
+       parent(sam, leo).
+       male(sam) && parent(sam, leo) => male(sam) && parent(sam, leo).
+       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(sam) && parent(sam, leo) => father(sam, leo).
+     `);
+
+    assertThat(kb)
+     .proving("father(sam, anna).")
+     .equalsTo(`
+       male(sam).
+       child(anna, sam).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
+       male(sam) && parent(sam, anna) => male(sam) && parent(sam, anna).
+       forall (x) forall (y) male(x) && parent(x, y) => father(x, y) && male(sam) && parent(sam, anna) => father(sam, anna).
+     `);
+
+    // this causes an infinite loop.
+    // assertThat(kb)
+    // .proving("mother(dani, leo).")
+    //  .equalsTo("");
+    // assertThat(kb)
+    //  .proving("mother(dani, anna).")
+    //  .equalsTo("");
+
+
+    // TODO(goto): this causes an infinite loop.
+    // assertThat(kb)
+    // .proving("spouse(dani, x?).")
+    // .equalsTo("");
 
     // forall (g) forall (c) (grandparent(g, c) => exists (p) parent(g, p) && parent(p, c)).
     // forall (g) forall (c) (exists (p) parent(g, p) && parent(p, c) => grandparent(g, c)).
