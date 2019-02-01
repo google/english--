@@ -562,25 +562,16 @@ describe("First order logic", function() {
   });
 
   it("students and professors", function() {
-    // skips this statement, until we support the
-    // exists () quantifier.
-    // forall (x) exists (y) friends(y?, x?).
-
     const kb = `
       professor(lucy).
       forall (x) professor(x) => person(x).
       dean(john).
+      forall (x) exists (y) friends(y, x).
       forall (x) dean(x) => professor(x).
       forall (x) forall(y) (professor(x) && dean(y)) => (friends(x, y) || ~knows(x, y)).
       forall (x) forall (y) (person(x) && person(y) && criticized(x, y)) => ~friends(y, x).
       criticized(lucy, john).
      `;
-
-    // TODO(goto): add this case.
-    // assertThat(kb)
-    // .proving("knows(lucy, john)?")
-    // .equalsTo("");
-    // return;
 
     assertThat(kb)
      .proving("~friends(john, lucy)?")
@@ -615,10 +606,15 @@ describe("First order logic", function() {
        forall (x) professor(x) => person(x) && professor(lucy) => person(lucy).
      `);
 
-    // TODO(goto): this is an interesting query that we should support. 
     assertThat(kb)
-      .proving("critized(x?, john)?")
-      .equalsTo("");
+      .proving("criticized(x?, john)?")
+      .equalsTo("criticized(lucy, john). criticized(x = lucy, john).");
+
+    // TODO(goto): add this case.
+    // assertThat(kb)
+    // .proving("knows(lucy, john)?")
+    // .equalsTo("");
+    // return;
   });
 
   it("big bertha", function() {
