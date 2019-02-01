@@ -82,51 +82,62 @@ describe("First order logic", function() {
       predicate("P", [argument(func("Q", [argument(literal("x"))]))]));
   });
 
-  it("Rewrite: forall(x) P(x) == P(x?)", function() {
+  it("Rewrite: forall(x) P(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x).");
-    let expects = Rule.of("P(x?).");
+    let expects = Rule.of("P(x).");
+    expects.arguments[0].free = true;
     expects.quantifiers = [forall("x")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x) && Q(x) == P(x?) && Q(x?)", function() {
+  it("Rewrite: forall(x) P(x) && Q(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x) && Q(x).");
-    let expects = Rule.of("P(x?) && Q(x?).");
+    let expects = Rule.of("P(x) && Q(x).");
+    expects.left.arguments[0].free = true;
+    expects.right.arguments[0].free = true;
     expects.quantifiers = [forall("x")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x) => Q(x) == P(x?) => Q(x?)", function() {
+  it("Rewrite: forall(x) P(x) => Q(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x) => Q(x).");
-    let expects = Rule.of("P(x?) => Q(x?).");
+    let expects = Rule.of("P(x) => Q(x).");
+    expects.left.arguments[0].free = true;
+    expects.right.arguments[0].free = true;
     expects.quantifiers = [forall("x")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) ~P(x) == ~P(x?)", function() {
+  it("Rewrite: forall(x) ~P(x)", function() {
     let {statements} = Parser.parse("forall (x) ~P(x).");
-    let expects = Rule.of("~P(x?).");
+    let expects = Rule.of("~P(x).");
+    expects.expression.arguments[0].free = true;
     expects.quantifiers = [forall("x")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x, y) == P(x?, y)", function() {
+  it("Rewrite: forall(x) P(x, y)", function() {
     let {statements} = Parser.parse("forall (x) P(x, y).");
-    let expects = Rule.of("P(x?, y).");
+    let expects = Rule.of("P(x, y).");
+    expects.arguments[0].free = true;
     expects.quantifiers = [forall("x")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) forall (y) P(x, y) == P(x?, y?)", function() {
+  it("Rewrite: forall(x) forall (y) P(x, y)", function() {
     let {statements} = Parser.parse("forall (x) forall (y) P(x, y).");
-    let expects = Rule.of("P(x?, y?).");
+    let expects = Rule.of("P(x, y).");
+    expects.arguments[0].free = true;
+    expects.arguments[1].free = true;
     expects.quantifiers = [forall("x"), forall("y")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) forall (y) ~P(x, y, c) == ~P(x?, y?, c)", function() {
+  it("Rewrite: forall(x) forall (y) ~P(x, y, c)", function() {
     let {statements} = Parser.parse("forall (x) forall (y) ~P(x, y, c).");
-    let expects = Rule.of("~P(x?, y?, c).");
+    let expects = Rule.of("~P(x, y, c).");
+    expects.expression.arguments[0].free = true;
+    expects.expression.arguments[1].free = true;
     expects.quantifiers = [forall("x"), forall("y")];
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
