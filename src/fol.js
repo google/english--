@@ -23,50 +23,33 @@ class Reasoner extends Backward {
   // Universal introduction
   for (let statement of this.kb) {
    let unifies = unify(statement, goal);
-   // console.log(statement);
-   // console.log(unifies);
-   // console.log(goal);
    if (!unifies) {
     continue;
    }
 
-   // else if (Object.entries(unifies).length == 1) {
-   // deals with the specific case where we can
-   // resolve a single variable.
-   // TODO(goto): deal with more general cases.
-   // console.log(Object.entries(unifies)[0][1]);
    // console.log(statement);
-   //let captured = Object.entries(unifies)[0][1];
-   // console.log(captured);
-   //return [{
-   //  given: captured,
-   //  goal: captured
-   //}];
-   //}
-   // console.log("hi");
+   // console.log(toString({statements: [fill(statement, unifies)]}));
+
    return [{given: statement}, {given: fill(goal, unifies)}];
   }
 
   // Searches for something that implies goal.
   for (let statement of this.op("=>")) {
-   // console.log(statement);
    let implication = statement.right;
    let unifies = unify(implication, goal);
-   // console.log(implication);
-   // console.log(JSON.stringify(unifies));
    if (!unifies || Object.entries(unifies).length == 0) {
     continue;
    }
    let left = fill(statement.left, unifies, true);
-   // console.log(JSON.stringify(left));
    let dep = this.backward(left);
+   // console.log(unifies);
    if (dep) {
-    // console.log("hi");
-    return [...dep, {given: statement, and: [left], goal: goal}];
+    // console.log(toString({statements: [fill(statement, unifies)]}));
+    //console.log(dep);
+    return [...dep, {given: statement, and: [left], goal: fill(goal, unifies)}];
    }
   }
 
-  // console.log("hello");
   return false;
  }
 }
@@ -108,7 +91,7 @@ function rewrite(expression, vars = []) {
   expression.expression = rewrite(expression.expression, vars);
   return expression;
  } else {
-  console.log(expression);
+  // console.log(expression);
   throw new Error("unknown type");
  }
 }

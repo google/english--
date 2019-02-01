@@ -296,7 +296,9 @@ function stringify(rule) {
   let arg = (x) => {
    if (x.literal) {
     // return x.literal.name + (x.free ? "?" : "");
-    return x.literal.name + (x.value ? ` = ${stringify(x.value)}` : "");
+    let free =  x.free ? "*" : "";
+    let value = x.value ? ` = ${stringify(x.value)}` : "";
+    return x.literal.name + value;
    } else if (x.call) {
     return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
    }

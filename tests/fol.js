@@ -507,6 +507,25 @@ describe("First order logic", function() {
      .equalsTo("p(a). p(x = a).");
    });
 
+  it.skip("p(a). forall (x) p(x) => q(x). |= q(x?).", function() {
+    assertThat("p(a). forall (x) p(x) => q(x).")
+     .proving("q(x?)?")
+     .equalsTo("p(a). p(x = a). forall (x) p(x) => q(x) && p(x) => q(x).");
+   });
+
+  it.skip("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
+    // here is an example where we are going to have to look at multiple unification
+    // options before finding something that works.
+    assertThat(`
+       p(a). 
+       q(b). 
+       p(c). q(c). 
+       forall (x) p(x) && q(x) => r(x).
+     `)
+     .proving("r(x?)?")
+     .equalsTo("");
+   });
+
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
     assertThat(`
         forall(x) ((greedy(x) && king(x)) => evil(x)).
