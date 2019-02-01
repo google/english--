@@ -297,6 +297,13 @@ describe("First order logic", function() {
     assertThat(unify(Rule.of("P(a, b)."), Rule.of("forall (x) forall (y) P(x?, y?).")))
      .equalsTo({"x": literal("a"), "y": literal("b")});
   });
+  
+  it.skip("Unify(P(a?), P(b?))", function() {
+    // What should happen when unify a free variable with another
+    // free variable?
+    assertThat(unify(Rule.of("P(a?)."), Rule.of("P(b?).")))
+     .equalsTo({});
+  });
 
   it("Unity fails: Unify(P(a) && Q(b), P(x?) && Q(c))", function() {
     assertThat(unify(Rule.of("P(a) && Q(b)."), Rule.of("P(x?) && Q(c).")))
@@ -507,9 +514,9 @@ describe("First order logic", function() {
      .equalsTo("p(a). p(x = a).");
    });
 
-  it.skip("p(a). forall (x) p(x) => q(x). |= q(x?).", function() {
+  it.skip("p(a). forall (x) p(x) => q(x). |= q(y?).", function() {
     assertThat("p(a). forall (x) p(x) => q(x).")
-     .proving("q(x?)?")
+     .proving("q(y?)?")
      .equalsTo("p(a). p(x = a). forall (x) p(x) => q(x) && p(x) => q(x).");
    });
 

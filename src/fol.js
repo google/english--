@@ -42,7 +42,7 @@ class Reasoner extends Backward {
    }
    let left = fill(statement.left, unifies, true);
    let dep = this.backward(left);
-   // console.log(unifies);
+   console.log(unifies);
    if (dep) {
     // console.log(toString({statements: [fill(statement, unifies)]}));
     //console.log(dep);
@@ -97,8 +97,9 @@ function rewrite(expression, vars = []) {
 }
 
 function fill(rule, map, override) {
-  // clones rule.
-  // console.log(rule);
+ // clones rule.
+ // console.log(rule);
+ // console.log(map);
  let result = JSON.parse(JSON.stringify(rule));
  if (result["@type"] == "UnaryOperator") {
   result.expression = fill(result.expression, map, override);
@@ -135,6 +136,10 @@ function fill(rule, map, override) {
 }
 
 function unify(a, b) {
+ // console.log("Unifying");
+ // console.log(JSON.stringify(a));
+ // console.log(JSON.stringify(b));
+
  let result = reduce(a, b);
 
  if (!result) {
