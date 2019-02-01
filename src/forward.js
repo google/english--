@@ -322,13 +322,15 @@ function explain(reasons) {
  for (let reason of reasons) {
   // console.log(reason);
   // console.log(reason);
+  // console.log(reason.given);
+  // console.log(reason.goal);
   if (equals(reason.given, reason.goal)) {
    // console.log("hi");
    result.push(stringify(reason.given) + ".\n");
   } else {
    let line = [];
    line.push("if (");
-   line.push(stringify(reason.given));     
+   line.push(stringify(reason.given));
    // line.push(" ");
    let ands = reason.and || [];
    for (let and of ands) {

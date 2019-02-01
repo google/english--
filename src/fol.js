@@ -25,9 +25,24 @@ class Reasoner extends Backward {
    let unifies = unify(statement, goal);
    // console.log(statement);
    // console.log(unifies);
+   // console.log(goal);
    if (!unifies) {
     continue;
    }
+
+   // else if (Object.entries(unifies).length == 1) {
+   // deals with the specific case where we can
+   // resolve a single variable.
+   // TODO(goto): deal with more general cases.
+   // console.log(Object.entries(unifies)[0][1]);
+   // console.log(statement);
+   //let captured = Object.entries(unifies)[0][1];
+   // console.log(captured);
+   //return [{
+   //  given: captured,
+   //  goal: captured
+   //}];
+   //}
    // console.log("hi");
    return [{given: statement, goal: goal}];
   }
@@ -58,11 +73,14 @@ class Reasoner extends Backward {
 
 function rewrite(expression, vars = []) {
  // if (statement.op == "forall") {
+ // console.log(expression);
+ // throw new Error();
  if (expression["@type"] == "Program") {
   // covers the case where we are rewriting the
   // entire program.
   return {statements: expression.statements.map(x => rewrite(x))};
- } else if (expression.op == "forall") {
+ } else if (expression["@type"] == "Quantifier") {
+  // console.log("hi");
   // vars.push(expression.variable);
   let result = expression.expression;
   // console.log(expression);

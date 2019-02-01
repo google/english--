@@ -327,14 +327,11 @@ describe("First order logic", function() {
   });
 
   it("Generalized modus ponens", function() {
-    assertThat(`
-        forall(x) men(x?) => mortal(x?). 
-        men(socrates).
-    `)
+    assertThat("forall(x) men(x?) => mortal(x?). men(socrates).")
      .proving("mortal(socrates)?")
      .equalsTo(`
         men(socrates). 
-        (forall (x) men(x) => mortal(x) and men(socrates)) => mortal(socrates).
+        if (forall (x) men(x) => mortal(x) and men(socrates)) then mortal(socrates).
      `);
   });
 
@@ -476,6 +473,12 @@ describe("First order logic", function() {
      .equalsTo("");
    });
 
+  it("p(a) |= exists (x) p(x).", function() {
+    assertThat("p(a).")
+     .proving("exists (x) p(x)?")
+     .equalsTo("p(a) => exists (x) p(x).");
+   });
+
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
     assertThat(`
         forall(x) ((greedy(x?) && king(x?)) => evil(x?)).
@@ -578,8 +581,8 @@ describe("First order logic", function() {
 
   it.skip("diet", function() {
     // nobody can see oneself. 
-    assertThat("forall(x?) (~sees(x?, x?)). forall(x?) (~sees(x?, feet(x?)) => diet(x?)).")
-     .proving("forall(x?) diet(x?)?")
+    assertThat("forall(x) ~sees(x, x). forall(x) ~sees(x, feet(x)) => diet(x).")
+     .proving("forall(x) diet(x)?")
      .equalsTo("");
     // should be false, since feet(x?) isn't necessarily x?.
    });
@@ -587,7 +590,7 @@ describe("First order logic", function() {
   function assertThat(x) {
    return {
     proving(z) {
-     let result = explain(new Reasoner(Parser.parse(x)).backward(Rule.of(z)));
+     let result = explain(new Reasoner(Parser.parse(x)).backward(rewrite(Rule.of(z))));
      return {
       equalsTo(y) {
        assertThat(toString(Parser.parse(result)))
