@@ -408,6 +408,17 @@ describe("First order logic", function() {
      `);
   });
 
+  it("forall (x) forall (y) p(x, y) && q(y) => r(y, x). p(a, b). q(b). |= r(b, a)?", function() {
+    assertThat("forall (x) forall (y) ((p(x, y) && q(y)) => r(y, x)). p(a, b). q(b).")
+     .proving("r(b, a)?")
+     .equalsTo(`
+        p(a, b). 
+        q(b). 
+        p(a, b) && q(b) => p(a, b) && q(b).
+        forall (x) forall (y) p(x, y) && q(y) => r(y, x) && p(a, b) && q(b) => r(b, a).
+     `);
+   });
+
   it.skip("p(a). p(b). |= p(x?)?", function() {
     // we want to find a way to get x = [a, b] rather than
     // stop on the first match. may be useful to use a
@@ -681,6 +692,66 @@ describe("First order logic", function() {
      .proving("forall(x) diet(x)?")
      .equalsTo("");
     // should be false, since feet(x?) isn't necessarily x?.
+   });
+
+  it("kinships", function() {
+    // logic from:
+    // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
+    let kb = `
+     forall (x) forall (y) parent(x, y) => child(y, x).
+     forall (x) forall (y) child(x, y) => parent(y, x).
+     forall (x) male(x) => ~female(x).
+     forall (x) female(x) => ~male(x).
+
+     forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
+
+     parent(sam, leo).
+     child(anna, sam).
+
+     male(leo).
+     female(anna).
+     `;
+
+    assertThat(kb)
+     .proving("child(leo, sam)?")
+     .equalsTo(`
+       parent(sam, leo).
+       forall (x) forall (y) parent(x, y) => child(y, x) && parent(sam, leo) => child(leo, sam).
+     `);
+
+    assertThat(kb)
+     .proving("parent(sam, anna)?")
+     .equalsTo(`
+       child(anna, sam).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
+     `);
+
+    assertThat(kb)
+      .proving("son(leo, sam)?")
+      .equalsTo(`
+        male(leo).
+        parent(sam, leo).
+        male(leo) && parent(sam, leo) => male(leo) && parent(sam, leo).
+        forall (x) forall (y) male(y) && parent(x, y) => son(y, x) && male(leo) && parent(sam, leo) => son(leo, sam).
+     `);
+
+    assertThat(kb)
+     .proving("female(leo)?")
+     .equalsTo("");
+
+    assertThat(kb)
+     .proving("male(anna)?")
+     .equalsTo("");
+
+    // forall (g) forall (c) (grandparent(g, c) => exists (p) parent(g, p) && parent(p, c)).
+    // forall (g) forall (c) (exists (p) parent(g, p) && parent(p, c) => grandparent(g, c)).
+
+    // assertThat(kb)
+    // .proving("grandparent(maura, anna)?")
+    // .equalsTo(`
+    //   child(anna, sam).
+    //   forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, sam) => parent(sam, anna).
+    // `);
    });
 
   function assertThat(x) {
