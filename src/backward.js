@@ -1,4 +1,4 @@
-const {normalize, stringify, equals} = require("./forward.js");
+const {normalize, stringify, equals, explain} = require("./forward.js");
 const {Parser, Rule} = require("./parser.js");
 
 const {
@@ -14,6 +14,35 @@ const {
   or,
   negation} = Parser;
 
+class Result {
+ constructor() {
+  this.reason = [];
+ }
+ static failed() {
+  return new Result();
+ }
+ static of(reason) {
+  return new Result().push(reason);
+ }
+ failed() {
+  return this.reason.length == 0;
+ }
+ push(reason) {
+  if (reason instanceof Result) {
+   this.reason.push(...reason.reason);
+  } else if (Array.isArray(reason)) {
+   this.reason.push(...reason);
+  } else if (typeof reason == "object") {
+   this.reason.push(reason);
+  } else {
+   throw new Error("Unsupported reason type");
+  }
+  return this;
+ }
+ toString() {
+  return explain(this.reason);
+ }
+}
 
 class Backward {
  constructor(kb) {
@@ -40,25 +69,25 @@ class Backward {
   // console.log(`${Rule.from(goal)}?`);
   for (let subgoal of stack) {
    if (equals(goal, subgoal)) {
-    return false;
+    return Result.failed();
    }
   }
 
   let {statement, match} = this.direct(goal);
   if (match) {
-   return [{given: statement, goal: goal}];
+   return Result.of({given: statement, goal: goal});
   }
 
   // Conjunction elimination
   for (let statement of this.op("&&")) {
    if (equals(statement.left, goal)) {
     this.kb.push(goal);
-    return [{given: statement, goal: goal}];
+    return Result.of({given: statement, goal: goal});
    }
 
    if (equals(statement.right, goal)) {
     this.kb.push(goal);
-    return [{given: statement, goal: goal}];
+    return Result.of({given: statement, goal: goal});
    }
   }
 
@@ -69,9 +98,9 @@ class Backward {
     stack.push(goal);
     let subgoal = this.backward(statement.left, stack);
     stack.pop();
-    if (subgoal.length > 0) {
+    if (!subgoal.failed()) {
      this.kb.push(goal);
-     return [...subgoal, {given: statement, and: [statement.left], goal: goal}];
+     return subgoal.push({given: statement, and: [statement.left], goal: goal});
     }
    }
   }
@@ -84,9 +113,9 @@ class Backward {
     stack.push(goal);
     let subgoal = this.backward(negation(statement.right), stack);
     stack.pop();
-    if (subgoal.length > 0) {
+    if (!subgoal.failed()) {
      this.kb.push(goal);
-     return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+     return subgoal.push({given: statement, and: [negation(statement.right)], goal: goal});
     }
     // return backward(negation(statement.right));
    }
@@ -100,18 +129,26 @@ class Backward {
     stack.push(goal);
     let subgoal = this.backward(negation(statement.right), stack);
     stack.pop();
-    if (subgoal.length > 0) {
+    if (!subgoal.failed()) {
      this.kb.push(goal);
-     return [...subgoal, {given: statement, and: [negation(statement.right)], goal: goal}];
+     return subgoal.push({
+       given: statement, 
+       and: [negation(statement.right)], 
+       goal: goal
+     });
     }
    } else if (equals(statement.right, goal)) {
     // console.log(statement);
     stack.push(goal);
     let subgoal = this.backward(negation(statement.left), stack);
     stack.pop();
-    if (subgoal.length > 0) {
+    if (!subgoal.failed()) {
      this.kb.push(goal);
-     return [...subgoal, {given: statement, and: [negation(statement.left)], goal: goal}];
+     return  subgoal.push({
+       given: statement, 
+       and: [negation(statement.left)], 
+       goal: goal
+     });
     }
    }
   }
@@ -122,13 +159,17 @@ class Backward {
    stack.push(goal);
    let left = this.backward(goal.left, stack);
    stack.pop();
-   if (left.length > 0) {
+   if (!left.failed()) {
     stack.push(goal);
     let right = this.backward(goal.right, stack);
     stack.pop();
-    if (right.length > 0) {
+    if (!right.failed()) {
      this.kb.push(goal);
-     return [...left, ...right, {given: goal.left, and: [goal.right], goal: goal}];
+     return left.push(right).push({
+       given: goal.left, 
+       and: [goal.right], 
+       goal: goal
+     });
     }
    }
   }
@@ -138,16 +179,16 @@ class Backward {
    stack.push(goal);
    let left = this.backward(goal.left, stack);
    stack.pop();
-   if (left.length > 0) {
+   if (!left.failed()) {
     this.kb.push(goal);
-    return [...left, {given: goal.left, goal: goal}];
+    return left.push({given: goal.left, goal: goal});
    }
    stack.push(goal);
    let right = this.backward(goal.right, stack);
    stack.pop()
-   if (right.length > 0) {
+    if (!right.failed()) {
     this.kb.push(goal);
-    return [...right, {given: goal.right, goal: goal}];
+    return right.push({given: goal.right, goal: goal});
    }
   }
 
@@ -161,7 +202,7 @@ class Backward {
      for (let left of this.op("=>")) {
       if (equals(left.right, right.left)) {
        this.kb.push(goal);
-       return [{given: left, and: [right], goal: goal}];
+       return Result.of({given: left, and: [right], goal: goal});
       }
      }
     }
@@ -175,17 +216,17 @@ class Backward {
      stack.push(goal);
      let result = this.backward(implies(goal.left, goal.right.right), stack);
      stack.pop();
-     if (result.length > 0) {
+     if (!result.failed()) {
       this.kb.push(goal);
-      return [{given: implies(goal.left, goal.right.right), goal: goal}];
+      return  Result.of({given: implies(goal.left, goal.right.right), goal: goal});
      }
     } else if (equals(goal.right.right, goal.left)) {
      stack.push(goal);
      let result = this.backward(implies(goal.left, goal.right.left), stack);
      stack.pop();
-     if (result.length > 0) {
+     if (!result.failed()) {
       this.kb.push(goal);
-      return [{given: implies(goal.left, goal.right.left), goal: goal}];
+      return Result.of({given: implies(goal.left, goal.right.left), goal: goal});
      }
     }
    }
@@ -207,7 +248,7 @@ class Backward {
             equals(third.right, second.left)) {
          // console.log("found");
          this.kb.push(goal);
-         return [{given: first, and: [second, third], goal: goal}];
+         return Result.of({given: first, and: [second, third], goal: goal});
         }
        }
       }
@@ -220,11 +261,12 @@ class Backward {
   // console.log(goal);
   // console.log(kb.statements);
 
-  return [];
+  return new Result();
  }
 }
 
 
 module.exports = {
  Backward: Backward,
+ Result: Result
 };

@@ -1,5 +1,5 @@
 const {equals, toString} = require("./forward.js");
-const {Backward} = require("./backward.js");
+const {Backward, Result} = require("./backward.js");
 const {Parser, Rule} = require("./parser.js");
 
 const {
@@ -30,7 +30,7 @@ class Reasoner extends Backward {
    if (equals(goal, subgoal)) {
     // console.log(goal);
     // console.log("duplicate!");
-    return false;
+    return Result.failed();
    }
   }
 
@@ -38,7 +38,7 @@ class Reasoner extends Backward {
    // console.log("propositional!");
    // console.log(goal);
    let propositional = super.backward(goal, stack);
-   if (propositional.length > 0) {
+   if (!propositional.failed()) {
     return propositional;
    }
   }
@@ -50,7 +50,7 @@ class Reasoner extends Backward {
     continue;
    }
 
-   return [{given: statement}, {given: fill(goal, unifies)}];
+   return Result.of([{given: statement}, {given: fill(goal, unifies)}]);
   }
 
   // universal modus ponens.
@@ -64,8 +64,8 @@ class Reasoner extends Backward {
    stack.push(goal);
    let dep = this.backward(left, stack);
    stack.pop();
-   if (dep) {
-    return [...dep, {given: statement, and: [left], goal: fill(goal, unifies)}];
+   if (!dep.failed()) {
+    return dep.push({given: statement, and: [left], goal: fill(goal, unifies)});
    }
   }
 
@@ -73,11 +73,11 @@ class Reasoner extends Backward {
   for (let statement of this.op("&&")) {
    let left = unify(statement.left, goal);
    if (left) {
-    return [{given: fill(statement, left)}, {given: goal}];
+    return Result.of([{given: fill(statement, left)}, {given: goal}]);
    }
    let right = unify(statement.right, goal);
    if (right) {
-    return [{given: fill(statement, right)}, {given: goal}];
+    return Result.of([{given: fill(statement, right)}, {given: goal}]);
    }
   }
 
@@ -89,10 +89,10 @@ class Reasoner extends Backward {
     stack.push(goal);
     let result = this.backward(right, stack);
     stack.pop();
-    if (result) {
+    if (!result.failed()) {
      let explanation = JSON.parse(JSON.stringify(statement));
      delete explanation.quantifiers;
-     return [...result, {given: statement, goal: fill(explanation, left, true)}, {given: goal}];
+     return result.push([{given: statement, goal: fill(explanation, left, true)}, {given: goal}]);
     }
    }
 
@@ -102,10 +102,10 @@ class Reasoner extends Backward {
     stack.push(goal);
     let result = this.backward(left, stack);
     stack.pop();
-    if (result) {
+    if (!result.failed()) {
      let explanation = JSON.parse(JSON.stringify(statement));
      delete explanation.quantifiers;
-     return [...result, {given: statement, goal: fill(explanation, right, true)}, {given: goal}];
+     return result.push([{given: statement, goal: fill(explanation, right, true)}, {given: goal}]);
     }
    }
   }
@@ -120,12 +120,12 @@ class Reasoner extends Backward {
    let left = JSON.parse(JSON.stringify(goal.left));
    left.quantifiers = goal.quantifiers;
    let result = this.backward(left, stack);
-   console.log(result);
+   // console.log(result);
    stack.pop();
    // console.log(left);
   }
 
-  return false;
+  return Result.failed();
  }
 }
 

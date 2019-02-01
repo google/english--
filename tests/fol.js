@@ -19,7 +19,7 @@ const {
  negation,
  argument} = Parser;
 
-describe("First order logic", function() {
+describe.only("First order logic", function() {
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse(`
@@ -896,10 +896,10 @@ describe("First order logic", function() {
   function assertThat(x) {
    return {
     proving(z) {
-     let result = explain(new Reasoner(Parser.parse(x)).backward(rewrite(Rule.of(z))));
+     let result = new Reasoner(Parser.parse(x)).backward(rewrite(Rule.of(z)));
      return {
       equalsTo(y) {
-       assertThat(toString(Parser.parse(result)))
+       assertThat(toString(Parser.parse(result.toString())))
         .equalsTo(toString(Parser.parse(y)));
       }
      };

@@ -43,25 +43,23 @@ describe("Backward", function() {
    });
 
   it("a || b, ~a |= b?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a || b.
       ~a.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("b?"))))
-     .equalsTo(`
+    `)
+    .proving("b?")
+    .equalsTo(`
       ~a.
       a || b && ~a => b.
     `);
    });
 
   it("a || b, ~b |= a?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a || b.
       ~b.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a?"))))
+    `)
+     .proving("a?")
      .equalsTo(`
       ~b.
       a || b && ~b => a.
@@ -69,81 +67,70 @@ describe("Backward", function() {
    });
 
   it("a |= a || b?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a || b?"))))
-     .equalsTo(`a. a => a || b.`);
+    `)
+    .proving("a || b?")
+    .equalsTo(`a. a => a || b.`);
    });
 
   it("a |= b || a?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("b || a?"))))
-     .equalsTo(`a. a => b || a.`);
+    `)
+    .proving("b || a?")
+    .equalsTo(`a. a => b || a.`);
    });
 
   it("a && b |= a?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a && b.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a."))))
+    `)
+     .proving("a.")
      .equalsTo(`a && b => a.`);
    });
 
   it("b && a |= a?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       b && a.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a."))))
+    `)
+     .proving("a.")
      .equalsTo(`b && a => a.`);
    });
 
   it("a, b |= a && b?", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a.
       b.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a && b?"))))
-     .equalsTo(`
+    `)
+    .proving("a && b?")
+    .equalsTo(`
       a.
       b.
       a && b => a && b.`);
    });
 
   it("a => b, b => c |= a => c?", function() {
-    let code = Parser.parse(`
-      a => b.
-      b => c.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a => c?"))))
-     .equalsTo(`((a => b) && (b => c)) => (a => c).`);
+    assertThat("a => b. b => c.")
+     .proving("a => c?")
+     .equalsTo("((a => b) && (b => c)) => (a => c).");
    });
 
   it("(a => c) && (b => d), a || b |= c || d", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a => c.
       b => d.
       a || b.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("c || d?"))))
+    `)
+     .proving("c || d?")
      .equalsTo(`if ((a => c) and (b => d) and (a || b)) then c || d.`);
    });
 
   it("a => b |= a => (a && b)", function() {
-    let code = Parser.parse(`
+    assertThat(`
       a => b.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("a => (a && b)?"))))
+    `)
+     .proving("a => (a && b)?")
      .equalsTo(`if (a => b) then a => a && b.`);
    });
 
@@ -174,14 +161,13 @@ describe("Backward", function() {
   it("criminal?", function() {
     // https://www.iep.utm.edu/prop-log/#SH5a
 
-    let code = Parser.parse(`
+    assertThat(`
       cat_fur || dog_fur.
       dog_fur => thompson_allergy.
       cat_fur => macavity_criminal.
       ~thompson_allergy.
-    `);
-
-    assertThat(explain(new Backward(code).backward(Rule.of("macavity_criminal?"))))
+    `)
+     .proving("macavity_criminal?")
      .equalsTo(`
       ~thompson_allergy.
       if (dog_fur => thompson_allergy and ~thompson_allergy) then ~dog_fur.
@@ -193,7 +179,7 @@ describe("Backward", function() {
 
   it("brake?", function() {
     // http://www.cs.cornell.edu/courses/cs472/2005fa/lectures/15-kb-systems_part3_6up.pdf
-    let kb = Parser.parse(`
+    assertThat(`
      PersonInFrontOfCar => Brake.
      (YellowLight && Policeman && ~Slippery) => Brake.
      Policecar => Policeman.
@@ -207,10 +193,8 @@ describe("Backward", function() {
      Dry.
      Policecar.
      ~PersonInFrontOfCar.
-    `);
-
-    // Can we infer "Brake"?
-    assertThat(explain(new Backward(kb).backward(Rule.of("Brake?"))))
+    `)
+     .proving("Brake?")
      .equalsTo(`
       Policecar.
       if (Policecar => Policeman && Policecar) then Policeman.
@@ -229,7 +213,7 @@ describe("Backward", function() {
   it("q?", function() {
     // http://pages.cs.wisc.edu/~bgibson/cs540/handouts/pl.pdf
     // TODO(goto): 
-    let kb = Parser.parse(`
+    assertThat(`
       p => q.
       (l && m) => p.
       (b && l) => m.
@@ -237,13 +221,8 @@ describe("Backward", function() {
       (a && b) => l.
       a.
       b.
-    `);
-
-    // console.log(kb);
-    // return;
-
-    // Can we infer "Brake"?
-    assertThat(explain(new Backward(kb).backward(Rule.of("q?"))))
+    `)
+     .proving("q?")
      .equalsTo(`
       a.
       b.
@@ -275,7 +254,8 @@ describe("Backward", function() {
        let kb = Parser.parse(x);
        let result = new Backward(kb).backward(Rule.of(y));
        // console.log(explain(result));
-       let explanation = Parser.parse(explain(result));       
+       // console.log(result);
+       let explanation = Parser.parse(result.toString());
        // console.log(explanation);
        // console.log(z);
        let expected = Parser.parse(z);
