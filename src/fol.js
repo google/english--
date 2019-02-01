@@ -22,11 +22,21 @@ class Reasoner extends Backward {
  find(predicate) {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
- backward(goal) {
+ backward(goal, stack = []) {
   //console.log(JSON.stringify(goal));
   // console.log(toString({statements: [goal]}));
+
+  // console.log(`${Rule.from(goal)}?`);
+  for (let subgoal of stack) {
+   if (equals(goal, subgoal)) {
+    // console.log(goal);
+    // console.log("quit?");
+    return false;
+   }
+  }
+
   if (!goal.quantifiers) {
-   let propositional = super.backward(goal);
+   let propositional = super.backward(goal, stack);
    if (propositional.length > 0) {
     return propositional;
    }
@@ -50,7 +60,9 @@ class Reasoner extends Backward {
     continue;
    }
    let left = fill(statement.left, unifies, true);
-   let dep = this.backward(left);
+   stack.push(goal);
+   let dep = this.backward(left, stack);
+   stack.pop();
    if (dep) {
     return [...dep, {given: statement, and: [left], goal: fill(goal, unifies)}];
    }
@@ -73,7 +85,9 @@ class Reasoner extends Backward {
    let left = unify(statement.left, goal);
    if (left) {
     let right = negation(statement.right);
-    let result = this.backward(right);
+    stack.push(goal);
+    let result = this.backward(right, stack);
+    stack.pop();
     if (result) {
      let explanation = JSON.parse(JSON.stringify(statement));
      delete explanation.quantifiers;
@@ -84,7 +98,9 @@ class Reasoner extends Backward {
    let right = unify(statement.right, goal);
    if (right) {
     let left = negation(statement.left);
-    let result = this.backward(left);
+    stack.push(goal);
+    let result = this.backward(left, stack);
+    stack.pop();
     if (result) {
      let explanation = JSON.parse(JSON.stringify(statement));
      delete explanation.quantifiers;
@@ -98,8 +114,10 @@ class Reasoner extends Backward {
       goal.quantifiers.length == 1 &&
       goal.quantifiers[0].op == "exists" &&
       goal.op == "&&") {
-   let left = this.backward(goal.left);
-   console.log(left);
+   stack.push(goal);
+   let left = this.backward(goal.left, stack);
+   stack.pop();
+   // console.log(left);
   }
 
   return false;
