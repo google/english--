@@ -25,12 +25,14 @@ class Reasoner extends Backward {
  backward(goal) {
   //console.log(JSON.stringify(goal));
   // console.log(toString({statements: [goal]}));
-  let propositional = super.backward(goal);
-  if (propositional.length > 0) {
-   return propositional;
+  if (!goal.quantifiers) {
+   let propositional = super.backward(goal);
+   if (propositional.length > 0) {
+    return propositional;
+   }
   }
 
-  // Universal introduction
+  // universal introduction
   for (let statement of this.kb) {
    let unifies = unify(statement, goal);
    if (!unifies) {
@@ -40,7 +42,7 @@ class Reasoner extends Backward {
    return [{given: statement}, {given: fill(goal, unifies)}];
   }
 
-  // Modus ponens.
+  // universal modus ponens.
   for (let statement of this.op("=>")) {
    let implication = statement.right;
    let unifies = unify(implication, goal);
@@ -54,7 +56,7 @@ class Reasoner extends Backward {
    }
   }
 
-  // Conjunction elimination.
+  // universal conjunction elimination.
   for (let statement of this.op("&&")) {
    let left = unify(statement.left, goal);
    if (left) {
@@ -66,7 +68,7 @@ class Reasoner extends Backward {
    }
   }
 
-  // Disjunction syllogism
+  // universal disjunction syllogism
   for (let statement of this.op("||")) {
    let left = unify(statement.left, goal);
    if (left) {
@@ -89,6 +91,15 @@ class Reasoner extends Backward {
      return [...result, {given: statement, goal: fill(explanation, right, true)}, {given: goal}];
     }
    }
+  }
+
+  // existential conjunction introduction
+  if (goal.quantifiers &&
+      goal.quantifiers.length == 1 &&
+      goal.quantifiers[0].op == "exists" &&
+      goal.op == "&&") {
+   let left = this.backward(goal.left);
+   console.log(left);
   }
 
   return false;

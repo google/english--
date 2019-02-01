@@ -378,7 +378,7 @@ describe("First order logic", function() {
   });
 
   it("forall (x) P(x) && Q(x). P(a)?", function() {
-    // conjunction elimination.
+    // universal conjunction elimination.
     assertThat("forall (x) P(x) && Q(x).")
      .proving("P(a)?")
      .equalsTo("forall (x) P(x = a) && Q(x = a). P(a).");
@@ -388,7 +388,7 @@ describe("First order logic", function() {
   });
 
   it("forall (x) P(x) || Q(x). ~Q(a). P(a)?", function() {
-    // disjunctive syllogistm.
+    // universal disjunctive syllogistm.
     assertThat("forall (x) P(x) || Q(x). ~Q(a).")
      .proving("P(a)?")
      .equalsTo(`
@@ -408,10 +408,13 @@ describe("First order logic", function() {
      `);
   });
 
-  it("forall (x) forall (y) P(x, y). P(a, b)?", function() {
-    assertThat("forall (x) forall (y) P(x, y).")
-     .proving("P(a, b)?")
-     .equalsTo("forall (x) forall (y) P(x, y). P(a, b).");
+  it.skip("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
+    // existential conjunction introduction.
+    // TODO(goto): it is probably hard to do conjunction
+    // introduction with the universal quantifier.
+    assertThat("P(a). Q(a).")
+     .proving("exists (x) P(x) && Q(x)?")
+     .equalsTo("");
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
