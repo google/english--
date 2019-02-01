@@ -625,7 +625,14 @@ describe("First order logic", function() {
        on(bertha, table).
        forall (x) on(bertha, x) => collapses(x) && on(bertha, table) => collapses(table).
      `);
-    // it would also be interesting to ask: collapses(x?)? and get x = table.
+
+    assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
+     .proving("collapses(y?)?")
+     .equalsTo(`
+       forall (x) on(x, table).
+       on(bertha, x = table).
+       forall (x) on(bertha, x) => collapses(x) && on(bertha, x) => collapses(y = x).
+     `);
    });
 
   it.skip("diet", function() {
