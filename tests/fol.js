@@ -713,6 +713,24 @@ describe("First order logic", function() {
   });
 
   it("grandparent", function() {
+    // Brainstorming english grammar here:
+    //
+    // facts
+    //
+    // X is a P of Y. <=> P(X, Y).
+    //
+    // implications
+    //
+    // If X is a P of Y then Y is a Q or X. <=> forall (x) forall (y) P(X, Y) => Q(Y, X).
+    // If X is a P then X is a Q. <=> forall(x) P(x) => Q(x).
+    //
+    // negations
+    //
+    // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
+    // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
+    // If X is not a P then X is a Q. <=> forall(x) ~P(x) => Q(x).
+    // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
+
     let kb = `
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).

@@ -23,7 +23,6 @@ class Reasoner extends Backward {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal, stack = []) {
-  // console.log(JSON.stringify(goal));
   // console.log("goal: " + toString({statements: [goal]}));
 
   // console.log(`${Rule.from(goal)}?`);
@@ -118,7 +117,10 @@ class Reasoner extends Backward {
       goal.op == "&&") {
    // console.log("hello world");
    stack.push(goal);
-   let left = this.backward(goal.left, stack);
+   let left = JSON.parse(JSON.stringify(goal.left));
+   left.quantifiers = goal.quantifiers;
+   let result = this.backward(left, stack);
+   console.log(result);
    stack.pop();
    // console.log(left);
   }
