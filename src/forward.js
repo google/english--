@@ -287,23 +287,21 @@ function stringify(rule) {
   return quantify(rule, rule.name);
  } else if (rule["@type"] == "Quantifier") {
   return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
+ } else if (rule["@type"] == "Argument") {
+  if (rule.literal) {
+   // return x.literal.name + (x.free ? "?" : "");
+   // console.log(JSON.stringify(rule));
+   let free =  rule.free ? "*" : "";
+   let value = rule.value ? ` = ${stringify(rule.value)}` : "";
+   return rule.literal.name + value;
+  } else if (rule.call) {
+   return rule.call.name + "(" + rule.call.arguments.map(stringify).join(", ") + ")";
+  }
+   //return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {
   return quantify(rule, `~${stringify(rule.expression)}`);
  } else if (rule["@type"] == "Predicate") {
-  // console.log(JSON.stringify(rule.arguments, undefined, 2));
-  // console.log(rule.arguments.map(x => x.literal));
-  // console.log(JSON.stringify(rule));
-  let arg = (x) => {
-   if (x.literal) {
-    // return x.literal.name + (x.free ? "?" : "");
-    let free =  x.free ? "*" : "";
-    let value = x.value ? ` = ${stringify(x.value)}` : "";
-    return x.literal.name + value;
-   } else if (x.call) {
-    return x.call.name + "(" + x.call.arguments.map(arg).join(", ") + ")";
-   }
-  }
-  return quantify(rule, `${rule.name}(${rule.arguments.map(arg).join(", ")})`);
+  return quantify(rule, `${rule.name}(${rule.arguments.map(stringify).join(", ")})`);
  } else if (rule.op) {
   // NOTE(goto): by not parenthesizing we loose some information
   // but on the other hand we gain readability. Not sure if that's

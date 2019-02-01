@@ -61,7 +61,7 @@ class Parser {
   return Parser.binary("^", a, b);
  }
 
- static argument(a, value) {
+ static argument(a, value, free) {
     let result = {"@type": "Argument"};
     if (a["@type"] == "Literal") {
         result.literal = a;
@@ -72,6 +72,9 @@ class Parser {
     }
     if (value) {
      result.value = value;
+    }
+    if (free) {
+     result.free = free;
     }
     return result;
  } 

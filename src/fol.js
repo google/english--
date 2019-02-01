@@ -108,13 +108,16 @@ function fill(rule, map, override) {
   result.right = fill(result.right, map, override);
  } else if (result["@type"] == "Argument") {
   // console.log("hello world");
+  // console.log(result);
+  // console.log(map);
   if (result.call) {
    result.call = fill(result.call, map, override);
   }
   if (result.literal && result.free) {
    let mapping = map[result.literal.name];
+   // console.log(result);
    if (!mapping) {
-    return false;
+    return result;
    }
    delete result.free;
    // console.log(override);
@@ -128,6 +131,7 @@ function fill(rule, map, override) {
    }
   }
  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+  // console.log(result);
   result.arguments = result.arguments.map(x => {
     return fill(x, map, override);
    });
@@ -141,6 +145,9 @@ function unify(a, b) {
  // console.log(JSON.stringify(b));
 
  let result = reduce(a, b);
+
+ // console.log(result);
+ // console.log();
 
  if (!result) {
   return false;
@@ -197,7 +204,10 @@ function reduce(a, b) {
     result[b.arguments[i].literal.name] = a.arguments[i].literal || a.arguments[i].call;
    } else if (a.arguments[i].free && b.arguments[i].free) {
     // sanity check if this is correct.
-    result[a.arguments[i].name] = b.arguments[i].name;
+    // console.log(a.arguments[i].literal.name);
+    // console.log(b.arguments[i]);
+    result[b.arguments[i].literal.name] = a.arguments[i];
+    // console.log(result);
    }
   }
   return result;
