@@ -44,7 +44,7 @@ class Reasoner extends Backward {
    //}];
    //}
    // console.log("hi");
-   return [{given: statement, goal: fill(goal, unifies)}];
+   return [{given: statement}, {given: fill(goal, unifies)}];
   }
 
   // Searches for something that implies goal.

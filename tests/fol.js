@@ -342,7 +342,10 @@ describe("First order logic", function() {
   it("Universal introduction", function() {
     assertThat("forall(x) P(x?).")
      .proving("P(a)?")
-     .equalsTo("if (forall (x) P(x)) then (P(a)).");
+     .equalsTo(`
+       forall (x) P(x).
+       P(a).
+     `);
   });
 
   it("Generalized modus ponens", function() {
@@ -354,28 +357,28 @@ describe("First order logic", function() {
      `);
   });
 
-  it("forall (x) P(x?). P(a)?", function() {
-    assertThat("forall (x) P(x?).")
+  it("forall (x) P(x). P(a)?", function() {
+    assertThat("forall (x) P(x).")
      .proving("P(a)?")
-     .equalsTo("forall (x) P(x) => P(a).");
+     .equalsTo("forall (x) P(x). P(a).");
   });
 
-  it("forall (x) P(x?, b). P(a, b)?", function() {
-    assertThat("forall (x) P(x?, b).")
+  it("forall (x) P(x, b). P(a, b)?", function() {
+    assertThat("forall (x) P(x, b).")
      .proving("P(a, b)?")
-     .equalsTo("forall (x) P(x, b) => P(a, b).");
+     .equalsTo("forall (x) P(x, b). P(a, b).");
   });
 
-  it.skip("forall (x) P(x?) && Q(x?). P(a)?", function() {
+  it.skip("forall (x) P(x?) && Q(x). P(a)?", function() {
     assertThat("forall (x) P(x?) && Q(x?).")
      .proving("P(a)?")
      .equalsTo("");
   });
 
-  it("forall (x) forall (y) P(x?, y?). P(a, b)?", function() {
-    assertThat("forall (x) forall (y) P(x?, y?).")
+  it("forall (x) forall (y) P(x, y). P(a, b)?", function() {
+    assertThat("forall (x) forall (y) P(x, y).")
      .proving("P(a, b)?")
-     .equalsTo("forall (x) forall (y) P(x, y) => P(a, b).");
+     .equalsTo("forall (x) forall (y) P(x, y). P(a, b).");
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
@@ -495,13 +498,13 @@ describe("First order logic", function() {
   it("p(a) |= exists (x) p(x).", function() {
     assertThat("p(a).")
      .proving("exists (x) p(x)?")
-     .equalsTo("p(a) => exists (x) p(x = a).");
+     .equalsTo("p(a). exists (x) p(x = a).");
    });
 
   it("p(a) |= p(x?).", function() {
     assertThat("p(a).")
      .proving("p(x?)?")
-     .equalsTo("if p(a) then p(x = a).");
+     .equalsTo("p(a). p(x = a).");
    });
 
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
@@ -598,7 +601,8 @@ describe("First order logic", function() {
     assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
      .proving("collapses(table)?")
      .equalsTo(`
-       forall (x) on(x, table) => on(bertha, table).
+       forall (x) on(x, table).
+       on(bertha, table).
        forall (x) on(bertha, x) => collapses(x) && on(bertha, table) => collapses(table).
      `);
     // it would also be interesting to ask: collapses(x?)? and get x = table.

@@ -324,7 +324,7 @@ function explain(reasons) {
   // console.log(reason);
   // console.log(reason.given);
   // console.log(reason.goal);
-  if (equals(reason.given, reason.goal)) {
+  if (!reason.goal || equals(reason.given, reason.goal)) {
    // console.log("hi");
    result.push(stringify(reason.given) + ".\n");
   } else {
