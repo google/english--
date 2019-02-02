@@ -87,7 +87,7 @@ class Reasoner extends Backward {
    // happens when there are multiple quantifiers.
    let wrapping = clone(statement.quantifiers).filter(x => {
      return !unifies[x.variable];
-    }).map((x) => {console.log(x); x.op = "exists"; return x;});
+    }).map((x) => {x.op = "exists"; return x;});
    left.quantifiers = (left.quantifiers || []);
    left.quantifiers.push(...wrapping);
 
