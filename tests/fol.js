@@ -365,7 +365,8 @@ describe("First order logic", function() {
      .equalsTo(`
        forall (x) P(x).
        P(a).
-     `);
+     `)
+     .done();
   });
 
   it("Generalized modus ponens", function() {
@@ -374,29 +375,34 @@ describe("First order logic", function() {
      .equalsTo(`
         men(socrates). 
         forall (x = socrates) men(x) => mortal(x) => mortal(socrates).
-     `);
+     `)
+     .done();
   });
 
   it("forall (x) P(x). P(a)?", function() {
     assertThat("forall (x) P(x).")
      .proving("P(a)?")
-     .equalsTo("forall (x) P(x). P(a).");
+     .equalsTo("forall (x) P(x). P(a).")
+     .done();
   });
 
   it("forall (x) P(x, b). P(a, b)?", function() {
     assertThat("forall (x) P(x, b).")
      .proving("P(a, b)?")
-     .equalsTo("forall (x) P(x, b). P(a, b).");
+     .equalsTo("forall (x) P(x, b). P(a, b).")
+     .done();
   });
 
   it("forall (x) P(x) && Q(x). P(a)?", function() {
     // universal conjunction elimination.
     assertThat("forall (x) P(x) && Q(x).")
      .proving("P(a)?")
-     .equalsTo("forall (x = a) P(x) && Q(x). P(a).");
+     .equalsTo("forall (x = a) P(x) && Q(x). P(a).")
+     .done();
     assertThat("forall (x) P(x) && Q(x).")
      .proving("Q(a)?")
-     .equalsTo("forall (x = a) P(x) && Q(x). Q(a).");
+     .equalsTo("forall (x = a) P(x) && Q(x). Q(a).")
+     .done();
   });
 
   it("forall (x) P(x) || Q(x). ~Q(a). P(a)?", function() {
@@ -406,14 +412,16 @@ describe("First order logic", function() {
      .equalsTo(`
          ~Q(a). 
          forall (x = a) P(x) || Q(x) => P(a).
-     `);
+     `).
+     done();
 
     assertThat("forall (x) P(x) || Q(x). ~P(a).")
      .proving("Q(a)?")
      .equalsTo(`
          ~P(a). 
          forall (x = a) P(x) || Q(x) => Q(a).
-     `);
+     `)
+     .done();
   });
 
   it("forall (x) forall (y) p(x, y) && q(y) => r(y, x). p(a, b). q(b). |= r(b, a)?", function() {
@@ -425,13 +433,14 @@ describe("First order logic", function() {
         p(a, b) && q(b) => p(a, b) && q(b).
         forall (x = a) forall (y = b) p(x, y) && q(y) => r(y, x) => r(b, a).
      `);
+    // TODO(goto): there is another production here which doesn't look right.
    });
 
   it("p(a). p(b). |= p(x?)?", function() {
     assertThat("p(a). p(b).").proving("p(x?).")
      .equalsTo("p(a). p(x = a).")
      .equalsTo("p(b). p(x = b).")
-     .equalsTo("false.");
+     .done();
    });
 
   it("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
@@ -445,7 +454,8 @@ describe("First order logic", function() {
        exists (x = a) P(x).
        Q(a).
        exists (x = a) P(x) && Q(x).
-     `);
+     `)
+     .done();
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
@@ -565,13 +575,15 @@ describe("First order logic", function() {
   it("p(a) |= exists (x) p(x).", function() {
     assertThat("p(a).")
      .proving("exists (x) p(x)?")
-     .equalsTo("p(a). exists (x = a) p(x).");
+     .equalsTo("p(a). exists (x = a) p(x).")
+     .done();
    });
 
   it("p(a) |= p(x?).", function() {
     assertThat("p(a).")
      .proving("p(x?).")
-     .equalsTo("p(a). p(x = a).");
+     .equalsTo("p(a). p(x = a).")
+     .done();
    });
 
   it("p(a). forall (x) p(x) => q(x). |= q(y?).", function() {
@@ -580,7 +592,8 @@ describe("First order logic", function() {
     // should this be exists (x = a) p(x)?
     assertThat("p(a). forall (x) p(x) => q(x).")
      .proving("q(y?)?")
-     .equalsTo("p(a). exists (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).");
+     .equalsTo("p(a). exists (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).")
+     .done();
    });
 
   it("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(c).", function() {
@@ -626,7 +639,7 @@ describe("First order logic", function() {
        q(e).
        exists (x = e) p(x) && q(x).
      `)
-    .equalsTo("false.");
+    .done();
   });
 
   it("p(a). q(b). p(c). q(c). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
@@ -653,7 +666,7 @@ describe("First order logic", function() {
        exists (x = d) p(x) && q(x).
        forall (x = d) p(x) && q(x) => r(x) => r(z = x).
      `)
-     .equalsTo("false.");
+     .done();
    });
 
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
@@ -823,7 +836,8 @@ describe("First order logic", function() {
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
        forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
-     `);
+     `)
+     .done();
    });
 
   it("capturing daughters", () => {
@@ -836,7 +850,7 @@ describe("First order logic", function() {
      child(thais, marcia).
      female(dani).
      female(thais).
-     `)
+    `)
     .proving("daughter(z?, marcia)?")
     .equalsTo(`
       female(dani).
@@ -854,7 +868,7 @@ describe("First order logic", function() {
       exists (y = thais) female(y) && parent(marcia, y).
       forall (x = marcia) forall (y = thais) female(y) && parent(x, y) => daughter(y, x) => daughter(z = y, marcia).
     `)
-    .equalsTo("false.");
+    .done();
   });
 
   it("sons", () => {
@@ -870,7 +884,8 @@ describe("First order logic", function() {
       parent(mel, leo).
       exists (y = leo) male(y) && parent(mel, y).
       forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => son(z = y, mel).
-    `);
+    `)
+    .done();
   });
 
   it("my family", function() {
@@ -1095,6 +1110,10 @@ describe("First order logic", function() {
     proving(z) {
      let result = new Reasoner(Parser.parse(x)).go(rewrite(Rule.of(z)));
      return {
+      done() {
+       this.equalsTo("false.")
+       return this;
+      },
       equalsTo(y) {
        // console.log(result.toString());
        // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
