@@ -27,7 +27,7 @@ class Reasoner extends Backward {
   return this.kb.filter(statement => (statement["@type"] == predicate));
  }
  backward(goal, stack = []) {
-  // console.log("goal: " + toString({statements: [goal]}));
+  // console.log("goal: " + stringify(goal));
 
   // console.log(`${Rule.from(goal)}?`);
   for (let subgoal of stack) {
@@ -82,7 +82,9 @@ class Reasoner extends Backward {
    let dep = this.backward(left, stack);
    stack.pop();
    if (!dep.failed()) {
-    return dep.push({given: fill(statement, unifies, undefined, true), goal: fill(goal, unifies, undefined, false)});
+    // console.log(dep.bindings);
+    // console.log(goal);
+    return dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
    }
   }
 
@@ -144,8 +146,6 @@ class Reasoner extends Backward {
     let result = this.backward(fill(right, bindings, true), stack);
     stack.pop();
     if (!result.failed()) {
-     // console.log("yay!");
-     // console.log(bindings);
      return dep.push(result).push({given: fill(goal, bindings, undefined, true)}).bind(bindings);
     }
    }
@@ -207,6 +207,11 @@ function fill(rule, map, override, head = false) {
 
  for (let quantifier of result.quantifiers || []) {
   // console.log(quantifier);
+  //let ref = quantifier.variable;
+  //while (map[ref]) {
+  // if () {
+  // }
+  //}
   if (map[quantifier.variable]) {
    // console.log("hi");
    quantifier.value = map[quantifier.variable];

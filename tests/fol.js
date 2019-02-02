@@ -577,9 +577,12 @@ describe("First order logic", function() {
    });
 
   it("p(a). forall (x) p(x) => q(x). |= q(y?).", function() {
+    // TODO(goto): sanity check if this is right. seems a bit off
+    // to me to explain this as forall (x = a) p(x).
+    // should this be exists (x = a) p(x)?
     assertThat("p(a). forall (x) p(x) => q(x).")
      .proving("q(y?)?")
-     .equalsTo("p(a). forall (x = a) p(x). forall (x) p(x) => q(x) => q(y = x).");
+     .equalsTo("p(a). forall (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).");
    });
 
   it.skip("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
@@ -682,12 +685,12 @@ describe("First order logic", function() {
   });
 
   it("big bertha", function() {
-    assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
+    assertThat("forall (x) on(x, table). forall (y) on(bertha, y) => collapses(y).")
      .proving("collapses(table)?")
      .equalsTo(`
        forall (x) on(x, table).
        on(bertha, table).
-       forall (x = table) on(bertha, x) => collapses(x) => collapses(table).
+       forall (y = table) on(bertha, y) => collapses(y) => collapses(table).
      `);
 
     //assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
@@ -761,7 +764,7 @@ describe("First order logic", function() {
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
-       forall (g = maura) forall (c = anna) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
+       forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
      `);
    });
 
@@ -777,6 +780,25 @@ describe("First order logic", function() {
       // .proving("daughter(x?, mel)?")
      .equalsTo("");
 
+  });
+
+  it("sons", () => {
+    // this doesn't work for
+    // forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
+    // because we don't know yet how to capture forall (x?)
+    assertThat(`
+       forall (x) exists (y) ((parent(x, y) && male(y)) => son(y, x)).
+       parent(mel, leo).
+       male(leo).
+    `)
+    .proving("son(z?, mel)?")
+    .equalsTo(`
+      male(leo).
+      exists (y = leo) male(y).
+      parent(mel, leo).
+      exists (y = leo) male(y) && parent(mel, y).
+      forall (x = mel) exists (y = leo) male(y) && parent(x, y) => son(y, x) => son(z = y, mel).
+    `);
   });
 
   it("my family", function() {
@@ -856,10 +878,6 @@ describe("First order logic", function() {
         forall (x = mel) forall (y = anna) female(y) && parent(x, y) => daughter(y, x) => daughter(anna, mel).
      `);
 
-    // TODO(goto): this too.
-    // assertThat(kb)
-    // .proving("son(x?, mel)?")
-    // .equalsTo("");
 
     // TODO(goto): this fails.
     // assertThat(kb)
@@ -926,7 +944,7 @@ describe("First order logic", function() {
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x)  => parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
-       forall (g = maura) forall (c = anna) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
+       forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
      `);
 
     assertThat(kb)
@@ -938,7 +956,7 @@ describe("First order logic", function() {
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
-       forall (g = maura) forall (c = anna) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
+       forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
        female(maura) && grandparent(maura, anna) => female(maura) && grandparent(maura, anna).
        forall (g = maura) forall (c = anna) female(g) && grandparent(g, c) => grandmother(g, c) => grandmother(maura, anna).
      `);
@@ -951,7 +969,7 @@ describe("First order logic", function() {
        exists (p = mel) parent(maura, p).
        parent(mel, leo).
        exists (p = mel) parent(maura, p) && parent(p, leo).
-       forall (g = maura) forall (c = leo) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, leo).
+       forall (g = maura) forall (c = leo) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, leo).
        female(maura) && grandparent(maura, leo) => female(maura) && grandparent(maura, leo).
        forall (g = maura) forall (c = leo) female(g) && grandparent(g, c) => grandmother(g, c) => grandmother(maura, leo).
      `);
