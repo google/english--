@@ -561,7 +561,7 @@ describe("First order logic", function() {
   it("p(x) |~ p(y)?", function() {
     assertThat("p(x).")
      .proving("p(y)?")
-     .equalsTo("");
+     .equalsTo("false.");
    });
 
   it("p(a) |= exists (x) p(x).", function() {
@@ -653,7 +653,7 @@ describe("First order logic", function() {
 
     assertThat(kb)
       .proving("person(sam)?")
-      .equalsTo("");
+      .equalsTo("false.");
 
     assertThat(kb)
      .proving("person(john)?")
@@ -699,11 +699,11 @@ describe("First order logic", function() {
     // `);
    });
 
-  it.skip("diet", function() {
+  it("diet", function() {
     // nobody can see oneself. 
     assertThat("forall(x) ~sees(x, x). forall(x) ~sees(x, feet(x)) => diet(x).")
      .proving("forall(x) diet(x)?")
-     .equalsTo("");
+     .equalsTo("false.");
     // should be false, since feet(x?) isn't necessarily x?.
    });
 
@@ -873,11 +873,11 @@ describe("First order logic", function() {
 
     assertThat(kb)
      .proving("female(leo)?")
-     .equalsTo("");
+     .equalsTo("false.");
 
     assertThat(kb)
      .proving("male(anna)?")
-     .equalsTo("");
+     .equalsTo("false.");
 
     // assertThat(kb)
     // .proving("spouse(mel, x?).")

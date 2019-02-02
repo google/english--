@@ -287,6 +287,8 @@ function stringify(rule) {
  // console.log(rule);
  if (rule["@type"] == "Literal") {
   return quantify(rule, rule.name);
+ } else if (rule["@type"] == "Constant") {
+  return rule.name;
  } else if (rule["@type"] == "Quantifier") {
   let value = rule.value ? ` = ${stringify(rule.value)}` : "";
   // console.log("hello");
@@ -323,8 +325,8 @@ function explain(reasons) {
  // console.log(JSON.stringify(reasons, undefined, 2));
  // console.log("hi");
  // console.log(reasons);
- if (!reasons) {
-  return "";
+ if (!reasons || reasons.length == 0) {
+  return "false.";
  }
  for (let reason of reasons) {
   // console.log(reason);
