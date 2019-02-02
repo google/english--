@@ -19,7 +19,7 @@ const {
  negation,
  argument} = Parser;
 
-describe.only("First order logic", function() {
+describe("First order logic", function() {
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse(`
