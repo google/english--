@@ -428,13 +428,18 @@ describe.only("First order logic", function() {
      .equalsTo("p(a). p(x = a).");
    });
 
-  it.skip("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
+  it("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
     // existential conjunction introduction.
     // TODO(goto): it is probably hard to do conjunction
     // introduction with the universal quantifier.
     assertThat("P(a). Q(a).")
      .proving("exists (x) P(x) && Q(x)?")
-     .equalsTo("");
+     .equalsTo(`
+       P(a).
+       exists (x) P(x = a).
+       Q(a).
+       exists (x) P(x = a) && Q(x = a).
+     `);
   });
 
   it("a(x) => b(x), a(x) |= b(x)", function() {
@@ -712,43 +717,43 @@ describe.only("First order logic", function() {
      `);
   });
 
-  it("grandparent", function() {
-    // Brainstorming english grammar here:
-    //
-    // facts
-    //
-    // X is a P of Y. <=> P(X, Y).
-    //
-    // implications
-    //
-    // If X is a P of Y then Y is a Q or X. <=> forall (x) forall (y) P(X, Y) => Q(Y, X).
-    // If X is a P then X is a Q. <=> forall(x) P(x) => Q(x).
-    //
-    // negations
-    //
-    // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
-    // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
-    // If X is not a P then X is a Q. <=> forall(x) ~P(x) => Q(x).
-    // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
+  // Brainstorming english grammar here:
+  //
+  // facts
+  //
+  // X is a P of Y. <=> P(X, Y).
+  //
+  // implications
+  //
+  // If X is a P of Y then Y is a Q or X. <=> forall (x) forall (y) P(X, Y) => Q(Y, X).
+  // If X is a P then X is a Q. <=> forall(x) P(x) => Q(x).
+  //
+  // negations
+  //
+  // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
+  // If X is a P then X is not a Q. <=> forall(x) P(x) => ~Q(x).
+  // If X is not a P then X is a Q. <=> forall(x) ~P(x) => Q(x).
+  // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
 
-    let kb = `
+  it("grandparent", function() {
+    assertThat(`
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).
 
-      forall (g) forall (c) (grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c)))).
-      forall (g) forall (c) ((exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c)).
+      forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
+      forall (g) forall (c) (exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c).
 
       parent(maura, mel).
       child(anna, mel).
-    `;
-    assertThat(kb)
-     .proving("exists (x) parent(maura, x?).")
-     .equalsTo("parent(maura, mel). exists (x) parent(maura, x = mel).");
-    // TODO(goto): we need to resolve the existential conjunction introduction
-    // before this can be made to work.
-    assertThat(kb)
+    `)
      .proving("grandparent(maura, anna)?")
      .equalsTo(`
+       parent(maura, mel).
+       exists (p) parent(maura, p = mel).
+       child(anna, mel).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
+       exists (p) parent(maura, p = mel) && parent(p = mel, anna).
+       forall (g) forall (c) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) && exists (p) parent(maura, p) && parent(p, anna) => grandparent(maura, anna).
      `);
    });
 

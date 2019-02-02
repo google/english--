@@ -17,6 +17,7 @@ const {
 class Result {
  constructor() {
   this.reason = [];
+  this.bindings = {};
  }
  static failed() {
   return new Result();
@@ -26,6 +27,20 @@ class Result {
  }
  failed() {
   return this.reason.length == 0;
+ }
+ get(key) {
+  return this.bindings[key];
+ }
+ bind(vars) {
+  for (let [key, value] of Object.entries(vars)) {
+   if (this.bindings[key]) {
+    throw new Error("Unsupported condition: conflicting bindings.");
+   }
+  }
+  for (let [key, value] of Object.entries(vars)) {
+   this.bindings[key] = value;
+  }
+  return this;
  }
  push(reason) {
   if (reason instanceof Result) {

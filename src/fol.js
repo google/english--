@@ -50,7 +50,7 @@ class Reasoner extends Backward {
     continue;
    }
 
-   return Result.of([{given: statement}, {given: fill(goal, unifies)}]);
+   return Result.of([{given: statement}, {given: fill(goal, unifies)}]).bind(unifies);
   }
 
   // universal modus ponens.
@@ -116,12 +116,26 @@ class Reasoner extends Backward {
       goal.quantifiers[0].op == "exists" &&
       goal.op == "&&") {
    // console.log("hello world");
-   stack.push(goal);
+   let variable = goal.quantifiers[0].variable;
    let left = JSON.parse(JSON.stringify(goal.left));
    left.quantifiers = goal.quantifiers;
-   let result = this.backward(left, stack);
-   // console.log(result);
+   stack.push(goal);
+   let dep = this.backward(left, stack);
    stack.pop();
+   if (!dep.failed()) {
+    let bindings = {
+     [variable]: dep.get(variable)
+    };
+    let right = JSON.parse(JSON.stringify(goal.right));
+    stack.push(goal);
+    let result = this.backward(fill(right, bindings, true), stack);
+    stack.pop();
+    if (!result.failed()) {
+     // console.log("yay!");
+     return dep.push(result).push({given: fill(goal, bindings)});
+    }
+   }
+   
    // console.log(left);
   }
 
