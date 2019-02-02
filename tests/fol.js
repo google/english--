@@ -582,7 +582,7 @@ describe("First order logic", function() {
     // should this be exists (x = a) p(x)?
     assertThat("p(a). forall (x) p(x) => q(x).")
      .proving("q(y?)?")
-     .equalsTo("p(a). forall (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).");
+     .equalsTo("p(a). exists (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).");
    });
 
   it("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(c).", function() {
@@ -636,15 +636,22 @@ describe("First order logic", function() {
      .equalsTo(normalize("false."));
   });
 
-  it.skip("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
+  it("p(a). q(b). p(c). q(c). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
+    // TODO(goto): deal with re-writing variables.
     assertThat(`
        p(a). 
        q(b). 
        p(c). q(c). 
        forall (x) (p(x) && q(x)) => r(x).
      `)
-     .proving("r(x?)?")
-     .equalsTo("false.");
+     .proving("r(z?)?")
+     .equalsTo(`
+       p(c).
+       exists (x = c) p(x).
+       q(c).
+       exists (x = c) p(x) && q(x).
+       forall (x = c) p(x) && q(x) => r(x) => r(z = x).
+     `);
    });
 
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {

@@ -41,12 +41,15 @@ class Reasoner extends Backward {
    }
   }
 
+  // console.log("foo");
   if (!goal.quantifiers || goal.quantifiers.length == 0) {
    let propositional = super.backward(goal, stack);
    if (!propositional.failed()) {
+    // console.log("propositional!");
     yield propositional;
    }
   }
+  // console.log("bar");
 
   // universal introduction
   for (let statement of this.kb) {
@@ -67,31 +70,33 @@ class Reasoner extends Backward {
   }
 
   // universal modus ponens.
-  // console.log("foobar");
   for (let statement of this.op("=>")) {
-   // console.log("helloworld");
+   if (!statement.quantifiers || statement.quantifiers.length == 0) {
+    continue;
+   }
+
    let implication = statement.right;
    let unifies = unify(implication, goal);
+   // console.log(unifies);
    if (!unifies || Object.entries(unifies).length == 0) {
     continue;
    }
-   // console.log("hello");
    // console.log(unifies);
    let left = fill(statement.left, unifies, true);
-   // console.log(left.quantifiers);
-   // console.log(statement.quantifiers);
+   // TODO(goto): understand and create a test to see what
+   // happens when there are multiple quantifiers.
    let wrapping = clone(statement.quantifiers).filter(x => {
      return !unifies[x.variable];
-   });
+    }).map((x) => {console.log(x); x.op = "exists"; return x;});
    left.quantifiers = (left.quantifiers || []);
    left.quantifiers.push(...wrapping);
-   // console.log(left.quantifiers);
+
+   // console.log(left);
+
    stack.push(goal);
    let dep = this.backward(left, stack);
    stack.pop();
    if (!dep.failed()) {
-    // console.log(dep.bindings);
-    // console.log(unifies);
     yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
    }
   }

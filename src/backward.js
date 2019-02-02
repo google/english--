@@ -69,6 +69,10 @@ class Backward {
  * op(op) {
   for (let statement of this.kb.filter(x => x.op == op)) {
    // body(statement);
+   // if (statement.quantifiers || statement.quantifiers.length > 0) {
+   //   // ignore all of the statements that are quantified.
+   //   continue;
+   // }
    yield statement;
   }
  }
