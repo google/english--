@@ -965,16 +965,29 @@ describe("First order logic", function() {
         forall (x = mel) forall (y = anna) female(y) && parent(x, y) => daughter(y, x) => daughter(anna, mel).
      `);
 
+    // TODO(goto): this isn't entirely correct, because
+    // son(leo, dani) is also true as well as daughter(anna, mel).
+    assertThat(kb)
+     .proving("son(leo, z?).")
+     .equalsTo(`
+       male(leo).
+       parent(mel, leo).
+       parent(x = mel, leo).
+       exists (x) male(leo) && parent(x, leo).
+       forall (x) forall (y = leo) male(y) && parent(x, y) => son(y, x) => son(leo, z = x).
+     `)
+     .done();
 
-    // TODO(goto): this fails.
-    // assertThat(kb)
-    // .proving("son(leo, ?)?")
-    // .equalsTo("");
-
-    // TODO(goto): this fails.
-    // assertThat(kb)
-    //  .proving("daughter(anna, x?)?")
-    //  .equalsTo("");
+    assertThat(kb)
+     .proving("daughter(anna, z?)?")
+     .equalsTo(`
+       female(anna).
+       parent(dani, anna).
+       parent(x = dani, anna).
+       exists (x) female(anna) && parent(x, anna).
+       forall (x) forall (y = anna) female(y) && parent(x, y) => daughter(y, x) => daughter(anna, z = x).
+     `)
+     .done();
 
     assertThat(kb)
      .proving("female(leo)?")
