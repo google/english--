@@ -427,13 +427,13 @@ describe("First order logic", function() {
      `);
    });
 
-  it.skip("p(a). p(b). |= p(x?)?", function() {
-    // we want to find a way to get x = [a, b] rather than
-    // stop on the first match. may be useful to use a
-    // generator here.
-    assertThat("p(a). p(b).")
-     .proving("p(x?).")
-     .equalsTo("p(a). p(x = a).");
+  it("p(a). p(b). |= p(x?)?", function() {
+    let reasoner = new Reasoner(Parser.parse("p(a). p(b)."));
+    let it = reasoner.go(Rule.of("p(x?)."));
+    assertThat(it.next().value.toString()).equalsTo("p(a).\n\np(x = a).\n");
+    assertThat(it.next().value.toString()).equalsTo("p(b).\n\np(x = b).\n");
+    assertThat(it.next().value.toString()).equalsTo("false.");
+    assertThat(it.next().done).equalsTo(true);
    });
 
   it("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
@@ -585,17 +585,66 @@ describe("First order logic", function() {
      .equalsTo("p(a). forall (x = a) p(x). forall (x = a) p(x) => q(x) => q(y = x).");
    });
 
-  it.skip("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
-    // here is an example where we are going to have to look at multiple unification
-    // options before finding something that works.
+  it("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(c).", function() {
     assertThat(`
        p(a). 
        q(b). 
        p(c). q(c). 
-       forall (x) p(x) && q(x) => r(x).
+       forall (x) (p(x) && q(x)) => r(x).
+     `)
+     .proving("r(c)?")
+     .equalsTo(`
+       p(c).
+       q(c).
+       p(c) && q(c) => p(c) && q(c).
+       forall (x = c) p(x) && q(x) => r(x) => r(c).
+     `);
+  });
+
+  it("p(a). q(a). p(b). q(b). p(c). q(c). |= exists (x) p(x) && q(x). ", function() {
+    let reasoner = new Reasoner(Parser.parse(`
+      p(a). q(a). 
+      p(b). q(b). 
+      p(c).
+      q(d). 
+      p(e). q(e).
+    `));
+    let it = reasoner.go(rewrite(Rule.of("exists (x) p(x) && q(x)?")));
+    let normalize = (code) => toString(Parser.parse(code));
+    assertThat(normalize(it.next().value.toString()))
+     .equalsTo(normalize(`
+       p(a).
+       exists (x = a) p(x).
+       q(a).
+       exists (x = a) p(x) && q(x).
+     `));
+    assertThat(normalize(it.next().value.toString()))
+     .equalsTo(normalize(`
+       p(b).
+       exists (x = b) p(x).
+       q(b).
+       exists (x = b) p(x) && q(x).
+     `));
+    assertThat(normalize(it.next().value.toString()))
+     .equalsTo(normalize(`
+       p(e).
+       exists (x = e) p(x).
+       q(e).
+       exists (x = e) p(x) && q(x).
+     `));
+    assertThat(normalize(it.next().value.toString()))
+     .equalsTo(normalize("false."));
+  });
+
+  it.skip("p(a). q(b). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
+    assertThat(`
+       p(a). 
+       q(b). 
+       p(c). q(c). 
+       forall (x) (p(x) && q(x)) => r(x).
      `)
      .proving("r(x?)?")
-     .equalsTo("");
+     .equalsTo("false.");
    });
 
   it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
@@ -776,10 +825,9 @@ describe("First order logic", function() {
      child(anna, mel).
      female(anna).
      `)
-    .proving("forall (y) female(y) && parent(mel, y).")
-      // .proving("daughter(x?, mel)?")
-     .equalsTo("");
-
+    //.proving("forall (y) female(y) && parent(mel, y).")
+    .proving("daughter(x?, mel)?")
+    .equalsTo("false.");
   });
 
   it("sons", () => {
@@ -979,6 +1027,41 @@ describe("First order logic", function() {
     // .proving("spouse(dani, x?).")
     // .equalsTo("");
    });
+
+  it("generators", () => {
+    function* a() {
+     yield 1;
+     yield 2;
+    };
+
+    let it = a();
+
+    assertThat(it.next().value).equalsTo(1);
+    assertThat(it.next().value).equalsTo(2);
+    assertThat(it.next().done).equalsTo(true);
+
+    let foo = new class {
+      hello() { return 1; }
+      *world() { yield 2; }
+    }();
+
+    assertThat(foo.hello()).equalsTo(1);
+    assertThat(foo.world().next().value).equalsTo(2);
+
+    function* loop() {
+     yield 1;
+     yield 2;
+     yield 3;
+    }
+
+    let sum = 0;
+    for (let i of loop()) {
+     sum += i;
+    }
+
+    assertThat(sum).equalsTo(6);
+
+  });
 
   function assertThat(x) {
    return {
