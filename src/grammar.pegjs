@@ -12,8 +12,21 @@ expression
   / negation
 
 quantifier
-  = quantifier:QUANTIFIER OPENPAREN id:identifier CLOSEPAREN expression:expression { 
-     return {"@type": "Quantifier", op: quantifier, variable: id, expression: expression} }
+  = quantifier:QUANTIFIER OPENPAREN id:identifier value:(_ "=" _ primary)? CLOSEPAREN expression:expression { 
+     let result = {
+       "@type": "Quantifier", 
+       op: quantifier, 
+       variable: id, 
+       expression: expression
+     };
+
+     if (value && value.length > 0) {
+       // console.log(value);
+       result.value = value[value.length - 1];
+     }
+
+     return result;
+}
 
 implication
   = left:logical op:IMPLICATION right:expression {
@@ -50,7 +63,7 @@ predicate =
 
 argument =
   call:function { return {"@type": "Argument", "call" : call} }
-  / name:identifier free:QUESTION? value:(_ "=" _ primary)?{
+  / name:identifier free:QUESTION? value:(_ "=" _ primary)? {
     let result = {"@type": "Argument", literal: {"@type": "Literal", name: name}}; 
     if (free == "?") {
       result.free = true;

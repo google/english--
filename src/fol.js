@@ -1,4 +1,4 @@
-const {equals, toString} = require("./forward.js");
+const {equals, stringify, toString} = require("./forward.js");
 const {Backward, Result} = require("./backward.js");
 const {Parser, Rule} = require("./parser.js");
 
@@ -14,6 +14,10 @@ const {
   and,
   or,
   negation} = Parser;
+
+function clone(obj) {
+ return JSON.parse(JSON.stringify(obj));
+}
 
 class Reasoner extends Backward {
  constructor(kb) {
@@ -34,9 +38,7 @@ class Reasoner extends Backward {
    }
   }
 
-  if (!goal.quantifiers) {
-   // console.log("propositional!");
-   // console.log(goal);
+  if (!goal.quantifiers || goal.quantifiers.length == 0) {
    let propositional = super.backward(goal, stack);
    if (!propositional.failed()) {
     return propositional;
@@ -48,9 +50,14 @@ class Reasoner extends Backward {
    let unifies = unify(statement, goal);
    if (!unifies) {
     continue;
+   } else if (Object.entries(unifies).length == 0) {
+    return Result.of({given: statement});
+   } else {
+    let head = goal.quantifiers && goal.quantifiers.length > 0;
+    // console.log(goal);
+    // console.log(head);
+    return Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
    }
-
-   return Result.of([{given: statement}, {given: fill(goal, unifies)}]).bind(unifies);
   }
 
   // universal modus ponens.
@@ -60,12 +67,22 @@ class Reasoner extends Backward {
    if (!unifies || Object.entries(unifies).length == 0) {
     continue;
    }
+   // console.log("hello");
+   // console.log(unifies);
    let left = fill(statement.left, unifies, true);
+   // console.log(left.quantifiers);
+   // console.log(statement.quantifiers);
+   let wrapping = clone(statement.quantifiers).filter(x => {
+     return !unifies[x.variable];
+   });
+   left.quantifiers = (left.quantifiers || []);
+   left.quantifiers.push(...wrapping);
+   // console.log(left.quantifiers);
    stack.push(goal);
    let dep = this.backward(left, stack);
    stack.pop();
    if (!dep.failed()) {
-    return dep.push({given: statement, and: [left], goal: fill(goal, unifies)});
+    return dep.push({given: fill(statement, unifies, undefined, true), goal: fill(goal, unifies, undefined, false)});
    }
   }
 
@@ -73,11 +90,11 @@ class Reasoner extends Backward {
   for (let statement of this.op("&&")) {
    let left = unify(statement.left, goal);
    if (left) {
-    return Result.of([{given: fill(statement, left)}, {given: goal}]);
+    return Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
    }
    let right = unify(statement.right, goal);
    if (right) {
-    return Result.of([{given: fill(statement, right)}, {given: goal}]);
+    return Result.of([{given: fill(statement, right, undefined, true)}, {given: goal}]);
    }
   }
 
@@ -85,27 +102,23 @@ class Reasoner extends Backward {
   for (let statement of this.op("||")) {
    let left = unify(statement.left, goal);
    if (left) {
-    let right = negation(statement.right);
+    let right = fill(negation(statement.right), left, true);
     stack.push(goal);
     let result = this.backward(right, stack);
     stack.pop();
     if (!result.failed()) {
-     let explanation = JSON.parse(JSON.stringify(statement));
-     delete explanation.quantifiers;
-     return result.push([{given: statement, goal: fill(explanation, left, true)}, {given: goal}]);
+     return result.push({given: fill(statement, left, undefined, true), goal: goal});
     }
    }
 
    let right = unify(statement.right, goal);
    if (right) {
-    let left = negation(statement.left);
+    let left = fill(negation(statement.left), right, true);
     stack.push(goal);
     let result = this.backward(left, stack);
     stack.pop();
     if (!result.failed()) {
-     let explanation = JSON.parse(JSON.stringify(statement));
-     delete explanation.quantifiers;
-     return result.push([{given: statement, goal: fill(explanation, right, true)}, {given: goal}]);
+     return result.push({given: fill(statement, right, undefined, true), goal: goal});
     }
    }
   }
@@ -132,7 +145,8 @@ class Reasoner extends Backward {
     stack.pop();
     if (!result.failed()) {
      // console.log("yay!");
-     return dep.push(result).push({given: fill(goal, bindings)});
+     // console.log(bindings);
+     return dep.push(result).push({given: fill(goal, bindings, undefined, true)}).bind(bindings);
     }
    }
    
@@ -185,32 +199,40 @@ function rewrite(expression, vars = []) {
  }
 }
 
-function fill(rule, map, override) {
+function fill(rule, map, override, head = false) {
  // clones rule.
  // console.log(rule);
  // console.log(map);
  let result = JSON.parse(JSON.stringify(rule));
- if (result["@type"] == "UnaryOperator") {
-  result.expression = fill(result.expression, map, override);
- } else if (result["@type"] == "BinaryOperator") {
-  result.left = fill(result.left, map, override);
-  result.right = fill(result.right, map, override);
- } else if (result["@type"] == "Argument") {
-  // console.log("hello world");
+
+ for (let quantifier of result.quantifiers || []) {
+  // console.log(quantifier);
+  if (map[quantifier.variable]) {
+   // console.log("hi");
+   quantifier.value = map[quantifier.variable];
+  }
   // console.log(result);
-  // console.log(map);
+ }
+
+ if (result["@type"] == "UnaryOperator") {
+  result.expression = fill(result.expression, map, override, head);
+ } else if (result["@type"] == "BinaryOperator") {
+  result.left = fill(result.left, map, override, head);
+  result.right = fill(result.right, map, override, head);
+ } else if (result["@type"] == "Argument") {
   if (result.call) {
-   result.call = fill(result.call, map, override);
+   result.call = fill(result.call, map, override, head);
   }
   if (result.literal && result.free) {
    let mapping = map[result.literal.name];
-   // console.log(result);
    if (!mapping) {
     return result;
    }
    delete result.free;
-   // console.log(override);
-   if (!override) {
+   if (head) {
+    // keep it free
+    // console.log(result);
+   } else if (!override) {
     result.value = mapping;
    } else if (mapping["@type"] == "Function") {
     result.call = mapping;
@@ -222,7 +244,7 @@ function fill(rule, map, override) {
  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
   // console.log(result);
   result.arguments = result.arguments.map(x => {
-    return fill(x, map, override);
+    return fill(x, map, override, head);
    });
  }
  return result;

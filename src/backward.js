@@ -33,8 +33,10 @@ class Result {
  }
  bind(vars) {
   for (let [key, value] of Object.entries(vars)) {
-   if (this.bindings[key]) {
-    throw new Error("Unsupported condition: conflicting bindings.");
+   if (this.bindings[key] && !equals(value, this.bindings[key])) {
+    // console.log(this.bindings[key]);
+    // console.log(value);
+    throw new Error("Unsupported condition: conflicting bindings: " + key);
    }
   }
   for (let [key, value] of Object.entries(vars)) {

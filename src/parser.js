@@ -21,10 +21,13 @@ class Parser {
   return {"@type": "Constant", name: value};
  }
 
- static forall(x, expression) {
+ static forall(x, expression, value) {
   let result =  {"@type": "Quantifier", op: "forall", variable: x};
   if (expression) {
    result.expression = expression;
+  }
+  if (value) {
+   result.value = value;
   }
   return result;
  }

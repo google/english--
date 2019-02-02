@@ -276,17 +276,22 @@ function quantify(rule, expression) {
  }
 
  let prefix = rule.quantifiers.map(x => {
-   return `${x.op} (${x.variable}) `;
+   let value = x.value ? ` = ${stringify(x.value)}` : "";
+   return `${x.op} (${x.variable}${value}) `;
  }).join("");
 
  return `${prefix} ${expression}`;
 }
 
 function stringify(rule) {
+ // console.log(rule);
  if (rule["@type"] == "Literal") {
   return quantify(rule, rule.name);
  } else if (rule["@type"] == "Quantifier") {
-  return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
+  let value = rule.value ? ` = ${stringify(rule.value)}` : "";
+  // console.log("hello");
+  // console.log(rule);
+  return `${rule.op} (${rule.variable}${value}) ${stringify(rule.expression)}`;
  } else if (rule["@type"] == "Argument") {
   if (rule.literal) {
    // return x.literal.name + (x.free ? "?" : "");
@@ -300,12 +305,13 @@ function stringify(rule) {
    //return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {
   return quantify(rule, `~${stringify(rule.expression)}`);
- } else if (rule["@type"] == "Predicate") {
+ } else if (rule["@type"] == "Predicate" || rule["@type"] == "Function") {
   return quantify(rule, `${rule.name}(${rule.arguments.map(stringify).join(", ")})`);
  } else if (rule.op) {
   // NOTE(goto): by not parenthesizing we loose some information
   // but on the other hand we gain readability. Not sure if that's
   // the right trade-off but works for now.
+  // console.log(rule);
   // console.log(rule);
   return quantify(rule, `${stringify(rule.left)} ${rule.op} ${stringify(rule.right)}`);
  }
@@ -314,8 +320,9 @@ function stringify(rule) {
 
 function explain(reasons) {
  let result = [];
- // console.log(JSON.stringify(reasons));
+ // console.log(JSON.stringify(reasons, undefined, 2));
  // console.log("hi");
+ // console.log(reasons);
  if (!reasons) {
   return "";
  }
@@ -343,6 +350,7 @@ function explain(reasons) {
    result.push(line.join(""));
   }
  }
+ // console.log(result.join("\n"));
  return result.join("\n");
 }
 
