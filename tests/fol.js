@@ -428,12 +428,10 @@ describe("First order logic", function() {
    });
 
   it("p(a). p(b). |= p(x?)?", function() {
-    let reasoner = new Reasoner(Parser.parse("p(a). p(b)."));
-    let it = reasoner.go(Rule.of("p(x?)."));
-    assertThat(it.next().value.toString()).equalsTo("p(a).\n\np(x = a).\n");
-    assertThat(it.next().value.toString()).equalsTo("p(b).\n\np(x = b).\n");
-    assertThat(it.next().value.toString()).equalsTo("false.");
-    assertThat(it.next().done).equalsTo(true);
+    assertThat("p(a). p(b).").proving("p(x?).")
+     .equalsTo("p(a). p(x = a).")
+     .equalsTo("p(b). p(x = b).")
+     .equalsTo("false.");
    });
 
   it("P(a). Q(a). exists (x) P(x) && Q(x)?", function() {
@@ -602,38 +600,33 @@ describe("First order logic", function() {
   });
 
   it("p(a). q(a). p(b). q(b). p(c). q(c). |= exists (x) p(x) && q(x). ", function() {
-    let reasoner = new Reasoner(Parser.parse(`
+    assertThat(`
       p(a). q(a). 
       p(b). q(b). 
       p(c).
       q(d). 
       p(e). q(e).
-    `));
-    let it = reasoner.go(rewrite(Rule.of("exists (x) p(x) && q(x)?")));
-    let normalize = (code) => toString(Parser.parse(code));
-    assertThat(normalize(it.next().value.toString()))
-     .equalsTo(normalize(`
+    `)
+    .proving("exists (x) p(x) && q(x)?")
+    .equalsTo(`
        p(a).
        exists (x = a) p(x).
        q(a).
        exists (x = a) p(x) && q(x).
-     `));
-    assertThat(normalize(it.next().value.toString()))
-     .equalsTo(normalize(`
+     `)
+    .equalsTo(`
        p(b).
        exists (x = b) p(x).
        q(b).
        exists (x = b) p(x) && q(x).
-     `));
-    assertThat(normalize(it.next().value.toString()))
-     .equalsTo(normalize(`
+     `)
+    .equalsTo(`
        p(e).
        exists (x = e) p(x).
        q(e).
        exists (x = e) p(x) && q(x).
-     `));
-    assertThat(normalize(it.next().value.toString()))
-     .equalsTo(normalize("false."));
+     `)
+    .equalsTo("false.");
   });
 
   it("p(a). q(b). p(c). q(c). forall (x) p(x) && q(x) => r(x). |= r(x?).", function() {
@@ -825,15 +818,25 @@ describe("First order logic", function() {
    });
 
   it.skip("capturing daughters", () => {
+    // TODO(goto): this is returning a single daughter.
     assertThat(`
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).
      forall (x) forall (y) ((parent(x, y) && female(y)) => daughter(y, x)).
-     child(anna, mel).
-     female(anna).
+     child(dani, marcia).
+     child(thais, marcia).
+     female(dani).
+     female(thais).
      `)
-    //.proving("forall (y) female(y) && parent(mel, y).")
-    .proving("daughter(x?, mel)?")
+    .proving("daughter(z?, marcia)?")
+    .equalsTo(`
+      female(dani).
+      exists (y = dani) female(y).
+      child(dani, marcia).
+      forall (x = dani) forall (y = marcia) child(x, y) => parent(y, x) => parent(marcia, dani).
+      exists (y = dani) female(y) && parent(marcia, y).
+      forall (x = marcia) forall (y = dani) female(y) && parent(x, y) => daughter(y, x) => daughter(z = y, marcia).
+    `)
     .equalsTo("false.");
   });
 
@@ -1073,13 +1076,14 @@ describe("First order logic", function() {
   function assertThat(x) {
    return {
     proving(z) {
-     let result = new Reasoner(Parser.parse(x)).backward(rewrite(Rule.of(z)));
+     let result = new Reasoner(Parser.parse(x)).go(rewrite(Rule.of(z)));
      return {
       equalsTo(y) {
        // console.log(result.toString());
        // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
-       assertThat(toString(Parser.parse(result.toString())))
+       assertThat(toString(Parser.parse(result.next().value.toString())))
         .equalsTo(toString(Parser.parse(y)));
+       return this;
       }
      };
     },
