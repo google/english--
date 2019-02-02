@@ -750,9 +750,8 @@ describe("First order logic", function() {
 
     // TODO(goto): add this case.
     // assertThat(kb)
-    // .proving("knows(lucy, john)?")
+    // .proving("~knows(lucy, john)?")
     // .equalsTo("");
-    // return;
   });
 
   it("big bertha", function() {
@@ -764,13 +763,14 @@ describe("First order logic", function() {
        forall (y = table) on(bertha, y) => collapses(y) => collapses(table).
      `);
 
-    //assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
-    // .proving("collapses(y?)?")
-    // .equalsTo(`
-    //   forall (x) on(x, table).
-    //   forall (x = table) on(bertha, x).
-    //   forall (x) on(bertha, x) => collapses(x) => collapses(y).
-    // `);
+    assertThat("forall (x) on(x, table). forall (x) on(bertha, x) => collapses(x).")
+     .proving("collapses(y?)?")
+     .equalsTo(`
+       forall (x) on(x, table).
+       exists (x = table) on(bertha, x).
+       forall (x = table) on(bertha, x) => collapses(x) => collapses(y = x).
+     `)
+     .done();
    });
 
   it("diet", function() {
@@ -997,10 +997,6 @@ describe("First order logic", function() {
      .proving("male(anna)?")
      .equalsTo("false.");
 
-    // assertThat(kb)
-    // .proving("spouse(mel, x?).")
-    // .equalsTo("spouse(mel, dani). spouse(mel, x = dani).");
-
     assertThat(kb)
      .proving("spouse(dani, mel).")
      .equalsTo(`
@@ -1077,10 +1073,18 @@ describe("First order logic", function() {
     //   forall (g = maura) forall (c = leo) female(g) && grandparent(g, c) => grandmother(g, c) => grandmother(maura, leo).
     // `);
 
-    // TODO(goto): this fails.
-    // assertThat(kb)
-    // .proving("spouse(dani, x?).")
-    // .equalsTo("");
+    // TODO(goto): calling done() here fails. figure out why.
+    assertThat(kb)
+     .proving("spouse(dani, p?).")
+     .equalsTo(`
+       spouse(mel, dani).
+       exists (x = mel) spouse(x, dani).
+       forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x) => spouse(dani, p = x).
+     `);
+
+    assertThat(kb)
+     .proving("spouse(mel, x?).")
+     .equalsTo("spouse(mel, dani). spouse(mel, x = dani).");
    });
 
   it("generators", () => {
