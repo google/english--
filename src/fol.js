@@ -94,10 +94,13 @@ class Reasoner extends Backward {
    // console.log(left);
 
    stack.push(goal);
-   let dep = this.backward(left, stack);
+   let deps = this.go(left, stack);
    stack.pop();
-   if (!dep.failed()) {
-    yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
+
+   for (let dep of deps) {
+    if (!dep.failed()) {
+     yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
+    }
    }
   }
 
