@@ -858,11 +858,8 @@ describe("First order logic", function() {
   });
 
   it("sons", () => {
-    // this doesn't work for
-    // forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
-    // because we don't know yet how to capture forall (x?)
     assertThat(`
-       forall (x) exists (y) ((parent(x, y) && male(y)) => son(y, x)).
+       forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
        parent(mel, leo).
        male(leo).
     `)
@@ -872,7 +869,7 @@ describe("First order logic", function() {
       exists (y = leo) male(y).
       parent(mel, leo).
       exists (y = leo) male(y) && parent(mel, y).
-      forall (x = mel) exists (y = leo) male(y) && parent(x, y) => son(y, x) => son(z = y, mel).
+      forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => son(z = y, mel).
     `);
   });
 
