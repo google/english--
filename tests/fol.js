@@ -777,6 +777,12 @@ describe.only("First order logic", function() {
      forall (x) forall (y) ((parent(x, y) && male(x)) => father(x, y)).
      forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
 
+     forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
+     forall (g) forall (c) (exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c).
+
+     forall (g) forall (c) ((grandparent(g, c) && male(g)) => grandfather(g, c)).
+     forall (g) forall (c) ((grandparent(g, c) && female(g)) => grandmother(g, c)).
+
      spouse(mel, dani).
 
      parent(mel, leo).
@@ -790,6 +796,9 @@ describe.only("First order logic", function() {
 
      male(leo).
      female(anna).
+
+     parent(maura, mel).
+     female(maura).
     `;
 
     assertThat(kb)
@@ -890,6 +899,44 @@ describe.only("First order logic", function() {
        parent(dani, anna).
        female(dani) && parent(dani, anna) => female(dani) && parent(dani, anna).
        forall (x) forall (y) female(x) && parent(x, y) => mother(x, y) && female(dani) && parent(dani, anna) => mother(dani, anna).
+     `);
+
+    assertThat(kb)
+     .proving("grandparent(maura, anna)?")
+     .equalsTo(`
+       parent(maura, mel).
+       exists (p) parent(maura, p = mel).
+       child(anna, mel).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
+       exists (p) parent(maura, p = mel) && parent(p = mel, anna).
+       forall (g) forall (c) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) && exists (p) parent(maura, p) && parent(p, anna) => grandparent(maura, anna).
+     `);
+
+    assertThat(kb)
+     .proving("grandmother(maura, anna)?")
+     .equalsTo(`
+       female(maura).
+       parent(maura, mel).
+       exists (p) parent(maura, p = mel).
+       child(anna, mel).
+       forall (x) forall (y) child(x, y) => parent(y, x) && child(anna, mel) => parent(mel, anna).
+       exists (p) parent(maura, p = mel) && parent(p = mel, anna).
+       forall (g) forall (c) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) && exists (p) parent(maura, p) && parent(p, anna) => grandparent(maura, anna).
+       female(maura) && grandparent(maura, anna) => female(maura) && grandparent(maura, anna).
+       forall (g) forall (c) female(g) && grandparent(g, c) => grandmother(g, c) && female(maura) && grandparent(maura, anna) => grandmother(maura, anna).
+     `);
+
+    assertThat(kb)
+     .proving("grandmother(maura, leo)?")
+     .equalsTo(`
+       female(maura).
+       parent(maura, mel).
+       exists (p) parent(maura, p = mel).
+       parent(mel, leo).
+       exists (p) parent(maura, p = mel) && parent(p = mel, leo).
+       forall (g) forall (c) exists (p) parent(g, p) && parent(p, c) => grandparent(g, c) && exists (p) parent(maura, p) && parent(p, leo) => grandparent(maura, leo).
+       female(maura) && grandparent(maura, leo) => female(maura) && grandparent(maura, leo).
+       forall (g) forall (c) female(g) && grandparent(g, c) => grandmother(g, c) && female(maura) && grandparent(maura, leo) => grandmother(maura, leo).
      `);
 
     // TODO(goto): this fails.
