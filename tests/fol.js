@@ -841,7 +841,6 @@ describe("First order logic", function() {
    });
 
   it("capturing daughters", () => {
-    // TODO(goto): this is returning a single daughter.
     assertThat(`
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).
@@ -888,19 +887,53 @@ describe("First order logic", function() {
     .done();
   });
 
+  it("uncles", () => {
+    // TODO(goto): calling done() at the end here causes an infinite loop.
+    // Figure out what's going on there.
+    // there is a bug where, if you wrap things in ()s this leads to a 
+    // different expression.
+    // forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
+    // forall (u) forall (c) ((exists(p) (parent(p, c) && sibling(u, p) && male(u))) => uncle(u, c)).
+
+    assertThat(`
+       forall (x) forall (y) parent(x, y) => child(y, x).
+       forall (x) forall (y) child(x, y) => parent(y, x).
+
+       forall (x) forall (y) (exists(p) (parent(p, x) && parent(p, y))) => sibling(x, y).
+
+       forall (x) forall (y) sibling(x, y) => sibling(y, x).
+
+       forall (x) forall (y) (sibling(x, y) && male(x)) => brother(x, y).
+       forall (x) forall (y) (sibling(x, y) && female(x)) => sister(x, y).
+
+       forall (x) forall (y) brother(x, y) => (sibling(x, y) && male(x)).
+       forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
+
+       forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
+
+       parent(mel, leo).
+
+       brother(ni, mel).
+       male(ni).
+    `)
+    .proving("uncle(ni, leo)?")
+    .equalsTo(`
+      brother(ni, mel).
+      exists (y = mel) brother(ni, y).
+      forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y) => exists (p = y) male(ni) && sibling(ni, p = y).
+      parent(mel, leo).
+      exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
+      forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && sibling(u, p) && male(u) => uncle(u, c) => uncle(ni, leo).
+    `);
+  });
+
   it("my family", function() {
     // logic from:
     // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
     let kb = `
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).
-
-     forall (x) male(x) => ~female(x).
-     forall (x) female(x) => ~male(x).
-
      forall (x) forall (y) spouse(x, y) => spouse(y, x).
-
-     forall (x) forall (y) parent(x, y) => child(y, x).
 
      forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
      forall (x) forall (y) ((parent(x, y) && female(y)) => daughter(y, x)).
@@ -908,11 +941,25 @@ describe("First order logic", function() {
      forall (x) forall (y) ((parent(x, y) && male(x)) => father(x, y)).
      forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
 
+     forall (x) forall (y) (exists(p) (parent(p, x) && parent(p, y))) => sibling(x, y).
+     forall (x) forall (y) sibling(x, y) => sibling(y, x).
+
+     forall (x) forall (y) (sibling(x, y) && male(x)) => brother(x, y).
+     forall (x) forall (y) (sibling(x, y) && female(x)) => sister(x, y).
+
+     forall (x) forall (y) (brother(x, y) => (sibling(x, y) && male(x))).
+     forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
+
+     forall (u) forall (c) (exists(p) (parent(p, c) && sibling(u, p) && male(u))) => uncle(u, c).
+
      forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
      forall (g) forall (c) (exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c).
 
      forall (g) forall (c) ((grandparent(g, c) && male(g)) => grandfather(g, c)).
      forall (g) forall (c) ((grandparent(g, c) && female(g)) => grandmother(g, c)).
+
+     forall (x) male(x) => ~female(x).
+     forall (x) female(x) => ~male(x).
 
      spouse(mel, dani).
 
@@ -930,6 +977,9 @@ describe("First order logic", function() {
 
      parent(maura, mel).
      female(maura).
+
+     male(ni).
+     brother(ni, mel).
     `;
 
     assertThat(kb)
@@ -1031,6 +1081,61 @@ describe("First order logic", function() {
        female(dani) && parent(dani, anna) => female(dani) && parent(dani, anna).
        forall (x = dani) forall (y = anna) female(x) && parent(x, y) => mother(x, y) => mother(dani, anna).
      `);
+
+    assertThat(kb)
+      .proving("sibling(anna, leo)?")
+      .equalsTo(`
+        parent(dani, anna).
+        exists (p = dani) parent(p, anna).
+        child(leo, dani).
+        forall (x = leo) forall (y = dani) child(x, y) => parent(y, x) => parent(dani, leo).
+        exists (p = dani) parent(p, anna) && parent(p, leo).
+        forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(anna, leo).
+     `);
+
+    assertThat(kb)
+      .proving("sibling(leo, anna)?")
+      .equalsTo(`
+        parent(mel, leo).
+        exists (p = mel) parent(p, leo).
+        child(anna, mel).
+        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
+        exists (p = mel) parent(p, leo) && parent(p, anna).
+        forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(leo, anna).
+    `);
+
+    assertThat(kb)
+      .proving("brother(leo, anna)?")
+      .equalsTo(`
+        male(leo).
+        parent(mel, leo).
+        exists (p = mel) parent(p, leo).
+        child(anna, mel).
+        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
+        exists (p = mel) parent(p, leo) && parent(p, anna).
+        forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(leo, anna).
+        male(leo) && sibling(leo, anna) => male(leo) && sibling(leo, anna).
+        forall (x = leo) forall (y = anna) male(x) && sibling(x, y) => brother(x, y) => brother(leo, anna).
+    `);
+
+    assertThat(kb)
+      .proving("sister(anna, leo)?")
+      .equalsTo(`
+        female(anna).
+        parent(dani, anna).
+        exists (p = dani) parent(p, anna).
+        child(leo, dani).
+        forall (x = leo) forall (y = dani) child(x, y) => parent(y, x) => parent(dani, leo).
+        exists (p = dani) parent(p, anna) && parent(p, leo).
+        forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(anna, leo).
+        female(anna) && sibling(anna, leo) => female(anna) && sibling(anna, leo).
+        forall (x = anna) forall (y = leo) female(x) && sibling(x, y) => sister(x, y) => sister(anna, leo).
+    `);
+
+    // assertThat(kb)
+    //  .proving("uncle(ni, leo)?")
+    //  .equalsTo(`
+    //`);
 
     // TODO(goto): these are causing an infinite loop somewhere in our
     // moden ponus generator.

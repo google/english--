@@ -280,7 +280,7 @@ function quantify(rule, expression) {
    return `${x.op} (${x.variable}${value}) `;
  }).join("");
 
- return `${prefix} ${expression}`;
+ return `${prefix}${expression}`;
 }
 
 function stringify(rule) {

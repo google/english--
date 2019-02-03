@@ -29,6 +29,15 @@ class Reasoner extends Backward {
  backward(goal, stack = []) {
   return this.go(goal, stack).next().value;
  }
+ * quantifiers(op) {
+  for (let statement of this.kb.filter(x => x.op == op)) {
+   if (statement.quantifiers && statement.quantifiers.length > 0) {
+    // ignore all of the statements that are quantified.
+    // continue;
+    yield statement;
+   }
+  }
+ }
  *go(goal, stack = []) {
   // console.log("goal: " + stringify(goal));
 
@@ -43,7 +52,10 @@ class Reasoner extends Backward {
 
   // console.log("foo");
   if (!goal.quantifiers || goal.quantifiers.length == 0) {
+   // console.log("hello");
+   // stack.push(goal);
    let propositional = super.backward(goal, stack);
+   // stack.pop();
    if (!propositional.failed()) {
     // console.log("propositional!");
     yield propositional;
@@ -70,10 +82,10 @@ class Reasoner extends Backward {
   }
 
   // universal modus ponens.
-  for (let statement of this.op("=>")) {
-   if (!statement.quantifiers || statement.quantifiers.length == 0) {
-    continue;
-   }
+  for (let statement of this.quantifiers("=>")) {
+   // if (!statement.quantifiers || statement.quantifiers.length == 0) {
+   // continue;
+   // }
 
    let implication = statement.right;
    let unifies = unify(implication, goal);
@@ -91,7 +103,11 @@ class Reasoner extends Backward {
    left.quantifiers = (left.quantifiers || []);
    left.quantifiers.push(...wrapping);
 
-   // console.log(left);
+   // console.log(statement);
+
+   // console.log(stringify(left));
+
+   // throw new Error("hello world");
 
    stack.push(goal);
    let deps = this.go(left, stack);
@@ -105,7 +121,7 @@ class Reasoner extends Backward {
   }
 
   // universal conjunction elimination.
-  for (let statement of this.op("&&")) {
+  for (let statement of this.quantifiers("&&")) {
    let left = unify(statement.left, goal);
    if (left) {
     yield Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
@@ -117,7 +133,7 @@ class Reasoner extends Backward {
   }
 
   // universal disjunction syllogism
-  for (let statement of this.op("||")) {
+  for (let statement of this.quantifiers("||")) {
    let left = unify(statement.left, goal);
    if (left) {
     let right = fill(negation(statement.right), left, true);
@@ -158,6 +174,17 @@ class Reasoner extends Backward {
      let bindings = {
       [variable]: dep.get(variable)
      };
+
+     // console.log(`${stringify(goal)}`);
+     // console.log(`${stringify(goal.right)}`);
+     // console.log(dep.get(variable));
+     // console.log(dep.bindings);
+     // console.log(variable);
+     // Ah, interesting, so we have to resolve
+     // the internal bindings here before continuing
+     // ... interesting ...
+     // throw new Error("hello");
+
      let right = JSON.parse(JSON.stringify(goal.right));
      stack.push(goal);
      let result = this.backward(fill(right, bindings, true), stack);

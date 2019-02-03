@@ -1,4 +1,4 @@
-const {normalize, stringify, equals, explain} = require("./forward.js");
+const {normalize, stringify, equals, explain, toString} = require("./forward.js");
 const {Parser, Rule} = require("./parser.js");
 
 const {
@@ -29,11 +29,15 @@ class Result {
   return this.reason.length == 0;
  }
  get(key) {
-  return this.bindings[key];
+  let result = key;
+  while (this.bindings[result] && this.bindings[result].free) {
+   result = this.bindings[result].literal.name;
+  }
+  return this.bindings[result];
  }
  bind(vars) {
   for (let [key, value] of Object.entries(vars)) {
-   if (this.bindings[key] && !equals(value, this.bindings[key])) {
+   if (this.bindings[key] && !equals(value, this.get(key))) {
     // console.log(this.bindings[key]);
     // console.log(value);
     throw new Error("Unsupported condition: conflicting bindings: " + key);
@@ -68,11 +72,11 @@ class Backward {
 
  * op(op) {
   for (let statement of this.kb.filter(x => x.op == op)) {
-   // body(statement);
-   // if (statement.quantifiers || statement.quantifiers.length > 0) {
-   //   // ignore all of the statements that are quantified.
-   //   continue;
-   // }
+   if (statement.quantifiers && statement.quantifiers.length > 0) {
+    // ignore all of the statements that are quantified.
+    // console.log(`skipping ${stringify(statement)}`);
+    continue;
+   }
    yield statement;
   }
  }
@@ -87,7 +91,7 @@ class Backward {
  }
 
  backward(goal, stack = []) {
-  // console.log(`${Rule.from(goal)}?`);
+  // console.log(`goal: ${stringify(goal)}? \/\/ propositional`);
   for (let subgoal of stack) {
    if (equals(goal, subgoal)) {
     return Result.failed();
@@ -115,6 +119,7 @@ class Backward {
   // Searches the KB for implications with
   // the goal on the right hand side (modus ponens).
   for (let statement of this.op("=>")) {
+   // console.log("foo");
    if (equals(statement.right, goal)) {
     stack.push(goal);
     let subgoal = this.backward(statement.left, stack);
