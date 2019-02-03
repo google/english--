@@ -65,9 +65,9 @@ predicate =
   }
 
 argument =
-  call:function { return {"@type": "Argument", "call" : call} }
+  call:function { return {"@type": "Argument", expression: call} }
   / name:identifier free:QUESTION? value:(_ "=" _ primary)? {
-    let result = {"@type": "Argument", literal: {"@type": "Literal", name: name}}; 
+    let result = {"@type": "Argument", expression: {"@type": "Literal", name: name}}; 
     if (free == "?") {
       result.free = true;
     }

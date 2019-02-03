@@ -12,7 +12,8 @@ const {
  constant, 
  and, 
  or, 
- negation} = Parser;
+ negation,
+ argument} = Parser;
 
 describe("Parser", function() {
   it("examples", function() {
@@ -426,19 +427,7 @@ describe("Parser", function() {
     });
   });
 
-  let arg = (x, free) => {
-   let result = {
-    "@type": "Argument",
-    "literal": {
-      "@type": "Literal",
-      "name": x
-    }
-   };
-   if (free) {
-    result["free"] = true
-   }
-   return result;
-  }
+  let arg = (x, free) => argument(literal(x), undefined, free);
 
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
     let code = Parser.parse(`

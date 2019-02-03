@@ -57,7 +57,7 @@ describe("First order logic", function() {
     assertThat(Rule.of("P(x?).")).equalsTo(
       predicate("P", [{
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "x"},
+        "expression": {"@type": "Literal", "name": "x"},
         free: true
       }]));
   });
@@ -65,11 +65,11 @@ describe("First order logic", function() {
   it("parser - multiple free variables", function() {
     assertThat(Rule.of("P(x?, y?).").arguments).equalsTo([{
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "x"},
+        "expression": {"@type": "Literal", "name": "x"},
         free: true
       }, {
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "y"},
+        "expression": {"@type": "Literal", "name": "y"},
         free: true
       }]);
   });
@@ -77,14 +77,14 @@ describe("First order logic", function() {
   it("parser - mixed variables", function() {
     assertThat(Rule.of("P(x, y?, z).").arguments).equalsTo([{
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "x"},
+        "expression": {"@type": "Literal", "name": "x"},
       }, {
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "y"},
+        "expression": {"@type": "Literal", "name": "y"},
         free: true
       }, {
         "@type": "Argument",
-        "literal": {"@type": "Literal", "name": "z"}
+        "expression": {"@type": "Literal", "name": "z"}
       }]);
   });
 
@@ -245,7 +245,7 @@ describe("First order logic", function() {
         "name": "Q",
         "arguments": [{
           "@type": "Argument",
-          "literal": {
+          "expression": {
            "@type": "Literal",
             "name": "a"
           }
@@ -315,14 +315,13 @@ describe("First order logic", function() {
   });
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
-    // console.log(JSON.stringify(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")), undefined, 2));
     assertThat(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")))
      .equalsTo({"y": literal("a"), "x": {
         "@type": "Function",
         "name": "Q",
         "arguments": [{
           "@type": "Argument",
-          "literal": {
+          "expression": {
            "@type": "Literal",
            "name": "y"
           },
@@ -389,6 +388,14 @@ describe("First order logic", function() {
     let unifies = unify(Rule.of("P(x?)."), Rule.of("P(Q(a))."));
     assertThat(fill(Rule.of("R(x?)."), unifies))
      .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
+  });
+
+  it.skip("Fills with ids", function() {
+    let unifies = unify(rewrite(Rule.of("forall (x) P(x?).")), rewrite(Rule.of("P(a).")));
+    // console.log(unifies);
+    console.log(rewrite(Rule.of("forall (x) P(x?).")));
+    //assertThat(fill(Rule.of("R(x?)."), unifies))
+    // .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
   });
 
   it("Universal introduction", function() {

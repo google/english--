@@ -189,9 +189,9 @@ function peg$parse(input, options) {
           let rest = tail.map(x => x[1]);
           return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
         },
-      peg$c19 = function(call) { return {"@type": "Argument", "call" : call} },
+      peg$c19 = function(call) { return {"@type": "Argument", expression: call} },
       peg$c20 = function(name, free, value) {
-          let result = {"@type": "Argument", literal: {"@type": "Literal", name: name}}; 
+          let result = {"@type": "Argument", expression: {"@type": "Literal", name: name}}; 
           if (free == "?") {
             result.free = true;
           }

@@ -65,6 +65,7 @@ class Reasoner extends Backward {
 
   // universal introduction
   for (let statement of this.kb) {
+   // console.log(stringify(goal));
    let unifies = unify(statement, goal);
    // console.log(unifies);
    // console.log(goal);
@@ -95,6 +96,7 @@ class Reasoner extends Backward {
    }
    // console.log(unifies);
    let left = fill(statement.left, unifies, true);
+   // console.log(JSON.stringify(statement.left, undefined, 2));
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
    let wrapping = clone(statement.quantifiers).filter(x => {
@@ -171,6 +173,7 @@ class Reasoner extends Backward {
 
    for (let dep of lefts) {
     if (!dep.failed()) {
+     // console.log(variable);
      let bindings = {
       [variable]: dep.get(variable)
      };
@@ -234,9 +237,9 @@ function rewrite(expression, vars = {}) {
   } else if (expression["@type"] == "Predicate") {
    for (let arg of expression.arguments) {
     // console.log(vars);
-    if (arg.literal && vars[arg.literal.name]) {
+    if (arg.expression && vars[arg.expression.name]) {
      arg.free = true;
-     arg.id = vars[arg.literal.name];
+     arg.id = vars[arg.expression.name];
     }
    }
    return expression;
@@ -282,25 +285,24 @@ function fill(rule, map, override, head = false) {
   result.left = fill(result.left, map, override, head);
   result.right = fill(result.right, map, override, head);
  } else if (result["@type"] == "Argument") {
-  if (result.call) {
-   result.call = fill(result.call, map, override, head);
+  // console.log(result.expression["@type"]);
+  if (result.expression["@type"] == "Function") {
+   result.expression = fill(result.expression, map, override, head);
   }
-  if (result.literal && result.free) {
-   let mapping = map[result.literal.name];
+  if (result.expression["@type"] == "Literal" && result.free) {
+   let mapping = map[result.expression.name];
    if (!mapping) {
     return result;
    }
+   // console.log(mapping);
    delete result.free;
    if (head) {
     // keep it free
     // console.log(result);
    } else if (!override) {
     result.value = mapping;
-   } else if (mapping["@type"] == "Function") {
-    result.call = mapping;
-    delete result.literal;
    } else {
-    result.literal = mapping;
+    result.expression = mapping;
    }
   }
  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
@@ -366,22 +368,23 @@ function reduce(a, b) {
   let result = {};
   for (let i = 0; i < a.arguments.length; i++) {
    if (!a.arguments[i].free && !b.arguments[i].free) {
-    let inner = unify(a.arguments[i].literal || a.arguments[i].call, 
-                      b.arguments[i].literal || b.arguments[i].call);
+    let inner = unify(a.arguments[i].expression, 
+                      b.arguments[i].expression);
     // can't unify inner.
     if (!inner) {
      return false;
     }
     result = {...result, ...inner};
    } else if (a.arguments[i].free && !b.arguments[i].free) {
-    result[a.arguments[i].literal.name] = b.arguments[i].literal || b.arguments[i].call;
+    result[a.arguments[i].expression.name] = b.arguments[i].expression;
    } else if (!a.arguments[i].free && b.arguments[i].free) {
-    result[b.arguments[i].literal.name] = a.arguments[i].literal || a.arguments[i].call;
+    result[b.arguments[i].expression.name] = a.arguments[i].expression;
    } else if (a.arguments[i].free && b.arguments[i].free) {
     // sanity check if this is correct.
+    // console.log
     // console.log(a.arguments[i].literal.name);
     // console.log(b.arguments[i]);
-    result[b.arguments[i].literal.name] = a.arguments[i];
+    result[b.arguments[i].expression.name] = a.arguments[i];
     // console.log(result);
    }
   }

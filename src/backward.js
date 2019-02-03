@@ -31,7 +31,7 @@ class Result {
  get(key) {
   let result = key;
   while (this.bindings[result] && this.bindings[result].free) {
-   result = this.bindings[result].literal.name;
+   result = this.bindings[result].expression.name;
   }
   return this.bindings[result];
  }

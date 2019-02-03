@@ -295,14 +295,15 @@ function stringify(rule) {
   // console.log(rule);
   return `${rule.op} (${rule.variable.name}${value}) ${stringify(rule.expression)}`;
  } else if (rule["@type"] == "Argument") {
-  if (rule.literal) {
+  // console.log(rule);
+  if (rule.expression["@type"] == "Literal") {
    // return x.literal.name + (x.free ? "?" : "");
    // console.log(JSON.stringify(rule));
    let free =  rule.free ? "*" : "";
    let value = rule.value ? ` = ${stringify(rule.value)}` : "";
-   return rule.literal.name + value;
-  } else if (rule.call) {
-   return rule.call.name + "(" + rule.call.arguments.map(stringify).join(", ") + ")";
+   return rule.expression.name + value;
+  } else if (rule.expression["@type"] == "Function") {
+   return rule.expression.name + "(" + rule.expression.arguments.map(stringify).join(", ") + ")";
   }
    //return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {

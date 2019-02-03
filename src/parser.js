@@ -84,13 +84,7 @@ class Parser {
 
  static argument(a, value, free) {
     let result = {"@type": "Argument"};
-    if (a["@type"] == "Literal") {
-     result.literal = a;
-    } else if (a["@type"] == "Function") {
-     result.call = a;
-    } else {
-     throw new Error("unknown argument type: " + a["@type"]);
-    }
+    result.expression = a;
     if (value) {
      result.value = value;
     }
