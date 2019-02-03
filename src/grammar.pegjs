@@ -16,7 +16,10 @@ quantifier
      let result = {
        "@type": "Quantifier", 
        op: quantifier, 
-       variable: id, 
+       variable: {
+         "@type": "Variable",
+         name: id
+       }, 
        expression: expression
      };
 

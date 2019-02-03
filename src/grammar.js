@@ -151,7 +151,10 @@ function peg$parse(input, options) {
            let result = {
              "@type": "Quantifier", 
              op: quantifier, 
-             variable: id, 
+             variable: {
+               "@type": "Variable",
+               name: id
+             }, 
              expression: expression
            };
 

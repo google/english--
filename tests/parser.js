@@ -282,7 +282,10 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Quantifier",
         "op": "forall",
-        "variable": "a",
+        "variable": {
+          "@type": "Variable",
+          "name": "a"
+         },
         "expression": {
           "@type": "BinaryOperator", 
           "op": "&&",
@@ -305,7 +308,10 @@ describe("Parser", function() {
       "statements": [{
         "@type": "Quantifier",
         "op": "exists",
-        "variable": "a",
+        "variable": {
+          "@type": "Variable",
+          "name": "a"
+        },
         "expression": {
           "@type": "BinaryOperator", 
           "op": "&&",

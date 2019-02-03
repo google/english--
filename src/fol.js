@@ -98,7 +98,7 @@ class Reasoner extends Backward {
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
    let wrapping = clone(statement.quantifiers).filter(x => {
-     return !unifies[x.variable];
+     return !unifies[x.variable.name];
     }).map((x) => {x.op = "exists"; return x;});
    left.quantifiers = (left.quantifiers || []);
    left.quantifiers.push(...wrapping);
@@ -162,7 +162,7 @@ class Reasoner extends Backward {
       goal.quantifiers.length == 1 &&
       goal.quantifiers[0].op == "exists" &&
       goal.op == "&&") {
-   let variable = goal.quantifiers[0].variable;
+   let variable = goal.quantifiers[0].variable.name;
    let left = JSON.parse(JSON.stringify(goal.left));
    left.quantifiers = goal.quantifiers;
    stack.push(goal);
@@ -205,46 +205,55 @@ class Reasoner extends Backward {
  }
 }
 
-function rewrite(expression, vars = []) {
- // if (statement.op == "forall") {
- // console.log(expression);
- // throw new Error();
- if (expression["@type"] == "Program") {
-  // covers the case where we are rewriting the
-  // entire program.
-  return {statements: expression.statements.map(x => rewrite(x))};
- } else if (expression["@type"] == "Quantifier") {
-  // console.log("hi");
-  // vars.push(expression.variable);
-  let result = expression.expression;
+function rewrite(expression, vars = {}) {
+ let id = 1;
+
+ function rewrite2(expression, vars = {}) {
+  // if (statement.op == "forall") {
   // console.log(expression);
-  result.quantifiers = expression.quantifiers || [];
-  result.quantifiers.push({
-   "@type": expression["@type"],
-   "op": expression.op,
-   "variable": expression.variable
-  });
-  vars.push(expression.variable);
-  return rewrite(result, vars);
- } else if (expression["@type"] == "Predicate") {
-  for (let arg of expression.arguments) {
-   // console.log(vars);
-   if (arg.literal && vars.includes(arg.literal.name)) {
-    arg.free = true;
+  // throw new Error();
+  if (expression["@type"] == "Program") {
+   // covers the case where we are rewriting the
+   // entire program.
+   return {statements: expression.statements.map(x => rewrite2(x))};
+  } else if (expression["@type"] == "Quantifier") {
+   // console.log("hi");
+   // vars.push(expression.variable);
+   let result = expression.expression;
+   // console.log(expression);
+   result.quantifiers = expression.quantifiers || [];
+   result.quantifiers.push({
+     "@type": expression["@type"],
+      "op": expression.op,
+      "variable": expression.variable,
+      id: id
+      });
+   vars[expression.variable.name] = id;
+   id++;
+   return rewrite2(result, vars);
+  } else if (expression["@type"] == "Predicate") {
+   for (let arg of expression.arguments) {
+    // console.log(vars);
+    if (arg.literal && vars[arg.literal.name]) {
+     arg.free = true;
+     arg.id = vars[arg.literal.name];
+    }
    }
+   return expression;
+  } else if (expression["@type"] == "BinaryOperator") {
+   expression.left = rewrite2(expression.left, vars);
+   expression.right = rewrite2(expression.right, vars);
+   return expression;
+  } else if (expression["@type"] == "UnaryOperator") {
+   expression.expression = rewrite2(expression.expression, vars);
+   return expression;
+  } else {
+   // console.log(expression);
+   throw new Error("unknown type");
   }
-  return expression;
- } else if (expression["@type"] == "BinaryOperator") {
-  expression.left = rewrite(expression.left, vars);
-  expression.right = rewrite(expression.right, vars);
-  return expression;
-   } else if (expression["@type"] == "UnaryOperator") {
-  expression.expression = rewrite(expression.expression, vars);
-  return expression;
- } else {
-  // console.log(expression);
-  throw new Error("unknown type");
  }
+
+ return rewrite2(expression, vars);
 }
 
 function fill(rule, map, override, head = false) {
@@ -260,9 +269,9 @@ function fill(rule, map, override, head = false) {
   // if () {
   // }
   //}
-  if (map[quantifier.variable]) {
+  if (map[quantifier.variable.name]) {
    // console.log("hi");
-   quantifier.value = map[quantifier.variable];
+   quantifier.value = map[quantifier.variable.name];
   }
   // console.log(result);
  }
@@ -302,6 +311,8 @@ function fill(rule, map, override, head = false) {
  }
  return result;
 }
+
+
 
 function unify(a, b) {
  // console.log("Unifying");

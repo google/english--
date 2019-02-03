@@ -277,7 +277,7 @@ function quantify(rule, expression) {
 
  let prefix = rule.quantifiers.map(x => {
    let value = x.value ? ` = ${stringify(x.value)}` : "";
-   return `${x.op} (${x.variable}${value}) `;
+   return `${x.op} (${x.variable.name}${value}) `;
  }).join("");
 
  return `${prefix}${expression}`;
@@ -293,7 +293,7 @@ function stringify(rule) {
   let value = rule.value ? ` = ${stringify(rule.value)}` : "";
   // console.log("hello");
   // console.log(rule);
-  return `${rule.op} (${rule.variable}${value}) ${stringify(rule.expression)}`;
+  return `${rule.op} (${rule.variable.name}${value}) ${stringify(rule.expression)}`;
  } else if (rule["@type"] == "Argument") {
   if (rule.literal) {
    // return x.literal.name + (x.free ? "?" : "");
