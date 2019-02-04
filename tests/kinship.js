@@ -20,7 +20,7 @@ const {
  argument} = Parser;
 
 describe("Kinship", () => {
-  it("mother", function() {
+  it("mother(dani, leo)", function() {
     assertThat(`
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).
@@ -28,7 +28,7 @@ describe("Kinship", () => {
       female(dani).
       child(leo, dani).
     `)
-     .proving("mother(dani, leo).")
+     .proving("mother(dani, leo)?")
      .equalsTo(`
        female(dani).
        child(leo, dani).
@@ -58,7 +58,7 @@ describe("Kinship", () => {
   // If X is not a P then X is a Q. <=> forall(x) ~P(x) => Q(x).
   // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
 
-  it.skip("grandparent", function() {
+  it.skip("grandparent(maura, anna)", function() {
     assertThat(`
       forall (x) forall (y) parent(x, y) => child(y, x).
       forall (x) forall (y) child(x, y) => parent(y, x).
@@ -83,7 +83,7 @@ describe("Kinship", () => {
      .done();
    });
 
-  it("capturing daughters", () => {
+  it("exists (z) daughter(z, marcia)", () => {
     assertThat(`
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (a) forall (b) child(a, b) => parent(b, a).
@@ -93,7 +93,6 @@ describe("Kinship", () => {
      female(dani).
      female(thais).
     `)
-    // .proving("exists (z) parent(marcia, z)?")
     .proving("exists (z) daughter(z, marcia)?")
     .equalsTo(`
       child(dani, marcia).
@@ -118,7 +117,7 @@ describe("Kinship", () => {
     // TODO(goto): calling done() here fails, investigate.
   });
 
-  it("sons", () => {
+  it("exists (z) son(z, mel)", () => {
     assertThat(`
        forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
        parent(mel, leo).
@@ -136,7 +135,7 @@ describe("Kinship", () => {
     .done();
   });
 
-  it.skip("uncles", () => {
+  it.skip("uncle(ni, leo)", () => {
     // TODO(goto): calling done() at the end here causes an infinite loop.
     // Figure out what's going on there.
     // there is a bug where, if you wrap things in ()s this leads to a 
@@ -282,7 +281,7 @@ describe("Kinship", () => {
      `);
   });
 
-  it("exists (z) son(leo, z)?", () => {
+  it("exists (z) son(leo, z)", () => {
     // TODO(goto): this isn't entirely correct, because
     // son(leo, mel) is also true as well as daughter(anna, dani)
     // but also, the filling of parent(x = leo, leo) is off too
@@ -300,7 +299,7 @@ describe("Kinship", () => {
      `);
   });
 
-  it("exists (z) daughter(anna, z)?", () => {
+  it("exists (z) daughter(anna, z)", () => {
     assertThat(kb)
      .proving("exists (z) daughter(anna, z)?")
      .equalsTo(`
@@ -313,13 +312,13 @@ describe("Kinship", () => {
      `);
   });
 
-  it("female(leo)?", () => {
+  it("female(leo)", () => {
     assertThat(kb)
      .proving("female(leo)?")
      .equalsTo("false.");
   });
 
-  it("male(anna)?", () => {
+  it("male(anna)", () => {
     assertThat(kb)
      .proving("male(anna)?")
      .equalsTo("false.");
@@ -361,7 +360,7 @@ describe("Kinship", () => {
      `);
   });
 
-  it("exists (p) spouse(dani, p)?", () => {
+  it("exists (p) spouse(dani, p)", () => {
     // TODO(goto): calling done() here fails. figure out why.
     assertThat(kb)
      .proving("exists (p) spouse(dani, p)?")
@@ -373,7 +372,7 @@ describe("Kinship", () => {
      `);
   });
 
-  it("exists (x) spouse(mel, x)?", () => {
+  it("exists (x) spouse(mel, x)", () => {
     assertThat(kb)
      .proving("exists (x) spouse(mel, x)?")
      .equalsTo("spouse(mel, dani). exists (x = dani) spouse(mel, x).");
@@ -390,7 +389,7 @@ describe("Kinship", () => {
    `);
   });
 
-  it.skip("sibling(anna, leo)?", () => {
+  it.skip("sibling(anna, leo)", () => {
     assertThat(kb)
       .proving("sibling(anna, leo)?")
       .equalsTo(`
@@ -403,7 +402,7 @@ describe("Kinship", () => {
     `);
   });
 
-  it.skip("sibling(leo, anna)?", () => {
+  it.skip("sibling(leo, anna)", () => {
     assertThat(kb)
       .proving("sibling(leo, anna)?")
       .equalsTo(`
@@ -416,7 +415,7 @@ describe("Kinship", () => {
     `);
   });
 
-  it.skip("brother(leo, anna)?", () => {
+  it.skip("brother(leo, anna)", () => {
     assertThat(kb)
       .proving("brother(leo, anna)?")
       .equalsTo(`
@@ -448,14 +447,14 @@ describe("Kinship", () => {
     `);
   });
 
-  it.skip("uncle(ni, leo)?", () => {
+  it.skip("uncle(ni, leo)", () => {
     assertThat(kb)
       .proving("uncle(ni, leo)?")
       .equalsTo(`
       `);
   });
 
-  it.skip("grandparent(maura, anna)?", () => {
+  it.skip("grandparent(maura, anna)", () => {
     assertThat(kb)
      .proving("grandparent(maura, anna)?")
      .equalsTo("");
@@ -483,8 +482,6 @@ describe("Kinship", () => {
        return this;
       },
       equalsTo(y) {
-       // console.log(result.toString());
-       // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
        assertThat(toString(Parser.parse(result.next().value.toString())))
         .equalsTo(toString(Parser.parse(y)));
        return this;
