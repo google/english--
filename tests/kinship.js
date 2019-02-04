@@ -147,7 +147,6 @@ describe("Kinship", () => {
     // TODO(goto): this doesn't work, dunno why.
     // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
 
-
     assertThat(`
        forall (x) forall (y) parent(x, y) => child(y, x).
        forall (x) forall (y) child(x, y) => parent(y, x).
@@ -183,10 +182,9 @@ describe("Kinship", () => {
     `);
   });
 
-  it("my family", function() {
-    // logic from:
-    // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
-    let kb = `
+  // logic from:
+  // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
+  const kb = `
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).
      forall (x) forall (y) spouse(x, y) => spouse(y, x).
@@ -236,8 +234,9 @@ describe("Kinship", () => {
 
      male(ni).
      brother(ni, mel).
-    `;
+  `;
 
+  it("child(leo, mel)", () => {
     assertThat(kb)
      .proving("child(leo, mel)?")
      .equalsTo(`
@@ -245,7 +244,9 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = leo) parent(x, y) => child(y, x).
        child(leo, mel).
      `);
+  });
 
+  it("parent(mel, anna)", () => {
     assertThat(kb)
      .proving("parent(mel, anna)?")
      .equalsTo(`
@@ -253,7 +254,9 @@ describe("Kinship", () => {
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
        parent(mel, anna).
      `);
+  });
 
+  it("son(leo, mel)", () => {
     assertThat(kb)
       .proving("son(leo, mel)?")
       .equalsTo(`
@@ -263,7 +266,9 @@ describe("Kinship", () => {
         forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x).
         son(leo, mel).
      `);
+  });
 
+  it("daughter(anna, mel)", () => {
     assertThat(kb)
       .proving("daughter(anna, mel)?")
       .equalsTo(`
@@ -275,7 +280,9 @@ describe("Kinship", () => {
         forall (x = mel) forall (y = anna) female(y) && parent(x, y) => daughter(y, x).
         daughter(anna, mel).
      `);
+  });
 
+  it("exists (z) son(leo, z)?", () => {
     // TODO(goto): this isn't entirely correct, because
     // son(leo, mel) is also true as well as daughter(anna, dani)
     // but also, the filling of parent(x = leo, leo) is off too
@@ -291,7 +298,9 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x).
        exists (z = mel) son(leo, z).
      `);
+  });
 
+  it("exists (z) daughter(anna, z)?", () => {
     assertThat(kb)
      .proving("exists (z) daughter(anna, z)?")
      .equalsTo(`
@@ -302,15 +311,21 @@ describe("Kinship", () => {
        forall (x = dani) forall (y = anna) female(y) && parent(x, y) => daughter(y, x).
        exists (z = dani) daughter(anna, z).
      `);
+  });
 
+  it("female(leo)?", () => {
     assertThat(kb)
      .proving("female(leo)?")
      .equalsTo("false.");
+  });
 
+  it("male(anna)?", () => {
     assertThat(kb)
      .proving("male(anna)?")
      .equalsTo("false.");
+  });
 
+  it("spouse(dani, mel)", () => {
     assertThat(kb)
      .proving("spouse(dani, mel).")
      .equalsTo(`
@@ -318,7 +333,9 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x).
        spouse(dani, mel).
      `);
+  });
 
+  it("father(mel, leo)", () => {
     assertThat(kb)
      .proving("father(mel, leo).")
      .equalsTo(`
@@ -328,7 +345,9 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = leo) male(x) && parent(x, y) => father(x, y).
        father(mel, leo).
      `);
+  });
 
+  it("father(mel, anna)", () => {
     assertThat(kb)
      .proving("father(mel, anna).")
      .equalsTo(`
@@ -340,7 +359,9 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = anna) male(x) && parent(x, y) => father(x, y).
        father(mel, anna).
      `);
+  });
 
+  it("exists (p) spouse(dani, p)?", () => {
     // TODO(goto): calling done() here fails. figure out why.
     assertThat(kb)
      .proving("exists (p) spouse(dani, p)?")
@@ -350,15 +371,15 @@ describe("Kinship", () => {
        forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x).
        exists (p = mel) spouse(dani, p).
      `);
+  });
 
+  it("exists (x) spouse(mel, x)?", () => {
     assertThat(kb)
      .proving("exists (x) spouse(mel, x)?")
      .equalsTo("spouse(mel, dani). exists (x = dani) spouse(mel, x).");
+  });
 
-    // TODO(goto): investigate why the tests below this line are failing.
-
-    return;
-
+  it.skip("mother(dani, anna)", () => {
     assertThat(kb)
      .proving("mother(dani, anna).")
      .equalsTo(`
@@ -367,7 +388,9 @@ describe("Kinship", () => {
        female(dani) && parent(dani, anna) => female(dani) && parent(dani, anna).
        forall (x = dani) forall (y = anna) female(x) && parent(x, y) => mother(x, y) => mother(dani, anna).
    `);
+  });
 
+  it.skip("sibling(anna, leo)?", () => {
     assertThat(kb)
       .proving("sibling(anna, leo)?")
       .equalsTo(`
@@ -378,7 +401,9 @@ describe("Kinship", () => {
         exists (p = dani) parent(p, anna) && parent(p, leo).
         forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(anna, leo).
     `);
+  });
 
+  it.skip("sibling(leo, anna)?", () => {
     assertThat(kb)
       .proving("sibling(leo, anna)?")
       .equalsTo(`
@@ -389,7 +414,9 @@ describe("Kinship", () => {
         exists (p = mel) parent(p, leo) && parent(p, anna).
         forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y) => sibling(leo, anna).
     `);
+  });
 
+  it.skip("brother(leo, anna)?", () => {
     assertThat(kb)
       .proving("brother(leo, anna)?")
       .equalsTo(`
@@ -403,7 +430,9 @@ describe("Kinship", () => {
         male(leo) && sibling(leo, anna) => male(leo) && sibling(leo, anna).
         forall (x = leo) forall (y = anna) male(x) && sibling(x, y) => brother(x, y) => brother(leo, anna).
     `);
+  });
 
+  it.skip("sister(anna, leo)", () => {
     assertThat(kb)
       .proving("sister(anna, leo)?")
       .equalsTo(`
@@ -417,53 +446,32 @@ describe("Kinship", () => {
         female(anna) && sibling(anna, leo) => female(anna) && sibling(anna, leo).
         forall (x = anna) forall (y = leo) female(x) && sibling(x, y) => sister(x, y) => sister(anna, leo).
     `);
+  });
 
-    // assertThat(kb)
-    //  .proving("uncle(ni, leo)?")
-    //  .equalsTo(`
-    //`);
+  it.skip("uncle(ni, leo)?", () => {
+    assertThat(kb)
+      .proving("uncle(ni, leo)?")
+      .equalsTo(`
+      `);
+  });
 
-    // TODO(goto): these are causing an infinite loop somewhere in our
-    // moden ponus generator.
+  it.skip("grandparent(maura, anna)?", () => {
+    assertThat(kb)
+     .proving("grandparent(maura, anna)?")
+     .equalsTo("");
+  });
 
-    //assertThat(kb)
-    // .proving("grandparent(maura, anna)?")
-    // .equalsTo(`
-    //   parent(maura, mel).
-    //   exists (p = mel) parent(maura, p).
-    //   child(anna, mel).
-    //   forall (x = anna) forall (y = mel) child(x, y) => parent(y, x)  => parent(mel, anna).
-    //   exists (p = mel) parent(maura, p) && parent(p, anna).
-    //   forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
-    // `);
+  it.skip("grandmother(maura, anna)", () => {
+    assertThat(kb)
+     .proving("grandmother(maura, anna)?")
+     .equalsTo("");
+  });
 
-    //assertThat(kb)
-    // .proving("grandmother(maura, anna)?")
-    // .equalsTo(`
-    //   female(maura).
-    //   parent(maura, mel).
-    //   exists (p = mel) parent(maura, p).
-    //   child(anna, mel).
-    //   forall (x = anna) forall (y = mel) child(x, y) => parent(y, x) => parent(mel, anna).
-    //   exists (p = mel) parent(maura, p) && parent(p, anna).
-    //   forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, anna).
-    //   female(maura) && grandparent(maura, anna) => female(maura) && grandparent(maura, anna).
-    //   forall (g = maura) forall (c = anna) female(g) && grandparent(g, c) => grandmother(g, c) => grandmother(maura, anna).
-    // `);
-
-    // assertThat(kb)
-    // .proving("grandmother(maura, leo)?")
-    //  .equalsTo(`
-    //   female(maura).
-    //   parent(maura, mel).
-    //   exists (p = mel) parent(maura, p).
-    //   parent(mel, leo).
-    //   exists (p = mel) parent(maura, p) && parent(p, leo).
-    //   forall (g = maura) forall (c = leo) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c) => grandparent(maura, leo).
-    //   female(maura) && grandparent(maura, leo) => female(maura) && grandparent(maura, leo).
-    //   forall (g = maura) forall (c = leo) female(g) && grandparent(g, c) => grandmother(g, c) => grandmother(maura, leo).
-    // `);
-   });
+  it.skip("", () => {
+    assertThat(kb)
+     .proving("grandmother(maura, leo)?")
+      .equalsTo(``);
+  });
 
   function assertThat(x) {
    return {
