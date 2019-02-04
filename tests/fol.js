@@ -42,31 +42,11 @@ describe("First order logic", function() {
      .done();
   });
 
-  it("Generalized modus ponens", function() {
-    assertThat("forall(x) men(x) => mortal(x). men(socrates).")
-     .proving("mortal(socrates)?")
-     .equalsTo(`
-        men(socrates). 
-        forall (x = socrates) men(x) => mortal(x).
-        mortal(socrates).
-     `)
-     .done();
-  });
-
   it("forall (x) P(x). P(a)?", function() {
     assertThat("forall (x) P(x).")
      .proving("P(a)?")
      .equalsTo("forall (x) P(x). P(a).")
      .done();
-  });
-
-  it("Unify() implication", function() {
-    // this can't be unified because ultimately, 
-    // exists (y) q(y) can't be unified with
-    // forall (x) q(x) between x and y.
-    assertThat(unify(rewrite(Rule.of("forall (x) p(x) => q(x).")).right,
-                     rewrite(Rule.of("exists (y) q(y)."))))
-     .equalsTo(false);
   });
 
   it("forall (x) p(x) => q(x). p(a). q(a)?", function() {
@@ -403,7 +383,61 @@ describe("First order logic", function() {
      .done();
    });
 
-  it("greedy(x) && king(x) => evil(x). greedy(john). king(john). evil(john)?", function() {
+  it("forall (x) p(x, a). p(b, a)?", () => {
+    // universal introduction
+    assertThat("forall (x) p(x, a).")
+    .proving("p(b, a)?")
+    .equalsTo("forall (x) p(x, a). p(b, a).");
+  });
+
+  it("forall (x) p(x, b). exists (x) p(a, x)?", () => {
+    assertThat("forall (x) p(x, b).")
+    .proving("exists (x) p(a, x)?")
+    .equalsTo("forall (x) p(x, b). exists (x = b) p(a, x).");
+  });
+
+  it("forall (x) p(x). exists (x) p(x)?", () => {
+    // You have to be able to find x to something
+    // concrete to say exists (x).
+    assertThat("forall (x) p(x).")
+    .proving("exists (x) p(x)?")
+    .equalsTo("false.");
+  });
+
+  it("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
+    assertThat("forall (x) p(x, a). forall (y) p(b, y) => q(y).")
+    .proving("q(a)?")
+    .equalsTo(`
+      forall (x) p(x, a).
+      p(b, a).
+      forall (y = a) p(b, y) => q(y).
+      q(a).
+    `);
+  });
+
+  it("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
+    assertThat("forall (x) p(x, a). forall (y) p(b, y) => q(y).")
+    .proving("exists (z) q(z)?")
+    .equalsTo(`
+      forall (x) p(x, a).
+      exists (y = a) p(b, y).
+      forall (y = a) p(b, y) => q(y).
+      exists (z = a) q(z).
+    `);
+  });
+
+  it("mortal(socrates)", function() {
+    assertThat("forall(x) men(x) => mortal(x). men(socrates).")
+     .proving("mortal(socrates)?")
+     .equalsTo(`
+        men(socrates). 
+        forall (x = socrates) men(x) => mortal(x).
+        mortal(socrates).
+     `)
+     .done();
+  });
+
+  it("evil(john)?", function() {
     assertThat(`
         forall(x) ((greedy(x) && king(x)) => evil(x)).
         greedy(john).
@@ -419,7 +453,7 @@ describe("First order logic", function() {
      `);
   });
 
-  it("greedy(x) && king(x) => evil(x). greedy(father(john)). king(father(john)). evil(father(john))?", function() {
+  it("evil(father(john))?", function() {
     assertThat(`
         forall(x) (greedy(x) && king(x)) => evil(x).
         greedy(father(john)).
@@ -435,7 +469,7 @@ describe("First order logic", function() {
      `);
   });
 
-  it("students and professors", function() {
+  it("~friends(john, lucy)", function() {
     const kb = `
       professor(lucy).
       forall (x) professor(x) => person(x).
@@ -497,49 +531,6 @@ describe("First order logic", function() {
     // .equalsTo("");
   });
 
-  it("forall (x) p(x, a). p(b, a)?", () => {
-    // universal introduction
-    assertThat("forall (x) p(x, a).")
-    .proving("p(b, a)?")
-    .equalsTo("forall (x) p(x, a). p(b, a).");
-  });
-
-  it("forall (x) p(x, b). exists (x) p(a, x)?", () => {
-    assertThat("forall (x) p(x, b).")
-    .proving("exists (x) p(a, x)?")
-    .equalsTo("forall (x) p(x, b). exists (x = b) p(a, x).");
-  });
-
-  it("forall (x) p(x). exists (x) p(x)?", () => {
-    // You have to be able to find x to something
-    // concrete to say exists (x).
-    assertThat("forall (x) p(x).")
-    .proving("exists (x) p(x)?")
-    .equalsTo("false.");
-  });
-
-  it("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
-    assertThat("forall (x) p(x, a). forall (y) p(b, y) => q(y).")
-    .proving("q(a)?")
-    .equalsTo(`
-      forall (x) p(x, a).
-      p(b, a).
-      forall (y = a) p(b, y) => q(y).
-      q(a).
-    `);
-  });
-
-  it("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
-    assertThat("forall (x) p(x, a). forall (y) p(b, y) => q(y).")
-    .proving("exists (z) q(z)?")
-    .equalsTo(`
-      forall (x) p(x, a).
-      exists (y = a) p(b, y).
-      forall (y = a) p(b, y) => q(y).
-      exists (z = a) q(z).
-    `);
-  });
-
   it("collapses(table)?", function() {
     assertThat("forall (x) on(x, table). forall (y) on(bertha, y) => collapses(y).")
      .proving("collapses(table)?")
@@ -562,7 +553,7 @@ describe("First order logic", function() {
      .done();
    });
 
-  it("diet", function() {
+  it("forall(x) diet(x)", function() {
     // nobody can see oneself. 
     assertThat("forall(x) ~sees(x, x). forall(x) ~sees(x, feet(x)) => diet(x).")
      .proving("forall(x) diet(x)?")

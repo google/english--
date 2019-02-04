@@ -466,7 +466,7 @@ describe("Kinship", () => {
      .equalsTo("");
   });
 
-  it.skip("", () => {
+  it.skip("grandmother(maura, leo)", () => {
     assertThat(kb)
      .proving("grandmother(maura, leo)?")
       .equalsTo(``);

@@ -447,6 +447,15 @@ describe("Unify", () => {
     .equalsTo(false);
   });
 
+  it("Unify() implication", function() {
+    // this can't be unified because ultimately, 
+    // exists (y) q(y) can't be unified with
+    // forall (x) q(x) between x and y.
+    assertThat(unify(rewrite(Rule.of("forall (x) p(x) => q(x).")).right,
+                     rewrite(Rule.of("exists (y) q(y)."))))
+     .equalsTo(false);
+  });
+
   it("Fill(P(a), P(x?))", function() {
     let rule = Rule.of("P(x?).");
     assertThat(fill(rule, unify(Rule.of("P(a)."), rule)))
