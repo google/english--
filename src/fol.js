@@ -30,10 +30,10 @@ class Reasoner extends Backward {
   return this.go(goal, stack).next().value;
  }
  * quantifiers(op) {
+  // console.log(`${op}`);
   for (let statement of this.kb.filter(x => x.op == op)) {
-   if (statement.quantifiers && statement.quantifiers.length > 0) {
-    // ignore all of the statements that are quantified.
-    // continue;
+   // console.log(statement);
+   if (statement.quantifiers != undefined && statement.quantifiers.length > 0) {
     yield statement;
    }
   }
@@ -63,10 +63,48 @@ class Reasoner extends Backward {
   }
   // console.log("bar");
 
+  // unifies.
+
+  // existential introduction
+  if (goal.quantifiers &&
+      goal.quantifiers.length == 1 &&
+      goal.quantifiers[0].op == "exists") {
+   let subgoal = clone(goal);
+   for (let statement of this.kb) {
+    // console.log(stringify(statement));
+    // console.log(stringify(subgoal));
+    // console.log(subgoal);
+    let unifies = unify(statement, subgoal);
+    // console.log(unifies);
+    if (!unifies) {
+     continue;
+    } else if (Object.entries(unifies).length == 0) {
+     yield Result.of({given: statement});
+    } else {
+     let head = goal.quantifiers && goal.quantifiers.length > 0;
+     yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
+    }
+   }
+  }
+
   // universal introduction
+  // forall (x) P(x) |= P(a).
   for (let statement of this.kb) {
-   // console.log(stringify(goal));
-   let unifies = unify(statement, goal);
+   // console.log(stringify(statement));
+   let universal = clone(statement);
+   if (!(universal.quantifiers &&
+         universal.quantifiers.length == 1 &&
+         universal.quantifiers[0].op == "forall")) {
+    // TODO(goto): deal with multiple chained quantifiers.
+    continue;
+   }
+   // removes the quantifier, while still leaving
+   // the variable free in the body.
+   universal.quantifiers.pop();
+   // console.log("hi");
+   // TODO(goto): deal with expressions in the body
+   // rather than just immediate unifications.
+   let unifies = unify(universal, goal);
    // console.log(unifies);
    // console.log(goal);
    // console
@@ -84,10 +122,6 @@ class Reasoner extends Backward {
 
   // universal modus ponens.
   for (let statement of this.quantifiers("=>")) {
-   // if (!statement.quantifiers || statement.quantifiers.length == 0) {
-   // continue;
-   // }
-
    let implication = statement.right;
    let unifies = unify(implication, goal);
    // console.log(unifies);
@@ -96,18 +130,29 @@ class Reasoner extends Backward {
    }
    // console.log(unifies);
    let left = fill(statement.left, unifies, true);
+   // console.log(JSON.stringify(left, undefined, 2));
    // console.log(JSON.stringify(statement.left, undefined, 2));
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
+   // console.log(unifies);
    let wrapping = clone(statement.quantifiers).filter(x => {
      return !unifies[x.variable.name];
-    }).map((x) => {x.op = "exists"; return x;});
+   }).map((x) => {x.op = "exists"; return x;});
    left.quantifiers = (left.quantifiers || []);
    left.quantifiers.push(...wrapping);
 
+   // TODO(goto): this is a total hack because the
+   // .equals() of expressions don't know the difference
+   // between an expression with empty quantifiers
+   // and undefined quantifiers. This is going to cause
+   // a lot of trouble, we should fix it.
+   if (left.quantifiers.length == 0) {
+    delete left.quantifiers;
+   }
+
    // console.log(statement);
 
-   // console.log(stringify(left));
+   // console.log(left);
 
    // throw new Error("hello world");
 
@@ -116,7 +161,12 @@ class Reasoner extends Backward {
    stack.pop();
 
    for (let dep of deps) {
+
+    // console.log(dep.failed());
+
     if (!dep.failed()) {
+     // console.log("hey");
+     // console.log(stringify(goal));
      yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
     }
    }
@@ -164,6 +214,9 @@ class Reasoner extends Backward {
       goal.quantifiers.length == 1 &&
       goal.quantifiers[0].op == "exists" &&
       goal.op == "&&") {
+
+   // console.log("hello");
+
    let variable = goal.quantifiers[0].variable.name;
    let left = JSON.parse(JSON.stringify(goal.left));
    left.quantifiers = goal.quantifiers;
@@ -192,6 +245,7 @@ class Reasoner extends Backward {
      stack.push(goal);
      let result = this.backward(fill(right, bindings, true), stack);
      stack.pop();
+
      if (!result.failed()) {
       yield dep.push(result).push({given: fill(goal, bindings, undefined, true)}).bind(bindings);
      }
@@ -296,6 +350,7 @@ function fill(rule, map, override, head = false) {
    }
    // console.log(mapping);
    delete result.free;
+   delete result.id;
    if (head) {
     // keep it free
     // console.log(result);
@@ -337,13 +392,56 @@ function unify(a, b) {
  return result;
 }
 
+function quantified(expression) {
+ return expression.quantifiers != undefined && expression.quantifiers.length > 0;
+}
+
 function reduce(a, b) {
+ // console.log(quantified(a));
+ // console.log(quantified(b));
+ if (quantified(a) || quantified(b)) {
+  let result = match(a, b);
+  if (result) {
+   // TODO(goto): deal with multiple chained quantifiers.
+   if (quantified(a) && quantified(b) &&
+       a.quantifiers[0].op == b.quantifiers[0].op) {
+    // when quantifiers are of the same type, they are
+    // allowed to match each other's variables.
+    return result;
+   }
+   let free = Object.entries(result).filter(([key, value]) => value.free);
+   if (free.length == 0) {
+    return result;
+   }
+  }
+  return false;
+  //} else if (quantified(a) && quantified(b) &&
+  //          a.quantifiers.length == 1 && b.quantifiers.length == 1 &&
+  //          a.quantifiers[0].op != b.quantifiers[0].op) {
+  // TODO(goto): deal with multiple chained quantifiers.
+  // if one is an existential quantifier and the other is
+  // a universal quantifier they can only be reduced
+  // if there are no more free arguments left.
+  //let result = match(a, b);
+  //let free = Object.entries(result).filter(([key, value]) => value.free);
+  //if (result && free.length == 0) {
+   // console.log("hi");
+  // return result;
+  //}
+  //return false;
+ }
+
+ return match(a, b);
+}
+
+function match (a, b) {
  if (a["@type"] == "Literal" && b["@type"] == "Literal" &&
      a.name == b.name) {
   return {};
  } else if (a["@type"] == "UnaryOperator" && b["@type"] == "UnaryOperator") {
   return unify(a.expression, b.expression);
  } else if (a.op == "forall") {
+  // console.log("hello");
   return reduce(a.expression, b);
  } else if (b.op == "forall") {
   return reduce(a, b.expression);
@@ -367,6 +465,9 @@ function reduce(a, b) {
             a.arguments.length == b.arguments.length) {
   let result = {};
   for (let i = 0; i < a.arguments.length; i++) {
+   //console.log("hi");
+   // console.log(a.arguments[i].free);
+   // console.log(!b.arguments[i].free);
    if (!a.arguments[i].free && !b.arguments[i].free) {
     let inner = unify(a.arguments[i].expression, 
                       b.arguments[i].expression);
@@ -376,6 +477,7 @@ function reduce(a, b) {
     }
     result = {...result, ...inner};
    } else if (a.arguments[i].free && !b.arguments[i].free) {
+    // console.log("hi");
     result[a.arguments[i].expression.name] = b.arguments[i].expression;
    } else if (!a.arguments[i].free && b.arguments[i].free) {
     result[b.arguments[i].expression.name] = a.arguments[i].expression;

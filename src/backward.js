@@ -83,7 +83,10 @@ class Backward {
 
  direct(goal) {
   for (let statement of this.kb) {
+   // console.log(`${stringify(goal)} == ${stringify(statement)}`);
+   // console.log(goal);
    if (equals(statement, goal)) {
+    // console.log("hello");
     return {statement: statement, match: true};
    }
   }

@@ -82,16 +82,23 @@ class Parser {
   return Parser.binary("^", a, b);
  }
 
- static argument(a, value, free) {
-    let result = {"@type": "Argument"};
-    result.expression = a;
-    if (value) {
-     result.value = value;
-    }
-    if (free) {
-     result.free = free;
-    }
-    return result;
+ static argument(a, value, free, id) {
+  // if (!free && id) {
+  //   throw new Error("bound variables can't have an id");
+  // }
+
+  let result = {"@type": "Argument"};
+  result.expression = a;
+  if (value) {
+   result.value = value;
+  }
+  if (free) {
+   result.free = free;
+  }
+  if (id) {
+   result.id = id;
+  }
+  return result;
  } 
 }
 
