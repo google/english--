@@ -189,7 +189,8 @@ class Reasoner extends Backward {
     if (!dep.failed()) {
      // console.log("hey");
      // console.log(stringify(goal));
-     yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, false)});
+     // console.log(dep.bindings);
+     yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, true)});
     }
    }
   }
@@ -342,17 +343,13 @@ function fill(rule, map, override, head = false) {
  let result = JSON.parse(JSON.stringify(rule));
 
  for (let quantifier of result.quantifiers || []) {
-  // console.log(quantifier);
-  //let ref = quantifier.variable;
-  //while (map[ref]) {
-  // if () {
-  // }
-  //}
   if (map[quantifier.variable.name]) {
-   // console.log("hi");
-   quantifier.value = map[quantifier.variable.name];
+   let key = quantifier.variable.name;
+   while (map[key] && map[key].free) {
+    key = map[key].expression.name;
+   }
+   quantifier.value = map[key];
   }
-  // console.log(result);
  }
 
  if (result["@type"] == "UnaryOperator") {

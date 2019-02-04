@@ -551,7 +551,7 @@ describe("First order logic", function() {
      .equalsTo(`
        p(a).
        exists (x = a) p(x).
-       forall (x = a) p(x) => q(x) => exists (y = x) q(y = x).
+       forall (x = a) p(x) => q(x) => exists (y = a) q(y).
      `)
      .done();
   });
@@ -779,15 +779,12 @@ describe("First order logic", function() {
    });
 
   it("p(a). forall (x) p(x) => q(x). |= q(y?).", function() {
-    // TODO(goto): sanity check if this is right. seems a bit off
-    // to me to explain this as forall (x = a) p(x).
-    // should this be exists (x = a) p(x)?
     assertThat("p(a). forall (x) p(x) => q(x).")
      .proving("exists (y) q(y)?")
      .equalsTo(`
        p(a). 
        exists (x = a) p(x). 
-       forall (x = a) p(x) => q(x) => exists (y = x) q(y = x).
+       forall (x = a) p(x) => q(x) => exists (y = a) q(y).
      `)
      .done();
    });
@@ -853,14 +850,14 @@ describe("First order logic", function() {
        exists (x = c) p(x).
        q(c).
        exists (x = c) p(x) && q(x).
-       forall (x = c) p(x) && q(x) => r(x) => exists (z = x) r(z = x).
+       forall (x = c) p(x) && q(x) => r(x) => exists (z = c) r(z).
      `)
      .equalsTo(`
        p(d).
        exists (x = d) p(x).
        q(d).
        exists (x = d) p(x) && q(x).
-       forall (x = d) p(x) && q(x) => r(x) => exists (z = x) r(z = x).
+       forall (x = d) p(x) && q(x) => r(x) => exists (z = d) r(z).
      `)
      .done();
    });
@@ -981,10 +978,14 @@ describe("First order logic", function() {
     `);
   });
 
-  it.skip("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
+  it("forall (x) p(x, a). forall (y) p(b, y) => q(y). exists (x) q(x)?", () => {
     assertThat("forall (x) p(x, a). forall (y) p(b, y) => q(y).")
     .proving("exists (z) q(z)?")
-    .equalsTo("");
+    .equalsTo(`
+      forall (x) p(x, a).
+      exists (y = a) p(b, y).
+      forall (y = a) p(b, y) => q(y) => exists (z = a) q(z).
+    `);
   });
 
   it("collapses(table)?", function() {
@@ -1090,18 +1091,18 @@ describe("First order logic", function() {
     .equalsTo(`
       child(dani, marcia).
       exists (a = dani) child(a, marcia).
-      forall (a = dani) forall (b = marcia) child(a, b) => parent(b, a) => exists (q = a) parent(marcia, q = a).
+      forall (a = dani) forall (b = marcia) child(a, b) => parent(b, a) => exists (q = dani) parent(marcia, q).
       female(dani).
       exists (q = dani) parent(marcia, q) && female(q).
-      forall (p = marcia) forall (q = dani) female(q) && parent(p, q) => daughter(q, p) => exists (z = q) daughter(z = q, marcia).
+      forall (p = marcia) forall (q = dani) female(q) && parent(p, q) => daughter(q, p) => exists (z = dani) daughter(z, marcia).
     `)
     .equalsTo(`
       child(thais, marcia).
       exists (a = thais) child(a, marcia).
-      forall (a = thais) forall (b = marcia) child(a, b) => parent(b, a) => exists (q = a) parent(marcia, q = a).
+      forall (a = thais) forall (b = marcia) child(a, b) => parent(b, a) => exists (q = thais) parent(marcia, q).
       female(thais).
       exists (q = thais) parent(marcia, q) && female(q).
-      forall (p = marcia) forall (q = thais) female(q) && parent(p, q) => daughter(q, p) => exists (z = q) daughter(z = q, marcia).
+      forall (p = marcia) forall (q = thais) female(q) && parent(p, q) => daughter(q, p) => exists (z = thais) daughter(z, marcia).
     `);
     // TODO(goto): calling done() here fails, investigate.
   });
@@ -1118,7 +1119,7 @@ describe("First order logic", function() {
       exists (y = leo) parent(mel, y).
       male(leo).
       exists (y = leo) parent(mel, y) && male(y).
-      forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => exists (z = y) son(z = y, mel).
+      forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => exists (z = leo) son(z, mel).
     `)
     .done();
   });
@@ -1270,7 +1271,7 @@ describe("First order logic", function() {
        exists (x = mel) parent(x, leo).
        male(leo).
        exists (x = mel) parent(x, leo) && male(leo).
-       forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => exists (z = x) son(leo, z = x).
+       forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x) => exists (z = mel) son(leo, z).
      `);
 
     assertThat(kb)
@@ -1280,7 +1281,7 @@ describe("First order logic", function() {
        exists (x = dani) parent(x, anna).
        female(anna).
        exists (x = dani) parent(x, anna) && female(anna).
-       forall (x = dani) forall (y = anna) female(y) && parent(x, y) => daughter(y, x) => exists (z = x) daughter(anna, z = x).
+       forall (x = dani) forall (y = anna) female(y) && parent(x, y) => daughter(y, x) => exists (z = dani) daughter(anna, z).
      `);
 
     assertThat(kb)
@@ -1325,7 +1326,7 @@ describe("First order logic", function() {
      .equalsTo(`
        spouse(mel, dani).
        exists (x = mel) spouse(x, dani).
-       forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x) => exists (p = x) spouse(dani, p = x).
+       forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x) => exists (p = mel) spouse(dani, p).
      `);
 
     assertThat(kb)
