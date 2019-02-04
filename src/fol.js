@@ -39,6 +39,7 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
+  // console.log("");
   // console.log("goal: " + stringify(goal));
 
   // console.log(`${Rule.from(goal)}?`);
@@ -122,24 +123,45 @@ class Reasoner extends Backward {
 
   // universal modus ponens.
   for (let statement of this.quantifiers("=>")) {
-   let implication = statement.right;
+   // let implication = statement.right;
+
+   let reversed = clone(statement);
+   reversed.quantifiers = reversed.quantifiers
+    .map((x) => {x.op = "exists"; return x;});
+   
+   // console.log(stringify(reversed));
+   reversed.right.quantifiers = reversed.quantifiers;
+
+   let implication = reversed.right;
    let unifies = unify(implication, goal);
+
+   // let unifies = unify(implication, goal);
+   // console.log(stringify(implication));
+   // console.log(stringify(goal));
    // console.log(unifies);
    if (!unifies || Object.entries(unifies).length == 0) {
     continue;
    }
    // console.log(unifies);
-   let left = fill(statement.left, unifies, true);
+   // let left = fill(statement.left, unifies, true);
+   // TODO(goto): we probably need to push to the
+   // quantifiers rather than replace it.
+   reversed.left.quantifiers = reversed.quantifiers;
+   let left = fill(reversed.left, unifies, true);
+   // console.log(stringify(left));
    // console.log(JSON.stringify(left, undefined, 2));
    // console.log(JSON.stringify(statement.left, undefined, 2));
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
    // console.log(unifies);
-   let wrapping = clone(statement.quantifiers).filter(x => {
+   //let wrapping = clone(statement.quantifiers).filter(x => {
+   //  return !unifies[x.variable.name];
+   //}).map((x) => {x.op = "exists"; return x;});
+   //left.quantifiers = (left.quantifiers || []);
+   //left.quantifiers.push(...wrapping);
+   left.quantifiers = left.quantifiers.filter(x => {
      return !unifies[x.variable.name];
-   }).map((x) => {x.op = "exists"; return x;});
-   left.quantifiers = (left.quantifiers || []);
-   left.quantifiers.push(...wrapping);
+   });
 
    // TODO(goto): this is a total hack because the
    // .equals() of expressions don't know the difference
@@ -409,6 +431,7 @@ function reduce(a, b) {
     // allowed to match each other's variables.
     return result;
    }
+   // console.log(a);
    let free = Object.entries(result).filter(([key, value]) => value.free);
    if (free.length == 0) {
     return result;

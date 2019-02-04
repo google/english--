@@ -305,9 +305,9 @@ function stringify(rule) {
   } else if (rule.expression["@type"] == "Function") {
    return rule.expression.name + "(" + rule.expression.arguments.map(stringify).join(", ") + ")";
   }
-  //else if (rule.expression["@type"] == "Argument") {
-  // return stringify(rule.expression);
-  //}
+  // else if (rule.expression["@type"] == "Argument") {
+  //  return stringify(rule.expression);
+  // }
   //return `${rule.op} (${rule.variable}) ${stringify(rule.expression)}`;
  } else if (rule.op == "~") {
   return quantify(rule, `~${stringify(rule.expression)}`);
