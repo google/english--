@@ -136,52 +136,6 @@ describe("Kinship", () => {
     .done();
   });
 
-  it.skip("uncle(ni, leo)", () => {
-    // TODO(goto): calling done() at the end here causes an infinite loop.
-    // Figure out what's going on there.
-    // there is a bug where, if you wrap things in ()s this leads to a 
-    // different expression.
-    // forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
-    // forall (u) forall (c) ((exists(p) (parent(p, c) && sibling(u, p) && male(u))) => uncle(u, c)).
-
-    // TODO(goto): this doesn't work, dunno why.
-    // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
-
-    assertThat(`
-       forall (x) forall (y) parent(x, y) => child(y, x).
-       forall (x) forall (y) child(x, y) => parent(y, x).
-
-       forall (x) forall (y) (exists(p) (parent(p, x) && parent(p, y))) => sibling(x, y).
-
-       forall (x) forall (y) sibling(x, y) => sibling(y, x).
-
-       forall (x) forall (y) (sibling(x, y) && male(x)) => brother(x, y).
-       forall (x) forall (y) (sibling(x, y) && female(x)) => sister(x, y).
-
-       forall (x) forall (y) brother(x, y) => sibling(x, y).
-       forall (x) forall (y) brother(x, y) => male(x).
-
-       forall (x) forall (y) sister(x, y) => sibling(x, y).
-       forall (x) forall (y) sister(x, y) => female(x).
-
-       forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
-
-       parent(mel, leo).
-
-       brother(ni, mel).
-    `)
-     // .proving("uncle(ni, leo)?")
-    .proving("exists (x) sibling(ni, x)?")
-    .equalsTo(`
-      brother(ni, mel).
-      exists (y = mel) brother(ni, y).
-      forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y) => exists (p = y) male(ni) && sibling(ni, p = y).
-      parent(mel, leo).
-      exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
-      forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && sibling(u, p) && male(u) => uncle(u, c) => uncle(ni, leo).
-    `);
-  });
-
   // logic from:
   // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
   const kb = `
@@ -204,10 +158,10 @@ describe("Kinship", () => {
      forall (x) forall (y) (brother(x, y) => (sibling(x, y) && male(x))).
      forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
 
-     forall (u) forall (c) (exists(p) (parent(p, c) && sibling(u, p) && male(u))) => uncle(u, c).
+     forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
 
      forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
-     forall (g) forall (c) (exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c).
+     forall (g) forall (c) exists (p) (parent(g, p) && parent(p, c)) => grandparent(g, c).
 
      forall (g) forall (c) ((grandparent(g, c) && male(g)) => grandfather(g, c)).
      forall (g) forall (c) ((grandparent(g, c) && female(g)) => grandmother(g, c)).
@@ -459,11 +413,34 @@ describe("Kinship", () => {
     `);
   });
 
-  it.skip("uncle(ni, leo)", () => {
+  it("uncle(ni, leo)", () => {
     assertThat(kb)
       .proving("uncle(ni, leo)?")
       .equalsTo(`
+        brother(ni, mel).
+        exists (y = mel) brother(ni, y).
+        forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y).
+        exists (p = mel) male(ni) && sibling(ni, p).
+        parent(mel, leo).
+        exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
+        forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
+        uncle(ni, leo).
       `);
+  });
+
+  it.skip("exists (x) uncle(x, leo)", () => {
+    // TODO(goto): this doesn't work, dunno why.
+    // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
+    assertThat(kb)
+     .proving("exists (x) uncle(x, leo)?")
+     .equalsTo(`
+    `);
+  });
+
+  it.skip("exists (x) sibling(ni, x)", () => {
+    assertThat(kb)
+    .proving("exists (x) sibling(ni, x)?")
+    .equalsTo("");
   });
 
   it.skip("grandparent(maura, anna)", () => {
