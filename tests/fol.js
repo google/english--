@@ -427,6 +427,37 @@ describe("First order logic", function() {
     `);
   });
 
+  it("q(a, b)", () => {
+    assertThat(`
+      forall (x) forall (y) exists(z) (p(z, x) && p(z, y)) => q(x, y).
+      p(c, a).
+      p(c, b).
+    `)
+    .proving("q(a, b).")
+    .equalsTo(`
+      p(c, a).
+      exists (z = c) p(z, a).
+      p(c, b).
+      exists (z = c) p(z, a) && p(z, b).
+      forall (x = a) forall (y = b) exists (z = c) p(z, x) && p(z, y) => q(x, y).
+      q(a, b).
+    `);
+
+  });
+
+  it.skip("q(a, b)", () => {
+    // This fails because the () parenthesis creates a new
+    // scope and that messes with the generalized modus ponens
+    // reasoner.
+    assertThat(`
+      forall (x) forall (y) (exists(z) (p(z, x) && p(z, y))) => q(x, y).
+      p(c, a).
+      p(c, b).
+    `)
+    .proving("q(a, b).")
+    .equalsTo("false.");
+  });
+
   it("mortal(socrates)", function() {
     assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")

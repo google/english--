@@ -35,7 +35,6 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-  // console.log("");
   // console.log("goal: " + stringify(goal));
 
   for (let subgoal of stack) {
@@ -99,10 +98,10 @@ class Reasoner extends Backward {
    let reversed = clone(statement);
    reversed.quantifiers = reversed.quantifiers
     .map((x) => {x.op = "exists"; return x;});
-   
-   reversed.right.quantifiers = reversed.quantifiers;
 
-   let implication = reversed.right;
+   let implication = clone(reversed.right);
+   implication.quantifiers = reversed.quantifiers;
+
    let unifies = unify(implication, goal);
 
    if (!unifies || Object.entries(unifies).length == 0) {
@@ -111,8 +110,15 @@ class Reasoner extends Backward {
 
    // TODO(goto): we probably need to push to the
    // quantifiers rather than replace it.
-   reversed.left.quantifiers = reversed.quantifiers;
-   let left = fill(reversed.left, unifies, true);
+   let head = clone(reversed.left);
+   head.quantifiers = reversed.quantifiers;
+   let left = fill(head, unifies, true);
+
+   // console.log(stringify(reversed));
+   // console.log(stringify(head));
+   // console.log(stringify(left));
+ 
+   // console.log(stringify(left));
 
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
