@@ -283,6 +283,10 @@ function quantify(rule, expression) {
  return `${prefix}${expression}`;
 }
 
+function clone(obj) {
+ return JSON.parse(JSON.stringify(obj));
+}
+
 function stringify(rule) {
  // console.log(rule);
  if (rule["@type"] == "Literal") {
@@ -374,5 +378,6 @@ module.exports = {
  stringify: stringify,
  equals: equals,
  explain: explain,
- toString: toString
+ toString: toString,
+ clone: clone
 };
