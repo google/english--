@@ -60,16 +60,7 @@ describe("Kinship", () => {
   // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
 
   it.skip("grandparent(maura, anna)", function() {
-    assertThat(`
-      forall (x) forall (y) parent(x, y) => child(y, x).
-      forall (x) forall (y) child(x, y) => parent(y, x).
-
-      forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
-      forall (g) forall (c) (exists (p) (parent(g, p) && parent(p, c))) => grandparent(g, c).
-
-      parent(maura, mel).
-      child(anna, mel).
-    `)
+    assertThat(kb)
      .proving("grandparent(maura, anna)?")
      .equalsTo(`
        parent(maura, mel).
@@ -443,22 +434,36 @@ describe("Kinship", () => {
     .equalsTo("");
   });
 
-  it.skip("grandparent(maura, anna)", () => {
+  it("grandparent(maura, anna)", () => {
     assertThat(kb)
      .proving("grandparent(maura, anna)?")
-     .equalsTo("");
+     .equalsTo(`
+       parent(maura, mel).
+       exists (p = mel) parent(maura, p).
+       child(anna, mel).
+       forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
+       parent(mel, anna).
+       exists (p = mel) parent(maura, p) && parent(p, anna).
+       forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
+       grandparent(maura, anna).
+     `);
   });
 
-  it.skip("grandmother(maura, anna)", () => {
-    assertThat(kb)
-     .proving("grandmother(maura, anna)?")
-     .equalsTo("");
-  });
-
-  it.skip("grandmother(maura, leo)", () => {
+  it("grandmother(maura, leo)", () => {
     assertThat(kb)
      .proving("grandmother(maura, leo)?")
-      .equalsTo(``);
+     .equalsTo(`
+       female(maura).
+       parent(maura, mel).
+       exists (p = mel) parent(maura, p).
+       parent(mel, leo).
+       exists (p = mel) parent(maura, p) && parent(p, leo).
+       forall (g = maura) forall (c = leo) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
+       grandparent(maura, leo).
+       female(maura) && grandparent(maura, leo) => female(maura) && grandparent(maura, leo).
+       forall (g = maura) forall (c = leo) female(g) && grandparent(g, c) => grandmother(g, c).
+       grandmother(maura, leo).
+      `);
   });
 
   function assertThat(x) {

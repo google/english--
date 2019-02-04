@@ -458,6 +458,24 @@ describe("First order logic", function() {
     .equalsTo("false.");
   });
 
+  it("g(a, c)", () => {
+    assertThat(`
+      forall (x) forall (y) exists (z) g(x, y) => (p(x, z) && p(z, y)).
+      forall (x) forall (y) exists (z) (p(x, z) && p(z, y)) => g(x, y).
+      p(a, b).
+      p(b, c).
+    `)
+    .proving("g(a, c).")
+    .equalsTo(`
+      p(a, b).
+      exists (z = b) p(a, z).
+      p(b, c).
+      exists (z = b) p(a, z) && p(z, c).
+      forall (x = a) forall (y = c) exists (z = b) p(x, z) && p(z, y) => g(x, y).
+      g(a, c).
+    `);
+  });
+
   it("mortal(socrates)", function() {
     assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")

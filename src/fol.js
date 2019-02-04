@@ -35,12 +35,18 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-  // console.log("goal: " + stringify(goal));
+  // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
 
   for (let subgoal of stack) {
-   if (equals(goal, subgoal)) {
-    yield Result.failed();
+   // this is expensive and un-necessary, but more
+   // correct than equals().
+   // console.log(`${stringify(goal)} == ${stringify(subgoal)}`);
+   if (stringify(goal) == stringify(subgoal)) {
+    return Result.failed();
    }
+   // if (equals(goal, subgoal)) {
+   //   yield Result.failed();
+   // }
   }
 
   if (!goal.quantifiers || goal.quantifiers.length == 0) {
@@ -132,13 +138,22 @@ class Reasoner extends Backward {
    // between an expression with empty quantifiers
    // and undefined quantifiers. This is going to cause
    // a lot of trouble, we should fix it.
+   // for (let quantifier of left.quantifiers) {
+   //   delete quantifier.id;
+   // }
+
    if (left.quantifiers.length == 0) {
     delete left.quantifiers;
    }
 
+   // console.log(JSON.stringify(left, undefined, 2));
+   // throw new Error("foo");
+
    stack.push(goal);
+   // console.log("push: " + stringify(goal));
+   // console.log("stack: " + stack.map(x => stringify(x)));
    let deps = this.go(left, stack);
-   stack.pop();
+   // console.log("hello");
 
    for (let dep of deps) {
     if (!dep.failed()) {
@@ -147,6 +162,8 @@ class Reasoner extends Backward {
       .push({given: fill(goal, dep.bindings, undefined, true)});
     }
    }
+
+   stack.pop();
   }
 
   // universal conjunction elimination.
