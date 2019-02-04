@@ -190,7 +190,9 @@ class Reasoner extends Backward {
      // console.log("hey");
      // console.log(stringify(goal));
      // console.log(dep.bindings);
-     yield dep.bind(unifies).push({given: fill(statement, dep.bindings, undefined, true), goal: fill(goal, dep.bindings, undefined, true)});
+     yield dep.bind(unifies)
+      .push({given: fill(statement, dep.bindings, undefined, true)})
+      .push({given: fill(goal, dep.bindings, undefined, true)});
     }
    }
   }
