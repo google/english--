@@ -476,11 +476,17 @@ describe("First order logic", function() {
     `);
   });
 
+  it("p(a, b). exists (x) exists (y) p(x, y)?", () => {
+    assertThat("p(a, b).")
+	.proving("exists (x) exists (y) p(x, y)?")
+	.equalsTo("p(a, b). exists (x = a) exists (y = b) p(x, y).");
+  });
+
   it("mortal(socrates)", function() {
     assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")
      .equalsTo(`
-        men(socrates). 
+        men(socrates).
         forall (x = socrates) men(x) => mortal(x).
         mortal(socrates).
      `)

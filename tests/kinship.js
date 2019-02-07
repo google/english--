@@ -420,7 +420,10 @@ describe("Kinship", () => {
   });
 
   it.skip("exists (x) uncle(x, leo)", () => {
-    // TODO(goto): this doesn't work, dunno why.
+    assertThat(kb)
+	.proving("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?")
+	.equalsTo("");
+
     // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
     assertThat(kb)
      .proving("exists (x) uncle(x, leo)?")
@@ -429,9 +432,9 @@ describe("Kinship", () => {
   });
 
   it.skip("exists (x) sibling(ni, x)", () => {
-    assertThat(kb)
-    .proving("exists (x) sibling(ni, x)?")
-    .equalsTo("");
+    //assertThat(kb)
+    //.proving("exists (x) sibling(ni, x)?")
+    //.equalsTo("");
   });
 
   it("grandparent(maura, anna)", () => {

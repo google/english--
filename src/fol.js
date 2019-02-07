@@ -35,7 +35,7 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-  // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
+   // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
 
   for (let subgoal of stack) {
    // this is expensive and un-necessary, but more
@@ -56,23 +56,22 @@ class Reasoner extends Backward {
    }
   }
 
-  // existential introduction
-  if (goal.quantifiers &&
-      goal.quantifiers.length == 1 &&
-      goal.quantifiers[0].op == "exists") {
-   let subgoal = clone(goal);
-   for (let statement of this.kb) {
-    let unifies = unify(statement, subgoal);
-    if (!unifies) {
-     continue;
-    } else if (Object.entries(unifies).length == 0) {
-     yield Result.of({given: statement});
-    } else {
-     let head = goal.quantifiers && goal.quantifiers.length > 0;
-     yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
-    }
+   // existential introduction
+   if (goal.quantifiers &&
+       goal.quantifiers.find(x => x.op == "forall") == undefined) {
+     let subgoal = clone(goal);
+     for (let statement of this.kb) {
+       let unifies = unify(statement, subgoal);
+       if (!unifies) {
+	 continue;
+       } else if (Object.entries(unifies).length == 0) {
+	 yield Result.of({given: statement});
+       } else {
+	 let head = goal.quantifiers && goal.quantifiers.length > 0;
+	 yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
+       }
+     }
    }
-  }
 
   // universal introduction
   for (let statement of this.kb) {
