@@ -19,7 +19,7 @@ const {
  negation,
  argument} = Parser;
 
-describe.only("Unify", () => {
+describe("Unify", () => {
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse(`
@@ -322,7 +322,7 @@ describe.only("Unify", () => {
 
   it("Unify(P(a) && Q(b) => ~R(c), P(a) && Q(x?) => ~R(y?)", function() {
     assertThat(unify(Rule.of("P(a) && Q(b) => ~R(c)."), Rule.of("P(a) && Q(x?) => ~R(y?).")))
-     .equalsTo({"x@": literal("b"), "y": literal("c")});
+     .equalsTo({"x@": literal("b"), "y@": literal("c")});
   });
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
@@ -377,12 +377,12 @@ describe.only("Unify", () => {
      });
   });
   
-  it.only("Unify(forall (x) P(x, a), forall (y) P(b, y))", function() {
+  it("Unify(forall (x) P(x, a), forall (y) P(b, y))", function() {
     assertThat(unify(rewrite(Rule.of("forall (x) P(x, a).")), 
                      rewrite(Rule.of("forall (y) P(b, y)."))))
      .equalsTo({
        "x@1": literal("b"),
-       "y@1": literal("a")
+       "y@1": literal("a") // they share ids because rewrite was called twice
      });
   });
 
@@ -390,8 +390,8 @@ describe.only("Unify", () => {
     assertThat(unify(rewrite(Rule.of("forall (x) P(x, a).")), 
                      rewrite(Rule.of("exists (y) P(b, y)."))))
      .equalsTo({
-       x: literal("b"),
-       y: literal("a")
+       "x@1": literal("b"),
+       "y@1": literal("a")
      });
   });
 
@@ -403,12 +403,12 @@ describe.only("Unify", () => {
 
   it("Unify(P(a, b), P(x?, y?))", function() {
     assertThat(unify(rewrite(Rule.of("P(a, b).")), rewrite(Rule.of("P(x?, y?)."))))
-     .equalsTo({"x": literal("a"), "y": literal("b")});
+     .equalsTo({"x@": literal("a"), "y@": literal("b")});
   });
   
   it("Unify(P(a?), P(b?))", function() {
     assertThat(unify(Rule.of("P(a?)."), Rule.of("P(b?).")))
-     .equalsTo({"b": argument(literal("a"), undefined, true)});
+     .equalsTo({"a@": argument(literal("b"), undefined, true)});
   });
 
   it("Unify fails: Unify(P(a) && Q(b), P(x?) && Q(c))", function() {
@@ -490,7 +490,7 @@ describe.only("Unify", () => {
 
   it("Filling binds and removes ids", function() {
     let unifies = {
-     "x": literal("a")
+     "x@1": literal("a")
     };
     assertThat(fill(rewrite(Rule.of("exists (x) P(x) && R(x).")).right, unifies, true))
      .equalsTo(predicate("R", [argument(literal("a"))]));

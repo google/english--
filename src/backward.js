@@ -31,30 +31,45 @@ class Result {
  get(key) {
   let result = key;
   while (this.bindings[result] && this.bindings[result].free) {
-   result = this.bindings[result].expression.name;
+   result = `${this.bindings[result].expression.name}@${this.bindings[result].id || ""}`;
   }
   return this.bindings[result];
  }
  bind(vars) {
-   for (let [key, value] of Object.entries(vars)) {
-     if (this.bindings[key] && !equals(value, this.get(key))) {
-       console.log(this.bindings[key]);
-       console.log(value);
-       console.log(this.get(key));
-       throw new Error("Unsupported condition: conflicting bindings: " + key);
-     }
+  for (let [key, value] of Object.entries(vars)) {
+   if (this.bindings[key] &&
+       !value.free &&
+       !equals(value, this.get(key))) {
+    // console.log(this.bindings[key]);
+    // console.log(value);
+    // console.log(vars);
+    // console.log(this.get(key));
+    // console.log(this.bindings);
+    throw new Error("Conflict in bindings for " + key + ": " 
+                    + JSON.stringify(this.get(key)) + " != " 
+                    + JSON.stringify(value));
    }
-   for (let [key, value] of Object.entries(vars)) {
-     if (!value.free) {
-       // if this is a concrete value, bind it.
-       this.bindings[key] = value;
-     } else {
-       // if this is an free value, leave it open or
-       // bind it to an existing one.
-       this.bindings[key] = this.get(value.expression.name) || value;
-     }
+  }
+  for (let [key, value] of Object.entries(vars)) {
+   if (!value.free) {
+    // if this is a concrete value, bind it.
+    // console.log(this.bindings[key]);
+    // console.log(key);
+    // console.log(this.bindings);
+    this.bindings[key] = value;
+   } else {
+    // if this is an free value, leave it open or
+    // bind it to an existing one.
+    let id = `${value.expression.name}@${value.id}`;
+    // console.log(id);
+    // console.log(this.get(id));
+    // console.log(value);
+    // console.log(this.get(key));
+    this.bindings[id] = this.get(key) || value;
+    // this.bindings[key] = this.get(id) || value;
    }
-   return this;
+  }
+  return this;
  }
  push(reason) {
   if (reason instanceof Result) {

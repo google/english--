@@ -35,7 +35,7 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-   console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
+  // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
 
   for (let subgoal of stack) {
    // this is expensive and un-necessary, but more
@@ -128,8 +128,13 @@ class Reasoner extends Backward {
    // TODO(goto): understand and create a test to see what
    // happens when there are multiple quantifiers.
 
+   // console.log(left.quantifiers);
+   // console.log(unifies);
+
    left.quantifiers = left.quantifiers.filter(x => {
-     return !unifies[x.variable.name];
+     let binding = unifies[`${x.variable.name}@${x.id}`]; 
+     // console.log(binding);
+     return !binding || binding.free;
    });
 
    // TODO(goto): this is a total hack because the
@@ -156,8 +161,13 @@ class Reasoner extends Backward {
 
    for (let dep of deps) {
      if (!dep.failed()) {
-       //console.log(dep.bindings);
-       //console.log(unifies);
+      // console.log("hello");
+      // console.log(dep.bindings);
+      // console.log(unifies);
+      dep.bind(unifies);
+      // console.log("foobar");
+      // console.log(dep.bindings);
+      // console.log(unifies);
       yield dep.bind(unifies)
 	  .push({given: fill(statement, dep.bindings, undefined, true)})
 	  .push({given: fill(goal, dep.bindings, undefined, true)});
@@ -171,6 +181,8 @@ class Reasoner extends Backward {
   for (let statement of this.quantifiers("&&")) {
    let left = unify(statement.left, goal);
    if (left) {
+    // console.log("hi");
+    // console.log(statement);
     yield Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
    }
    let right = unify(statement.right, goal);
