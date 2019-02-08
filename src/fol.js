@@ -35,14 +35,20 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-  // console.log(JSON.stringify(goal));
-  // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
+  //let indent = " ".repeat(stack.length);
+  //try {
+  // stringify(goal);
+  //} catch (e) {
+  // console.log(indent + JSON.stringify(goal));
+  //}
+  //console.log(indent + "goal: " + stringify(goal));
 
   for (let subgoal of stack) {
    // this is expensive and un-necessary, but more
    // correct than equals().
    // console.log(`${stringify(goal)} == ${stringify(subgoal)}`);
    if (stringify(goal) == stringify(subgoal)) {
+    // console.log(indent + "cycle.");
     return Result.failed();
    }
    // if (equals(goal, subgoal)) {
@@ -155,7 +161,7 @@ class Reasoner extends Backward {
    // throw new Error("foo");
 
    stack.push(goal);
-   // console.log("push: " + stringify(goal));
+   // console.log(indent + "left for goal: " + stringify(goal) + " from " + stringify(statement));
    // console.log("stack: " + stack.map(x => stringify(x)));
    let deps = this.go(left, stack);
    // console.log("hello");

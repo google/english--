@@ -524,6 +524,13 @@ describe("Kinship", () => {
     .done();
   });
 
+  it.skip("exists (x) sibling(x, ni)", () => {
+    assertThat(kb)
+    .proving("exists (x) sibling(x, ni)?")
+    .equalsTo(`
+    `);
+  });
+
   it.skip("exists (x) sibling(ni, x)", () => {
     assertThat(kb)
     .proving("exists (x) sibling(ni, x)?")
