@@ -19,7 +19,7 @@ const {
  negation,
  argument} = Parser;
 
-describe("Unify", () => {
+describe.only("Unify", () => {
   it("parser", function() {
     // doesn't throw a parse exception.
     Parser.parse(`
@@ -98,7 +98,7 @@ describe("Unify", () => {
      .equalsTo(predicate("P", [argument(literal("x"), literal("a"))]));
   });
 
-  it("Rewrite: forall(x) P(x)", function() {
+  it("Rewrite: forall (x) P(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x).");
     let expects = Rule.of("P(x).");
     expects.arguments[0].free = true;
@@ -108,7 +108,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x)", function() {
+  it("Rewrite: forall (x) P(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x).");
     let expects = Rule.of("P(x).");
     expects.arguments[0].free = true;
@@ -118,7 +118,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x) && Q(x)", function() {
+  it("Rewrite: forall (x) P(x) && Q(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x) && Q(x).");
     let expects = Rule.of("P(x) && Q(x).");
     expects.left.arguments[0].free = true;
@@ -130,7 +130,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x) => Q(x)", function() {
+  it("Rewrite: forall (x) P(x) => Q(x)", function() {
     let {statements} = Parser.parse("forall (x) P(x) => Q(x).");
     let expects = Rule.of("P(x) => Q(x).");
     expects.left.arguments[0].free = true;
@@ -142,7 +142,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) ~P(x)", function() {
+  it("Rewrite: forall (x) ~P(x)", function() {
     let {statements} = Parser.parse("forall (x) ~P(x).");
     let expects = Rule.of("~P(x).");
     expects.expression.arguments[0].free = true;
@@ -152,7 +152,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) P(x, y)", function() {
+  it("Rewrite: forall (x) P(x, y)", function() {
     let {statements} = Parser.parse("forall (x) P(x, y).");
     let expects = Rule.of("P(x, y).");
     expects.arguments[0].free = true;
@@ -162,7 +162,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) forall (y) P(x, y)", function() {
+  it("Rewrite: forall (x) forall (y) P(x, y)", function() {
     let {statements} = Parser.parse("forall (x) forall (y) P(x, y).");
     let expects = Rule.of("P(x, y).");
     expects.arguments[0].free = true;
@@ -175,7 +175,7 @@ describe("Unify", () => {
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
-  it("Rewrite: forall(x) forall (y) ~P(x, y, c)", function() {
+  it("Rewrite: forall (x) forall (y) ~P(x, y, c)", function() {
     let {statements} = Parser.parse("forall (x) forall (y) ~P(x, y, c).");
     let expects = Rule.of("~P(x, y, c).");
     expects.expression.arguments[0].free = true;
@@ -223,31 +223,31 @@ describe("Unify", () => {
   it("Unify(P(a), P(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(a).")), 
                      rewrite(Rule.of("P(x?)."))))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   it("Unify(P(a, b), P(a, x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(a, b).")), 
                      rewrite(Rule.of("P(a, x?)."))))
-     .equalsTo({"x": literal("b")});
+     .equalsTo({"x@": literal("b")});
   });
 
   it("Unify(P(y?, b), P(a, x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(y?, b).")), 
                      rewrite(Rule.of("P(a, x?)."))))
-     .equalsTo({"x": literal("b"), "y": literal("a")});
+     .equalsTo({"x@": literal("b"), "y@": literal("a")});
   });
 
   it("Unify(P(p?, q?), P(x, y))", function() {
     assertThat(unify(rewrite(Rule.of("a(p?, q?).")), 
                      rewrite(Rule.of("a(x, y)."))))
-     .equalsTo({"p": literal("x"), "q": literal("y")});
+     .equalsTo({"p@": literal("x"), "q@": literal("y")});
   });
 
   it("Unify(P(Q(a)), P(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(Q(a)).")), 
                      rewrite(Rule.of("P(x?)."))))
-     .equalsTo({"x": {
+     .equalsTo({"x@": {
         "@type": "Function",
         "name": "Q",
         "arguments": [{
@@ -264,70 +264,70 @@ describe("Unify", () => {
   it("Unify(P(Q(a)), P(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(Q(a)).")), 
                      rewrite(Rule.of("P(x?)."))))
-     .equalsTo({"x": func("Q", [argument(literal("a"))])});
+     .equalsTo({"x@": func("Q", [argument(literal("a"))])});
   });
 
   // disjunctions
   it("Unify(P(Q(a)), P(Q(x?)))", function() {
     assertThat(unify(rewrite(Rule.of("P(Q(a)).")), 
                      rewrite(Rule.of("P(Q(x?))."))))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   it("Unify(P(a) && Q(b), P(x?) && Q(b))", function() {
     assertThat(unify(rewrite(Rule.of("P(a) && Q(b).")), 
                      rewrite(Rule.of("P(x?) && Q(b)."))))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   it("Unify(P(a) && Q(b), P(a) && Q(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(a) && Q(b).")), 
                      rewrite(Rule.of("P(a) && Q(x?)."))))
-     .equalsTo({"x": literal("b")});
+     .equalsTo({"x@": literal("b")});
   });
 
   // conjunctions
   it("Unify(P(a) || Q(b), P(x?) || Q(b))", function() {
     assertThat(unify(Rule.of("P(a) || Q(b)."), Rule.of("P(x?) || Q(b).")))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   it("Unify(P(a) || Q(b), P(a) || Q(x?))", function() {
     assertThat(unify(Rule.of("P(a) || Q(b)."), Rule.of("P(a) || Q(x?).")))
-     .equalsTo({"x": literal("b")});
+     .equalsTo({"x@": literal("b")});
   });
 
   // implication
   it("Unify(P(a) => Q(b), P(x?) => Q(b))", function() {
     assertThat(unify(Rule.of("P(a) => Q(b)."), Rule.of("P(x?) => Q(b).")))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   it("Unify(P(a) => Q(b), P(a) => Q(x?))", function() {
     assertThat(unify(Rule.of("P(a) => Q(b)."), Rule.of("P(a) => Q(x?).")))
-     .equalsTo({"x": literal("b")});
+     .equalsTo({"x@": literal("b")});
   });
 
   // unary
   it("Unify(~P(a), ~P(x?))", function() {
     assertThat(unify(Rule.of("~P(a)."), Rule.of("~P(x?).")))
-     .equalsTo({"x": literal("a")});
+     .equalsTo({"x@": literal("a")});
   });
 
   // composition
   it("Unify(P(a) && Q(~R(b)), P(a) && Q(R(x?))", function() {
     assertThat(unify(Rule.of("P(a) && Q(R(b))."), Rule.of("P(a) && Q(R(x?)).")))
-     .equalsTo({"x": literal("b")});
+     .equalsTo({"x@": literal("b")});
   });
 
   it("Unify(P(a) && Q(b) => ~R(c), P(a) && Q(x?) => ~R(y?)", function() {
     assertThat(unify(Rule.of("P(a) && Q(b) => ~R(c)."), Rule.of("P(a) && Q(x?) => ~R(y?).")))
-     .equalsTo({"x": literal("b"), "y": literal("c")});
+     .equalsTo({"x@": literal("b"), "y": literal("c")});
   });
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
     assertThat(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")))
-     .equalsTo({"y": literal("a"), "x": {
+     .equalsTo({"y@": literal("a"), "x@": {
         "@type": "Function",
         "name": "Q",
         "arguments": [{
@@ -347,15 +347,15 @@ describe("Unify", () => {
   it("Unify(P(a) => Q(b), forall (x) P(x) => Q(b))", function() {
     assertThat(unify(rewrite(Rule.of("P(a) => Q(b).")), rewrite(Rule.of("forall (x) P(x?) => Q(b)."))))
      .equalsTo({
-       "x": literal("a")
+       "x@1": literal("a")
      });
   });
 
-  it("Unify(forall (y) P(y?) => Q(b), forall (x) P(x?) => Q(b))", function() {
+  it("Unify(forall (y) P(y) => Q(b), forall (x) P(x?) => Q(b))", function() {
     assertThat(unify(rewrite(Rule.of("forall (y) P(y) => Q(b).")), 
                      rewrite(Rule.of("forall (x) P(x) => Q(b)."))))
      .equalsTo({
-       "x": argument(literal("y"), undefined, true, 1)
+       "y@1": argument(literal("x"), undefined, true, 1)
      });
   });
 
@@ -363,8 +363,8 @@ describe("Unify", () => {
     assertThat(unify(rewrite(Rule.of("P(a, b).")), 
                      rewrite(Rule.of("forall (x) forall (y) P(x, y)."))))
      .equalsTo({
-       "x": literal("a"),
-       "y": literal("b")
+       "x@1": literal("a"),
+       "y@2": literal("b")
      });
   });
   
@@ -372,17 +372,17 @@ describe("Unify", () => {
     assertThat(unify(rewrite(Rule.of("forall (p) forall (q) P(p, q).")), 
                      rewrite(Rule.of("forall (x) forall (y) P(x, y)."))))
      .equalsTo({
-       "x": argument(literal("p"), undefined, true, 1),
-       "y": argument(literal("q"), undefined, true, 2)
+       "p@1": argument(literal("x"), undefined, true, 1),
+       "q@2": argument(literal("y"), undefined, true, 2)
      });
   });
   
-  it("Unify(forall (x) P(x, a), forall (y) P(b, y))", function() {
+  it.only("Unify(forall (x) P(x, a), forall (y) P(b, y))", function() {
     assertThat(unify(rewrite(Rule.of("forall (x) P(x, a).")), 
                      rewrite(Rule.of("forall (y) P(b, y)."))))
      .equalsTo({
-       "x": literal("b"),
-       "y": literal("a")
+       "x@1": literal("b"),
+       "y@1": literal("a")
      });
   });
 
@@ -431,14 +431,22 @@ describe("Unify", () => {
   it("Unify(forall(x) P(x), P(a))", () => {
     assertThat(unify(rewrite(Rule.of("forall (x) P(x).")), rewrite(Rule.of("P(a)."))))
     .equalsTo({
-      "x": literal("a")
+      "x@1": literal("a")
     });
   });
 
   it("Unify(exists (x) P(x), P(a))", () => {
     assertThat(unify(rewrite(Rule.of("exists (x) P(x).")), rewrite(Rule.of("P(a)."))))
     .equalsTo({
-      "x": literal("a")
+      "x@1": literal("a")
+    });
+  });
+
+  it("Unify(P(a), exists (x) P(x))", () => {
+    assertThat(unify(rewrite(Rule.of("P(a).")),
+		     rewrite(Rule.of("exists (x) P(x)."))))
+    .equalsTo({
+      "x@1": literal("a")
     });
   });
 

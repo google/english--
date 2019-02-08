@@ -35,7 +35,7 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-   // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
+   console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
 
   for (let subgoal of stack) {
    // this is expensive and un-necessary, but more
@@ -155,10 +155,12 @@ class Reasoner extends Backward {
    // console.log("hello");
 
    for (let dep of deps) {
-    if (!dep.failed()) {
-     yield dep.bind(unifies)
-      .push({given: fill(statement, dep.bindings, undefined, true)})
-      .push({given: fill(goal, dep.bindings, undefined, true)});
+     if (!dep.failed()) {
+       //console.log(dep.bindings);
+       //console.log(unifies);
+      yield dep.bind(unifies)
+	  .push({given: fill(statement, dep.bindings, undefined, true)})
+	  .push({given: fill(goal, dep.bindings, undefined, true)});
     }
    }
 
@@ -229,16 +231,23 @@ class Reasoner extends Backward {
 	let right = clone(goal.right);
 	right.quantifiers = goal.quantifiers;
 	stack.push(goal);
-	// console.log(`binary: ${stringify(goal)}`);
-	// console.log(`left: ${stringify(left)}`);
-	// console.log(`right: ${stringify(right)}`);
-	// console.log(dep.bindings);
-	// console.log(JSON.stringify(fill(right, dep.bindings, true), undefined, 2));
-	// console.log(`filled: ${stringify(fill(right, dep.bindings, true))}`);
 	let result = this.backward(fill(right, dep.bindings, true), stack);
 	stack.pop();
 
 	if (!result.failed()) {
+	  // console.log(`binary: ${stringify(goal)}`);
+	  // console.log(`left: ${stringify(left)}`);
+	  // console.log(`right: ${stringify(right)}`);
+	  // console.log(dep.bindings);
+	  // console.log(JSON.stringify(fill(right, dep.bindings, true), undefined, 2));
+	  // console.log(`right filled: ${stringify(fill(right, dep.bindings, true))}`);
+	  // console.log(`done`);
+	  // console.log(dep.bindings);
+	  // console.log(result.bindings);
+	  // console.log(Object.assign());
+
+	  dep.bind(result.bindings);
+
 	  yield dep.push(result).push({
 	    given: fill(goal, dep.bindings, undefined, true)
 	  }).bind(dep.bindings);

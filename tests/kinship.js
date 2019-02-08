@@ -458,10 +458,20 @@ describe("Kinship", () => {
       `);
   });
 
-  it.skip("exists (x) uncle(x, leo)", () => {
+  it("exists (x) uncle(x, leo)", () => {
     assertThat(kb)
 	.proving("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?")
-	.equalsTo("");
+	.equalsTo(`
+          parent(mel, leo).
+          exists (u) exists (p = mel) parent(p, leo).
+          brother(ni, mel).
+          exists (x = ni) brother(x, mel).
+          forall (x = ni) forall (y = mel) brother(x, y) => sibling(x, y) && male(x).
+          exists (u = ni) exists (p = mel) sibling(u, mel) && male(u).
+          exists (u = ni) exists (p = mel) parent(p, leo) && sibling(u, p) && male(u).
+        `);
+
+    return;
 
     // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
     assertThat(kb)

@@ -163,7 +163,7 @@ function match (a, b) {
   let right = unify(a.right, b.right);
   if (left && right) {
    for (let variable of Object.keys(left)) {
-    if (right[variable] && !equals(right[variable], left[variable])) {            
+    if (right[variable] && !equals(right[variable], left[variable])) {
      // There is a unification that happened on the left side of the
      // equation that is inconsistent with the unification of the right
      // side.
@@ -177,21 +177,26 @@ function match (a, b) {
             a.name == b.name &&
             a.arguments.length == b.arguments.length) {
   let result = {};
-  for (let i = 0; i < a.arguments.length; i++) {
-   if (!a.arguments[i].free && !b.arguments[i].free) {
-    let inner = unify(a.arguments[i].expression, 
-                      b.arguments[i].expression);
+   for (let i = 0; i < a.arguments.length; i++) {
+     let left = a.arguments[i];
+     let right = b.arguments[i];
+   if (!left.free && !right.free) {
+    let inner = unify(left.expression,
+                      right.expression);
     // Can't unify inner.
     if (!inner) {
      return false;
     }
     result = {...result, ...inner};
-   } else if (a.arguments[i].free && !b.arguments[i].free) {
-    result[a.arguments[i].expression.name] = b.arguments[i].expression;
-   } else if (!a.arguments[i].free && b.arguments[i].free) {
-    result[b.arguments[i].expression.name] = a.arguments[i].expression;
-   } else if (a.arguments[i].free && b.arguments[i].free) {
-    result[b.arguments[i].expression.name] = a.arguments[i];
+   } else if (left.free && !right.free) {
+     let key = `${left.expression.name}@${left.id || ""}`;
+     result[key] = right.expression;
+   } else if (!left.free && right.free) {
+     let key = `${right.expression.name}@${right.id || ""}`;
+     result[key] = left.expression;
+   } else if (left.free && right.free) {
+     let key = `${left.expression.name}@${left.id || ""}`;
+     result[key] = right;
    }
   }
   return result;

@@ -38,9 +38,9 @@ class Result {
  bind(vars) {
    for (let [key, value] of Object.entries(vars)) {
      if (this.bindings[key] && !equals(value, this.get(key))) {
-       // console.log(this.bindings[key]);
-       // console.log(value);
-       // console.log(this.get(key));
+       console.log(this.bindings[key]);
+       console.log(value);
+       console.log(this.get(key));
        throw new Error("Unsupported condition: conflicting bindings: " + key);
      }
    }
