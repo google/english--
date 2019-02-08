@@ -106,8 +106,8 @@ describe("Kinship", () => {
       exists (q = thais) parent(marcia, q) && female(q).
       forall (p = marcia) forall (q = thais) (parent(p, q) && female(q)) => daughter(q, p).
       exists (z = thais) daughter(z, marcia).
-    `);
-    // TODO(goto): calling done() here fails, investigate.
+    `)
+    .done();
   });
 
   it("exists (z) son(z, mel)", () => {
@@ -189,7 +189,8 @@ describe("Kinship", () => {
        parent(mel, leo).
        forall (x = mel) forall (y = leo) parent(x, y) => child(y, x).
        child(leo, mel).
-     `);
+     `)
+     .done();
   });
 
   it("parent(mel, anna)", () => {
@@ -199,19 +200,21 @@ describe("Kinship", () => {
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
        parent(mel, anna).
-     `);
+     `)
+    .done();
   });
 
   it("son(leo, mel)", () => {
     assertThat(kb)
-      .proving("son(leo, mel)?")
-      .equalsTo(`
+    .proving("son(leo, mel)?")
+    .equalsTo(`
         male(leo).
         parent(mel, leo).
         male(leo) && parent(mel, leo) => male(leo) && parent(mel, leo).
         forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x).
         son(leo, mel).
-     `);
+    `)
+    .done();
   });
 
   it("daughter(anna, mel)", () => {
@@ -225,15 +228,11 @@ describe("Kinship", () => {
         female(anna) && parent(mel, anna) => female(anna) && parent(mel, anna).
         forall (x = mel) forall (y = anna) female(y) && parent(x, y) => daughter(y, x).
         daughter(anna, mel).
-     `);
+     `)
+      .done();
   });
 
   it("exists (z) son(leo, z)", () => {
-    // TODO(goto): this isn't entirely correct, because
-    // son(leo, mel) is also true as well as daughter(anna, dani)
-    // but also, the filling of parent(x = leo, leo) is off too
-    // and most probably related to the fact that we are using
-    // names to fill rather than ids.
     assertThat(kb)
      .proving("exists (z) son(leo, z)?")
      .equalsTo(`
@@ -243,7 +242,18 @@ describe("Kinship", () => {
        exists (x = mel) parent(x, leo) && male(leo).
        forall (x = mel) forall (y = leo) (parent(x, y) && male(y)) => son(y, x).
        exists (z = mel) son(leo, z).
-     `);
+     `)
+     .equalsTo(`
+       child(leo, dani).
+       exists (y = dani) child(leo, y).
+       forall (x = leo) forall (y = dani) child(x, y) => parent(y, x).
+       exists (x = dani) parent(x, leo).
+       male(leo).
+       exists (x = dani) parent(x, leo) && male(leo).
+       forall (x = dani) forall (y = leo) parent(x, y) && male(y) => son(y, x).
+       exists (z = dani) son(leo, z).
+     `)
+     .done();
   });
 
   it("exists (z) daughter(anna, z)", () => {
@@ -256,19 +266,32 @@ describe("Kinship", () => {
        exists (x = dani) parent(x, anna) && female(anna).
        forall (x = dani) forall (y = anna) (parent(x, y) && female(y)) => daughter(y, x).
        exists (z = dani) daughter(anna, z).
-     `);
+     `)
+     .equalsTo(`
+       child(anna, mel).
+       exists (y = mel) child(anna, y).
+       forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
+       exists (x = mel) parent(x, anna).
+       female(anna).
+       exists (x = mel) parent(x, anna) && female(anna).
+       forall (x = mel) forall (y = anna) parent(x, y) && female(y) => daughter(y, x).
+       exists (z = mel) daughter(anna, z).
+     `)
+     .done();
   });
 
   it("female(leo)", () => {
     assertThat(kb)
-     .proving("female(leo)?")
-     .equalsTo("false.");
+    .proving("female(leo)?")
+    .equalsTo("false.")
+    .done();
   });
 
   it("male(anna)", () => {
     assertThat(kb)
      .proving("male(anna)?")
-     .equalsTo("false.");
+     .equalsTo("false.")
+     .done();
   });
 
   it("spouse(dani, mel)", () => {
@@ -278,7 +301,8 @@ describe("Kinship", () => {
        spouse(mel, dani).
        forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x).
        spouse(dani, mel).
-     `);
+     `)
+     .done();
   });
 
   it("father(mel, leo)", () => {
@@ -290,7 +314,8 @@ describe("Kinship", () => {
        male(mel) && parent(mel, leo) => male(mel) && parent(mel, leo).
        forall (x = mel) forall (y = leo) male(x) && parent(x, y) => father(x, y).
        father(mel, leo).
-     `);
+     `)
+     .done();
   });
 
   it("father(mel, anna)", () => {
@@ -304,7 +329,8 @@ describe("Kinship", () => {
        male(mel) && parent(mel, anna) => male(mel) && parent(mel, anna).
        forall (x = mel) forall (y = anna) male(x) && parent(x, y) => father(x, y).
        father(mel, anna).
-     `);
+     `)
+     .done();
   });
 
   it("exists (p) spouse(dani, p)", () => {
@@ -334,7 +360,8 @@ describe("Kinship", () => {
        female(dani) && parent(dani, anna) => female(dani) && parent(dani, anna).
        forall (x = dani) forall (y = anna) female(x) && parent(x, y) => mother(x, y).
        mother(dani, anna).
-    `);
+    `)
+    .done();
   });
 
   it("sibling(anna, leo)", () => {
@@ -349,7 +376,18 @@ describe("Kinship", () => {
         exists (p = dani) parent(p, anna) && parent(p, leo).
         forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(anna, leo).
-     `);
+     `)
+    .equalsTo(`
+        child(anna, mel).
+        exists (y = mel) child(anna, y).
+        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
+        exists (p = mel) parent(p, anna).
+        parent(mel, leo).
+        exists (p = mel) parent(p, anna) && parent(p, leo).
+        forall (x = anna) forall (y = leo) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
+        sibling(anna, leo).
+    `);
+    // .done(); returns one more instance
   });
 
   it("sibling(leo, anna)", () => {
@@ -364,7 +402,18 @@ describe("Kinship", () => {
         exists (p = mel) parent(p, leo) && parent(p, anna).
         forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(leo, anna).
+     `)
+     .equalsTo(`
+        child(leo, dani).
+        exists (y = dani) child(leo, y).
+        forall (x = leo) forall (y = dani) child(x, y) => parent(y, x).
+        exists (p = dani) parent(p, leo).
+        parent(dani, anna).
+        exists (p = dani) parent(p, leo) && parent(p, anna).
+        forall (x = leo) forall (y = anna) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
+        sibling(leo, anna).
      `);
+    // .done();
   });
 
   it("brother(leo, anna)", () => {
@@ -383,7 +432,8 @@ describe("Kinship", () => {
         male(leo) && sibling(leo, anna) => male(leo) && sibling(leo, anna).
         forall (x = leo) forall (y = anna) male(x) && sibling(x, y) => brother(x, y).
         brother(leo, anna).
-    `);
+    `)
+    .done();
   });
 
   it("sister(anna, leo)", () => {
@@ -402,46 +452,8 @@ describe("Kinship", () => {
         female(anna) && sibling(anna, leo) => female(anna) && sibling(anna, leo).
         forall (x = anna) forall (y = leo) female(x) && sibling(x, y) => sister(x, y).
         sister(anna, leo).
-    `);
-  });
-
-  it("r(a, b)?", () => {
-    // existential conjunction introduction with no indirection.
-    assertThat(`
-      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
-      p(a, c).
-      q(c, b).
     `)
-    .proving("r(a, b).")
-    .equalsTo(`
-      p(a, c).
-      exists (z = c) p(a, z).
-      q(c, b).
-      exists (z = c) p(a, z) && q(z, b).
-      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
-      r(a, b).
-    `);
-  });
-
-  it("r(a, b)?", () => {
-    // existential conjunction introduction with one level of indirection.
-    assertThat(`
-      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
-      forall (i) forall (j) k(i, j) => q(i, j).
-      p(a, c).
-      k(c, b).
-    `)
-    .proving("r(a, b).")
-    .equalsTo(`
-      p(a, c).
-      exists (z = c) p(a, z).
-      k(c, b).
-      forall (i = c) forall (j = b) k(i, j) => q(i, j).
-      exists (z = c) q(c, b).
-      exists (z = c) p(a, z) && q(z, b).
-      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
-      r(a, b).
-    `);
+    .done();
   });
 
   it("uncle(ni, leo)", () => {
@@ -456,7 +468,7 @@ describe("Kinship", () => {
         exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
         forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
         uncle(ni, leo).
-      `);
+     `);
   });
 
   it("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?", () => {
@@ -508,7 +520,8 @@ describe("Kinship", () => {
     // but this is otherwise working as expected.
     assertThat(kb)
     .proving("child(ni, maura)?")
-    .equalsTo("false.");
+    .equalsTo("false.")
+    .done();
   });
 
   it.skip("exists (x) sibling(ni, x)", () => {
@@ -530,7 +543,8 @@ describe("Kinship", () => {
        exists (p = mel) parent(maura, p) && parent(p, anna).
        forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
        grandparent(maura, anna).
-     `);
+     `)
+    .done();
   });
 
   it("grandmother(maura, leo)", () => {
@@ -547,20 +561,27 @@ describe("Kinship", () => {
        female(maura) && grandparent(maura, leo) => female(maura) && grandparent(maura, leo).
        forall (g = maura) forall (c = leo) female(g) && grandparent(g, c) => grandmother(g, c).
        grandmother(maura, leo).
-      `);
+      `)
+    .done();
   });
 
   function assertThat(x) {
    return {
     proving(z) {
      let result = new Reasoner(Parser.parse(x)).go(rewrite(Rule.of(z)));
+     let end = false;
      return {
       done() {
-       this.equalsTo("false.")
+       if (end) {
+        return this;
+       }
+       this.equalsTo("false.");
        return this;
       },
       equalsTo(y) {
-       assertThat(toString(Parser.parse(result.next().value.toString())))
+       let next = result.next();
+       end = next.done;
+       assertThat(toString(Parser.parse(next.value.toString())))
         .equalsTo(toString(Parser.parse(y)));
        return this;
       }

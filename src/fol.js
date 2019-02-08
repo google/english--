@@ -57,22 +57,22 @@ class Reasoner extends Backward {
    }
   }
 
-   // existential introduction
-   if (goal.quantifiers &&
-       goal.quantifiers.find(x => x.op == "forall") == undefined) {
-     let subgoal = clone(goal);
-     for (let statement of this.kb) {
-       let unifies = unify(statement, subgoal);
-       if (!unifies) {
-	 continue;
-       } else if (Object.entries(unifies).length == 0) {
-	 yield Result.of({given: statement});
-       } else {
-	 let head = goal.quantifiers && goal.quantifiers.length > 0;
-	 yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
-       }
-     }
+  // existential introduction
+  if (goal.quantifiers &&
+      goal.quantifiers.find(x => x.op == "forall") == undefined) {
+   let subgoal = clone(goal);
+   for (let statement of this.kb) {
+    let unifies = unify(statement, subgoal);
+    if (!unifies) {
+     continue;
+    } else if (Object.entries(unifies).length == 0) {
+     yield Result.of({given: statement});
+    } else {
+     let head = goal.quantifiers && goal.quantifiers.length > 0;
+     yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
+    }
    }
+  }
 
   // universal introduction
   for (let statement of this.kb) {
@@ -104,7 +104,7 @@ class Reasoner extends Backward {
    let reversed = clone(statement);
    reversed.quantifiers = reversed.quantifiers
     .map((x) => {x.op = "exists"; return x;});
-
+   
    let implication = clone(reversed.right);
    implication.quantifiers = reversed.quantifiers;
 
@@ -119,11 +119,11 @@ class Reasoner extends Backward {
    let head = clone(reversed.left);
    head.quantifiers = reversed.quantifiers;
    let left = fill(head, unifies, true);
-
+   
    // console.log(stringify(reversed));
    // console.log(stringify(head));
    // console.log(stringify(left));
- 
+   
    // console.log(stringify(left));
 
    // TODO(goto): understand and create a test to see what
@@ -270,7 +270,7 @@ class Reasoner extends Backward {
     stack.pop();
   }
 
-  yield Result.failed();
+  return Result.failed();
  }
 }
 

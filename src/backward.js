@@ -321,7 +321,7 @@ class Backward {
   // console.log(goal);
   // console.log(kb.statements);
 
-  return new Result();
+  return Result.failed();
  }
 }
 

@@ -495,6 +495,48 @@ describe("First order logic", function() {
         `);
   });
 
+
+  it("r(a, b)?", () => {
+    // existential conjunction introduction with no indirection.
+    assertThat(`
+      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
+      p(a, c).
+      q(c, b).
+    `)
+    .proving("r(a, b).")
+    .equalsTo(`
+      p(a, c).
+      exists (z = c) p(a, z).
+      q(c, b).
+      exists (z = c) p(a, z) && q(z, b).
+      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
+      r(a, b).
+    `)
+    .done();
+  });
+
+  it("r(a, b)?", () => {
+    // existential conjunction introduction with one level of indirection.
+    assertThat(`
+      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
+      forall (i) forall (j) k(i, j) => q(i, j).
+      p(a, c).
+      k(c, b).
+    `)
+    .proving("r(a, b).")
+    .equalsTo(`
+      p(a, c).
+      exists (z = c) p(a, z).
+      k(c, b).
+      forall (i = c) forall (j = b) k(i, j) => q(i, j).
+      exists (z = c) q(c, b).
+      exists (z = c) p(a, z) && q(z, b).
+      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
+      r(a, b).
+    `)
+    .done();
+  });
+
   it("mortal(socrates)", function() {
     assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")
