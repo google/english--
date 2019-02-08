@@ -35,6 +35,7 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
+  // console.log(JSON.stringify(goal));
   // console.log("goal: " + stringify(goal) + ", stack: " + stack.length);
 
   for (let subgoal of stack) {
@@ -225,6 +226,7 @@ class Reasoner extends Backward {
     let variable = goal.quantifiers[0].variable.name;
     let left = JSON.parse(JSON.stringify(goal.left));
     left.quantifiers = goal.quantifiers;
+
     stack.push(goal);
 
     let lefts = this.go(left, stack);
@@ -234,19 +236,16 @@ class Reasoner extends Backward {
       // console.log(dep.bindings);
 
       if (!dep.failed()) {
-	// let bindings = {
-	//   [variable]: dep.get(variable)
-	// };
-
-	// console.log(bindings);
 
 	let right = clone(goal.right);
-	right.quantifiers = goal.quantifiers;
-	stack.push(goal);
-	let result = this.backward(fill(right, dep.bindings, true), stack);
-	stack.pop();
 
-	if (!result.failed()) {
+	right.quantifiers = goal.quantifiers;
+
+	stack.push(goal);
+
+	let result = this.backward(fill(right, dep.bindings, true), stack);
+
+	if (!result.failed() && !dep.conflicts(result.bindings)) {
 	  // console.log(`binary: ${stringify(goal)}`);
 	  // console.log(`left: ${stringify(left)}`);
 	  // console.log(`right: ${stringify(right)}`);
@@ -264,6 +263,7 @@ class Reasoner extends Backward {
 	    given: fill(goal, dep.bindings, undefined, true)
 	  }).bind(dep.bindings);
 	}
+        stack.pop();
       }
     }
 

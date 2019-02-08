@@ -38,7 +38,8 @@ describe("Kinship", () => {
        female(dani) && parent(dani, leo) => female(dani) && parent(dani, leo).
        forall (x = dani) forall (y = leo) female(x) && parent(x, y) => mother(x, y).
        mother(dani, leo).
-     `);
+     `)
+    .done();
   });
 
   // Brainstorming english grammar here:
@@ -71,7 +72,8 @@ describe("Kinship", () => {
        exists (p = mel) parent(maura, p) && parent(p, anna).
        forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
        grandparent(maura, anna).
-     `);
+     `)
+     .done();
    });
 
   it("exists (z) daughter(z, marcia)", () => {
@@ -485,6 +487,28 @@ describe("Kinship", () => {
       forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && sibling(u, p) && male(u) => uncle(u, c).
       exists (x = ni) uncle(x, leo).
     `);
+  });
+
+  it.skip("exists (x) exists (y) child(x, y)?", () => {
+    assertThat(kb)
+    .proving("exists (x) exists (y) child(x, y)?")
+    .equalsTo("child(anna, mel). exists (x = anna) exists (y = mel) child(x, y).")
+    .equalsTo("child(leo, dani). exists (x = leo) exists (y = dani) child(x, y).")
+    // this is incorrectly capturing the variables.
+    .equalsTo(`
+       parent(mel, leo).
+       exists (x = mel) exists (y = leo) parent(x, y).
+       forall (x = leo) forall (y = leo) parent(x, y) => child(y, x).
+       exists (x = leo) exists (y = leo) child(x, y).`)
+    ;
+  });
+
+  it("child(ni, maura)", () => {
+    // the kb is missing this relationship, so we can't infer,
+    // but this is otherwise working as expected.
+    assertThat(kb)
+    .proving("child(ni, maura)?")
+    .equalsTo("false.");
   });
 
   it.skip("exists (x) sibling(ni, x)", () => {

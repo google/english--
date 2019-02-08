@@ -35,7 +35,7 @@ class Result {
   }
   return this.bindings[result];
  }
- bind(vars) {
+ conflicts(vars) {
   for (let [key, value] of Object.entries(vars)) {
    if (this.bindings[key] &&
        !value.free &&
@@ -45,11 +45,19 @@ class Result {
     // console.log(vars);
     // console.log(this.get(key));
     // console.log(this.bindings);
-    throw new Error("Conflict in bindings for " + key + ": " 
-                    + JSON.stringify(this.get(key)) + " != " 
-                    + JSON.stringify(value));
+    return [key, value];
    }
   }
+  return false;
+ }
+ bind(vars) {
+  if (this.conflicts(vars)) {
+   let [key, value] = this.conflicts(vars);
+   throw new Error("Conflict in bindings for " + key + ": " 
+                   + JSON.stringify(this.get(key)) + " != " 
+                   + JSON.stringify(value));
+  }
+
   for (let [key, value] of Object.entries(vars)) {
    if (!value.free) {
     // if this is a concrete value, bind it.
