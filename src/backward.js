@@ -36,17 +36,25 @@ class Result {
   return this.bindings[result];
  }
  bind(vars) {
-  for (let [key, value] of Object.entries(vars)) {
-   if (this.bindings[key] && !equals(value, this.get(key))) {
-    // console.log(this.bindings[key]);
-    // console.log(value);
-    throw new Error("Unsupported condition: conflicting bindings: " + key);
+   for (let [key, value] of Object.entries(vars)) {
+     if (this.bindings[key] && !equals(value, this.get(key))) {
+       // console.log(this.bindings[key]);
+       // console.log(value);
+       // console.log(this.get(key));
+       throw new Error("Unsupported condition: conflicting bindings: " + key);
+     }
    }
-  }
-  for (let [key, value] of Object.entries(vars)) {
-   this.bindings[key] = value;
-  }
-  return this;
+   for (let [key, value] of Object.entries(vars)) {
+     if (!value.free) {
+       // if this is a concrete value, bind it.
+       this.bindings[key] = value;
+     } else {
+       // if this is an free value, leave it open or
+       // bind it to an existing one.
+       this.bindings[key] = this.get(value.expression.name) || value;
+     }
+   }
+   return this;
  }
  push(reason) {
   if (reason instanceof Result) {

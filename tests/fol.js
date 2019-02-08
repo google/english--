@@ -477,9 +477,22 @@ describe("First order logic", function() {
   });
 
   it("p(a, b). exists (x) exists (y) p(x, y)?", () => {
+    // chained existential introduction.
     assertThat("p(a, b).")
 	.proving("exists (x) exists (y) p(x, y)?")
 	.equalsTo("p(a, b). exists (x = a) exists (y = b) p(x, y).");
+  });
+
+  it("p(a, b). exists (x) exists (y) p(x, y) && q(y, x)?", () => {
+    // chained existential conjunction introduction.
+    assertThat("p(a, b). q(b, a).")
+	.proving("exists (x) exists (y) p(x, y) && q(y, x)?")
+	.equalsTo(`
+            p(a, b).
+            exists (x = a) exists (y = b) p(x, y).
+            q(b, a).
+            exists (x = a) exists (y = b) p(x, y) && q(y, x).
+        `);
   });
 
   it("mortal(socrates)", function() {

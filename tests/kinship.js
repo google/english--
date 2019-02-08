@@ -93,7 +93,7 @@ describe("Kinship", () => {
       exists (q = dani) parent(marcia, q).
       female(dani).
       exists (q = dani) parent(marcia, q) && female(q).
-      forall (p = marcia) forall (q = dani) female(q) && parent(p, q) => daughter(q, p).
+      forall (p = marcia) forall (q = dani) (parent(p, q) && female(q)) => daughter(q, p).
       exists (z = dani) daughter(z, marcia).
     `)
     .equalsTo(`
@@ -103,7 +103,7 @@ describe("Kinship", () => {
       exists (q = thais) parent(marcia, q).
       female(thais).
       exists (q = thais) parent(marcia, q) && female(q).
-      forall (p = marcia) forall (q = thais) female(q) && parent(p, q) => daughter(q, p).
+      forall (p = marcia) forall (q = thais) (parent(p, q) && female(q)) => daughter(q, p).
       exists (z = thais) daughter(z, marcia).
     `);
     // TODO(goto): calling done() here fails, investigate.
@@ -121,7 +121,7 @@ describe("Kinship", () => {
       exists (y = leo) parent(mel, y).
       male(leo).
       exists (y = leo) parent(mel, y) && male(y).
-      forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x).
+      forall (x = mel) forall (y = leo) (parent(x, y) && male(y)) => son(y, x).
       exists (z = leo) son(z, mel).
     `)
     .done();
@@ -240,7 +240,7 @@ describe("Kinship", () => {
        exists (x = mel) parent(x, leo).
        male(leo).
        exists (x = mel) parent(x, leo) && male(leo).
-       forall (x = mel) forall (y = leo) male(y) && parent(x, y) => son(y, x).
+       forall (x = mel) forall (y = leo) (parent(x, y) && male(y)) => son(y, x).
        exists (z = mel) son(leo, z).
      `);
   });
@@ -253,7 +253,7 @@ describe("Kinship", () => {
        exists (x = dani) parent(x, anna).
        female(anna).
        exists (x = dani) parent(x, anna) && female(anna).
-       forall (x = dani) forall (y = anna) female(y) && parent(x, y) => daughter(y, x).
+       forall (x = dani) forall (y = anna) (parent(x, y) && female(y)) => daughter(y, x).
        exists (z = dani) daughter(anna, z).
      `);
   });
@@ -344,7 +344,7 @@ describe("Kinship", () => {
         exists (p = dani) parent(p, anna).
         child(leo, dani).
         forall (x = leo) forall (y = dani) child(x, y) => parent(y, x).
-        parent(dani, leo).
+        exists (p = dani) parent(dani, leo).
         exists (p = dani) parent(p, anna) && parent(p, leo).
         forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(anna, leo).
@@ -359,7 +359,7 @@ describe("Kinship", () => {
         exists (p = mel) parent(p, leo).
         child(anna, mel).
         forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
-        parent(mel, anna).
+        exists (p = mel) parent(mel, anna).
         exists (p = mel) parent(p, leo) && parent(p, anna).
         forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(leo, anna).
@@ -375,7 +375,7 @@ describe("Kinship", () => {
         exists (p = mel) parent(p, leo).
         child(anna, mel).
         forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
-        parent(mel, anna).
+        exists (p = mel) parent(mel, anna).
         exists (p = mel) parent(p, leo) && parent(p, anna).
         forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(leo, anna).
@@ -394,13 +394,52 @@ describe("Kinship", () => {
         exists (p = dani) parent(p, anna).
         child(leo, dani).
         forall (x = leo) forall (y = dani) child(x, y) => parent(y, x).
-        parent(dani, leo).
+        exists (p = dani) parent(dani, leo).
         exists (p = dani) parent(p, anna) && parent(p, leo).
         forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(anna, leo).
         female(anna) && sibling(anna, leo) => female(anna) && sibling(anna, leo).
         forall (x = anna) forall (y = leo) female(x) && sibling(x, y) => sister(x, y).
         sister(anna, leo).
+    `);
+  });
+
+  it("r(a, b)?", () => {
+    // existential conjunction introduction with no indirection.
+    assertThat(`
+      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
+      p(a, c).
+      q(c, b).
+    `)
+    .proving("r(a, b).")
+    .equalsTo(`
+      p(a, c).
+      exists (z = c) p(a, z).
+      q(c, b).
+      exists (z = c) p(a, z) && q(z, b).
+      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
+      r(a, b).
+    `);
+  });
+
+  it("r(a, b)?", () => {
+    // existential conjunction introduction with one level of indirection.
+    assertThat(`
+      forall (x) forall (y) forall (z) (p(x, z) && q(z, y)) => r(x, y).
+      forall (i) forall (j) k(i, j) => q(i, j).
+      p(a, c).
+      k(c, b).
+    `)
+    .proving("r(a, b).")
+    .equalsTo(`
+      p(a, c).
+      exists (z = c) p(a, z).
+      k(c, b).
+      forall (i = c) forall (j = b) k(i, j) => q(i, j).
+      exists (z = c) q(c, b).
+      exists (z = c) p(a, z) && q(z, b).
+      forall (x = a) forall (y = b) forall (z = c) p(x, z) && q(z, y) => r(x, y).
+      r(a, b).
     `);
   });
 
@@ -445,7 +484,7 @@ describe("Kinship", () => {
        exists (p = mel) parent(maura, p).
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
-       parent(mel, anna).
+       exists (p = mel) parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
        forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
        grandparent(maura, anna).

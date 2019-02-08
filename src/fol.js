@@ -192,45 +192,61 @@ class Reasoner extends Backward {
 
    let right = unify(statement.right, goal);
    if (right) {
-    let left = fill(negation(statement.left), right, true);
-    stack.push(goal);
-    let result = this.backward(left, stack);
-    stack.pop();
-    if (!result.failed()) {
-     yield result.push({given: fill(statement, right, undefined, true), goal: goal});
-    }
+     let left = fill(negation(statement.left), right, true);
+     stack.push(goal);
+     let result = this.backward(left, stack);
+     stack.pop();
+     if (!result.failed()) {
+       yield result.push({given: fill(statement, right, undefined, true), goal: goal});
+     }
    }
   }
 
-  // existential conjunction introduction
+   // existential conjunction introduction
+   // console.log(goal.quantifiers);
   if (goal.quantifiers &&
-      goal.quantifiers.length == 1 &&
-      goal.quantifiers[0].op == "exists" &&
+      goal.quantifiers.find(x => x.op == "forall") == undefined &&
       goal.op == "&&") {
 
-   let variable = goal.quantifiers[0].variable.name;
-   let left = JSON.parse(JSON.stringify(goal.left));
-   left.quantifiers = goal.quantifiers;
-   stack.push(goal);
-   let lefts = this.go(left, stack);
-   stack.pop();
+    let variable = goal.quantifiers[0].variable.name;
+    let left = JSON.parse(JSON.stringify(goal.left));
+    left.quantifiers = goal.quantifiers;
+    stack.push(goal);
 
-   for (let dep of lefts) {
-    if (!dep.failed()) {
-     let bindings = {
-      [variable]: dep.get(variable)
-     };
+    let lefts = this.go(left, stack);
 
-     let right = JSON.parse(JSON.stringify(goal.right));
-     stack.push(goal);
-     let result = this.backward(fill(right, bindings, true), stack);
-     stack.pop();
+    for (let dep of lefts) {
 
-     if (!result.failed()) {
-      yield dep.push(result).push({given: fill(goal, bindings, undefined, true)}).bind(bindings);
-     }
+      // console.log(dep.bindings);
+
+      if (!dep.failed()) {
+	// let bindings = {
+	//   [variable]: dep.get(variable)
+	// };
+
+	// console.log(bindings);
+
+	let right = clone(goal.right);
+	right.quantifiers = goal.quantifiers;
+	stack.push(goal);
+	// console.log(`binary: ${stringify(goal)}`);
+	// console.log(`left: ${stringify(left)}`);
+	// console.log(`right: ${stringify(right)}`);
+	// console.log(dep.bindings);
+	// console.log(JSON.stringify(fill(right, dep.bindings, true), undefined, 2));
+	// console.log(`filled: ${stringify(fill(right, dep.bindings, true))}`);
+	let result = this.backward(fill(right, dep.bindings, true), stack);
+	stack.pop();
+
+	if (!result.failed()) {
+	  yield dep.push(result).push({
+	    given: fill(goal, dep.bindings, undefined, true)
+	  }).bind(dep.bindings);
+	}
+      }
     }
-   }
+
+    stack.pop();
   }
 
   yield Result.failed();
