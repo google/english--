@@ -458,7 +458,7 @@ describe("Kinship", () => {
       `);
   });
 
-  it("exists (x) uncle(x, leo)", () => {
+  it("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?", () => {
     assertThat(kb)
 	.proving("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?")
 	.equalsTo(`
@@ -470,20 +470,29 @@ describe("Kinship", () => {
           exists (u = ni) exists (p = mel) sibling(u, mel) && male(u).
           exists (u = ni) exists (p = mel) parent(p, leo) && sibling(u, p) && male(u).
         `);
+  });
 
-    return;
-
-    // forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
+  it("exists (x) uncle(x, leo)", () => {
     assertThat(kb)
      .proving("exists (x) uncle(x, leo)?")
      .equalsTo(`
+      parent(mel, leo).
+      exists (u) exists (p = mel) parent(p, leo).
+      brother(ni, mel).
+      exists (x = ni) brother(x, mel).
+      forall (x = ni) forall (y = mel) brother(x, y) => sibling(x, y) && male(x).
+      exists (u = ni) exists (p = mel) sibling(u, mel) && male(u).
+      exists (u = ni) exists (p = mel) parent(p, leo) && sibling(u, p) && male(u).
+      forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && sibling(u, p) && male(u) => uncle(u, c).
+      exists (x = ni) uncle(x, leo).
     `);
   });
 
   it.skip("exists (x) sibling(ni, x)", () => {
-    //assertThat(kb)
-    //.proving("exists (x) sibling(ni, x)?")
-    //.equalsTo("");
+    assertThat(kb)
+    .proving("exists (x) sibling(ni, x)?")
+    .equalsTo(`
+    `);
   });
 
   it("grandparent(maura, anna)", () => {
