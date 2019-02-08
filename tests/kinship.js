@@ -59,7 +59,7 @@ describe("Kinship", () => {
   // If X is not a P then X is a Q. <=> forall(x) ~P(x) => Q(x).
   // If X is not a P then X is not a Q. <=> forall(x) ~P(x) => ~Q(x).
 
-  it.skip("grandparent(maura, anna)", function() {
+  it("grandparent(maura, anna)", function() {
     assertThat(kb)
      .proving("grandparent(maura, anna)?")
      .equalsTo(`
@@ -67,12 +67,11 @@ describe("Kinship", () => {
        exists (p = mel) parent(maura, p).
        child(anna, mel).
        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
-       parent(mel, anna).
+       exists (p = mel) parent(mel, anna).
        exists (p = mel) parent(maura, p) && parent(p, anna).
        forall (g = maura) forall (c = anna) exists (p = mel) parent(g, p) && parent(p, c) => grandparent(g, c).
        grandparent(maura, anna).
-     `)
-     .done();
+     `);
    });
 
   it("exists (z) daughter(z, marcia)", () => {
