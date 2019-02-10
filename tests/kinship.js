@@ -154,7 +154,8 @@ describe("Kinship", () => {
      forall (x) forall (y) (brother(x, y) => (sibling(x, y) && male(x))).
      forall (x) forall (y) (sister(x, y) => (sibling(x, y) && female(x))).
 
-     forall (u) forall (c) exists(p) (parent(p, c) && sibling(u, p) && male(u)) => uncle(u, c).
+     forall (u) forall (c) exists(p) (parent(p, c) && brother(u, p)) => uncle(u, c).
+     forall (a) forall (c) exists(p) (parent(p, c) && sister(a, p)) => aunt(a, c).
 
      forall (g) forall (c) grandparent(g, c) => (exists (p) (parent(g, p) && parent(p, c))).
      forall (g) forall (c) exists (p) (parent(g, p) && parent(p, c)) => grandparent(g, c).
@@ -183,6 +184,7 @@ describe("Kinship", () => {
      female(maura).
 
      son(ni, maura).
+     daughter(de, maura).
      brother(ni, mel).
   `;
 
@@ -439,12 +441,10 @@ describe("Kinship", () => {
       .proving("uncle(ni, leo)?")
       .equalsTo(`
         brother(ni, mel).
-        exists (y = mel) brother(ni, y).
-        forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y).
-        exists (p = mel) male(ni) && sibling(ni, p).
+        exists (p = mel) brother(ni, p).
         parent(mel, leo).
-        exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
-        forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
+        exists (p = mel) brother(ni, p) && parent(p, leo).
+        forall (u = ni) forall (c = leo) exists (p = mel) brother(u, p) && parent(p, c) => uncle(u, c).
         uncle(ni, leo).
      `)
       .done();
@@ -481,16 +481,39 @@ describe("Kinship", () => {
     assertThat(kb)
      .proving("exists (x) uncle(x, leo)?")
      .equalsTo(`
-      parent(mel, leo).
-      exists (u) exists (p = mel) parent(p, leo).
-      brother(ni, mel).
-      exists (x = ni) brother(x, mel).
-      forall (x = ni) forall (y = mel) brother(x, y) => sibling(x, y) && male(x).
-      exists (u = ni) exists (p = mel) sibling(u, mel) && male(u).
-      exists (u = ni) exists (p = mel) parent(p, leo) && sibling(u, p) && male(u).
-      forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && sibling(u, p) && male(u) => uncle(u, c).
-      exists (x = ni) uncle(x, leo).
+       parent(mel, leo).
+       exists (u) exists (p = mel) parent(p, leo).
+       brother(ni, mel).
+       exists (u = ni) exists (p = mel) brother(u, mel).
+       exists (u = ni) exists (p = mel) parent(p, leo) && brother(u, p).
+       forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && brother(u, p) => uncle(u, c).
+       exists (x = ni) uncle(x, leo).
     `);
+  });
+
+  it("exists (x) uncle(ni, x)", () => {
+    assertThat(kb)
+     .proving("exists (x) uncle(ni, x)?")
+     .equalsTo(`
+       parent(mel, leo).
+       exists (c = leo) exists (p = mel) parent(p, c).
+       brother(ni, mel).
+       exists (c = leo) exists (p = mel) parent(p, c) && brother(ni, p).
+       forall (u = ni) forall (c = leo) exists (p = mel) parent(p, c) && brother(u, p) => uncle(u, c).
+       exists (x = leo) uncle(ni, x).
+    `)
+      .equalsTo(`
+        child(anna, mel).
+        exists (x = anna) exists (y = mel) child(x, y).
+        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
+        exists (c = anna) exists (p = mel) parent(p, c).
+        brother(ni, mel).
+        exists (c = anna) exists (p = mel) parent(p, c) && brother(ni, p).
+        forall (u = ni) forall (c = anna) exists (p = mel) brother(u, p) && parent(p, c) => uncle(u, c).
+        exists (x = anna) uncle(ni, x).
+    `);
+    // More is returned by different proof paths. We should ignore
+    // proofs when they lead to the same binding.
   });
 
   it.skip("exists (x) exists (y) child(x, y)?", () => {
