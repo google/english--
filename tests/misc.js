@@ -175,7 +175,14 @@ describe("Knowledge", function() {
 	  equalsTo(y) {
 	    // console.log(result.toString());
 	    // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
-	    assertThat(toString(Parser.parse(result.next().value.toString())))
+	    let next = result.next();
+
+	    if (next.done) {
+	      assertThat(y).equalsTo("false.");
+	      return;
+	    }
+	    
+	    assertThat(toString(Parser.parse(next.value.toString())))
               .equalsTo(toString(Parser.parse(y)));
 	    return this;
 	  }

@@ -375,17 +375,7 @@ describe("Kinship", () => {
         forall (x = anna) forall (y = leo) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(anna, leo).
      `)
-    .equalsTo(`
-        child(anna, mel).
-        exists (y = mel) child(anna, y).
-        forall (x = anna) forall (y = mel) child(x, y) => parent(y, x).
-        exists (p = mel) parent(p, anna).
-        parent(mel, leo).
-        exists (p = mel) parent(p, anna) && parent(p, leo).
-        forall (x = anna) forall (y = leo) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
-        sibling(anna, leo).
-    `);
-     // .done();
+      .done();
   });
 
   it("sibling(leo, anna)", () => {
@@ -401,17 +391,7 @@ describe("Kinship", () => {
         forall (x = leo) forall (y = anna) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(leo, anna).
      `)
-     .equalsTo(`
-        child(leo, dani).
-        exists (y = dani) child(leo, y).
-        forall (x = leo) forall (y = dani) child(x, y) => parent(y, x).
-        exists (p = dani) parent(p, leo).
-        parent(dani, anna).
-        exists (p = dani) parent(p, leo) && parent(p, anna).
-        forall (x = leo) forall (y = anna) exists (p = dani) parent(p, x) && parent(p, y) => sibling(x, y).
-        sibling(leo, anna).
-     `);
-    // .done();
+      .done();
   });
 
   it("brother(leo, anna)", () => {
@@ -478,14 +458,7 @@ describe("Kinship", () => {
         forall (x = maura) forall (y = ni) son(y, x) => male(y) && parent(x, y).
         male(ni).
       `)
-      .equalsTo(`
-        brother(ni, mel).
-        exists (y = mel) brother(ni, y).
-        forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y).
-        male(ni).
-    `);
-    // There are multiple ways to prove this. We should probably skip
-    // proving multiple times.
+      .done();
   });
 
 
@@ -645,6 +618,12 @@ describe("Kinship", () => {
 	  equalsTo(y) {
 	    let next = result.next();
 	    end = next.done;
+
+	    if (next.done) {
+	      assertThat(y).equalsTo("false.");
+	      return;
+	    }
+	    
 	    assertThat(toString(Parser.parse(next.value.toString())))
               .equalsTo(toString(Parser.parse(y)));
 	    if (next.value.toString() == "false.") {

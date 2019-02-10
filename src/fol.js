@@ -215,6 +215,11 @@ class Reasoner extends Backward {
 	  yield dep.bind(unifies)
 	    .push({given: fill(statement, dep.bindings, undefined, true)})
 	    .push({given: fill(goal, dep.bindings, undefined, true)});
+
+	  if (!this.generates(goal)) {
+	    return;
+	  }
+
 	}
       }
       
