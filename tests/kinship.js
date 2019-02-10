@@ -647,6 +647,9 @@ describe("Kinship", () => {
 	    end = next.done;
 	    assertThat(toString(Parser.parse(next.value.toString())))
               .equalsTo(toString(Parser.parse(y)));
+	    if (next.value.toString() == "false.") {
+	      end = true;
+	    }
 	    return this;
 	  }
 	};

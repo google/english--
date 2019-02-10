@@ -283,7 +283,7 @@ class Reasoner extends Backward {
       stack.pop();
     }
 
-    return Result.failed();
+    yield Result.failed();
   }
 }
 
