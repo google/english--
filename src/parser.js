@@ -21,7 +21,7 @@ class Parser {
     return {"@type": "Constant", name: value};
   }
 
-  static quantifier(op, x, value) {
+  static quantifier(op, x, value, id) {
     let result =  {
       "@type": "Quantifier", 
       op: op, 
@@ -29,21 +29,24 @@ class Parser {
 	"@type": "Variable",
 	name: x
       }
-    };    
+    };
+    if (id) {
+      result.id = id;
+    }
     if (value) {
       result.value = value;
     }
     return result;
   }
   
-  static forall(x, expression, value) {
-    let result = Parser.quantifier("forall", x, value);
+  static forall(x, expression, value, id) {
+    let result = Parser.quantifier("forall", x, value, id);
     expression.quantifiers.unshift(result);
     return expression;
   }
 
-  static exists(x, expression, value) {
-    let result = Parser.quantifier("exists", x, value);
+  static exists(x, expression, value, id) {
+    let result = Parser.quantifier("exists", x, value, id);
     expression.quantifiers.unshift(result);
     return expression;
   }

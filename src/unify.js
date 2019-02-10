@@ -12,9 +12,9 @@ function rewrite(expression, vars = {}) {
       id++;
     }
     if (expression["@type"] == "Program") {
-      // covers the case where we are rewriting the
-      // entire program.
-      return {statements: expression.statements.map(x => rewrite2(x))};
+	// covers the case where we are rewriting the
+	// entire program.
+	return {statements: expression.statements.map(x => rewrite2(x))};
     } else if (expression["@type"] == "Predicate") {
       for (let arg of expression.arguments) {
 	// console.log(arg.expression.name);

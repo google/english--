@@ -485,18 +485,16 @@ describe("Unify", () => {
     let unifies = {
      "x@1": literal("a")
     };
-    console.log(JSON.stringify(rewrite(Rule.of("exists (x) P(x) && R(x).")).quantifiers));
-    return;
     assertThat(fill(rewrite(Rule.of("exists (x) P(x) && R(x).")).right, unifies, true))
      .equalsTo(predicate("R", [argument(literal("a"))]));
   });
 
-  it.skip("Fills with ids", function() {
+  it("Fills with ids", function() {
     let unifies = unify(rewrite(Rule.of("forall (x) P(x).")), rewrite(Rule.of("P(a).")));
-    // console.log(unifies);
-    // console.log(rewrite(Rule.of("forall (x) P(x?).")));
-    // assertThat(fill(Rule.of("R(x)."), unifies))
-    // .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
+    assertThat(fill(rewrite(Rule.of("exists (x) R(x).")), unifies))
+      .equalsTo(exists("x", predicate("R", [
+	argument(literal("x"), literal("a"))
+      ]), literal("a"), 1));
   });
 
   function assertThat(x) {
