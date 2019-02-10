@@ -26,22 +26,25 @@ class Reasoner extends Backward {
   backward(goal, stack = []) {
     return this.go(goal, stack).next().value;
   }
-  * quantifiers(op) {
-    // console.log(`${op}`);
+  *quantifiers(op) {
     for (let statement of this.kb.filter(x => x.op == op)) {
       if (statement.quantifiers != undefined && statement.quantifiers.length > 0) {
 	yield statement;
       }
     }
   }
+  generates(goal) {
+    if (goal.quantifiers &&
+	goal.quantifiers.find(x => x.op == "exists") != undefined) {
+      // If this the goal is an existential quantification, it may
+      // generate multiple results. Otherwise, it returns just
+      // a single result.
+      return true;
+    }
+    return false;
+  }
   *go(goal, stack = []) {
     let indent = " ".repeat(stack.length);
-    //try {
-    //    stringify(goal);
-    //} catch (e) {
-    // console.trace();
-    //    console.log(indent + "fail: " + JSON.stringify(goal));
-    //}
     // console.log(indent + "goal: " + stringify(goal));
     
     for (let subgoal of stack) {
@@ -49,7 +52,8 @@ class Reasoner extends Backward {
       // correct than equals(). we can stringify before putting
       // on the stack, so that we only need to do that once.
       if (stringify(goal) == stringify(subgoal)) {
-	return Result.failed();
+	yield Result.failed();
+	return;
       }
     }
     
@@ -59,6 +63,9 @@ class Reasoner extends Backward {
       let propositional = super.backward(goal, stack);
       if (!propositional.failed()) {
 	yield propositional;
+	if (!this.generates(goal)) {
+	  return;
+	}
       }
     }
 
@@ -117,6 +124,8 @@ class Reasoner extends Backward {
       
       let unifies = unify(implication, goal);
 
+      // console.log(unifies);
+      
       if (!unifies) {
 	// If we fail to unify lexically, we construct
 	// a new temporary knowledge base with the implication
@@ -184,8 +193,10 @@ class Reasoner extends Backward {
       stack.push(goal);
       // console.log(`${indent} recurse: ${stringify(left)}`);
       let deps = this.go(left, stack);
+      // console.log(`${indent} back!`);
       
       for (let dep of deps) {
+	// console.log(`${indent} back!`);
 	// console.log(dep.conflicts(unifies));
 	if (!dep.failed() && !dep.conflicts(unifies)) {
 	  dep.bind(unifies);
