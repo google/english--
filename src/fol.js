@@ -78,11 +78,17 @@ class Reasoner extends Backward {
 	let unifies = unify(statement, subgoal);
 	if (!unifies) {
 	  continue;
-	} else if (Object.entries(unifies).length == 0) {
+	}
+
+	if (Object.entries(unifies).length == 0) {
 	  yield Result.of({given: statement});
 	} else {
 	  let head = goal.quantifiers && goal.quantifiers.length > 0;
 	  yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
+	}
+
+	if (!this.generates(goal)) {
+	  return;
 	}
       }
     }
@@ -105,11 +111,17 @@ class Reasoner extends Backward {
       let unifies = unify(universal, goal);
       if (!unifies) {
 	continue;
-      } else if (Object.entries(unifies).length == 0) {
+      }
+
+      if (Object.entries(unifies).length == 0) {
 	yield Result.of({given: statement});
       } else {
 	let head = goal.quantifiers && goal.quantifiers.length > 0;
 	yield Result.of([{given: statement}, {given: fill(goal, unifies, undefined, head)}]).bind(unifies);
+      }
+
+      if (!this.generates(goal)) {
+	return;
       }
     }
     

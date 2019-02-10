@@ -607,16 +607,28 @@ describe("First Order Logic", function() {
     return {
       proving(z) {
 	let result = new Reasoner(rewrite(Parser.parse(x))).go(rewrite(Rule.of(z)));
+	let end = false;
 	return {
 	  done() {
+	    if (end) {
+	      return this;
+	    }
 	    this.equalsTo("false.")
+	    // assertThat(result.next().done).equalsTo(true);
 	    return this;
 	  },
 	  equalsTo(y) {
 	    // console.log(result.toString());
 	    // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
-	    assertThat(toString(Parser.parse(result.next().value.toString())))
+	    let next = result.next();
+	    end = next.done;
+	    if (next.done) {
+	      assertThat(y).equalsTo("false.");
+	      return;
+	    }
+	    assertThat(toString(Parser.parse(next.value.toString())))
               .equalsTo(toString(Parser.parse(y)));
+	    // console.log(next);
 	    return this;
 	  }
 	};
