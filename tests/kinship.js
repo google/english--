@@ -129,7 +129,8 @@ describe("Kinship", () => {
   });
 
   // logic from:
-  // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf 
+  // https://people.cs.pitt.edu/~milos/courses/cs2740/Lectures/class8.pdf
+  // TODO(goto): come up with a <=> notation.
   const kb = `
      forall (x) forall (y) parent(x, y) => child(y, x).
      forall (x) forall (y) child(x, y) => parent(y, x).

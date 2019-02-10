@@ -48,14 +48,9 @@ class Reasoner extends Backward {
       // TODO(goto): this is expensive and un-necessary, but more
       // correct than equals(). we can stringify before putting
       // on the stack, so that we only need to do that once.
-      // console.log(`${stringify(goal)} == ${stringify(subgoal)}`);
       if (stringify(goal) == stringify(subgoal)) {
-	// console.log(indent + "cycle.");
 	return Result.failed();
       }
-      // if (equals(goal, subgoal)) {
-      //   yield Result.failed();
-      // }
     }
     
     if (!goal.quantifiers || goal.quantifiers.length == 0) {
@@ -84,7 +79,6 @@ class Reasoner extends Backward {
 
     // universal introduction
     for (let statement of this.kb) {
-
       let universal = clone(statement);
       if (!(universal.quantifiers &&
             universal.quantifiers.length == 1 &&
