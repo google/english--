@@ -83,6 +83,7 @@ class Reasoner extends Backward {
     
     // universal introduction
     for (let statement of this.kb) {
+
       let universal = clone(statement);
       if (!(universal.quantifiers &&
             universal.quantifiers.length == 1 &&
@@ -118,6 +119,18 @@ class Reasoner extends Backward {
       let unifies = unify(implication, goal);
       
       if (!unifies) {
+	// let right = clone(statement.right);
+	// right.quantifiers = right.quantifiers || [];
+	// right.quantifiers.push(...statement.quantifiers);
+	
+	// console.log(stringify(right));
+	// console.log(stringify(goal));
+	// console.log(right);
+
+	// let kb = new Reasoner({"@type": "Program", statements: [right]});
+	// let entails = kb.backward(goal);
+	// console.log(entails.reason[entails.reason.length - 2].given.quantifiers);
+	
 	continue;
       }
       
@@ -144,13 +157,7 @@ class Reasoner extends Backward {
       
       for (let dep of deps) {
 	if (!dep.failed()) {
-	  // console.log("hello");
-	  // console.log(dep.bindings);
-	  // console.log(unifies);
 	  dep.bind(unifies);
-	  // console.log("foobar");
-	  // console.log(dep.bindings);
-	  // console.log(unifies);
 	  yield dep.bind(unifies)
 	    .push({given: fill(statement, dep.bindings, undefined, true)})
 	    .push({given: fill(goal, dep.bindings, undefined, true)});
@@ -164,8 +171,6 @@ class Reasoner extends Backward {
     for (let statement of this.quantifiers("&&")) {
       let left = unify(statement.left, goal);
       if (left) {
-	// console.log("hi");
-	// console.log(statement);
 	yield Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
       }
       let right = unify(statement.right, goal);
@@ -200,7 +205,6 @@ class Reasoner extends Backward {
     }
 
     // existential conjunction introduction
-    // console.log(goal.quantifiers);
     if (goal.quantifiers &&
 	goal.quantifiers.find(x => x.op == "forall") == undefined &&
 	goal.op == "&&") {
@@ -214,33 +218,13 @@ class Reasoner extends Backward {
       let lefts = this.go(left, stack);
       
       for (let dep of lefts) {
-
-	// console.log(dep.bindings);
-	
 	if (!dep.failed()) {
-	
 	  let right = clone(goal.right);
-	  
 	  right.quantifiers = goal.quantifiers;
-	  
 	  stack.push(goal);
-	  
 	  let result = this.backward(fill(right, dep.bindings, true), stack);
-	  
 	  if (!result.failed() && !dep.conflicts(result.bindings)) {
-	    // console.log(`binary: ${stringify(goal)}`);
-	    // console.log(`left: ${stringify(left)}`);
-	    // console.log(`right: ${stringify(right)}`);
-	    // console.log(dep.bindings);
-	    // console.log(JSON.stringify(fill(right, dep.bindings, true), undefined, 2));
-	    // console.log(`right filled: ${stringify(fill(right, dep.bindings, true))}`);
-	    // console.log(`done`);
-	    // console.log(dep.bindings);
-	    // console.log(result.bindings);
-	    // console.log(Object.assign());
-	    
 	    dep.bind(result.bindings);
-
 	    yield dep.push(result).push({
 	      given: fill(goal, dep.bindings, undefined, true)
 	    }).bind(dep.bindings);
