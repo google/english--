@@ -446,7 +446,8 @@ describe("Kinship", () => {
         exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
         forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
         uncle(ni, leo).
-     `);
+     `)
+      .done();
   });
 
   it("male(ni)", () => {
