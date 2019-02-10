@@ -114,8 +114,9 @@ class Backward {
 
   direct(goal) {
     for (let statement of this.kb) {
-      // console.log(`${stringify(goal)} == ${stringify(statement)}`);
+      // console.log(`${stringify(goal)} == ${stringify(statement)}? ${equals(statement, goal)}.`);
       // console.log(goal);
+      // console.log(statement);
       if (equals(statement, goal)) {
 	// console.log("hello");
 	return {statement: statement, match: true};
@@ -125,7 +126,7 @@ class Backward {
   }
   
   backward(goal, stack = []) {
-    // console.log(`goal: ${stringify(goal)}? \/\/ propositional`);
+    // console.log(`${"".repeat(stack.length)}goal: ${stringify(goal)}? \/\/ propositional`);
     for (let subgoal of stack) {
       if (equals(goal, subgoal)) {
 	return Result.failed();

@@ -5,19 +5,19 @@ const {Parser, Rule} = require("../src/parser.js");
 const {fill, unify, rewrite} = require("../src/unify.js");
 
 const {
- program, 
- forall, 
- exists, 
- implies, 
- predicate, 
- func,
- binary, 
- literal, 
- constant, 
- and, 
- or, 
- negation,
- argument} = Parser;
+  program, 
+  forall, 
+  exists, 
+  implies, 
+  predicate, 
+  func,
+  binary, 
+  literal, 
+  constant, 
+  and, 
+  or, 
+  negation,
+  argument} = Parser;
 
 describe("Unify", () => {
   it("parser", function() {
@@ -247,18 +247,9 @@ describe("Unify", () => {
   it("Unify(P(Q(a)), P(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(Q(a)).")), 
                      rewrite(Rule.of("P(x?)."))))
-     .equalsTo({"x@": {
-        "@type": "Function",
-        "name": "Q",
-        "arguments": [{
-          "@type": "Argument",
-          "expression": {
-           "@type": "Literal",
-            "name": "a"
-          }
-        }] 
-      }
-     });
+      .equalsTo({
+	"x@": func("Q", [argument(literal("a"))])
+      });
   });
 
   it("Unify(P(Q(a)), P(x?))", function() {
@@ -327,21 +318,10 @@ describe("Unify", () => {
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
     assertThat(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")))
-     .equalsTo({"y@": literal("a"), "x@": {
-        "@type": "Function",
-        "name": "Q",
-        "arguments": [{
-          "@type": "Argument",
-          "expression": {
-           "@type": "Literal",
-           "name": "y"
-          },
-          "value": {
-           "@type": "Literal",
-            "name": "a"
-          }
-        }]
-     }});
+      .equalsTo({
+	"y@": literal("a"),
+	"x@": func("Q", [argument(literal("y"), literal("a"))])
+      });
   });
 
   it("Unify(P(a) => Q(b), forall (x) P(x) => Q(b))", function() {
@@ -455,6 +435,14 @@ describe("Unify", () => {
     .equalsTo(false);
   });
 
+  it("Unify(forall (x) forall (y) P(x) && Q(x, y), P(a) && Q(a, b)?)", () => {
+    assertThat(unify(rewrite(Rule.of("forall (x) forall (y) P(x) && Q(x, y).")), rewrite(Rule.of("P(a) && Q(a, b)."))))
+    .equalsTo({
+      "x@1": literal("a"),
+      "y@2": literal("b")
+    });
+  });
+
   it("Unify() implication", function() {
     // this can't be unified because ultimately, 
     // exists (y) q(y) can't be unified with
@@ -485,7 +473,7 @@ describe("Unify", () => {
   it("Fills from unification", function() {
     let unifies = unify(Rule.of("P(x?)."), Rule.of("P(Q(a))."));
     assertThat(fill(Rule.of("R(x?)."), unifies))
-     .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
+      .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
   });
 
   it("Filling binds and removes ids", function() {

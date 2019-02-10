@@ -54,6 +54,8 @@ class Reasoner extends Backward {
     }
     
     if (!goal.quantifiers || goal.quantifiers.length == 0) {
+      // console.log(`${indent} propositional: ${stringify(goal)}?`);
+      // console.log(goal);
       let propositional = super.backward(goal, stack);
       if (!propositional.failed()) {
 	yield propositional;
@@ -62,6 +64,7 @@ class Reasoner extends Backward {
 
     // existential introduction
     if (goal.quantifiers &&
+	goal.quantifiers.length > 0 &&
 	goal.quantifiers.find(x => x.op == "forall") == undefined) {
       let subgoal = clone(goal);
       for (let statement of this.kb) {
@@ -86,6 +89,7 @@ class Reasoner extends Backward {
 	// TODO(goto): deal with multiple chained quantifiers.
 	continue;
       }
+      // console.log("hello");
       // removes the quantifier, while still leaving
       // the variable free in the body.
       universal.quantifiers.pop();
@@ -114,14 +118,16 @@ class Reasoner extends Backward {
       let unifies = unify(implication, goal);
 
       if (!unifies) {
-	// If we fail to unify trivially / lexically, we construct
+	// If we fail to unify lexically, we construct
 	// a new temporary knowledge base with the implication
 	// and check if the implication entails the goal. If it does,
 	// we use the result as the unification bindings.
+
 	let right = clone(statement.right);
-	right.quantifiers = right.quantifiers || [];
+	// right.quantifiers = right.quantifiers || [];
 	right.quantifiers.push(...statement.quantifiers);
 	
+	// console.log(`going into a side inference: ${stringify(right)}.`);
 	let reasoner = new Reasoner({"@type": "Program", statements: [right]});
 	let entails = reasoner.backward(goal);
 	// console.log(`out of the side inference: failed? ${entails.failed()}.`);
@@ -133,11 +139,16 @@ class Reasoner extends Backward {
 	// bindings of the result. We should come up with a better
 	// API.
 	// console.log(`original: ${stringify(statement)}`);
-	// console.log(`recurse: ${stringify(goal)}, right: ${stringify(right)}`);
+	// console.log(`looking for: ${stringify(goal)}`);
+	// console.log(`right: ${stringify(right)}`);
 	// console.log(entails.toString());
 	let bindings = entails.reason[entails.reason.length - 2].given;
-	if (!bindings.quantifiers) {
+	// console.log(`result: ${stringify(bindings)}`);
+	if (!bindings.quantifiers || bindings.quantifiers.length == 0) {
 	  // If we weren't able to find anything, ignore.
+	  // This isn't entirely correct, the Result isn't guaranteed
+	  // to have the right bindings in the penultimate position.
+	  // TODO(goto): add a test that captures this error and fix it.
 	  continue;
 	}
 	unifies = {};
@@ -166,11 +177,12 @@ class Reasoner extends Backward {
 	return !binding || binding.free;
       });
       
-      if (left.quantifiers.length == 0) {
-	delete left.quantifiers;
-      }
+      // if (left.quantifiers.length == 0) {
+      // delete left.quantifiers;
+      // }
 
       stack.push(goal);
+      // console.log(`${indent} recurse: ${stringify(left)}`);
       let deps = this.go(left, stack);
       
       for (let dep of deps) {
@@ -229,10 +241,10 @@ class Reasoner extends Backward {
 
     // existential conjunction introduction
     if (goal.quantifiers &&
+	goal.quantifiers.length > 0 &&
 	goal.quantifiers.find(x => x.op == "forall") == undefined &&
 	goal.op == "&&") {
 
-      
       let variable = goal.quantifiers[0].variable.name;
       let left = JSON.parse(JSON.stringify(goal.left));
       left.quantifiers = goal.quantifiers;

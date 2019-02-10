@@ -10,7 +10,7 @@ class Parser {
  };
 
  static binary(op, left, right) {
-  return {"@type": "BinaryOperator", left: left, "op": op, right: right};
+     return {"@type": "BinaryOperator", left: left, "op": op, right: right, quantifiers: []};
  };
  
  static program(statements) {
@@ -55,15 +55,15 @@ class Parser {
  }
 
  static predicate(name, args) {
-  return {"@type": "Predicate", name: name, arguments: args};
+     return {"@type": "Predicate", name: name, arguments: args, quantifiers: []};
  }
 
  static negation(a) {
-  return {"@type": "UnaryOperator", op: "~", expression: a};
+     return {"@type": "UnaryOperator", op: "~", expression: a, quantifiers: []};
  }
 
  static func(name, args) {
-   return {"@type": "Function", name: name, arguments: args};
+     return {"@type": "Function", name: name, arguments: args, quantifiers: []};
  }
   
  static and(left, right) {
