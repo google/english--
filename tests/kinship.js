@@ -138,6 +138,9 @@ describe("Kinship", () => {
      forall (x) forall (y) ((parent(x, y) && male(y)) => son(y, x)).
      forall (x) forall (y) ((parent(x, y) && female(y)) => daughter(y, x)).
 
+     forall (x) forall (y) son(y, x) => (parent(x, y) && male(y)).
+     forall (x) forall (y) daughter(y, x) => (parent(x, y) && female(y)).
+
      forall (x) forall (y) ((parent(x, y) && male(x)) => father(x, y)).
      forall (x) forall (y) ((parent(x, y) && female(x)) => mother(x, y)).
 
@@ -178,7 +181,7 @@ describe("Kinship", () => {
      parent(maura, mel).
      female(maura).
 
-     male(ni).
+     son(ni, maura).
      brother(ni, mel).
   `;
 
@@ -279,14 +282,7 @@ describe("Kinship", () => {
      `)
      .done();
   });
-
-  it("female(leo)", () => {
-    assertThat(kb)
-    .proving("female(leo)?")
-    .equalsTo("false.")
-    .done();
-  });
-
+ 
   it("male(anna)", () => {
     assertThat(kb)
      .proving("male(anna)?")
@@ -469,9 +465,28 @@ describe("Kinship", () => {
         exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
         forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
         uncle(ni, leo).
-     `)
-      .done();
+     `);
   });
+
+  it("male(ni)", () => {
+    assertThat(kb)
+      .proving("male(ni)?")
+      .equalsTo(`
+        son(ni, maura).
+        exists (x = maura) son(ni, x).
+        forall (x = maura) forall (y = ni) son(y, x) => male(y) && parent(x, y).
+        male(ni).
+      `)
+      .equalsTo(`
+        brother(ni, mel).
+        exists (y = mel) brother(ni, y).
+        forall (x = ni) forall (y = mel) brother(x, y) => male(x) && sibling(x, y).
+        male(ni).
+    `);
+    // There are multiple ways to prove this. We should probably skip
+    // proving multiple times.
+  });
+
 
   it("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?", () => {
     assertThat(kb)
@@ -525,30 +540,57 @@ describe("Kinship", () => {
   });
   
   it("child(ni, maura)", () => {
-    // the kb is missing this relationship, so we can't infer,
-    // but this is otherwise working as expected.
     assertThat(kb)
     .proving("child(ni, maura)?")
-    .equalsTo("false.")
+    .equalsTo(`
+      son(ni, maura).
+      forall (x = maura) forall (y = ni) son(y, x) => male(y) && parent(x, y).
+      parent(maura, ni).
+      forall (x = maura) forall (y = ni) parent(x, y) => child(y, x).
+      child(ni, maura).
+    `)
     .done();
   });
 
   it("exists (x) sibling(x, ni)", () => {
-    // there is a possible inference missing,
-    // but this isn't unsound. it is incomplete,
-    // but not unsound, i think. i need to add
-    // the inference, but this addresses an
-    // existing problem at the moment.
     assertThat(kb)
       .proving("exists (x) sibling(x, ni)?")
-      .equalsTo("false.")
+      .equalsTo(`
+        parent(maura, mel).
+        exists (x = mel) exists (p = maura) parent(p, x).
+        son(ni, maura).
+        forall (x = maura) forall (y = ni) son(y, x) => male(y) && parent(x, y).
+        parent(maura, ni).
+        forall (x = maura) forall (y = ni) parent(x, y) => child(y, x).
+        child(ni, maura).
+        forall (x = ni) forall (y = maura) child(x, y) => parent(y, x).
+        exists (x = mel) exists (p = maura) parent(maura, ni).
+        exists (x = mel) exists (p = maura) parent(p, x) && parent(p, ni).
+        forall (x = mel) forall (y = ni) exists (p = maura) parent(p, x) && parent(p, y) => sibling(x, y).
+        exists (x = mel) sibling(x, ni).
+      `)
       .done();
   });
 
   it("exists (x) sibling(ni, x)", () => {
     assertThat(kb)
       .proving("exists (x) sibling(ni, x)?")
-      .equalsTo("false.")
+      .equalsTo(`
+        parent(maura, mel).
+        exists (x = mel) exists (p = maura) parent(p, x).
+        son(ni, maura).
+        forall (x = maura) forall (y = ni) son(y, x) => male(y) && parent(x, y).
+        parent(maura, ni).
+        forall (x = maura) forall (y = ni) parent(x, y) => child(y, x).
+        child(ni, maura).
+        forall (x = ni) forall (y = maura) child(x, y) => parent(y, x).
+        exists (x = mel) exists (p = maura) parent(maura, ni).
+        exists (x = mel) exists (p = maura) parent(p, x) && parent(p, ni).
+        forall (x = mel) forall (y = ni) exists (p = maura) parent(p, x) && parent(p, y) => sibling(x, y).
+        exists (x = mel) sibling(x, ni).
+        forall (x = mel) forall (y = ni) sibling(x, y) => sibling(y, x).
+        exists (x = mel) sibling(ni, x).
+      `)
       .done();
   });
 

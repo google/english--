@@ -142,6 +142,10 @@ class Reasoner extends Backward {
 	// console.log(`recurse: ${stringify(goal)}, right: ${stringify(right)}`);
 	// console.log(entails.toString());
 	let bindings = entails.reason[entails.reason.length - 2].given;
+	if (!bindings.quantifiers) {
+	  // If we weren't able to find anything, ignore.
+	  continue;
+	}
 	unifies = {};
 	for (let {variable, id, value} of bindings.quantifiers) {
 	  if (!value) {
