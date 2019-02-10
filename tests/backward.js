@@ -134,6 +134,16 @@ describe("Backward", function() {
      .equalsTo(`if (a => b) then a => a && b.`);
    });
 
+  it.skip("a => b && c. a. |= b?", function() {
+    // This should probably be derived.
+    assertThat(`
+      a => b && c.
+      a.
+    `)
+     .proving("b?")
+     .equalsTo(`false.`);
+   });
+
   it.skip("a => b || c. a. ~b. |= c.", function() {
     // This is logically correct.
     let code = Parser.parse(`

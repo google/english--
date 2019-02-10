@@ -495,7 +495,6 @@ describe("First Order Logic", function() {
         `);
   });
   
-  
   it("r(a, b)?", () => {
     // existential conjunction introduction with no indirection.
     assertThat(`
@@ -536,7 +535,20 @@ describe("First Order Logic", function() {
     `)
       .done();
   });
-    
+
+  it.skip("forall (x) p(x) => q(x) && r(x). p(a). |= q(a)?", () => {
+    assertThat(`
+      forall (x) p(x) => q(x) && r(x).
+      p(a).
+    `)
+      .proving("q(a)?")
+      .equalsTo(`
+        forall (x = a) q(x) && r(x).
+        q(a).
+    `)
+      .done();
+  });
+  
   it("generators", () => {
     function* a() {
       yield 1;
