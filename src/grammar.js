@@ -154,16 +154,20 @@ function peg$parse(input, options) {
              variable: {
                "@type": "Variable",
                name: id
-             }, 
-             expression: expression
+             }
            };
 
            if (value && value.length > 0) {
              // console.log(value);
              result.value = value[value.length - 1];
            }
+       
+           // TODO(goto): this will lead to a bug if we try to
+           // quantify a non-quantifiable expression, like
+           // forall (x) true.
+           expression.quantifiers.unshift(result);
 
-           return result;
+           return expression;
       },
       peg$c4 = function(left, op, right) {
           return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};

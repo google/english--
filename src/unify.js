@@ -4,24 +4,21 @@ function rewrite(expression, vars = {}) {
   let id = 1;
 
   function rewrite2(expression, vars = {}) {
+    // Assign ids to every quantifier.
+    for (let quantifier of expression.quantifiers || []) {
+      vars[quantifier.variable.name] = id;
+      quantifier.id = id;
+      // console.log(`${quantifier.variable.name} => ${id}`);
+      id++;
+    }
     if (expression["@type"] == "Program") {
       // covers the case where we are rewriting the
       // entire program.
       return {statements: expression.statements.map(x => rewrite2(x))};
-    } else if (expression["@type"] == "Quantifier") {
-      let result = expression.expression;
-      result.quantifiers = expression.quantifiers || [];
-      result.quantifiers.push({
-	"@type": expression["@type"],
-	"op": expression.op,
-	"variable": expression.variable,
-	id: id
-      });
-      vars[expression.variable.name] = id;
-      id++;
-      return rewrite2(result, vars);
     } else if (expression["@type"] == "Predicate") {
       for (let arg of expression.arguments) {
+	// console.log(arg.expression.name);
+	// console.log(vars);
 	if (arg.expression && vars[arg.expression.name]) {
 	  arg.free = true;
 	  arg.id = vars[arg.expression.name];
