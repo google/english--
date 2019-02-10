@@ -42,11 +42,12 @@ class Reasoner extends Backward {
     // console.trace();
     //    console.log(indent + "fail: " + JSON.stringify(goal));
     //}
-    //console.log(indent + "goal: " + stringify(goal));
+    // console.log(indent + "goal: " + stringify(goal));
     
     for (let subgoal of stack) {
-      // this is expensive and un-necessary, but more
-      // correct than equals().
+      // TODO(goto): this is expensive and un-necessary, but more
+      // correct than equals(). we can stringify before putting
+      // on the stack, so that we only need to do that once.
       // console.log(`${stringify(goal)} == ${stringify(subgoal)}`);
       if (stringify(goal) == stringify(subgoal)) {
 	// console.log(indent + "cycle.");
@@ -63,7 +64,7 @@ class Reasoner extends Backward {
 	yield propositional;
       }
     }
-    
+
     // existential introduction
     if (goal.quantifiers &&
 	goal.quantifiers.find(x => x.op == "forall") == undefined) {
@@ -80,7 +81,7 @@ class Reasoner extends Backward {
 	}
       }
     }
-    
+
     // universal introduction
     for (let statement of this.kb) {
 
@@ -117,21 +118,40 @@ class Reasoner extends Backward {
       implication.quantifiers = reversed.quantifiers;
       
       let unifies = unify(implication, goal);
-      
-      if (!unifies) {
-	// let right = clone(statement.right);
-	// right.quantifiers = right.quantifiers || [];
-	// right.quantifiers.push(...statement.quantifiers);
-	
-	// console.log(stringify(right));
-	// console.log(stringify(goal));
-	// console.log(right);
 
-	// let kb = new Reasoner({"@type": "Program", statements: [right]});
-	// let entails = kb.backward(goal);
-	// console.log(entails.reason[entails.reason.length - 2].given.quantifiers);
+      if (!unifies) {
+	// If we fail to unify trivially / lexically, we construct
+	// a new temporary knowledge base with the implication
+	// and check if the implication entails the goal. If it does,
+	// we use the result as the unification bindings.
+	let right = clone(statement.right);
+	right.quantifiers = right.quantifiers || [];
+	right.quantifiers.push(...statement.quantifiers);
 	
-	continue;
+	let reasoner = new Reasoner({"@type": "Program", statements: [right]});
+	let entails = reasoner.backward(goal);
+	// console.log(`out of the side inference: failed? ${entails.failed()}.`);
+	
+	if (entails.failed()) {
+	  continue;
+	}
+	// TODO(goto): this is a terrible way to get the resulting
+	// bindings of the result. We should come up with a better
+	// API.
+	// console.log(`original: ${stringify(statement)}`);
+	// console.log(`recurse: ${stringify(goal)}, right: ${stringify(right)}`);
+	// console.log(entails.toString());
+	let bindings = entails.reason[entails.reason.length - 2].given;
+	unifies = {};
+	for (let {variable, id, value} of bindings.quantifiers) {
+	  if (!value) {
+	    // console.log(variable.name);
+	    // console.log(bindings.quantifiers);
+	    // throw new Error("foo");
+	    continue;
+	  }
+	  unifies[`${variable.name}@${id}`] = value;
+	}
       }
       
       // TODO(goto): we probably need to push to the
@@ -156,7 +176,8 @@ class Reasoner extends Backward {
       let deps = this.go(left, stack);
       
       for (let dep of deps) {
-	if (!dep.failed()) {
+	// console.log(dep.conflicts(unifies));
+	if (!dep.failed() && !dep.conflicts(unifies)) {
 	  dep.bind(unifies);
 	  yield dep.bind(unifies)
 	    .push({given: fill(statement, dep.bindings, undefined, true)})
@@ -169,6 +190,10 @@ class Reasoner extends Backward {
 
     // universal conjunction elimination.
     for (let statement of this.quantifiers("&&")) {
+      if ((statement.quantifiers || []).find(x => x.op == "exists") != undefined) {
+	// the elimination requires all quantifiers to be of the type forall.
+	continue;
+      }
       let left = unify(statement.left, goal);
       if (left) {
 	yield Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
@@ -209,6 +234,7 @@ class Reasoner extends Backward {
 	goal.quantifiers.find(x => x.op == "forall") == undefined &&
 	goal.op == "&&") {
 
+      
       let variable = goal.quantifiers[0].variable.name;
       let left = JSON.parse(JSON.stringify(goal.left));
       left.quantifiers = goal.quantifiers;

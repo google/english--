@@ -536,16 +536,35 @@ describe("First Order Logic", function() {
       .done();
   });
 
-  it.skip("forall (x) p(x) => q(x) && r(x). p(a). |= q(a)?", () => {
+  it("forall (x) p(x) => q(x) && r(x). p(a). |= q(a)?", () => {
     assertThat(`
       forall (x) p(x) => q(x) && r(x).
       p(a).
     `)
       .proving("q(a)?")
       .equalsTo(`
-        forall (x = a) q(x) && r(x).
-        q(a).
+         p(a).
+         forall (x = a) p(x) => q(x) && r(x).
+         q(a).
     `)
+      .done();
+  });
+
+  it("exists (x) p(x) |= p(a)? nope.", () => {
+    assertThat("exists (x) p(x).")
+      .proving("p(a)?")
+      .done();
+  });
+
+  it("exists (x) exists (y) p(x, y) |= p(a, b)? nope.", () => {
+    assertThat("exists (x) exists (y) p(x, y).")
+      .proving("p(a, b)?")
+      .done();
+  });
+
+  it("exists (x) exists (y) p(x, y) && q(y, x) |= p(a, b)? nope.", () => {
+    assertThat("exists (x) exists (y) p(x, y) && q(y, x).")
+      .proving("p(a, b)?")
       .done();
   });
   

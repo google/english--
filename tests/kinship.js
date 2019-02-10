@@ -515,6 +515,13 @@ describe("Kinship", () => {
     ;
   });
 
+  it("parent(maura, ni)?", () => {
+    assertThat("exists (p) exists (g) exists (c) parent(g, p) && parent(p, c).")
+      .proving("parent(maura, ni)?")
+      .equalsTo("false.")
+      .done();
+  });
+  
   it("child(ni, maura)", () => {
     // the kb is missing this relationship, so we can't infer,
     // but this is otherwise working as expected.
