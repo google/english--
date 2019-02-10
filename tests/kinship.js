@@ -516,6 +516,75 @@ describe("Kinship", () => {
     // proofs when they lead to the same binding.
   });
 
+  it("sister(de, mel)", () => {
+    assertThat(kb)
+     .proving("sister(de, mel)?")
+     .equalsTo(`
+       daughter(de, maura).
+       exists (x = maura) daughter(de, x).
+       forall (x = maura) forall (y = de) daughter(y, x) => female(y) && parent(x, y).
+       female(de).
+       parent(maura, mel).
+       exists (p = maura) parent(p, mel).
+       daughter(de, maura).
+       forall (x = maura) forall (y = de) daughter(y, x) => female(y) && parent(x, y).
+       parent(maura, de).
+       forall (x = maura) forall (y = de) parent(x, y) => child(y, x).
+       child(de, maura).
+       forall (x = de) forall (y = maura) child(x, y) => parent(y, x).
+       exists (p = maura) parent(maura, de).
+       exists (p = maura) parent(p, mel) && parent(p, de).
+       forall (x = mel) forall (y = de) exists (p = maura) parent(p, x) && parent(p, y) => sibling(x, y).
+       sibling(mel, de).
+       forall (x = mel) forall (y = de) sibling(x, y) => sibling(y, x).
+       sibling(de, mel).
+       female(de) && sibling(de, mel) => female(de) && sibling(de, mel).
+       forall (x = de) forall (y = mel) female(x) && sibling(x, y) => sister(x, y).
+       sister(de, mel).
+    `);
+  });
+
+  it("aunt(de, leo)", () => {
+    assertThat(kb)
+     .proving("aunt(de, leo)?")
+     .equalsTo(`
+       parent(mel, leo).
+       exists (p = mel) parent(p, leo).
+       daughter(de, maura).
+       exists (x = maura) daughter(de, x).
+       forall (x = maura) forall (y = de) daughter(y, x) => female(y) && parent(x, y).
+       female(de).
+       parent(maura, mel).
+       exists (p = maura) parent(p, mel).
+       daughter(de, maura).
+       forall (x = maura) forall (y = de) daughter(y, x) => female(y) && parent(x, y).
+       parent(maura, de).
+       forall (x = maura) forall (y = de) parent(x, y) => child(y, x).
+       child(de, maura).
+       forall (x = de) forall (y = maura) child(x, y) => parent(y, x).
+       exists (p = maura) parent(maura, de).
+       exists (p = maura) parent(p, mel) && parent(p, de).
+       forall (x = mel) forall (y = de) exists (p = maura) parent(p, x) && parent(p, y) => sibling(x, y).
+       sibling(mel, de).
+       forall (x = mel) forall (y = de) sibling(x, y) => sibling(y, x).
+       sibling(de, mel).
+       female(de) && sibling(de, mel) => female(de) && sibling(de, mel).
+       forall (x = de) forall (y = mel) female(x) && sibling(x, y) => sister(x, y).
+       exists (p = mel) sister(de, mel).
+       exists (p = mel) parent(p, leo) && sister(de, p).
+       forall (a = de) forall (c = leo) exists (p = mel) parent(p, c) && sister(a, p) => aunt(a, c).
+       aunt(de, leo).
+    `);
+  });
+
+  it.skip("exists (x) aunt(x, leo)?", () => {
+    // TODO(goto): This fails. Investigate.
+    assertThat(kb)
+      .proving("exists (x) aunt(x, leo)?")
+      .equalsTo(`
+      `);
+  });
+  
   it.skip("exists (x) exists (y) child(x, y)?", () => {
     assertThat(kb)
     .proving("exists (x) exists (y) child(x, y)?")
