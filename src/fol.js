@@ -235,10 +235,17 @@ class Reasoner extends Backward {
       let left = unify(statement.left, goal);
       if (left) {
 	yield Result.of([{given: fill(statement, left, undefined, true)}, {given: goal}]);
+	if (!this.generates(goal)) {
+	  return;
+	}
       }
+
       let right = unify(statement.right, goal);
       if (right) {
 	yield Result.of([{given: fill(statement, right, undefined, true)}, {given: goal}]);
+	if (!this.generates(goal)) {
+	  return;
+	}
       }
     }
 
@@ -252,6 +259,9 @@ class Reasoner extends Backward {
 	stack.pop();
 	if (!result.failed()) {
 	  yield result.push({given: fill(statement, left, undefined, true), goal: goal});
+	  if (!this.generates(goal)) {
+	    return;
+	  }
 	}
       }
 
@@ -263,6 +273,9 @@ class Reasoner extends Backward {
 	stack.pop();
 	if (!result.failed()) {
 	  yield result.push({given: fill(statement, right, undefined, true), goal: goal});
+	  if (!this.generates(goal)) {
+	    return;
+	  }
 	}
       }
     }
@@ -292,6 +305,11 @@ class Reasoner extends Backward {
 	    yield dep.push(result).push({
 	      given: fill(goal, dep.bindings, undefined, true)
 	    }).bind(dep.bindings);
+
+	    if (!this.generates(goal)) {
+	      return;
+	    }
+	    
 	  }
           stack.pop();
 	}
