@@ -334,7 +334,6 @@ describe("Kinship", () => {
   });
 
   it("exists (p) spouse(dani, p)", () => {
-    // TODO(goto): calling done() here fails. figure out why.
     assertThat(kb)
      .proving("exists (p) spouse(dani, p)?")
      .equalsTo(`
@@ -342,13 +341,15 @@ describe("Kinship", () => {
        exists (x = mel) spouse(x, dani).
        forall (x = mel) forall (y = dani) spouse(x, y) => spouse(y, x).
        exists (p = mel) spouse(dani, p).
-     `);
+     `)
+      .done();
   });
 
   it("exists (x) spouse(mel, x)", () => {
     assertThat(kb)
-     .proving("exists (x) spouse(mel, x)?")
-     .equalsTo("spouse(mel, dani). exists (x = dani) spouse(mel, x).");
+      .proving("exists (x) spouse(mel, x)?")
+      .equalsTo("spouse(mel, dani). exists (x = dani) spouse(mel, x).")
+      .done();
   });
 
   it("mother(dani, anna)", () => {
@@ -387,7 +388,7 @@ describe("Kinship", () => {
         forall (x = anna) forall (y = leo) exists (p = mel) parent(p, x) && parent(p, y) => sibling(x, y).
         sibling(anna, leo).
     `);
-    // .done(); returns one more instance
+     // .done();
   });
 
   it("sibling(leo, anna)", () => {
@@ -468,7 +469,8 @@ describe("Kinship", () => {
         exists (p = mel) male(ni) && sibling(ni, p) && parent(p, leo).
         forall (u = ni) forall (c = leo) exists (p = mel) male(u) && sibling(u, p) && parent(p, c) => uncle(u, c).
         uncle(ni, leo).
-     `);
+     `)
+      .done();
   });
 
   it("exists (u) exists (p) parent(p, leo) && sibling(u, p) && male(u)?", () => {
@@ -537,21 +539,17 @@ describe("Kinship", () => {
     // but not unsound, i think. i need to add
     // the inference, but this addresses an
     // existing problem at the moment.
-    // forall (x) p(x) => q(x) && r(x);
-    // p(a)
-    // q(a)?
-    // should return true, but we don't currently
-    // recurse on the implication, but rather try
-    // to unify.
     assertThat(kb)
       .proving("exists (x) sibling(x, ni)?")
-      .equalsTo("false.");
+      .equalsTo("false.")
+      .done();
   });
 
   it("exists (x) sibling(ni, x)", () => {
     assertThat(kb)
-    .proving("exists (x) sibling(ni, x)?")
-    .equalsTo("false.");
+      .proving("exists (x) sibling(ni, x)?")
+      .equalsTo("false.")
+      .done();
   });
 
   it("grandparent(maura, anna)", () => {
