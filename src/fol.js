@@ -18,7 +18,7 @@ const {
 
 class Reasoner extends Backward {
   constructor(kb) {
-    super(rewrite(kb));
+    super(kb);
   }
   find(predicate) {
     return this.kb.filter(statement => (statement["@type"] == predicate));

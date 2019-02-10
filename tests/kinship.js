@@ -582,31 +582,31 @@ describe("Kinship", () => {
   });
 
   function assertThat(x) {
-   return {
-    proving(z) {
-     let result = new Reasoner(Parser.parse(x)).go(rewrite(Rule.of(z)));
-     let end = false;
-     return {
-      done() {
-       if (end) {
-        return this;
-       }
-       this.equalsTo("false.");
-       return this;
+    return {
+      proving(z) {
+	let result = new Reasoner(rewrite(Parser.parse(x))).go(rewrite(Rule.of(z)));
+	let end = false;
+	return {
+	  done() {
+	    if (end) {
+              return this;
+	    }
+	    this.equalsTo("false.");
+	    return this;
+	  },
+	  equalsTo(y) {
+	    let next = result.next();
+	    end = next.done;
+	    assertThat(toString(Parser.parse(next.value.toString())))
+              .equalsTo(toString(Parser.parse(y)));
+	    return this;
+	  }
+	};
       },
       equalsTo(y) {
-       let next = result.next();
-       end = next.done;
-       assertThat(toString(Parser.parse(next.value.toString())))
-        .equalsTo(toString(Parser.parse(y)));
-       return this;
+	Assert.deepEqual(x, y);
       }
-     };
-    },
-    equalsTo(y) {
-     Assert.deepEqual(x, y);
     }
-   }
   }
 
 });

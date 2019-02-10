@@ -166,7 +166,7 @@ describe("Knowledge", function() {
   function assertThat(x) {
     return {
       proving(z) {
-	let result = new Reasoner(Parser.parse(x)).go(rewrite(Rule.of(z)));
+	let result = new Reasoner(rewrite(Parser.parse(x))).go(rewrite(Rule.of(z)));
 	return {
 	  done() {
 	    this.equalsTo("false.")
