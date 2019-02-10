@@ -109,6 +109,13 @@ function fill(rule, map, override, head = false) {
    }
    delete result.free;
    delete result.id;
+
+   if (value["@type"] == "Argument" && value.value) {
+       // TODO(goto): figure out if this is a valid
+       // case or if this should never be supported.
+     value = value.value;
+   }
+
    if (head) {
    } else if (!override) {
     result.value = value;

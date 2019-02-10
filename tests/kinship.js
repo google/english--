@@ -524,18 +524,27 @@ describe("Kinship", () => {
     .done();
   });
 
-  it.skip("exists (x) sibling(x, ni)", () => {
+  it("exists (x) sibling(x, ni)", () => {
+    // there is a possible inference missing,
+    // but this isn't unsound. it is incomplete,
+    // but not unsound, i think. i need to add
+    // the inference, but this addresses an
+    // existing problem at the moment.
+    // forall (x) p(x) => q(x) && r(x);
+    // p(a)
+    // q(a)?
+    // should return true, but we don't currently
+    // recurse on the implication, but rather try
+    // to unify.
     assertThat(kb)
-    .proving("exists (x) sibling(x, ni)?")
-    .equalsTo(`
-    `);
+      .proving("exists (x) sibling(x, ni)?")
+      .equalsTo("false.");
   });
 
-  it.skip("exists (x) sibling(ni, x)", () => {
+  it("exists (x) sibling(ni, x)", () => {
     assertThat(kb)
     .proving("exists (x) sibling(ni, x)?")
-    .equalsTo(`
-    `);
+    .equalsTo("false.");
   });
 
   it("grandparent(maura, anna)", () => {

@@ -27,7 +27,7 @@ class Reasoner extends Backward {
   return this.go(goal, stack).next().value;
  }
  * quantifiers(op) {
-  // console.log(`${op}`);
+     // console.log(`${op}`);
   for (let statement of this.kb.filter(x => x.op == op)) {
    if (statement.quantifiers != undefined && statement.quantifiers.length > 0) {
     yield statement;
@@ -35,11 +35,12 @@ class Reasoner extends Backward {
   }
  }
  *go(goal, stack = []) {
-  //let indent = " ".repeat(stack.length);
+  let indent = " ".repeat(stack.length);
   //try {
-  // stringify(goal);
+  //    stringify(goal);
   //} catch (e) {
-  // console.log(indent + JSON.stringify(goal));
+      // console.trace();
+  //    console.log(indent + "fail: " + JSON.stringify(goal));
   //}
   //console.log(indent + "goal: " + stringify(goal));
 
@@ -120,15 +121,18 @@ class Reasoner extends Backward {
     continue;
    }
 
+   // console.log(unifies);
+
    // TODO(goto): we probably need to push to the
    // quantifiers rather than replace it.
    let head = clone(reversed.left);
    head.quantifiers = reversed.quantifiers;
+   // console.log(JSON.stringify(head, undefined, 2));
    let left = fill(head, unifies, true);
    
    // console.log(stringify(reversed));
    // console.log(stringify(head));
-   // console.log(stringify(left));
+   // console.log(JSON.stringify(left, undefined, 2));
    
    // console.log(stringify(left));
 
