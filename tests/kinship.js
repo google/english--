@@ -501,7 +501,7 @@ describe("Kinship", () => {
     `);
   });
 
-  it.skip("exists (x) exists (y) child(x, y)?", () => {
+  it("exists (x) exists (y) child(x, y)?", () => {
     assertThat(kb)
     .proving("exists (x) exists (y) child(x, y)?")
     .equalsTo("child(anna, mel). exists (x = anna) exists (y = mel) child(x, y).")

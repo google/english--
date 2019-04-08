@@ -537,6 +537,17 @@ describe("First order logic", function() {
     .done();
   });
 
+  it.skip("exists (x) exists (y) q(x, y)?", () => {
+    assertThat("p(a, b). forall (x) forall(y) p(x, y) => q(y, x).")
+    .proving("exists (x) exists (y) q(x, y)?")
+    .equalsTo(`
+      p(a, b).
+      exists (x = a) exists (y = b) p(x, y).
+      forall (x = a) forall (y = b) p(x, y) => q(y, x).
+      exists (x = a) exists (y = b) q(x, y).
+    `);
+  });
+
   it("mortal(socrates)", function() {
     assertThat("forall(x) men(x) => mortal(x). men(socrates).")
      .proving("mortal(socrates)?")
@@ -726,7 +737,9 @@ describe("First order logic", function() {
       equalsTo(y) {
        // console.log(result.toString());
        // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
-       assertThat(toString(Parser.parse(result.next().value.toString())))
+       let next = result.next().value;
+       // console.log(JSON.stringify(next.reason[2], undefined, 2));
+       assertThat(toString(Parser.parse(next.toString())))
         .equalsTo(toString(Parser.parse(y)));
        return this;
       }

@@ -171,13 +171,24 @@ class Reasoner extends Backward {
       // console.log("hello");
       // console.log(dep.bindings);
       // console.log(unifies);
+      //console.log("bindings");
+      //console.log(dep.bindings);
+      //console.log("unifies");
+      //console.log(unifies);
       dep.bind(unifies);
+      //console.log("bound");
+      //console.log(dep.bindings);
       // console.log("foobar");
-      // console.log(dep.bindings);
-      // console.log(unifies);
+      // console.log(goal);
+      // console.log(statement);
+      // let binding = Object.assign(dep.bindings, unify);
+      let premise = clone(fill(statement, dep.bindings, undefined, true));
+      // console.log(binding);
+      // console.log(JSON.stringify(premise, undefined, 2));
+      let consequent = clone(fill(goal, dep.bindings, undefined, true));
       yield dep.bind(unifies)
-	  .push({given: fill(statement, dep.bindings, undefined, true)})
-	  .push({given: fill(goal, dep.bindings, undefined, true)});
+       .push({given: premise})
+       .push({given: consequent});
     }
    }
 
