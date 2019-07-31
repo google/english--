@@ -12,28 +12,48 @@ describe.only("DRT", function() {
   });
 
   let S = (np, vp) => { return {"@type": "Sentence", np: np, vp: vp} };
-  let NP = (pn) => { return {"@type": "NounPhrase", pn: pn} };
+  let NP = (pn) => { return {"@type": "NounPhrase", np: pn} };
   let VP = (vb, np) => { return {"@type": "VerbPhrase", verb: vb, np: np} };
   let PN = (name) => { return {"@type": "ProperName", name: name} };
   let V = (name) => { return {"@type": "Verb", name: name} };
+  let PRO = (name) => { return {"@type": "Pronoun", name: name} };
 
   it.only("S = NP VP", function() {
     const parser = peg.generate(`
       S = np:NP vp:VP {return {"@type": "Sentence", np: np, vp: vp}}
-      VP = _ v:V _ np:NP _ { return {"@type": "VerbPhrase", verb: v, np: np}; }
-      NP = _ pn:PN _ { return { "@type": "NounPhrase", pn: pn}; }
-      PN = name:names { return {"@type": "ProperName", "name": name} }
-      V = name:verbs { return {"@type": "Verb", "name": name} }
+      VP = v:V np:NP { return {"@type": "VerbPhrase", verb: v, np: np}; }
+      NP = pn:PN { return { "@type": "NounPhrase", np: pn}; } /
+           pro:PRO { return { "@type": "NounPhrase", np: pro}; }
+      PN = _ name:names _ { return {"@type": "ProperName", "name": name} }
+      V = _ name:verbs _ { return {"@type": "Verb", "name": name} }
+      PRO = _ name:pronous _ { return {"@type": "Pronoun", "name": name} }
+
       _ = [ ]*
+
       names = "Jones" /
               "Mary"
       verbs = "likes" /
               "loves"
+      pronous = "he" / "him" / "she" / "her" / "it" / "they" /
+                "He" / "Him" / "She" / "Her" / "It" / "They"
+
     `);
     assertThat(parser.parse("Jones loves Mary"))
      .equalsTo(S(NP(PN("Jones")), 
                  VP(V("loves"), 
                     NP(PN("Mary")))));
+    assertThat(parser.parse("Mary likes Jones"))
+     .equalsTo(S(NP(PN("Mary")), 
+                 VP(V("likes"), 
+                    NP(PN("Jones")))));
+    assertThat(parser.parse("Mary likes him"))
+     .equalsTo(S(NP(PN("Mary")), 
+                 VP(V("likes"), 
+                    NP(PRO("him")))));
+    assertThat(parser.parse("She likes him"))
+     .equalsTo(S(NP(PRO("She")), 
+                 VP(V("likes"), 
+                    NP(PRO("him")))));
    });
 
   function assertThat(x) {
