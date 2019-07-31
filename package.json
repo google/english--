@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/samuelgoto/english",
   "dependencies": {
+    "nearley": "^2.18.0",
     "pegjs": "^0.10.0"
   },
   "devDependencies": {

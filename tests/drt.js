@@ -1,7 +1,21 @@
 const Assert = require("assert");
 const peg = require("pegjs");
 
+const nearley = require("nearley");
+const grammar = require("./grammar.js");
+
 describe.only("DRT", function() {
+  it.only("nearly", function() {
+    // Create a Parser object from our grammar.
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    
+    // Parse something!
+    parser.feed("foo\n");
+    
+    // parser.results is an array of possible parsings.
+    assertThat(parser.results).equalsTo([[[[["foo"], "\n"] ]]]);
+  });
+   
   it("basic", function() {
     const parser = peg.generate(`
       S = "foo" /
@@ -20,7 +34,7 @@ describe.only("DRT", function() {
   let DET = (name) => { return {"@type": "Determiner", name: name} };
   let N = (name) => { return {"@type": "Noun", name: name} };
 
-  it.only("S = NP VP", function() {
+  it("S = NP VP", function() {
     const parser = peg.generate(`
       S = np:NP vp:VP PERIOD {return {"@type": "Sentence", np: np, vp: vp}}
       VP = v:V np:NP { return {"@type": "VerbPhrase", verb: v, np: np}; }
