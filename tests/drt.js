@@ -4,17 +4,27 @@ const peg = require("pegjs");
 const nearley = require("nearley");
 const grammar = require("./grammar.js");
 
+const {S, VP, NP, PN, V, N} = require("./ast.js");
+
 describe.only("DRT", function() {
-  it.only("nearly", function() {
-    // Create a Parser object from our grammar.
+  it("nearly", function() {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-    
-    // Parse something!
     parser.feed("foo\n");
-    
-    // parser.results is an array of possible parsings.
     assertThat(parser.results).equalsTo([[[[["foo"], "\n"] ]]]);
   });
+
+  function parse(code) {
+   const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+   parser.feed(code);
+   return parser.results;
+  }
+
+  it.only("nearly basic", function() {
+    assertThat(parse("Jones likes Mary."))
+     .equalsTo([S(NP(PN("Jones")), 
+                  VP(V("likes"), 
+                     NP(PN("Mary"))))]);
+   });
    
   it("basic", function() {
     const parser = peg.generate(`
@@ -24,15 +34,6 @@ describe.only("DRT", function() {
     assertThat(parser.parse("foo")).equalsTo("foo");
     assertThat(parser.parse("bar")).equalsTo("bar");
   });
-
-  let S = (np, vp) => { return {"@type": "Sentence", np: np, vp: vp} };
-  let NP = (...args) => { return {"@type": "NounPhrase", children: args} };
-  let VP = (vb, np) => { return {"@type": "VerbPhrase", verb: vb, np: np} };
-  let PN = (name) => { return {"@type": "ProperName", name: name} };
-  let V = (name) => { return {"@type": "Verb", name: name} };
-  let PRO = (name) => { return {"@type": "Pronoun", name: name} };
-  let DET = (name) => { return {"@type": "Determiner", name: name} };
-  let N = (name) => { return {"@type": "Noun", name: name} };
 
   it("S = NP VP", function() {
     const parser = peg.generate(`
