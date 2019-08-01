@@ -6,8 +6,8 @@ const grammar = require("./grammar.js");
 
 const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
-describe.only("DRT", function() {
-  it("nearly", function() {
+describe("DRT", function() {
+  it.skip("nearly", function() {
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     parser.feed("foo\n");
     assertThat(parser.results).equalsTo([[[[["foo"], "\n"] ]]]);
@@ -19,7 +19,7 @@ describe.only("DRT", function() {
    return parser.results;
   }
 
-  it.only("nearly basic", function() { 
+  it("nearly basic", function() { 
    assertThat(parse("Jones likes Mary."))
      .equalsTo([S(NP(PN("Jones")), 
                   VP(V("likes"), 

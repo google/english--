@@ -656,13 +656,7 @@ describe("First Order Logic", function() {
 	};
       },
       equalsTo(y) {
-       // console.log(result.toString());
-       // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
-       let next = result.next().value;
-       // console.log(JSON.stringify(next.reason[2], undefined, 2));
-       assertThat(toString(Parser.parse(next.toString())))
-        .equalsTo(toString(Parser.parse(y)));
-       return this;
+       Assert.deepEqual(x, y);
       }
     }
   }
