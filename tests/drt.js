@@ -51,6 +51,13 @@ describe.only("DRT", function() {
                     NP(AND(NP(DET("a"), N("woman")),
                            NP(DET("a"), N("car")))
                        )))]);
+    assertThat(parse("a man and a woman likes a car."))
+     .equalsTo([S(NP(AND(NP(DET("a"), N("man")),
+                         NP(DET("a"), N("woman")))
+                     ), 
+                  VP(V("likes"), 
+                     NP(DET("a"), N("car"))
+                     ))]);
    });
    
   it("basic", function() {
