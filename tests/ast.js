@@ -8,4 +8,5 @@ module.exports = {
  PRO: (name) => { return {"@type": "Pronoun", name: name} },
  DET: (name) => { return {"@type": "Determiner", name: name} },
  N: (name) => { return {"@type": "Noun", name: name} },
+ AND: (left, right) => { return {"@type": "Conjunction", left: left, right: right} },
 }

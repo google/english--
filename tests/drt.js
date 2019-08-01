@@ -4,7 +4,7 @@ const peg = require("pegjs");
 const nearley = require("nearley");
 const grammar = require("./grammar.js");
 
-const {S, VP, NP, PN, V, PRO, DET, N} = require("./ast.js");
+const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
 describe.only("DRT", function() {
   it("nearly", function() {
@@ -26,24 +26,31 @@ describe.only("DRT", function() {
                      NP(PN("Mary"))))]);
     assertThat(parse("Mary likes Jones."))
      .equalsTo([S(NP(PN("Mary")), 
-                 VP(V("likes"), 
-                    NP(PN("Jones"))))]);
+                  VP(V("likes"), 
+                     NP(PN("Jones"))))]);
     assertThat(parse("Mary likes him."))
      .equalsTo([S(NP(PN("Mary")), 
-                 VP(V("likes"), 
-                    NP(PRO("him"))))]);
+                  VP(V("likes"), 
+                     NP(PRO("him"))))]);
     assertThat(parse("she likes him."))
      .equalsTo([S(NP(PRO("she")), 
-                 VP(V("likes"), 
-                    NP(PRO("him"))))]);
+                  VP(V("likes"), 
+                     NP(PRO("him"))))]);
     assertThat(parse("she likes every car."))
      .equalsTo([S(NP(PRO("she")), 
-                 VP(V("likes"), 
-                    NP(DET("every"), N("car"))))]);
+                  VP(V("likes"), 
+                     NP(DET("every"), N("car"))))]);
     assertThat(parse("a man likes a woman."))
      .equalsTo([S(NP(DET("a"), N("man")), 
+                  VP(V("likes"), 
+                     NP(DET("a"), N("woman"))))]);
+
+    assertThat(parse("a man likes a woman and a car."))
+     .equalsTo([S(NP(DET("a"), N("man")), 
                  VP(V("likes"), 
-                    NP(DET("a"), N("woman"))))]);
+                    NP(AND(NP(DET("a"), N("woman")),
+                           NP(DET("a"), N("car")))
+                       )))]);
    });
    
   it("basic", function() {

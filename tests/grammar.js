@@ -2,7 +2,7 @@
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
- const {S, VP, NP, PN, V, PRO, DET, N} = require("./ast.js"); var grammar = {
+ const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js"); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -103,6 +103,8 @@ function id(x) { return x[0]; }
     {"name": "NP", "symbols": ["PN", "_"], "postprocess": args => NP(PN(args[0][0]))},
     {"name": "NP", "symbols": ["PRO", "_"], "postprocess": args => NP(PRO(args[0][0]))},
     {"name": "NP", "symbols": ["DET", "_", "N", "_"], "postprocess": args => NP(DET(args[0][0]), N(args[2][0]))},
+    {"name": "NP$string$1", "symbols": [{"literal":"a"}, {"literal":"n"}, {"literal":"d"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "NP", "symbols": ["NP", "NP$string$1", "_", "NP"], "postprocess": args => NP(AND(args[0], args[3]))},
     {"name": "PN$string$1", "symbols": [{"literal":"J"}, {"literal":"o"}, {"literal":"n"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "PN", "symbols": ["PN$string$1"]},
     {"name": "PN$string$2", "symbols": [{"literal":"S"}, {"literal":"m"}, {"literal":"i"}, {"literal":"t"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
