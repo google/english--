@@ -2,7 +2,7 @@
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
- const {S, VP, NP, PN, V} = require("./ast.js"); var grammar = {
+ const {S, VP, NP, PN, V, PRO, DET, N} = require("./ast.js"); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -101,6 +101,8 @@ function id(x) { return x[0]; }
     {"name": "S", "symbols": ["NP", "VP", {"literal":"."}], "postprocess": args => S(args[0], args[1])},
     {"name": "VP", "symbols": ["V", "_", "NP"], "postprocess": args => VP(V(args[0][0]), args[2])},
     {"name": "NP", "symbols": ["PN", "_"], "postprocess": args => NP(PN(args[0][0]))},
+    {"name": "NP", "symbols": ["PRO", "_"], "postprocess": args => NP(PRO(args[0][0]))},
+    {"name": "NP", "symbols": ["DET", "_", "N", "_"], "postprocess": args => NP(DET(args[0][0]), N(args[2][0]))},
     {"name": "PN$string$1", "symbols": [{"literal":"J"}, {"literal":"o"}, {"literal":"n"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "PN", "symbols": ["PN$string$1"]},
     {"name": "PN$string$2", "symbols": [{"literal":"S"}, {"literal":"m"}, {"literal":"i"}, {"literal":"t"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
@@ -110,7 +112,40 @@ function id(x) { return x[0]; }
     {"name": "V$string$1", "symbols": [{"literal":"l"}, {"literal":"i"}, {"literal":"k"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V", "symbols": ["V$string$1"]},
     {"name": "V$string$2", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "V", "symbols": ["V$string$2"]}
+    {"name": "V", "symbols": ["V$string$2"]},
+    {"name": "N$string$1", "symbols": [{"literal":"b"}, {"literal":"o"}, {"literal":"o"}, {"literal":"k"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "N", "symbols": ["N$string$1"]},
+    {"name": "N$string$2", "symbols": [{"literal":"m"}, {"literal":"a"}, {"literal":"n"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "N", "symbols": ["N$string$2"]},
+    {"name": "N$string$3", "symbols": [{"literal":"w"}, {"literal":"o"}, {"literal":"m"}, {"literal":"a"}, {"literal":"n"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "N", "symbols": ["N$string$3"]},
+    {"name": "N$string$4", "symbols": [{"literal":"d"}, {"literal":"o"}, {"literal":"n"}, {"literal":"k"}, {"literal":"e"}, {"literal":"y"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "N", "symbols": ["N$string$4"]},
+    {"name": "N$string$5", "symbols": [{"literal":"c"}, {"literal":"a"}, {"literal":"r"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "N", "symbols": ["N$string$5"]},
+    {"name": "DET", "symbols": [{"literal":"a"}]},
+    {"name": "DET$string$1", "symbols": [{"literal":"e"}, {"literal":"v"}, {"literal":"e"}, {"literal":"r"}, {"literal":"y"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "DET", "symbols": ["DET$string$1"]},
+    {"name": "DET$string$2", "symbols": [{"literal":"t"}, {"literal":"h"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "DET", "symbols": ["DET$string$2"]},
+    {"name": "DET$string$3", "symbols": [{"literal":"s"}, {"literal":"o"}, {"literal":"m"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "DET", "symbols": ["DET$string$3"]},
+    {"name": "DET$string$4", "symbols": [{"literal":"a"}, {"literal":"l"}, {"literal":"l"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "DET", "symbols": ["DET$string$4"]},
+    {"name": "DET$string$5", "symbols": [{"literal":"m"}, {"literal":"o"}, {"literal":"s"}, {"literal":"t"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "DET", "symbols": ["DET$string$5"]},
+    {"name": "PRO$string$1", "symbols": [{"literal":"h"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$1"]},
+    {"name": "PRO$string$2", "symbols": [{"literal":"h"}, {"literal":"i"}, {"literal":"m"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$2"]},
+    {"name": "PRO$string$3", "symbols": [{"literal":"s"}, {"literal":"h"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$3"]},
+    {"name": "PRO$string$4", "symbols": [{"literal":"h"}, {"literal":"e"}, {"literal":"r"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$4"]},
+    {"name": "PRO$string$5", "symbols": [{"literal":"i"}, {"literal":"t"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$5"]},
+    {"name": "PRO$string$6", "symbols": [{"literal":"t"}, {"literal":"h"}, {"literal":"e"}, {"literal":"y"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PRO", "symbols": ["PRO$string$6"]}
 ]
   , ParserStart: "S"
 }
