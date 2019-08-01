@@ -2,18 +2,19 @@ const Assert = require("assert");
 const {Parser, Rule} = require("../src/parser.js");
 
 const {
- program, 
- forall, 
- exists, 
- implies, 
- predicate, 
- binary, 
- literal, 
- constant, 
- and, 
- or, 
- negation,
- argument} = Parser;
+  program, 
+  forall, 
+  exists, 
+  implies, 
+  predicate, 
+  binary, 
+  literal, 
+  constant, 
+  and, 
+  or,
+  xor,
+  negation,
+  argument} = Parser;
 
 describe("Parser", function() {
   it("examples", function() {
@@ -66,120 +67,71 @@ describe("Parser", function() {
   });
 
   it("true", function() {
-    assertThat(Parser.parse("true.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "Constant", 
-       "name": "true"
-      }]
-    });
+    assertThat(Parser.parse("true."))
+      .equalsTo(program([
+	constant("true")
+      ]));
    });
 
   it("false", function() {
-    assertThat(Parser.parse("false.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "Constant", 
-       "name": "false"
-      }]
-    });
+    assertThat(Parser.parse("false."))
+      .equalsTo(program([
+	constant("false")
+      ]));
    });
 
   it("a", function() {
-    assertThat(Parser.parse("a.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "Literal", 
-       "name": "a"
-      }]
-    });
+    assertThat(Parser.parse("a."))
+      .equalsTo(program([
+	literal("a")
+      ]));
    });
 
   it("~a", function() {
     assertThat(Parser.parse("~a."))
-     .equalsTo(program([negation(literal("a"))]));
+      .equalsTo(program([
+	negation(literal("a"))
+      ]));
    });
 
   it("~~a", function() {
     assertThat(Parser.parse("~~a."))
-     .equalsTo(program([negation(negation(literal("a")))]));
+      .equalsTo(program([
+	negation(negation(literal("a")))
+      ]));
    });
 
   it("a && b", function() {
-    assertThat(Parser.parse("a && b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "BinaryOperator", 
-        "left": {
-          "@type": "Literal",
-          "name" : "a"
-        },
-        "op": "&&",
-        "right": {
-          "@type": "Literal",
-          "name" : "b"
-        }
-       }]
-     });
+    assertThat(Parser.parse("a && b."))
+      .equalsTo(program([
+	and(literal("a"), literal("b"))
+      ]));
    });
 
   it("a || b", function() {
-    assertThat(Parser.parse("a || b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-         "@type": "BinaryOperator", 
-         "left": {
-          "@type": "Literal",
-          "name" : "a"
-         },
-         "op": "||",
-         "right": {
-          "@type": "Literal",
-          "name" : "b"
-         }
-        }]
-     });
+    assertThat(Parser.parse("a || b."))
+      .equalsTo(program([
+	or(literal("a"), literal("b"))
+      ]));
    });
 
   it("a ^ b", function() {
-    assertThat(Parser.parse("a ^ b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": {
-          "@type": "Literal",
-          "name" : "a"
-        },
-       "op": "^",
-       "right": {
-          "@type": "Literal",
-          "name" : "b"
-        }
-      }]
-     });
+    assertThat(Parser.parse("a ^ b."))
+      .equalsTo(program([
+	xor(literal("a"), literal("b"))
+      ]));
    });
 
   it("a => b", function() {
-    assertThat(Parser.parse("a => b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": {
-         "@type": "Literal",
-         "name": "a"        
-       },
-       "op": "=>",
-       "right": {
-         "@type": "Literal",
-         "name": "b"
-       }
-      }]
-     });
+    assertThat(Parser.parse("a => b."))
+      .equalsTo(program([
+	implies(literal("a"), literal("b"))
+      ]));
    });
 
   it("~a", function() {
     assertThat(Parser.parse("~a."))
-     .equalsTo(program([negation(literal("a"))]));
+      .equalsTo(program([negation(literal("a"))]));
    });
 
    it("a => b. a.", function() {
@@ -206,127 +158,38 @@ describe("Parser", function() {
   });
 
   it("a => b && c", function() {
-    assertThat(Parser.parse("a => b && c.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": {
-         "@type": "Literal",
-         "name": "a"        
-       },
-       "op": "=>",
-       "right": {
-         "@type": "BinaryOperator",
-         "op": "&&",
-         "left": {
-           "@type": "Literal",
-           "name" : "b"
-         },
-         "right": {
-           "@type": "Literal",
-           "name" : "c"
-         }
-       }
-      }]
-     });
-   });
+    assertThat(Parser.parse("a => b && c."))
+      .equalsTo(program([
+	implies(literal("a"), and(literal("b"), literal("c")))
+      ]));
+  });
 
   it("a && b || c", function() {
-    assertThat(Parser.parse("a && b || c.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": {
-         "@type": "Literal",
-         "name": "a"        
-       },
-       "op": "&&",
-       "right": {
-         "@type": "BinaryOperator",
-         "op": "||",
-         "left": {
-           "@type": "Literal",
-           "name": "b"
-         },
-         "right": {
-           "@type": "Literal",
-           "name": "c"
-         }
-       }
-      }]
-     });
+    assertThat(Parser.parse("a && b || c."))
+      .equalsTo(program([
+	and(literal("a"), or(literal("b"), literal("c")))
+      ]));
    });
 
   it("P(a) => Q(a)", function() {
-    assertThat(Parser.parse("P(a) => Q(a).")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-       "@type": "BinaryOperator", 
-       "left": {
-         "@type": "Predicate",
-          "name": "P",
-          "arguments": [arg("a")],
-       },
-       "op": "=>",
-       "right": {
-         "@type": "Predicate",
-         "name": "Q",
-         "arguments": [arg("a")]
-        }
-      }]
-     });
+    assertThat(Parser.parse("P(a) => Q(a)."))
+      .equalsTo(program([
+	implies(predicate("P", [arg("a")]), predicate("Q", [arg("a")]))
+      ]));
    });
 
   it("forall (a) a && b", function() {
-    assertThat(Parser.parse("forall (a) a && b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Quantifier",
-        "op": "forall",
-        "variable": {
-          "@type": "Variable",
-          "name": "a"
-         },
-        "expression": {
-          "@type": "BinaryOperator", 
-          "op": "&&",
-          "left": {
-            "@type": "Literal",
-            "name" : "a"
-          },
-          "right": {
-            "@type": "Literal",
-            "name" : "b"
-          }
-         }
-       }]
-     });
+    assertThat(Parser.parse("forall (a) a && b."))
+      .equalsTo(program([
+	forall("a", and(literal("a"), literal("b")))
+      ]));
    });
 
   it("exists (a) a && b", function() {
-    assertThat(Parser.parse("exists (a) a && b.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Quantifier",
-        "op": "exists",
-        "variable": {
-          "@type": "Variable",
-          "name": "a"
-        },
-        "expression": {
-          "@type": "BinaryOperator", 
-          "op": "&&",
-          "left": {
-            "@type": "Literal",
-            "name" : "a"
-          },
-          "right": {
-            "@type": "Literal",
-            "name" : "b"
-          }
-         }
-       }]
-     });
+    assertThat(Parser.parse("exists (a) a && b."))
+      .equalsTo(program([
+	exists("a", and(literal("a"), literal("b")))
+      ]));
    });
 
   it("(forall (x) P(x)) && (true)", function() {
@@ -360,55 +223,33 @@ describe("Parser", function() {
    });
 
   it("P()", function() {
-    assertThat(Parser.parse("P().")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Predicate",
-        "name": "P"
-       }]
-     });
+    assertThat(Parser.parse("P().")).equalsTo(program([predicate("P", [])]));
    });
 
   it("P(a)", function() {
-    assertThat(Parser.parse("P(a).")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Predicate",
-        "name": "P",
-        "arguments": [arg("a")]
-       }]
-     });
+    assertThat(Parser.parse("P(a)."))
+      .equalsTo(program([predicate("P", [arg("a")])]));
    });
 
   it("P(a, b, c)", function() {
-    assertThat(Parser.parse("P(a, b, c).")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-        "@type": "Predicate",
-        "name": "P",
-        "arguments": [arg("a"), arg("b"), arg("c")]
-       }]
-     });
+    assertThat(Parser.parse("P(a, b, c)."))
+      .equalsTo(program([predicate("P", [
+	arg("a"), arg("b"), arg("c")
+      ])]));
    });
 
    it("line breaks at the end", function() {
-    assertThat(Parser.parse("a.\n\n")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-         "@type": "Literal", 
-         "name": "a"
-        }]
-    });
-  });
+     assertThat(Parser.parse("a.\n\n"))
+       .equalsTo(program([
+	 literal("a")
+       ]));
+   });
 
   it("line breaks at the beginning", function() {
-    assertThat(Parser.parse("\n\na.")).equalsTo({
-      "@type": "Program", 
-      "statements": [{
-         "@type": "Literal", 
-         "name": "a"
-        }]
-    });
+    assertThat(Parser.parse("\n\na."))
+      .equalsTo(program([
+	literal("a")
+      ]));
   });
 
   it("Multiple statements", function() {
@@ -431,10 +272,8 @@ describe("Parser", function() {
 
   it("forall (x) man(x) => mortal(x), man(Socrates)", function() {
     let code = Parser.parse(`
-
      forall (x) man(x) => mortal(x).
      man(Socrates).
-
     `);
 
     assertThat(code).equalsTo(program([

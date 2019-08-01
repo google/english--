@@ -12,39 +12,43 @@ expression
   / negation
 
 quantifier
-  = quantifier:QUANTIFIER OPENPAREN id:identifier value:(_ "=" _ primary)? CLOSEPAREN expression:expression { 
+  = quantifier:QUANTIFIER OPENPAREN id:identifier value:(_ "=" _ primary)? CLOSEPAREN expression:expression {
      let result = {
        "@type": "Quantifier", 
-       op: quantifier, 
+       op: quantifier,
        variable: {
          "@type": "Variable",
          name: id
-       }, 
-       expression: expression
+       }
      };
 
      if (value && value.length > 0) {
        // console.log(value);
        result.value = value[value.length - 1];
      }
+ 
+     // TODO(goto): this will lead to a bug if we try to
+     // quantify a non-quantifiable expression, like
+     // forall (x) true.
+     expression.quantifiers.unshift(result);
 
-     return result;
+     return expression;
 }
 
 implication
   = left:logical op:IMPLICATION right:expression {
-    return {"@type": "BinaryOperator", left:left, op:op, right:right};
+    return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};
    }
   / head:IF left:logical op:THEN right:expression {
-    return {"@type": "BinaryOperator", left:left, op:op, right:right};
+    return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};
    }
 
 negation
-  =  NEGATION expression:expression { return {"@type": "UnaryOperator", op: "~", expression: expression} }
+  =  NEGATION expression:expression { return {"@type": "UnaryOperator", op: "~", expression: expression, quantifiers: []} }
  
 logical
   = left:primary op:OPLOGIC right:expression {
-    return {"@type": "BinaryOperator", left:left, op:op, right:right};
+    return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};
    }
   / primary
 
@@ -58,10 +62,10 @@ primary
   / id:identifier { return {"@type": "Literal", name: id} }
 
 predicate =
-  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id} }
+  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Predicate", name: id, arguments: [], quantifiers: []} }
   / id:identifier OPENPAREN head:argument tail:("," argument)* CLOSEPAREN { 
     let rest = tail.map(x => x[1]);
-    return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+    return {"@type": "Predicate", name: id, arguments: [head, ...rest], quantifiers: []}
   }
 
 argument =
@@ -79,10 +83,10 @@ argument =
   }
 
 function =
-  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Function", name: id} }
+  id:identifier OPENPAREN CLOSEPAREN { return {"@type": "Function", name: id, quantifiers: []} }
   / id:identifier OPENPAREN head:argument tail:("," argument)* CLOSEPAREN { 
     let rest = tail.map(x => x[1]);
-    return {"@type": "Function", name: id, arguments: [head, ...rest]}
+    return {"@type": "Function", name: id, arguments: [head, ...rest], quantifiers: []}
   }
   
 identifier "identifier"

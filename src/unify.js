@@ -1,127 +1,131 @@
 const {equals, stringify, toString, clone} = require("./forward.js");
 
 function rewrite(expression, vars = {}) {
- let id = 1;
+  let id = 1;
 
- function rewrite2(expression, vars = {}) {
-  if (expression["@type"] == "Program") {
-   // covers the case where we are rewriting the
-   // entire program.
-   return {statements: expression.statements.map(x => rewrite2(x))};
-  } else if (expression["@type"] == "Quantifier") {
-   let result = expression.expression;
-   result.quantifiers = expression.quantifiers || [];
-   result.quantifiers.push({
-     "@type": expression["@type"],
-      "op": expression.op,
-      "variable": expression.variable,
-      id: id
-      });
-   vars[expression.variable.name] = id;
-   id++;
-   return rewrite2(result, vars);
-  } else if (expression["@type"] == "Predicate") {
-   for (let arg of expression.arguments) {
-    if (arg.expression && vars[arg.expression.name]) {
-     arg.free = true;
-     arg.id = vars[arg.expression.name];
+  function rewrite2(expression, vars = {}) {
+    // Assign ids to every quantifier.
+    for (let quantifier of expression.quantifiers || []) {
+      vars[quantifier.variable.name] = id;
+      quantifier.id = id;
+      // console.log(`${quantifier.variable.name} => ${id}`);
+      id++;
     }
-   }
-   return expression;
-  } else if (expression["@type"] == "BinaryOperator") {
-   expression.left = rewrite2(expression.left, vars);
-   expression.right = rewrite2(expression.right, vars);
-   return expression;
-  } else if (expression["@type"] == "UnaryOperator") {
-   expression.expression = rewrite2(expression.expression, vars);
-   return expression;
-  } else {
-   throw new Error("unknown type");
+    if (expression["@type"] == "Program") {
+	// covers the case where we are rewriting the
+	// entire program.
+	return {statements: expression.statements.map(x => rewrite2(x))};
+    } else if (expression["@type"] == "Predicate") {
+      for (let arg of expression.arguments) {
+	// console.log(arg.expression.name);
+	// console.log(vars);
+	if (arg.expression && vars[arg.expression.name]) {
+	  arg.free = true;
+	  arg.id = vars[arg.expression.name];
+	}
+      }
+      return expression;
+    } else if (expression["@type"] == "BinaryOperator") {
+      expression.left = rewrite2(expression.left, vars);
+      expression.right = rewrite2(expression.right, vars);
+      return expression;
+    } else if (expression["@type"] == "UnaryOperator") {
+      expression.expression = rewrite2(expression.expression, vars);
+      return expression;
+    } else {
+      throw new Error("unknown type");
+    }
   }
- }
 
- return rewrite2(expression, vars);
+  return rewrite2(expression, vars);
 }
 
 function id(arg) {
- return `${arg.expression.name}@${arg.id || ""}`;
+  return `${arg.expression.name}@${arg.id || ""}`;
 }
 
 function fill(rule, map, override, head = false) {
- let result = clone(rule);
+  let result = clone(rule);
 
- // console.log(map);
- // console.log(rule);
-
- let deref = (name) => {
-  let key = name;
-  while (map[key] && map[key].expression && map[key].free) {
-   if (key == id(map[key])) {
-    // circular reference.
-    // console.log(`${key}: ${JSON.stringify(map)}`);
-    break;
-   }
-   key = map[key].expression.name;
-  }
-  return map[key];
- }
-
- for (let quantifier of result.quantifiers || []) {
-  // console.log(quantifier);
-  let id = `${quantifier.variable.name}@${quantifier.id || ""}`;
-  let value = deref(id);
-  // console.log(key);
   // console.log(map);
-  // console.log(value);
-  if (value) {
-   quantifier.value = value;
-  }
-  //if (map[quantifier.variable.name]) {
-  //  let key = quantifier.variable.name;
-  //  while (map[key] && map[key].free) {
-  //    key = map[key].expression.name;
-  //  }
-  // quantifier.value = map[key];
-  //}
- }
+  // console.log(rule);
 
- if (result["@type"] == "UnaryOperator") {
-  result.expression = fill(result.expression, map, override, head);
- } else if (result["@type"] == "BinaryOperator") {
-  result.left = fill(result.left, map, override, head);
-  result.right = fill(result.right, map, override, head);
- } else if (result["@type"] == "Argument") {
-  if (result.expression["@type"] == "Function") {
-   result.expression = fill(result.expression, map, override, head);
+  let deref = (name) => {
+    let key = name;
+    while (map[key] && map[key].expression && map[key].free) {
+      if (key == id(map[key])) {
+	// circular reference.
+	// console.log(`${key}: ${JSON.stringify(map)}`);
+	break;
+      }
+      key = map[key].expression.name;
+    }
+    return map[key];
   }
-  if (result.expression["@type"] == "Literal" && result.free) {
-   // console.log("hi");
-   // let mapping = map[result.expression.name];
-   let value = deref(id(result));
-   // console.log(value);
-   // console.log(result);
-   // console.log(map);
-   // console.log();
-   // console.log(result.expression.name);
-   // console.log(`${JSON.stringify(value)} == ${JSON.stringify(mapping)}`);
-   if (!value) {
-    return result;
-   }
-   delete result.free;
-   delete result.id;
-   if (head) {
-   } else if (!override) {
-    result.value = value;
-   } else {
-    result.expression = value;
-   }
+
+  for (let quantifier of result.quantifiers || []) {
+    // console.log(quantifier);
+    let id = `${quantifier.variable.name}@${quantifier.id || ""}`;
+    let value = deref(id);
+    // console.log(key);
+    // console.log(map);
+    // console.log(value);
+    if (value) {
+      quantifier.value = value;
+    }
+    //if (map[quantifier.variable.name]) {
+    //  let key = quantifier.variable.name;
+    //  while (map[key] && map[key].free) {
+    //    key = map[key].expression.name;
+    //  }
+    // quantifier.value = map[key];
+    //}
   }
- } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
-  result.arguments = result.arguments.map(x => {
-    return fill(x, map, override, head);
-   });
- }
- return result;
+
+  if (result["@type"] == "UnaryOperator") {
+    result.expression = fill(result.expression, map, override, head);
+  } else if (result["@type"] == "BinaryOperator") {
+    result.left = fill(result.left, map, override, head);
+    result.right = fill(result.right, map, override, head);
+  } else if (result["@type"] == "Argument") {
+    if (result.expression["@type"] == "Function") {
+      result.expression = fill(result.expression, map, override, head);
+    }
+    if (result.expression["@type"] == "Literal" && result.free) {
+      // console.log("hi");
+      // let mapping = map[result.expression.name];
+      let value = deref(id(result));
+      // console.log(value);
+      // console.log(result);
+      // console.log(map);
+      // console.log();
+      // console.log(result.expression.name);
+      // console.log(`${JSON.stringify(value)} == ${JSON.stringify(mapping)}`);
+      if (!value) {
+	return result;
+      }
+      delete result.free;
+      delete result.id;
+      
+      if (value["@type"] == "Argument" && value.value) {
+	// TODO(goto): figure out if this is a valid
+	// case or if this should never be supported.
+	value = value.value;
+      }
+
+      if (head) {
+      } else if (!override) {
+	result.value = value;
+      } else {
+	result.expression = value;
+      }
+    }
+  } else if (result["@type"] == "Function" || result["@type"] == "Predicate") {
+    result.arguments = result.arguments.map(x => {
+      return fill(x, map, override, head);
+    });
+  }
+  return result;
 }
 
 

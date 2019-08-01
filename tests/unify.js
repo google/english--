@@ -5,19 +5,20 @@ const {Parser, Rule} = require("../src/parser.js");
 const {fill, unify, rewrite} = require("../src/unify.js");
 
 const {
- program, 
- forall, 
- exists, 
- implies, 
- predicate, 
- func,
- binary, 
- literal, 
- constant, 
- and, 
- or, 
- negation,
- argument} = Parser;
+  program, 
+  forall, 
+  exists, 
+  implies, 
+  predicate, 
+  func,
+  binary, 
+  literal, 
+  constant, 
+  and, 
+  or, 
+  negation,
+  argument,
+  quantifier} = Parser;
 
 describe("Unify", () => {
   it("parser", function() {
@@ -29,6 +30,8 @@ describe("Unify", () => {
   });
 
   it("parser: forall (x) forall (y) P(x, y).", function() {
+    // console.log(JSON.stringify(Parser.parse("forall(x) forall(y) P(x, y).")));
+    // return;
     assertThat(Parser.parse("forall(x) forall(y) P(x, y)."))
       .equalsTo(program([
           forall("x",
@@ -103,7 +106,7 @@ describe("Unify", () => {
     let expects = Rule.of("P(x).");
     expects.arguments[0].free = true;
     expects.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -113,7 +116,7 @@ describe("Unify", () => {
     let expects = Rule.of("P(x).");
     expects.arguments[0].free = true;
     expects.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -125,7 +128,7 @@ describe("Unify", () => {
     expects.left.arguments[0].id = 1;
     expects.right.arguments[0].free = true;
     expects.right.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -137,7 +140,7 @@ describe("Unify", () => {
     expects.left.arguments[0].id = 1;
     expects.right.arguments[0].free = true;
     expects.right.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -147,7 +150,7 @@ describe("Unify", () => {
     let expects = Rule.of("~P(x).");
     expects.expression.arguments[0].free = true;
     expects.expression.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -157,19 +160,21 @@ describe("Unify", () => {
     let expects = Rule.of("P(x, y).");
     expects.arguments[0].free = true;
     expects.arguments[0].id = 1;
-    expects.quantifiers = [forall("x")];
+    expects.quantifiers = [quantifier("forall", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
 
   it("Rewrite: forall (x) forall (y) P(x, y)", function() {
     let {statements} = Parser.parse("forall (x) forall (y) P(x, y).");
+    // console.log(JSON.stringify(statements));
+    // return;
     let expects = Rule.of("P(x, y).");
     expects.arguments[0].free = true;
     expects.arguments[0].id = 1;
     expects.arguments[1].free = true;
     expects.arguments[1].id = 2;
-    expects.quantifiers = [forall("x"), forall("y")];
+    expects.quantifiers = [quantifier("forall", "x"), quantifier("forall", "y")];
     expects.quantifiers[0].id = 1;
     expects.quantifiers[1].id = 2;
     assertThat(rewrite(statements[0])).equalsTo(expects);
@@ -182,7 +187,7 @@ describe("Unify", () => {
     expects.expression.arguments[0].id = 1;
     expects.expression.arguments[1].free = true;
     expects.expression.arguments[1].id = 2;
-    expects.quantifiers = [forall("x"), forall("y")];
+    expects.quantifiers = [quantifier("forall", "x"), quantifier("forall", "y")];
     expects.quantifiers[0].id = 1;
     expects.quantifiers[1].id = 2;
     assertThat(rewrite(statements[0])).equalsTo(expects);
@@ -193,7 +198,7 @@ describe("Unify", () => {
     let expects = Rule.of("P(x).");
     expects.arguments[0].free = true;
     expects.arguments[0].id = 1;
-    expects.quantifiers = [exists("x")];
+    expects.quantifiers = [quantifier("exists", "x")];
     expects.quantifiers[0].id = 1;
     assertThat(rewrite(statements[0])).equalsTo(expects);
   });
@@ -247,18 +252,9 @@ describe("Unify", () => {
   it("Unify(P(Q(a)), P(x?))", function() {
     assertThat(unify(rewrite(Rule.of("P(Q(a)).")), 
                      rewrite(Rule.of("P(x?)."))))
-     .equalsTo({"x@": {
-        "@type": "Function",
-        "name": "Q",
-        "arguments": [{
-          "@type": "Argument",
-          "expression": {
-           "@type": "Literal",
-            "name": "a"
-          }
-        }] 
-      }
-     });
+      .equalsTo({
+	"x@": func("Q", [argument(literal("a"))])
+      });
   });
 
   it("Unify(P(Q(a)), P(x?))", function() {
@@ -327,21 +323,10 @@ describe("Unify", () => {
 
   it("Unify(P(a, x?), P(y?, Q(y?)))", function() {
     assertThat(unify(Rule.of("P(a, x?)."), Rule.of("P(y?, Q(y?)).")))
-     .equalsTo({"y@": literal("a"), "x@": {
-        "@type": "Function",
-        "name": "Q",
-        "arguments": [{
-          "@type": "Argument",
-          "expression": {
-           "@type": "Literal",
-           "name": "y"
-          },
-          "value": {
-           "@type": "Literal",
-            "name": "a"
-          }
-        }]
-     }});
+      .equalsTo({
+	"y@": literal("a"),
+	"x@": func("Q", [argument(literal("y"), literal("a"))])
+      });
   });
 
   it("Unify(P(a) => Q(b), forall (x) P(x) => Q(b))", function() {
@@ -455,6 +440,14 @@ describe("Unify", () => {
     .equalsTo(false);
   });
 
+  it("Unify(forall (x) forall (y) P(x) && Q(x, y), P(a) && Q(a, b)?)", () => {
+    assertThat(unify(rewrite(Rule.of("forall (x) forall (y) P(x) && Q(x, y).")), rewrite(Rule.of("P(a) && Q(a, b)."))))
+    .equalsTo({
+      "x@1": literal("a"),
+      "y@2": literal("b")
+    });
+  });
+
   it("Unify() implication", function() {
     // this can't be unified because ultimately, 
     // exists (y) q(y) can't be unified with
@@ -485,7 +478,7 @@ describe("Unify", () => {
   it("Fills from unification", function() {
     let unifies = unify(Rule.of("P(x?)."), Rule.of("P(Q(a))."));
     assertThat(fill(Rule.of("R(x?)."), unifies))
-     .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
+      .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
   });
 
   it("Filling binds and removes ids", function() {
@@ -496,12 +489,12 @@ describe("Unify", () => {
      .equalsTo(predicate("R", [argument(literal("a"))]));
   });
 
-  it.skip("Fills with ids", function() {
+  it("Fills with ids", function() {
     let unifies = unify(rewrite(Rule.of("forall (x) P(x).")), rewrite(Rule.of("P(a).")));
-    // console.log(unifies);
-    // console.log(rewrite(Rule.of("forall (x) P(x?).")));
-    // assertThat(fill(Rule.of("R(x)."), unifies))
-    // .equalsTo(predicate("R", [argument(literal("x"), func("Q", [argument(literal("a"))]))]));
+    assertThat(fill(rewrite(Rule.of("exists (x) R(x).")), unifies))
+      .equalsTo(exists("x", predicate("R", [
+	argument(literal("x"), literal("a"))
+      ]), literal("a"), 1));
   });
 
   function assertThat(x) {

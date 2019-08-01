@@ -147,31 +147,35 @@ function peg$parse(input, options) {
       },
       peg$c1 = "=",
       peg$c2 = peg$literalExpectation("=", false),
-      peg$c3 = function(quantifier, id, value, expression) { 
+      peg$c3 = function(quantifier, id, value, expression) {
            let result = {
              "@type": "Quantifier", 
-             op: quantifier, 
+             op: quantifier,
              variable: {
                "@type": "Variable",
                name: id
-             }, 
-             expression: expression
+             }
            };
 
            if (value && value.length > 0) {
              // console.log(value);
              result.value = value[value.length - 1];
            }
+       
+           // TODO(goto): this will lead to a bug if we try to
+           // quantify a non-quantifiable expression, like
+           // forall (x) true.
+           expression.quantifiers.unshift(result);
 
-           return result;
+           return expression;
       },
       peg$c4 = function(left, op, right) {
-          return {"@type": "BinaryOperator", left:left, op:op, right:right};
+          return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};
          },
       peg$c5 = function(head, left, op, right) {
-          return {"@type": "BinaryOperator", left:left, op:op, right:right};
+          return {"@type": "BinaryOperator", left:left, op:op, right:right, quantifiers: []};
          },
-      peg$c6 = function(expression) { return {"@type": "UnaryOperator", op: "~", expression: expression} },
+      peg$c6 = function(expression) { return {"@type": "UnaryOperator", op: "~", expression: expression, quantifiers: []} },
       peg$c7 = "true",
       peg$c8 = peg$literalExpectation("true", false),
       peg$c9 = function() { return {"@type": "Constant", name: "true"} },
@@ -182,12 +186,12 @@ function peg$parse(input, options) {
           return expression;
          },
       peg$c14 = function(id) { return {"@type": "Literal", name: id} },
-      peg$c15 = function(id) { return {"@type": "Predicate", name: id} },
+      peg$c15 = function(id) { return {"@type": "Predicate", name: id, arguments: [], quantifiers: []} },
       peg$c16 = ",",
       peg$c17 = peg$literalExpectation(",", false),
       peg$c18 = function(id, head, tail) { 
           let rest = tail.map(x => x[1]);
-          return {"@type": "Predicate", name: id, arguments: [head, ...rest]}
+          return {"@type": "Predicate", name: id, arguments: [head, ...rest], quantifiers: []}
         },
       peg$c19 = function(call) { return {"@type": "Argument", expression: call} },
       peg$c20 = function(name, free, value) {
@@ -201,10 +205,10 @@ function peg$parse(input, options) {
           }
           return result;
         },
-      peg$c21 = function(id) { return {"@type": "Function", name: id} },
+      peg$c21 = function(id) { return {"@type": "Function", name: id, quantifiers: []} },
       peg$c22 = function(id, head, tail) { 
           let rest = tail.map(x => x[1]);
-          return {"@type": "Function", name: id, arguments: [head, ...rest]}
+          return {"@type": "Function", name: id, arguments: [head, ...rest], quantifiers: []}
         },
       peg$c23 = peg$otherExpectation("identifier"),
       peg$c24 = /^[a-zA-Z_]/,
