@@ -19,7 +19,7 @@ describe("DRT", function() {
    return parser.results;
   }
 
-  it("nearly basic", function() { 
+  it.only("basic", function() { 
    assertThat(parse("Jones likes Mary."))
      .equalsTo([S(NP(PN("Jones")), 
                   VP(V("likes"), 
@@ -58,6 +58,8 @@ describe("DRT", function() {
                   VP(V("likes"), 
                      NP(DET("a"), N("car"))
                      ))]);
+    
+
    });
    
   it("basic", function() {
