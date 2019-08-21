@@ -8,16 +8,148 @@ const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
 describe("DRT", function() {
 
-  it.only("compiler compiler", function() {
+  function expand(rule) {
+   // console.log(rule);
+   // return;
+   let vars = {};
+   let {head, tail} = rule;
 
-    let rule = (head = {}, tail = []) => { return {"@type": "Rule", head: head, tail: tail}};
-    let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
-    let literal = (value) => { return {"@type": "Literal", name: value} };
-    let phrase = (head, tail) => { return rule(head, [tail]); };
+   let capture = (types) =>
+    Object
+    .entries(types)
+    .filter(([key, value]) => value == -1 || Array.isArray(value))
+    .map(([key, value]) => vars[key] = value);
+     
+   // capture(rule.head.types);
 
-    let l = (value) => { return literal(value); };
+   for (let term of tail) {
+    if (term["@type"] == "Literal") {
+     continue;
+    }
+    term
+     .filter((term) => term["@type"] == "Term")
+     .map(({types}) => capture(types));
+   }
 
-    let space = (space) => { return {"@type": "Space"} };
+   // console.log(vars);
+
+   // return;
+
+   let {num, gen, caze, fin, gap, trans} = vars;
+
+   let dims = [];
+   // num
+   dims.push(num == -1 ? ["s", "p"] : (num ? num : ["_"]));
+   // gen
+   dims.push(gen == -1 ? ["m", "f", "h"] : (gen ? gen : ["_"]));
+   // case
+   dims.push(caze == -1 ? ["p", "m"] : (caze ? caze : ["_"]));
+   // fin
+   dims.push(fin == -1 ? ["p", "m"] : (fin ? fin : ["_"]));
+   // gap
+   dims.push(gap == -1 ? ["p", "m"] : (gap ? gap : ["_"]));
+   // trans
+   dims.push(trans == -1 ? ["p", "m"] : (trans ? trans : ["_"]));
+   
+   let pop = (a) => {};
+
+   let replace = (rule, fix) => {
+    let result = JSON.parse(JSON.stringify(rule));
+    for (let [key, value] of Object.entries(rule.head.types)) {
+     if (value == -1) {
+      result.head.types[key] = fix[key];
+     }
+    }
+    for (let line of result.tail) {
+     for (let term of line) {
+      for (let [key, value] of Object.entries(term.types)) {
+       if (value == -1) {
+        term.types[key] = fix[key];
+       }
+      }
+     }
+    }
+    return result;
+   };
+
+   let result = [];
+
+   for (let num of dims[0]) {
+    for (let gen of dims[1]) {
+     for (let caze of dims[2]) {
+      for (let fin of dims[3]) {
+       for (let gap of dims[4]) {
+        for (let trans of dims[5]) {
+         result.push(replace(rule, {
+            num: num, 
+            gen: gen, 
+            caze: caze, 
+            fin: fin, 
+            gap: gap, 
+            trans: trans
+         }));
+        }
+       }
+      }
+     }
+    }
+   }
+
+   return result;
+  }
+
+
+  let l = (value) => { return literal(value); };
+  let space = (space) => { return {"@type": "Space"} };
+  let rule = (head = {}, tail = []) => { return {"@type": "Rule", head: head, tail: tail}};
+  let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
+  let literal = (value) => { return {"@type": "Literal", name: value} };
+  let phrase = (head, tail) => { return rule(head, [tail]); };
+  let name = (term) => {
+   if (!term.types) {
+    return term.name;
+   }
+   let result = term.name;
+   result += "[";
+   let first = true;
+   for (let [key, value] of Object.entries(term.types)) {
+    if (!first) {
+     result += ", ";
+    }
+    first = false;
+    result += key + "=" + (value == -1 ? "*" : value);
+   }
+   result += "]";
+   return result;
+  }
+  let print = ({head, tail}) => {
+   let result = "";
+   result += name(head) + " ->";
+   for (let line of tail) {
+    for (let term of line) {
+     result += " " + name(term);
+    }
+   }
+   return result;
+  }
+
+  it.only("expand", function() {
+    let rule = phrase(term("S", {"num": -1}), 
+                      [term("NP", {"num": -1}),
+                       term("VP_", {"num": -1})]);
+
+    assertThat(print(rule)).equalsTo("S[num=*] -> NP[num=*] VP_[num=*]");
+
+    let rules = expand(rule);
+
+    assertThat(rules.length).equalsTo(2);
+    assertThat(print(rules[0])).equalsTo("S[num=s] -> NP[num=s] VP_[num=s]");
+    assertThat(print(rules[1])).equalsTo("S[num=p] -> NP[num=p] VP_[num=p]");
+
+   });
+
+  it("compiler compiler", function() {
+
 
     assertThat(term("S", {Num: "alpha"}))
      .equalsTo({"@type": "Term", name: "S", types: {Num: "alpha"}});
@@ -31,13 +163,23 @@ describe("DRT", function() {
 
     const grammar = [];
 
+    grammar.push(phrase(term("S", {"num": -1}), 
+                        [term("NP", {"num": -1}),
+                         term("VP_", {"num": -1})]));
+
+
+
+    // console.log(JSON.stringify(grammar, undefined, 2));
+
+    return;
+
 
     // phrase structure rules
 
     // PS1
-    grammar.push(phrase(term("S", {"num": "alpha"}), 
-                        [term("NP", {"num": "alpha", "gen": "beta", "case": "+nom"}),
-                         term("VP_", {"num": "alpha", "fin": "+"})]));
+    grammar.push(phrase(term("S", {"num": -1}), 
+                        [term("NP", {"num": -1, "gen": -1, "case": "p"}),
+                         term("VP_", {"num": -1, "fin": "p"})]));
     
     // PS2
     //grammar.push(rule(term("S", {"num": "alpha", "gap": "NP/num=gama"}), 
@@ -56,8 +198,8 @@ describe("DRT", function() {
     //                   term("VP", {"num": "sigma", "fin": "-", "gap": "gama"})]));
 
     // PS5
-    grammar.push(phrase(term("VP_", {"num": "alpha", "fin": "+", "gap": "gama"}), 
-                        [term("VP", {"num": "alpha", "fin": "+", "gap": "gama"})]));
+    grammar.push(phrase(term("VP_", {"num": -1, "fin": "p", "gap": -1}), 
+                        [term("VP", {"num": -1, "fin": "p", "gap": -1})]));
     
     // PS6
     //grammar.push(rule(term("VP", {"num": "alpha", "fin": "beta", "gap": "gama"}), 
@@ -65,8 +207,8 @@ describe("DRT", function() {
     //                   term("NP", {"num": "gama", "gen": "sigma", "case": "-nom", "gap": "gama"})]));
 
     // PS7
-    grammar.push(phrase(term("VP", {"num": "alpha", "fin": "beta"}), 
-                      [term("V", {"num": "alpha", "fin": "beta", "trans": "-"})]));
+    grammar.push(phrase(term("VP", {"num": -1, "fin": -1}), 
+                      [term("V", {"num": -1, "fin": -1, "trans": "m"})]));
 
     // PS8
     //grammar.push(rule(term("NP", {"num": "alpha", "gen": "beta", "case": "gama", "gap": "NP/num=alpha"}), 
@@ -78,8 +220,8 @@ describe("DRT", function() {
     //                   term("N", {"num": "alpha", "gen": "beta"})]));
 
     // PS10
-    grammar.push(phrase(term("NP", {"num": "alpha", "gen": "beta"}), 
-                        [term("PN", {"num": "alpha", "gen": "beta"}),
+    grammar.push(phrase(term("NP", {"num": -1, "gen": -1}), 
+                        [term("PN", {"num": -1, "gen": -1}),
                          space()]));
 
     // PS11
@@ -126,7 +268,7 @@ describe("DRT", function() {
     //grammar.push(rule(term("PRO", {"num": "plur", "gen": "male/fem/-hum", "case": "-nom"}), [l("them")]));
 
     // LI9
-    grammar.push(rule(term("PN", {"num": "sing", "gen": "male"}), [l("Jones"), l("Smith"), l("Bill")]));
+    grammar.push(rule(term("PN", {"num": "s", "gen": "m"}), [l("Jones"), l("Smith"), l("Bill")]));
     // LI10
     //grammar.push(rule(term("PN", {"num": "sing", "gen": "fem"}), [l("Jones"), l("Mary"), l("Anna")]));
     // LI11
@@ -148,7 +290,7 @@ describe("DRT", function() {
     //grammar.push(rule(term("V", {"num": "sing/plur", "trans": "+", "fin": "-"}), 
     //                  [l("like"), l("love"), l("own"), l("fascinate"), l("rotate")]));
     // LI18
-    grammar.push(rule(term("V", {"num": "sing/plur", "trans": "-", "fin": "-"}), 
+    grammar.push(rule(term("V", {"num": ["s", "p"], "trans": "m", "fin": "m"}), 
                       [l("stinks"), l("rotates")]));
 
     // TODO:
@@ -160,7 +302,26 @@ describe("DRT", function() {
     // LI22
     //grammar.push(rule(term("RPRO", {"num": "sing/plur", "gen": "-hum"}), [l("which")]));
 
-    // console.log(JSON.stringify(grammar, undefined, 2));
+    // console.log(JSON.stringify(grammar[0], undefined, 2));
+
+
+    // console.log(JSON.stringify(grammar[grammar.length - 6], undefined, 2));
+
+    // return;
+
+    let atom = (name, [num, gen, caze, fin, gap, trans]) => `${name}+${num}${gen}${caze}${fin}${gap}${trans}`;
+
+    for (let [rule, types] of expand(grammar[grammar.length - 6])) {
+     console.log(atom(rule.head.name, types));
+     console.log(rule);
+     for (let term of rule.tail) {
+      console.log(term);
+      // console.log(atom(term.name, term.types));
+     }
+     break;
+    }
+
+    return;
 
     let lines = [];
 
@@ -175,38 +336,34 @@ describe("DRT", function() {
     lines.push(``);
 
     for (let {head, tail} of grammar) {
-     // let line = [];
-     lines.push(`${head.name} ->`);
-     // line.push(head.name);
-     // line.push("->");
-     // line.push("\n");
-     // console.log(tail);
+
+     let expand = (head) => {
+      let suffix = Object.entries(head.types)
+      .map(([key, value]) => `${key}_${value}`)
+      .join("_");
+      return `${head.name}_${suffix}`;
+     };
+
+     lines.push(`${expand(head)} ->`);
      for (let i = 0; i < tail.length; i++) {
       let term = tail[i];
-      // console.log(term);
       let br = i < (tail.length - 1) ? " |" : "";
       if (term["@type"] == "Literal") {
        lines.push(`  "${term.name}" {% ([n]) => node("${head.name}", n) %}${br}`);
-      } else if (Array.isArray(term)) {
-       let terms = [];
-       let sentence = term.map(x => x["@type"] == "Space" ? "_"  : x.name).join(" ");
-       terms.push(`  ${sentence}`);
-       let sp = 0;
-       let args = term.map(x => x["@type"] == "Space" ? `s${sp++}`  : x.name).join(", ");
-       let values = term.filter(x => x["@type"] != "Space").map(x => x.name).join(", ");
-       terms.push(`{% ([${args}]) => node("${head.name}", ${values}) %}${br}`);
-       // console.log("hi");
-       // terms.push("hi");
-       // line.push(terms.join(" "));
-       lines.push(terms.join(" "));
+       continue;
       }
+      let terms = [];
+      let sentence = term.map(x => x["@type"] == "Space" ? "_"  : x.name).join(" ");
+      terms.push(`  ${sentence}`);
+      let sp = 0;
+      let args = term.map(x => x["@type"] == "Space" ? `s${sp++}`  : x.name).join(", ");
+      let values = term.filter(x => x["@type"] != "Space").map(x => x.name).join(", ");
+      terms.push(`{% ([${args}]) => node("${head.name}", ${values}) %}${br}`);
+      lines.push(terms.join(" "));
      }
-     // line.push(tail[0]["@type"] == "Literal" ? terms.join(" | ") : terms.join(" "));
     }
 
     lines.push(``);
-
-    // console.log(lines.join("\n"));
 
     assertThat(lines.join("\n")).equalsTo(`
 @builtin "whitespace.ne"
@@ -234,7 +391,7 @@ V ->
     fs.writeFileSync("./tests/foo.ne", lines.join("\n"));
   });
 
-  it.only("tests", function() {
+  it.skip("tests", function() {
     const grammar = require("./foo.js");
 
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));

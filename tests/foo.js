@@ -12,7 +12,7 @@ function id(x) { return x[0]; }
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "S", "symbols": ["NP", "VP_"], "postprocess": ([NP, VP_]) => node("S", NP, VP_)},
+    {"name": "S_foo_one+_", "symbols": ["NP", "VP_"], "postprocess": ([NP, VP_]) => node("S", NP, VP_)},
     {"name": "VP_", "symbols": ["VP"], "postprocess": ([VP]) => node("VP_", VP)},
     {"name": "VP", "symbols": ["V"], "postprocess": ([V]) => node("VP", V)},
     {"name": "NP", "symbols": ["PN", "_"], "postprocess": ([PN, s0]) => node("NP", PN)},
@@ -27,7 +27,7 @@ function id(x) { return x[0]; }
     {"name": "V$string$2", "symbols": [{"literal":"r"}, {"literal":"o"}, {"literal":"t"}, {"literal":"a"}, {"literal":"t"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V", "symbols": ["V$string$2"], "postprocess": ([n]) => node("V", n)}
 ]
-  , ParserStart: "S"
+  , ParserStart: "S_foo_one+_"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;
