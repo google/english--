@@ -117,8 +117,8 @@ describe("DRT", function() {
      result += ", ";
     }
     first = false;
-    let char = String.fromCharCode('A'.charCodeAt(0) + Math.abs(value) - 1);
-    result += key + "=" + (value < 0 ? char : value);
+    // let char = String.fromCharCode('A'.charCodeAt(0) + Math.abs(value) - 1);
+    result += key + "=" + value;
    }
    result += "]";
    return result;
@@ -151,36 +151,35 @@ describe("DRT", function() {
   
   let clone = (obj) => JSON.parse(JSON.stringify(obj));
 
+  function expand(obj) {
+   let queue = [];
+   let result = [];
+
+   queue.push(obj);
+    
+   while (queue.length > 0) {
+    let obj = queue.pop();
+    
+    let vars = Object.entries(obj)
+     .filter(([key, value]) => Array.isArray(value));
+    
+    if (vars.length == 0) {
+     result.unshift(obj);
+     continue;
+    }
+
+    let [key, values] = vars.shift();
+    for (let value of values) {
+     let fix = clone(obj);
+     fix[key] = value;
+     queue.push(fix);
+    }
+   };
+
+   return result;
+  }
+
   it.only("Expand", function() {
-
-    function expand(obj) {
-     let queue = [];
-     let result = [];
-
-     queue.push(obj);
-    
-     while (queue.length > 0) {
-      let obj = queue.pop();
-    
-      let vars = Object.entries(obj)
-       .filter(([key, value]) => Array.isArray(value));
-    
-      if (vars.length == 0) {
-       result.unshift(obj);
-       continue;
-      }
-
-      let [key, values] = vars.shift();
-      for (let value of values) {
-       let fix = clone(obj);
-       fix[key] = value;
-       queue.push(fix);
-      }
-     };
-
-     return result;
-    } 
-
     let obj = {"A": ["S", "P"], "B": ["X", "Y"]};
 
     assertThat(expand(obj))
@@ -189,6 +188,77 @@ describe("DRT", function() {
                 {"A": "P", "B": "X"},
                 {"A": "P", "B": "Y"}]);
 
+  });
+
+  function collect(rule) {
+   let vars = {};
+    
+   if (Number.isInteger(rule.head.types.num)) {
+    vars[rule.head.types.num] = ["S", "P"];
+   }
+   for (let line of rule.tail) {
+    for (let term of line) {
+     if (Number.isInteger(term.types.num)) {
+      vars[term.types.num] = ["S", "P"];
+     }
+    }
+   }
+   return vars;
+  }
+
+  it.only("Collect", function() {
+    let rule = phrase(term("VP", {"num": 1}),
+                      [term("V", {"num": 1}),
+                       term("NP", {"num": 2})]);
+
+    assertThat(print(rule))
+     .equalsTo("VP[num=1] -> V[num=1] NP[num=2]");
+    assertThat(collect(rule))
+     .equalsTo({"1": ["S", "P"], "2": ["S", "P"]});
+  });
+
+  function replace(rule, vars) {
+   let result = clone(rule);
+   if (Number.isInteger(result.head.types.num)) {
+    result.head.types.num = vars[result.head.types.num];
+   }
+   for (let line of result.tail) {
+    for (let term of line) {
+     if (Number.isInteger(term.types.num)) {
+      term.types.num = vars[term.types.num];
+     }
+    }
+   }
+   return result;
+  }
+
+  function generate(rule) {
+   let vars = collect(rule);
+   let all = expand(vars);
+
+   let result = [];
+   for (let combo of all) {
+    result.push(replace(rule, combo));
+   }
+   return result;
+  }
+
+  it.only("Generate", function() {
+    let rule = phrase(term("VP", {"num": 1}),
+                      [term("V", {"num": 1}),
+                       term("NP", {"num": 2})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(4);
+    assertThat(print(result[0]))
+     .equalsTo("VP[num=S] -> V[num=S] NP[num=S]");
+    assertThat(print(result[1]))
+     .equalsTo("VP[num=S] -> V[num=S] NP[num=P]");
+    assertThat(print(result[2]))
+     .equalsTo("VP[num=P] -> V[num=P] NP[num=S]");
+    assertThat(print(result[3]))
+     .equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
   });
 
   it.skip("Expand two vars", function() {
