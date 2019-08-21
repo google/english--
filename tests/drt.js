@@ -333,7 +333,7 @@ describe.only("DRT", function() {
      .equalsTo("S[num=plur] -> NP[num=plur, case=+nom] VP[num=plur]");
   });
 
-  it.skip("Generate with two types and two variables", function() {
+  it("Generate with two types and two variables", function() {
     let rule = phrase(term("NP", {"num": 1, "case": 2}),
                       [term("PRO", {"num": 1, "case": 2})]);
 
@@ -341,9 +341,13 @@ describe.only("DRT", function() {
 
     assertThat(result.length).equalsTo(4);
     assertThat(print(result[0]))
-     .equalsTo("NP[num=S, case=2] -> PRO[num=S, case=2]");
+     .equalsTo("NP[num=sing, case=+nom] -> PRO[num=sing, case=+nom]");
     assertThat(print(result[1]))
-     .equalsTo("NP[num=P, case=2] -> PRO[num=P, case=2]");
+     .equalsTo("NP[num=sing, case=-nom] -> PRO[num=sing, case=-nom]");
+    assertThat(print(result[2]))
+     .equalsTo("NP[num=plur, case=+nom] -> PRO[num=plur, case=+nom]");
+    assertThat(print(result[3]))
+     .equalsTo("NP[num=plur, case=-nom] -> PRO[num=plur, case=-nom]");
   });
 
   it.skip("Expand two vars", function() {
