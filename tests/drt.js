@@ -6,7 +6,7 @@ const grammar = require("./grammar.js");
 
 const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
-describe("DRT", function() {
+describe.only("DRT", function() {
 
   function expand2(rule) {
    // console.log(rule);
@@ -135,18 +135,17 @@ describe("DRT", function() {
   }
 
   it("Expand var", function() {
-    let rule = phrase(term("S", {"num": -1}),
-                      [term("NP", {"num": -1}),
-                       term("VP_", {"num": -1})]);
+    let rule = phrase(term("S", {"num": 1}),
+                      [term("NP", {"num": 1}),
+                       term("VP_", {"num": 1})]);
 
-    assertThat(print(rule)).equalsTo("S[num=A] -> NP[num=A] VP_[num=A]");
+    assertThat(print(rule)).equalsTo("S[num=@1] -> NP[num=@1] VP_[num=@1]");
 
-    let rules = expand(rule);
+    let rules = generate(rule);
 
     assertThat(rules.length).equalsTo(2);
-    assertThat(print(rules[0])).equalsTo("S[num=s] -> NP[num=s] VP_[num=s]");
-    assertThat(print(rules[1])).equalsTo("S[num=p] -> NP[num=p] VP_[num=p]");
-
+    assertThat(print(rules[0])).equalsTo("S[num=sing] -> NP[num=sing] VP_[num=sing]");
+    assertThat(print(rules[1])).equalsTo("S[num=plur] -> NP[num=plur] VP_[num=plur]");
    });
   
   let clone = (obj) => JSON.parse(JSON.stringify(obj));
@@ -179,7 +178,7 @@ describe("DRT", function() {
    return result;
   }
 
-  it.only("Expand", function() {
+  it("Expand", function() {
     let obj = {"A": ["S", "P"], "B": ["X", "Y"]};
 
     assertThat(expand(obj))
@@ -190,22 +189,22 @@ describe("DRT", function() {
 
   });
 
+  const FEATURES = {
+   "num": ["sing", "plur"],
+   "case": ["+nom", "-nom"],    
+  };
+
   function collect(rule) {
    let vars = {};
 
-   const types = {
-    "num": ["sing", "plur"],
-    "case": ["+nom", "-nom"],    
-   };
-
-   for (let [key, values] of Object.entries(types)) {
+   for (let [key, values] of Object.entries(FEATURES)) {
     if (Number.isInteger(rule.head.types[key])) {
-     vars[rule.head.types[key]] = types[key];
+     vars[rule.head.types[key]] = FEATURES[key];
     }
     for (let line of rule.tail) {
      for (let term of line) {
       if (Number.isInteger(term.types[key])) {
-       vars[term.types[key]] = types[key];
+       vars[term.types[key]] = FEATURES[key];
       }
      }
     }
@@ -214,7 +213,7 @@ describe("DRT", function() {
    return vars;
   }
 
-  it.only("Collect", function() {
+  it("Collect", function() {
     let rule = phrase(term("VP", {"num": 1}),
                       [term("V", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -225,7 +224,7 @@ describe("DRT", function() {
      .equalsTo({"1": ["sing", "plur"], "2": ["sing", "plur"]});
   });
 
-  it.only("Collects case", function() {
+  it("Collects case", function() {
     let rule = phrase(term("VP", {"case": 1}),
                       [term("V", {"case": 1}),
                        term("NP", {"case": 2})]);
@@ -238,16 +237,20 @@ describe("DRT", function() {
 
   function replace(rule, vars) {
    let result = clone(rule);
-   if (Number.isInteger(result.head.types.num)) {
-    result.head.types.num = vars[result.head.types.num];
-   }
-   for (let line of result.tail) {
-    for (let term of line) {
-     if (Number.isInteger(term.types.num)) {
-      term.types.num = vars[term.types.num];
+
+   for (let [feature, values] of Object.entries(FEATURES)) {
+    if (Number.isInteger(result.head.types[feature])) {
+     result.head.types[feature] = vars[result.head.types[feature]];
+    }
+    for (let line of result.tail) {
+     for (let term of line) {
+      if (Number.isInteger(term.types[feature])) {
+      term.types[feature] = vars[term.types[feature]];
+      }
      }
     }
    }
+
    return result;
   }
 
@@ -262,7 +265,7 @@ describe("DRT", function() {
    return result;
   }
 
-  it.only("Generate", function() {
+  it("Generate", function() {
     let rule = phrase(term("VP", {"num": 1}),
                       [term("V", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -280,7 +283,25 @@ describe("DRT", function() {
      .equalsTo("VP[num=plur] -> V[num=plur] NP[num=plur]");
   });
 
-  it.only("Generate with fixed values", function() {
+  it("Generate with case", function() {
+    let rule = phrase(term("VP", {"case": 1}),
+                      [term("V", {"case": 1}),
+                       term("NP", {"case": 2})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(4);
+    assertThat(print(result[0]))
+     .equalsTo("VP[case=+nom] -> V[case=+nom] NP[case=+nom]");
+    assertThat(print(result[1]))
+     .equalsTo("VP[case=+nom] -> V[case=+nom] NP[case=-nom]");
+    assertThat(print(result[2]))
+     .equalsTo("VP[case=-nom] -> V[case=-nom] NP[case=+nom]");
+    assertThat(print(result[3]))
+     .equalsTo("VP[case=-nom] -> V[case=-nom] NP[case=-nom]");
+  });
+
+  it("Generate with fixed values", function() {
     let rule = phrase(term("NP", {"num": "plur"}),
                       [term("NP", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -298,7 +319,7 @@ describe("DRT", function() {
      .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=plur]");
   });
 
-  it.only("Generate with two types", function() {
+  it("Generate with two types", function() {
     let rule = phrase(term("S", {"num": 1}),
                       [term("NP", {"num": 1, "case": "+nom"}),
                        term("VP", {"num": 1})]);
@@ -318,7 +339,7 @@ describe("DRT", function() {
 
     let result = generate(rule);
 
-    assertThat(result.length).equalsTo(2);
+    assertThat(result.length).equalsTo(4);
     assertThat(print(result[0]))
      .equalsTo("NP[num=S, case=2] -> PRO[num=S, case=2]");
     assertThat(print(result[1]))
