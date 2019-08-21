@@ -118,7 +118,7 @@ describe("DRT", function() {
     }
     first = false;
     // let char = String.fromCharCode('A'.charCodeAt(0) + Math.abs(value) - 1);
-    result += key + "=" + value;
+    result += key + "=" + (Number.isInteger(value) ? `@${value}` : value);
    }
    result += "]";
    return result;
@@ -220,7 +220,7 @@ describe("DRT", function() {
                        term("NP", {"num": 2})]);
 
     assertThat(print(rule))
-     .equalsTo("VP[num=1] -> V[num=1] NP[num=2]");
+     .equalsTo("VP[num=@1] -> V[num=@1] NP[num=@2]");
     assertThat(collect(rule))
      .equalsTo({"1": ["sing", "plur"], "2": ["sing", "plur"]});
   });
@@ -231,7 +231,7 @@ describe("DRT", function() {
                        term("NP", {"case": 2})]);
 
     assertThat(print(rule))
-     .equalsTo("VP[case=1] -> V[case=1] NP[case=2]");
+     .equalsTo("VP[case=@1] -> V[case=@1] NP[case=@2]");
     assertThat(collect(rule))
      .equalsTo({"1": ["+nom", "-nom"], "2": ["+nom", "-nom"]});
   });
