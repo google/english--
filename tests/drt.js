@@ -8,7 +8,7 @@ const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
 describe("DRT", function() {
 
-  function expand(rule) {
+  function expand2(rule) {
    // console.log(rule);
    // return;
    let vars = {};
@@ -117,7 +117,8 @@ describe("DRT", function() {
      result += ", ";
     }
     first = false;
-    result += key + "=" + (value == -1 ? "*" : value);
+    let char = String.fromCharCode('A'.charCodeAt(0) + Math.abs(value) - 1);
+    result += key + "=" + (value < 0 ? char : value);
    }
    result += "]";
    return result;
@@ -133,12 +134,12 @@ describe("DRT", function() {
    return result;
   }
 
-  it.only("expand", function() {
-    let rule = phrase(term("S", {"num": -1}), 
+  it("Expand var", function() {
+    let rule = phrase(term("S", {"num": -1}),
                       [term("NP", {"num": -1}),
                        term("VP_", {"num": -1})]);
 
-    assertThat(print(rule)).equalsTo("S[num=*] -> NP[num=*] VP_[num=*]");
+    assertThat(print(rule)).equalsTo("S[num=A] -> NP[num=A] VP_[num=A]");
 
     let rules = expand(rule);
 
@@ -146,6 +147,120 @@ describe("DRT", function() {
     assertThat(print(rules[0])).equalsTo("S[num=s] -> NP[num=s] VP_[num=s]");
     assertThat(print(rules[1])).equalsTo("S[num=p] -> NP[num=p] VP_[num=p]");
 
+   });
+  
+  let clone = (obj) => JSON.parse(JSON.stringify(obj));
+
+  it.only("Expand", function() {
+
+    function expand(obj) {
+     let queue = [];
+     let result = [];
+
+     queue.push(obj);
+    
+     while (queue.length > 0) {
+      let obj = queue.pop();
+    
+      let vars = Object.entries(obj)
+       .filter(([key, value]) => Array.isArray(value));
+    
+      if (vars.length == 0) {
+       result.unshift(obj);
+       continue;
+      }
+
+      let [key, values] = vars.shift();
+      for (let value of values) {
+       let fix = clone(obj);
+       fix[key] = value;
+       queue.push(fix);
+      }
+     };
+
+     return result;
+    } 
+
+    let obj = {"A": ["S", "P"], "B": ["X", "Y"]};
+
+    assertThat(expand(obj))
+     .equalsTo([{"A": "S", "B": "X"},
+                {"A": "S", "B": "Y"},
+                {"A": "P", "B": "X"},
+                {"A": "P", "B": "Y"}]);
+
+  });
+
+  it.skip("Expand two vars", function() {
+    let rule = phrase(term("VP", {"num": -1}),
+                      [term("V", {"num": -1}),
+                       term("NP", {"num": -2})]);
+
+    assertThat(print(rule)).equalsTo("VP[num=A] -> V[num=A] NP[num=B]");
+
+    // console.log(JSON.stringify(rule, undefined, 2));
+
+    function* expand(rule) {
+     let result = clone(rule);
+     if (result.head.types.num < 0) {
+      for (let num of ["S", "P"]) {
+       let tmp = clone(result);
+       for (let line of tmp.tail) {
+        for (let term of line) {
+         if (term.types.num == result.head.types.num) {
+          term.types.num = num;
+         }
+        }
+       }
+       tmp.head.types.num = num;
+       yield* expand(tmp);
+      }
+      return;
+     }
+
+     for (let line of result.tail) {
+      for (let term of line) {
+       if (term.types.num < 0) {
+        for (let num of ["S", "P"]) {
+         for (let line2 of tmp.tail) {
+          for (let term2 of line) {
+           if (term2.types.num == term.types.num) {
+            term2.types.num = num;
+           }
+          }
+         }
+         term.types.num = num;
+         yield* expand(tmp);
+        }
+        return;
+       }
+      }
+     }
+
+     yield rule;
+    }
+
+    let result = [];
+
+    for (let r of expand(rule)) {
+     console.log(print(r));
+     // result.push(r);
+    }
+
+    return;
+
+    assertThat(result.length).equalsTo(4);
+    assertThat(print(result[0])).equalsTo("VP[num=S] -> V[num=P] NP[num=P]");
+    assertThat(print(result[1])).equalsTo("VP[num=S] -> V[num=P] NP[num=P]");
+    assertThat(print(result[2])).equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
+    assertThat(print(result[3])).equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
+    return;
+
+    let rules = expand(rule);
+
+    assertThat(rules.length).equalsTo(2);
+    assertThat(print(rules[0])).equalsTo("VP[num=s] -> V[num=s] NP[num=B]");
+    assertThat(print(rules[1])).equalsTo("VP[num=p] -> V[num=p] NP[num=B]");
    });
 
   it("compiler compiler", function() {
