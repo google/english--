@@ -192,17 +192,25 @@ describe("DRT", function() {
 
   function collect(rule) {
    let vars = {};
-    
-   if (Number.isInteger(rule.head.types.num)) {
-    vars[rule.head.types.num] = ["S", "P"];
-   }
-   for (let line of rule.tail) {
-    for (let term of line) {
-     if (Number.isInteger(term.types.num)) {
-      vars[term.types.num] = ["S", "P"];
+
+   const types = {
+    "num": ["sing", "plur"],
+    "case": ["+nom", "-nom"],    
+   };
+
+   for (let [key, values] of Object.entries(types)) {
+    if (Number.isInteger(rule.head.types[key])) {
+     vars[rule.head.types[key]] = types[key];
+    }
+    for (let line of rule.tail) {
+     for (let term of line) {
+      if (Number.isInteger(term.types[key])) {
+       vars[term.types[key]] = types[key];
+      }
      }
     }
    }
+
    return vars;
   }
 
@@ -214,7 +222,18 @@ describe("DRT", function() {
     assertThat(print(rule))
      .equalsTo("VP[num=1] -> V[num=1] NP[num=2]");
     assertThat(collect(rule))
-     .equalsTo({"1": ["S", "P"], "2": ["S", "P"]});
+     .equalsTo({"1": ["sing", "plur"], "2": ["sing", "plur"]});
+  });
+
+  it.only("Collects case", function() {
+    let rule = phrase(term("VP", {"case": 1}),
+                      [term("V", {"case": 1}),
+                       term("NP", {"case": 2})]);
+
+    assertThat(print(rule))
+     .equalsTo("VP[case=1] -> V[case=1] NP[case=2]");
+    assertThat(collect(rule))
+     .equalsTo({"1": ["+nom", "-nom"], "2": ["+nom", "-nom"]});
   });
 
   function replace(rule, vars) {
@@ -252,13 +271,58 @@ describe("DRT", function() {
 
     assertThat(result.length).equalsTo(4);
     assertThat(print(result[0]))
-     .equalsTo("VP[num=S] -> V[num=S] NP[num=S]");
+     .equalsTo("VP[num=sing] -> V[num=sing] NP[num=sing]");
     assertThat(print(result[1]))
-     .equalsTo("VP[num=S] -> V[num=S] NP[num=P]");
+     .equalsTo("VP[num=sing] -> V[num=sing] NP[num=plur]");
     assertThat(print(result[2]))
-     .equalsTo("VP[num=P] -> V[num=P] NP[num=S]");
+     .equalsTo("VP[num=plur] -> V[num=plur] NP[num=sing]");
     assertThat(print(result[3]))
-     .equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
+     .equalsTo("VP[num=plur] -> V[num=plur] NP[num=plur]");
+  });
+
+  it.only("Generate with fixed values", function() {
+    let rule = phrase(term("NP", {"num": "plur"}),
+                      [term("NP", {"num": 1}),
+                       term("NP", {"num": 2})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(4);
+    assertThat(print(result[0]))
+     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=sing]");
+    assertThat(print(result[1]))
+     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=plur]");
+    assertThat(print(result[2]))
+     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=sing]");
+    assertThat(print(result[3]))
+     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=plur]");
+  });
+
+  it.only("Generate with two types", function() {
+    let rule = phrase(term("S", {"num": 1}),
+                      [term("NP", {"num": 1, "case": "+nom"}),
+                       term("VP", {"num": 1})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(2);
+    assertThat(print(result[0]))
+     .equalsTo("S[num=sing] -> NP[num=sing, case=+nom] VP[num=sing]");
+    assertThat(print(result[1]))
+     .equalsTo("S[num=plur] -> NP[num=plur, case=+nom] VP[num=plur]");
+  });
+
+  it.skip("Generate with two types and two variables", function() {
+    let rule = phrase(term("NP", {"num": 1, "case": 2}),
+                      [term("PRO", {"num": 1, "case": 2})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(2);
+    assertThat(print(result[0]))
+     .equalsTo("NP[num=S, case=2] -> PRO[num=S, case=2]");
+    assertThat(print(result[1]))
+     .equalsTo("NP[num=P, case=2] -> PRO[num=P, case=2]");
   });
 
   it.skip("Expand two vars", function() {
