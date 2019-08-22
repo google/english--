@@ -61,12 +61,17 @@ PN_num_sing_gen_male ->
   "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "John" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
 PN_num_sing_gen_fem -> 
-  "Mary" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
+  "Mary" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
+  "Anna" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
 V_num_sing_fin_p_trans_p -> 
-  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
+  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
 V_num_plur_fin_p_trans_p -> 
-  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
+  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
 V_num_sing_fin_p_trans_n -> 
-  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
 V_num_plur_fin_p_trans_n -> 
-  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
+  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}

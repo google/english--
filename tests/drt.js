@@ -1,7 +1,6 @@
 const Assert = require("assert");
-const peg = require("pegjs");
-
 const nearley = require("nearley");
+const grammar = require("./grammar.js");
 
 describe.only("DRT", function() {
   let l = (value) => { return literal(value); };
@@ -531,13 +530,13 @@ A ->
                       [[literal("Jones")], [literal("John")]]));
 
     // LI 11
-    grammar.push(phrase(term("PN", {"num": "sing", "gen": "fem"}),
-                        [literal("Mary")]));
+    grammar.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
+                      [[literal("Mary")], [literal("Anna")]]));
 
     // LI 19
     // Manually expanding into the third person.
-    grammar.push(phrase(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": 1}),
-                        [literal("loves")]));
+    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": 1}),
+                      [[literal("loves")], [literal("stinks")]]));
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
@@ -552,9 +551,9 @@ A ->
     assertThat(print(grammar[5]))
      .equalsTo(`PN[num=sing, gen=male] -> "Jones" "John"`);
     assertThat(print(grammar[6]))
-     .equalsTo(`PN[num=sing, gen=fem] -> "Mary"`);
+     .equalsTo(`PN[num=sing, gen=fem] -> "Mary" "Anna"`);
     assertThat(print(grammar[7]))
-     .equalsTo(`V[num=sing/plur, fin=+, trans=@1] -> "loves"`);
+     .equalsTo(`V[num=sing/plur, fin=+, trans=@1] -> "loves" "stinks"`);
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -593,15 +592,28 @@ A ->
    return node;
   }
 
+  function parse(source) {
+   const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+   parser.feed(source);
+   return clone(parser.results);
+  }
+
   it("parse", function() {
-    const grammar = require("./grammar.js");
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-
-    parser.feed("John loves");
-
-    assertThat(clear(clone(parser.results)))
+    assertThat(clear(parse("John loves")))
      .equalsTo([S(S(NP(PN("John")),
                     VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("Jones loves")))
+     .equalsTo([S(S(NP(PN("Jones")),
+                    VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("Mary loves")))
+     .equalsTo([S(S(NP(PN("Mary")),
+                    VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("Anna loves")))
+     .equalsTo([S(S(NP(PN("Anna")),
+                    VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("John stinks")))
+     .equalsTo([S(S(NP(PN("John")),
+                    VP_(VP(V("stinks")))))]);
   });
 
 

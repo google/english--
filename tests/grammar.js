@@ -52,14 +52,24 @@ var grammar = {
     {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$string$2"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
     {"name": "PN_num_sing_gen_fem$string$1", "symbols": [{"literal":"M"}, {"literal":"a"}, {"literal":"r"}, {"literal":"y"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "PN_num_sing_gen_fem", "symbols": ["PN_num_sing_gen_fem$string$1"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
+    {"name": "PN_num_sing_gen_fem$string$2", "symbols": [{"literal":"A"}, {"literal":"n"}, {"literal":"n"}, {"literal":"a"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "PN_num_sing_gen_fem", "symbols": ["PN_num_sing_gen_fem$string$2"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
     {"name": "V_num_sing_fin_p_trans_p$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
+    {"name": "V_num_sing_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$2"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
     {"name": "V_num_plur_fin_p_trans_p$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_p", "symbols": ["V_num_plur_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args)},
+    {"name": "V_num_plur_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_p", "symbols": ["V_num_plur_fin_p_trans_p$string$2"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args)},
     {"name": "V_num_sing_fin_p_trans_n$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args)},
+    {"name": "V_num_sing_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n$string$2"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args)},
     {"name": "V_num_plur_fin_p_trans_n$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)}
+    {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)},
+    {"name": "V_num_plur_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$2"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)}
 ]
   , ParserStart: "S"
 }
