@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha -w tests",
-    "build": "pegjs src/grammar.pegjs"
+    "build": "nearleyc tests/foo.ne -o tests/foo.js"
   },
   "repository": {
     "type": "git",

@@ -105,7 +105,10 @@ describe.only("DRT", function() {
   let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
   let literal = (value) => { return {"@type": "Literal", name: value} };
   let phrase = (head, tail) => { return rule(head, [tail]); };
-  let name = (term) => {
+  let name = (term, pretty) => {
+   if (term["@type"] == "Literal") {
+    return `"${term.name}"`;
+   }
    if (!term.types) {
     return term.name;
    }
@@ -126,14 +129,27 @@ describe.only("DRT", function() {
     result += key + "=" + val;
    }
    result += "]";
+
+   if (pretty) {
+    result = result.replace(/\[/g, '_');
+    result = result.replace(/\]/g, '');
+    result = result.replace(/\s/g, '');
+    result = result.replace(/,/g, '_');
+    result = result.replace(/-/g, 'n');
+    result = result.replace(/\+/g, 'p');
+    result = result.replace(/=/g, '_');
+    result = result.replace(/\'/g, '_');
+   }
+
    return result;
   }
-  let print = ({head, tail}) => {
+  
+  let print = ({head, tail}, pretty = false) => {
    let result = "";
-   result += name(head) + " ->";
+   result += name(head, pretty) + " ->";
    for (let line of tail) {
     for (let term of line) {
-     result += " " + name(term);
+     result += " " + name(term, pretty);
     }
    }
    return result;
@@ -208,14 +224,14 @@ describe.only("DRT", function() {
    let ids = -1;
 
    for (let [key, values] of Object.entries(FEATURES)) {
-    if (!rule.head.types) {
-     continue;
-    } else if (Number.isInteger(rule.head.types[key])) {
-     vars[rule.head.types[key]] = FEATURES[key];
-    } else if (Array.isArray(rule.head.types[key])) {
-     vars[`${ids}`] = rule.head.types[key];
-     rule.head.types[key] = ids;
-     ids--;
+    if (rule.head.types) {
+     if (Number.isInteger(rule.head.types[key])) {
+      vars[rule.head.types[key]] = FEATURES[key];
+     } else if (Array.isArray(rule.head.types[key])) {
+      vars[`${ids}`] = rule.head.types[key];
+      rule.head.types[key] = ids;
+      ids--;
+     }
     }
     for (let line of rule.tail) {
      for (let term of line) {
@@ -263,18 +279,18 @@ describe.only("DRT", function() {
                       [literal("it")]);
 
     assertThat(print(rule))
-     .equalsTo("PRO[num=sing, case=-nom/+nom] -> it");
+     .equalsTo('PRO[num=sing, case=-nom/+nom] -> "it"');
     assertThat(collect(rule)).equalsTo({"-1": ["-nom", "+nom"]});
     // console.log(rule);
     assertThat(print(rule))
-     .equalsTo("PRO[num=sing, case=@-1] -> it");
+     .equalsTo('PRO[num=sing, case=@-1] -> "it"');
   });
 
   function replace(rule, vars) {
    let result = clone(rule);
 
    for (let [feature, values] of Object.entries(FEATURES)) {
-    if (Number.isInteger(result.head.types[feature])) {
+    if (result.head.types && Number.isInteger(result.head.types[feature])) {
      result.head.types[feature] = vars[result.head.types[feature]];
     }
 
@@ -397,9 +413,9 @@ describe.only("DRT", function() {
     assertThat(result.length).equalsTo(2);
 
     assertThat(print(result[0]))
-     .equalsTo("PRO[num=sing, case=-nom] -> it");
+     .equalsTo('PRO[num=sing, case=-nom] -> "it"');
     assertThat(print(result[1]))
-     .equalsTo("PRO[num=sing, case=+nom] -> it");
+     .equalsTo('PRO[num=sing, case=+nom] -> "it"');
   });
 
   it("Gender", function() {
@@ -427,7 +443,7 @@ describe.only("DRT", function() {
     assertThat(result.length).equalsTo(1);
 
     assertThat(print(result[0]))
-     .equalsTo("V[num=sing, trans=-] -> likes");
+     .equalsTo('V[num=sing, trans=-] -> "likes"');
   });
 
   it("Fin", function() {
@@ -460,6 +476,209 @@ describe.only("DRT", function() {
      .equalsTo("VP'[num=plur, fin=+] -> VP[num=plur, fin=+]");
     assertThat(print(result[3]))
      .equalsTo("VP'[num=plur, fin=-] -> VP[num=plur, fin=-]");
+  });
+
+  function compile(grammar, header = true) {
+   let rules = {};
+   for (let rule of grammar) {
+    for (let expansion of generate(rule)) {
+     let head = name(expansion.head, true);
+     rules[head] = rules[head] || [];
+     for (let line of expansion.tail) {
+      let list = [];
+      for (let term of line) {
+       list.push(name(term, true));
+      }
+      rules[head].push([list.join(" _ "), processor(expansion)]);
+     }
+    }
+   }
+
+   let result = [];
+
+   if (header) {
+    result.push(`@builtin "whitespace.ne"`);
+    result.push(``);
+    result.push(`@{%
+function node(type, types, children) {
+  return {
+    "@type": type, 
+    "types": types, 
+    "children": children.filter(child => child)
+  }; 
+}
+%}`);
+    result.push(``);
+   }
+
+   for (let [key, list] of Object.entries(rules)) {
+    result.push(`${key} -> `);
+    let all = [];
+    for (let [line, processor] of list) {
+     all.push(`  ${line} {% ${processor} %}`);
+    }
+    result.push(all.join(" |\n"));
+   }
+
+   return result.join("\n");
+  }
+
+  it("Generate on tail", function() {
+    let rule = phrase(term("S"),
+                      [term("S", {"num": 1})]);
+    
+    assertThat(collect(rule)).equalsTo({"1": ["sing", "plur"]});
+
+    let result = generate(rule);
+    assertThat(result.length).equalsTo(2);
+    assertThat(print(result[0])).equalsTo("S -> S[num=sing]");
+    assertThat(print(result[1])).equalsTo("S -> S[num=plur]");
+   });
+
+  function processor(rule) {
+   let result = [];
+   result.push("(args)");
+   // let args = [];
+   // for (let line of rules[0].tail) {
+   // for (let term of line) {
+   //  args.push(name(term));
+   //  }
+   // }
+   // processor.push(args.join(", "));
+   // processor.push(")");
+   result.push(" => ");
+   result.push("node(");
+   //console.log(rule);
+   result.push(`"${rule.head.name}", ${JSON.stringify(rule.head.types || {})}, args`);
+   result.push(")");
+   return result.join("");
+  }
+
+  it("processor", function() {
+    let rule = phrase(term("S"),
+                      [term("S", {"num": 1})]);
+
+    let rules = generate(rule);
+
+    assertThat(processor(rules[0])).equalsTo(`(args) => node("S", {}, args)`);
+   });
+
+  it("processor", function() {
+    let rule = phrase(term("PN", {"num": "sing", "gen": "male"}),
+                      [literal("Jones")]);
+
+    let rules = generate(rule);
+
+    assertThat(processor(rules[0]))
+     .equalsTo(`(args) => node("PN", {"num":"sing","gen":"male"}, args)`);
+   });
+
+  it("processor", function() {
+    let rule = phrase(term("S"),
+                      [term("S", {"num": 1})]);
+
+    assertThat(compile([rule], false))
+     .equalsTo(`
+S -> 
+  S_num_sing {% (args) => node("S", {}, args) %} |
+  S_num_plur {% (args) => node("S", {}, args) %}
+               `.trim());
+  });
+
+
+  it("Simplest", function() {
+    let grammar = [];
+
+    // Root
+    grammar.push(phrase(term("S"),
+                        [term("S", {"num": 1})]));
+
+    // PS 1
+    grammar.push(phrase(term("S", {"num": 1}),
+                        [term("NP", {"num": 1, "gen": 2, "case": "+nom"}),
+                         term("VP'", {"num": 1, "fin": "+"})]));
+
+    // PS 5
+    grammar.push(phrase(term("VP'", {"num": 1, "fin": "+"}),
+                        [term("VP", {"num": 1, "fin": "+"})]));
+
+    // PS 7
+    grammar.push(phrase(term("VP", {"num": 1, "fin": 2}),
+                        [term("V", {"num": 1, "fin": 2, "trans": "-"})]));
+
+    // PS 10
+    // page 36 makes a simplification, which we introduce back manually:
+    // The intended meaning is that the left-hand side can have either of 
+    // the case values +nom and -nom. 
+    grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3}),
+                        [term("PN", {"num": 1, "gen": 2})]));
+
+    // LI 9
+    grammar.push(phrase(term("PN", {"num": "sing", "gen": "male"}),
+                        [literal("Jones")]));
+
+    // LI 11
+    grammar.push(phrase(term("PN", {"num": "sing", "gen": "fem"}),
+                        [literal("Mary")]));
+
+    // LI 19
+    // Manually expanding into the third person.
+    grammar.push(phrase(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": 1}),
+                        [literal("loves")]));
+
+    assertThat(print(grammar[0]))
+     .equalsTo("S -> S[num=@1]");
+    assertThat(print(grammar[1]))
+     .equalsTo("S[num=@1] -> NP[num=@1, gen=@2, case=+nom] VP'[num=@1, fin=+]");
+    assertThat(print(grammar[2]))
+     .equalsTo("VP'[num=@1, fin=+] -> VP[num=@1, fin=+]");
+    assertThat(print(grammar[3]))
+     .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]");
+    assertThat(print(grammar[4]))
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
+    assertThat(print(grammar[5]))
+     .equalsTo(`PN[num=sing, gen=male] -> "Jones"`);
+    assertThat(print(grammar[6]))
+     .equalsTo(`PN[num=sing, gen=fem] -> "Mary"`);
+    assertThat(print(grammar[7]))
+     .equalsTo(`V[num=sing/plur, fin=+, trans=@1] -> "loves"`);
+    
+    // "case" makes the distinction between "nominative case"
+    // and "non-nominative case", respectively, he/she and
+    // him/her.
+
+    // "fin" makes the distinction between "infinitival" and
+    // "finite" verb forms (- and +, respectively). 
+    // "infinitival" verb forms are used with negations.
+
+    const fs = require("fs");
+    fs.writeFileSync("./tests/foo.ne", compile(grammar));
+
+    // console.log(compile(grammar));
+  });
+
+  function node(type, types, ...children) {
+   return {"@type": type, "types": types, "children": children} 
+  }
+
+  it("grammar", function() {
+    const grammar = require("./foo.js");
+
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    parser.feed("Jones loves");
+
+    assertThat(parser.results)
+     .equalsTo([node("S", {},
+                     node("S", {"num": "sing"},
+                          node("NP", {"gen": "male", "num": "sing", "case": "+nom"},
+                               node("PN", {"gen": "male", "num": "sing"}, "Jones")),
+                          node("VP'", {"num": "sing", "fin": "+"},
+                               node("VP", {"num": "sing", "fin": "+"},
+                                    node("V", {"fin": "+", "num": "sing", "trans": "-"}, "loves"))
+                               )
+                          )
+                     )
+                ]);
   });
 
   it.skip("Expand two vars", function() {
