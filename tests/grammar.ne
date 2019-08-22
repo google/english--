@@ -35,45 +35,59 @@ VP_num_plur_fin_n ->
   V_num_plur_fin_n_trans_n {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %}
 NP_num_sing_gen_male_case_pnom -> 
   DET_num_sing _ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %} |
-  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %}
+  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %} |
+  PRO_num_sing_gen_male_case_pnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %}
 NP_num_sing_gen_male_case_nnom -> 
   DET_num_sing _ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom"}, args) %} |
-  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom"}, args) %}
+  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom"}, args) %} |
+  PRO_num_sing_gen_male_case_nnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom"}, args) %}
 NP_num_sing_gen_fem_case_pnom -> 
   DET_num_sing _ N_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom"}, args) %} |
-  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom"}, args) %}
+  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom"}, args) %} |
+  PRO_num_sing_gen_fem_case_pnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom"}, args) %}
 NP_num_sing_gen_fem_case_nnom -> 
   DET_num_sing _ N_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom"}, args) %} |
-  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom"}, args) %}
+  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom"}, args) %} |
+  PRO_num_sing_gen_fem_case_nnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom"}, args) %}
 NP_num_sing_gen_nhum_case_pnom -> 
   DET_num_sing _ N_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom"}, args) %} |
-  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom"}, args) %}
+  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom"}, args) %} |
+  PRO_num_sing_gen_nhum_case_pnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom"}, args) %}
 NP_num_sing_gen_nhum_case_nnom -> 
   DET_num_sing _ N_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom"}, args) %} |
-  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom"}, args) %}
+  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom"}, args) %} |
+  PRO_num_sing_gen_nhum_case_nnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom"}, args) %}
 NP_num_plur_gen_male_case_pnom -> 
   DET_num_plur _ N_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom"}, args) %} |
-  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom"}, args) %}
+  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom"}, args) %} |
+  PRO_num_plur_gen_male_case_pnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom"}, args) %}
 NP_num_plur_gen_male_case_nnom -> 
   DET_num_plur _ N_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom"}, args) %} |
-  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom"}, args) %}
+  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom"}, args) %} |
+  PRO_num_plur_gen_male_case_nnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom"}, args) %}
 NP_num_plur_gen_fem_case_pnom -> 
   DET_num_plur _ N_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom"}, args) %} |
-  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom"}, args) %}
+  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom"}, args) %} |
+  PRO_num_plur_gen_fem_case_pnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom"}, args) %}
 NP_num_plur_gen_fem_case_nnom -> 
   DET_num_plur _ N_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom"}, args) %} |
-  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom"}, args) %}
+  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom"}, args) %} |
+  PRO_num_plur_gen_fem_case_nnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom"}, args) %}
 NP_num_plur_gen_nhum_case_pnom -> 
   DET_num_plur _ N_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom"}, args) %} |
-  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom"}, args) %}
+  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom"}, args) %} |
+  PRO_num_plur_gen_nhum_case_pnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom"}, args) %}
 NP_num_plur_gen_nhum_case_nnom -> 
   DET_num_plur _ N_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %} |
-  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
+  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %} |
+  PRO_num_plur_gen_nhum_case_nnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
 DET_num_sing -> 
   "a" {% (args) => node("DET", {"num":"sing"}, args) %} |
   "every" {% (args) => node("DET", {"num":"sing"}, args) %} |
   "the" {% (args) => node("DET", {"num":"sing"}, args) %} |
   "some" {% (args) => node("DET", {"num":"sing"}, args) %}
+PRO_num_sing_gen_male_case_pnom -> 
+  "he" {% (args) => node("PRO", {"num":"sing","gen":"male","case":"+nom"}, args) %}
 PN_num_sing_gen_male -> 
   "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "John" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
