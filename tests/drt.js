@@ -490,8 +490,16 @@ S ->
                `.trim());
   });
 
+  it("multiple expansions", function() {
+    let grammar = [rule(term("A"), [[literal("b")], [literal("c")]])];
+    assertThat(compile(grammar, false)).equalsTo(`
+A -> 
+  "b" {% (args) => node("A", {}, args) %} |
+  "c" {% (args) => node("A", {}, args) %}
+     `.trim());
+  });
 
-  it("simplest", function() {
+  it("grammar", function() {
     let grammar = [];
 
     // Root
@@ -519,8 +527,8 @@ S ->
                         [term("PN", {"num": 1, "gen": 2})]));
 
     // LI 9
-    grammar.push(phrase(term("PN", {"num": "sing", "gen": "male"}),
-                        [literal("Jones")]));
+    grammar.push(rule(term("PN", {"num": "sing", "gen": "male"}),
+                      [[literal("Jones")], [literal("John")]]));
 
     // LI 11
     grammar.push(phrase(term("PN", {"num": "sing", "gen": "fem"}),
@@ -542,7 +550,7 @@ S ->
     assertThat(print(grammar[4]))
      .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
     assertThat(print(grammar[5]))
-     .equalsTo(`PN[num=sing, gen=male] -> "Jones"`);
+     .equalsTo(`PN[num=sing, gen=male] -> "Jones" "John"`);
     assertThat(print(grammar[6]))
      .equalsTo(`PN[num=sing, gen=fem] -> "Mary"`);
     assertThat(print(grammar[7]))
@@ -562,35 +570,38 @@ S ->
     // console.log(compile(grammar));
   });
 
-  function node(type, types, ...children) {
-   return {"@type": type, "types": types, "children": children} 
+  function node(type, ...children) {
+   return {"@type": type, "children": children} 
   }
 
-  let S = (types, ...children) => node("S", types, ...children);
-  let NP = (types, ...children) => node("NP", types, ...children);
-  let PN = (types, ...children) => node("PN", types, ...children);
-  let VP_ = (types, ...children) => node("VP'", types, ...children);
-  let VP = (types, ...children) => node("VP", types, ...children);
-  let V = (types, ...children) => node("V", types, ...children);
+  let S = (...children) => node("S", ...children);
+  let NP = (...children) => node("NP", ...children);
+  let PN = (...children) => node("PN", ...children);
+  let VP_ = (...children) => node("VP'", ...children);
+  let VP = (...children) => node("VP", ...children);
+  let V = (...children) => node("V", ...children);
 
-  it("grammar", function() {
+  function clear(node) {
+   if (Array.isArray(node)) {
+    for (let entry of node) {
+     clear(entry);
+    }
+   } else if (typeof node == "object") {
+    delete node.types;
+    clear(node.children);
+   }
+   return node;
+  }
+
+  it("parse", function() {
     const grammar = require("./grammar.js");
-
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-    parser.feed("Jones loves");
 
-    assertThat(parser.results)
-     .equalsTo([S({},
-                  S({"num": "sing"},
-                    NP({"gen": "male", "num": "sing", "case": "+nom"},
-                       PN({"gen": "male", "num": "sing"}, "Jones")),
-                    VP_({"num": "sing", "fin": "+"},
-                        VP({"num": "sing", "fin": "+"},
-                           V({"fin": "+", "num": "sing", "trans": "-"}, "loves"))
-                        )
-                    )
-                  )
-                ]);
+    parser.feed("John loves");
+
+    assertThat(clear(clone(parser.results)))
+     .equalsTo([S(S(NP(PN("John")),
+                    VP_(VP(V("loves")))))]);
   });
 
 

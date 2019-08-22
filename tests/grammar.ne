@@ -58,7 +58,8 @@ NP_num_plur_gen_nhum_case_pnom ->
 NP_num_plur_gen_nhum_case_nnom -> 
   PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
 PN_num_sing_gen_male -> 
-  "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+  "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "John" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
 PN_num_sing_gen_fem -> 
   "Mary" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
 V_num_sing_fin_p_trans_p -> 
