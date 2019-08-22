@@ -658,11 +658,6 @@ A ->
                     VP_(VP(V("loves")))))]);
   });
 
-  function parse(code) {
-   const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-   parser.feed(code);
-   return parser.results;
-  }
 
   function assertThat(x) {
    return {
