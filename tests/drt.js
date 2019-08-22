@@ -197,6 +197,7 @@ describe.only("DRT", function() {
   const FEATURES = {
    "num": ["sing", "plur"],
    "case": ["+nom", "-nom"],    
+   "gen": ["male", "fem", "-hum"],    
   };
 
   function collect(rule) {
@@ -398,6 +399,23 @@ describe.only("DRT", function() {
     assertThat(print(result[1]))
      .equalsTo("PRO[num=sing, case=+nom] -> it");
   });
+
+  it("Gender", function() {
+    let rule = phrase(term("NP", {"gen": -1}),
+                      [term("PRO", {"gen": -1})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(3);
+
+    assertThat(print(result[0]))
+     .equalsTo("NP[gen=male] -> PRO[gen=male]");
+    assertThat(print(result[1]))
+     .equalsTo("NP[gen=fem] -> PRO[gen=fem]");
+    assertThat(print(result[2]))
+     .equalsTo("NP[gen=-hum] -> PRO[gen=-hum]");
+  });
+
 
   it.skip("Expand two vars", function() {
     let rule = phrase(term("VP", {"num": -1}),
