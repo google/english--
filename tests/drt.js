@@ -2,9 +2,6 @@ const Assert = require("assert");
 const peg = require("pegjs");
 
 const nearley = require("nearley");
-const grammar = require("./grammar.js");
-
-const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
 describe.only("DRT", function() {
   let l = (value) => { return literal(value); };
