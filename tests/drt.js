@@ -444,6 +444,24 @@ describe.only("DRT", function() {
      .equalsTo("VP[fin=-] -> V[fin=-]");
   });
 
+  it("Combines nums with fins", function() {
+    let rule = phrase(term("VP'", {"num": 1, "fin": 2}),
+                      [term("VP", {"num": 1, "fin": 2})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(4);
+
+    assertThat(print(result[0]))
+     .equalsTo("VP'[num=sing, fin=+] -> VP[num=sing, fin=+]");
+    assertThat(print(result[1]))
+     .equalsTo("VP'[num=sing, fin=-] -> VP[num=sing, fin=-]");
+    assertThat(print(result[2]))
+     .equalsTo("VP'[num=plur, fin=+] -> VP[num=plur, fin=+]");
+    assertThat(print(result[3]))
+     .equalsTo("VP'[num=plur, fin=-] -> VP[num=plur, fin=-]");
+  });
+
   it.skip("Expand two vars", function() {
     let rule = phrase(term("VP", {"num": -1}),
                       [term("V", {"num": -1}),
