@@ -117,8 +117,13 @@ describe.only("DRT", function() {
      result += ", ";
     }
     first = false;
-    // let char = String.fromCharCode('A'.charCodeAt(0) + Math.abs(value) - 1);
-    result += key + "=" + (Number.isInteger(value) ? `@${value}` : value);
+    let val = value;
+    if (Number.isInteger(value)) {
+     val = `@${value}`;
+    } else if (Array.isArray(value)) {
+     val = `${value.join("/")}`;
+    }
+    result += key + "=" + val;
    }
    result += "]";
    return result;
@@ -197,14 +202,29 @@ describe.only("DRT", function() {
   function collect(rule) {
    let vars = {};
 
+   let ids = -1;
+
    for (let [key, values] of Object.entries(FEATURES)) {
-    if (Number.isInteger(rule.head.types[key])) {
+    if (!rule.head.types) {
+     continue;
+    } else if (Number.isInteger(rule.head.types[key])) {
      vars[rule.head.types[key]] = FEATURES[key];
+    } else if (Array.isArray(rule.head.types[key])) {
+     vars[`${ids}`] = rule.head.types[key];
+     rule.head.types[key] = ids;
+     ids--;
     }
     for (let line of rule.tail) {
      for (let term of line) {
+      if (!term.types) {
+       continue;
+      }
       if (Number.isInteger(term.types[key])) {
        vars[term.types[key]] = FEATURES[key];
+      } else if (Array.isArray(term.types[key])) {
+       vars[`${ids}`] = term.types[key];
+       term.types[key] = ids;
+       ids--;
       }
      }
     }
@@ -235,6 +255,18 @@ describe.only("DRT", function() {
      .equalsTo({"1": ["+nom", "-nom"], "2": ["+nom", "-nom"]});
   });
 
+  it("Collects array", function() {
+    let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "+nom"]}),
+                      [literal("it")]);
+
+    assertThat(print(rule))
+     .equalsTo("PRO[num=sing, case=-nom/+nom] -> it");
+    assertThat(collect(rule)).equalsTo({"-1": ["-nom", "+nom"]});
+    // console.log(rule);
+    assertThat(print(rule))
+     .equalsTo("PRO[num=sing, case=@-1] -> it");
+  });
+
   function replace(rule, vars) {
    let result = clone(rule);
 
@@ -242,6 +274,7 @@ describe.only("DRT", function() {
     if (Number.isInteger(result.head.types[feature])) {
      result.head.types[feature] = vars[result.head.types[feature]];
     }
+
     for (let line of result.tail) {
      for (let term of line) {
       if (Number.isInteger(term.types[feature])) {
@@ -348,6 +381,27 @@ describe.only("DRT", function() {
      .equalsTo("NP[num=plur, case=+nom] -> PRO[num=plur, case=+nom]");
     assertThat(print(result[3]))
      .equalsTo("NP[num=plur, case=-nom] -> PRO[num=plur, case=-nom]");
+  });
+
+  it.skip("Generate with array values", function() {
+    let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "nom"]}),
+                      [literal("it")]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(2);
+
+    return;
+
+    assertThat(result.length).equalsTo(4);
+    assertThat(print(result[0]))
+     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=sing]");
+    assertThat(print(result[1]))
+     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=plur]");
+    assertThat(print(result[2]))
+     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=sing]");
+    assertThat(print(result[3]))
+     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=plur]");
   });
 
   it.skip("Expand two vars", function() {
