@@ -7,98 +7,6 @@ const grammar = require("./grammar.js");
 const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js");
 
 describe.only("DRT", function() {
-
-  function expand2(rule) {
-   // console.log(rule);
-   // return;
-   let vars = {};
-   let {head, tail} = rule;
-
-   let capture = (types) =>
-    Object
-    .entries(types)
-    .filter(([key, value]) => value == -1 || Array.isArray(value))
-    .map(([key, value]) => vars[key] = value);
-     
-   // capture(rule.head.types);
-
-   for (let term of tail) {
-    if (term["@type"] == "Literal") {
-     continue;
-    }
-    term
-     .filter((term) => term["@type"] == "Term")
-     .map(({types}) => capture(types));
-   }
-
-   // console.log(vars);
-
-   // return;
-
-   let {num, gen, caze, fin, gap, trans} = vars;
-
-   let dims = [];
-   // num
-   dims.push(num == -1 ? ["s", "p"] : (num ? num : ["_"]));
-   // gen
-   dims.push(gen == -1 ? ["m", "f", "h"] : (gen ? gen : ["_"]));
-   // case
-   dims.push(caze == -1 ? ["p", "m"] : (caze ? caze : ["_"]));
-   // fin
-   dims.push(fin == -1 ? ["p", "m"] : (fin ? fin : ["_"]));
-   // gap
-   dims.push(gap == -1 ? ["p", "m"] : (gap ? gap : ["_"]));
-   // trans
-   dims.push(trans == -1 ? ["p", "m"] : (trans ? trans : ["_"]));
-   
-   let pop = (a) => {};
-
-   let replace = (rule, fix) => {
-    let result = JSON.parse(JSON.stringify(rule));
-    for (let [key, value] of Object.entries(rule.head.types)) {
-     if (value == -1) {
-      result.head.types[key] = fix[key];
-     }
-    }
-    for (let line of result.tail) {
-     for (let term of line) {
-      for (let [key, value] of Object.entries(term.types)) {
-       if (value == -1) {
-        term.types[key] = fix[key];
-       }
-      }
-     }
-    }
-    return result;
-   };
-
-   let result = [];
-
-   for (let num of dims[0]) {
-    for (let gen of dims[1]) {
-     for (let caze of dims[2]) {
-      for (let fin of dims[3]) {
-       for (let gap of dims[4]) {
-        for (let trans of dims[5]) {
-         result.push(replace(rule, {
-            num: num, 
-            gen: gen, 
-            caze: caze, 
-            fin: fin, 
-            gap: gap, 
-            trans: trans
-         }));
-        }
-       }
-      }
-     }
-    }
-   }
-
-   return result;
-  }
-
-
   let l = (value) => { return literal(value); };
   let space = (space) => { return {"@type": "Space"} };
   let rule = (head = {}, tail = []) => { return {"@type": "Rule", head: head, tail: tail}};
@@ -155,7 +63,7 @@ describe.only("DRT", function() {
    return result;
   }
 
-  it("Expand var", function() {
+  it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),
                       [term("NP", {"num": 1}),
                        term("VP_", {"num": 1})]);
@@ -199,7 +107,7 @@ describe.only("DRT", function() {
    return result;
   }
 
-  it("Expand", function() {
+  it("expand", function() {
     let obj = {"A": ["S", "P"], "B": ["X", "Y"]};
 
     assertThat(expand(obj))
@@ -252,7 +160,7 @@ describe.only("DRT", function() {
    return vars;
   }
 
-  it("Collect", function() {
+  it("collect", function() {
     let rule = phrase(term("VP", {"num": 1}),
                       [term("V", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -263,7 +171,7 @@ describe.only("DRT", function() {
      .equalsTo({"1": ["sing", "plur"], "2": ["sing", "plur"]});
   });
 
-  it("Collects case", function() {
+  it("collects case", function() {
     let rule = phrase(term("VP", {"case": 1}),
                       [term("V", {"case": 1}),
                        term("NP", {"case": 2})]);
@@ -274,7 +182,7 @@ describe.only("DRT", function() {
      .equalsTo({"1": ["+nom", "-nom"], "2": ["+nom", "-nom"]});
   });
 
-  it("Collects array", function() {
+  it("collects array", function() {
     let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "+nom"]}),
                       [literal("it")]);
 
@@ -319,7 +227,7 @@ describe.only("DRT", function() {
    return result;
   }
 
-  it("Generate", function() {
+  it("generate", function() {
     let rule = phrase(term("VP", {"num": 1}),
                       [term("V", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -337,7 +245,7 @@ describe.only("DRT", function() {
      .equalsTo("VP[num=plur] -> V[num=plur] NP[num=plur]");
   });
 
-  it("Generate with case", function() {
+  it("generate with case", function() {
     let rule = phrase(term("VP", {"case": 1}),
                       [term("V", {"case": 1}),
                        term("NP", {"case": 2})]);
@@ -355,7 +263,7 @@ describe.only("DRT", function() {
      .equalsTo("VP[case=-nom] -> V[case=-nom] NP[case=-nom]");
   });
 
-  it("Generate with fixed values", function() {
+  it("generate with fixed values", function() {
     let rule = phrase(term("NP", {"num": "plur"}),
                       [term("NP", {"num": 1}),
                        term("NP", {"num": 2})]);
@@ -373,7 +281,7 @@ describe.only("DRT", function() {
      .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=plur]");
   });
 
-  it("Generate with two types", function() {
+  it("generate with two types", function() {
     let rule = phrase(term("S", {"num": 1}),
                       [term("NP", {"num": 1, "case": "+nom"}),
                        term("VP", {"num": 1})]);
@@ -387,7 +295,7 @@ describe.only("DRT", function() {
      .equalsTo("S[num=plur] -> NP[num=plur, case=+nom] VP[num=plur]");
   });
 
-  it("Generate with two types and two variables", function() {
+  it("generate with two types and two variables", function() {
     let rule = phrase(term("NP", {"num": 1, "case": 2}),
                       [term("PRO", {"num": 1, "case": 2})]);
 
@@ -404,7 +312,7 @@ describe.only("DRT", function() {
      .equalsTo("NP[num=plur, case=-nom] -> PRO[num=plur, case=-nom]");
   });
 
-  it("Generate with array values", function() {
+  it("generate with array values", function() {
     let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "+nom"]}),
                       [literal("it")]);
 
@@ -418,7 +326,7 @@ describe.only("DRT", function() {
      .equalsTo('PRO[num=sing, case=+nom] -> "it"');
   });
 
-  it("Gender", function() {
+  it("gender", function() {
     let rule = phrase(term("NP", {"gen": -1}),
                       [term("PRO", {"gen": -1})]);
 
@@ -434,7 +342,7 @@ describe.only("DRT", function() {
      .equalsTo("NP[gen=-hum] -> PRO[gen=-hum]");
   });
 
-  it("Transitive verbs", function() {
+  it("transitive verbs", function() {
     let rule = phrase(term("V", {"num": "sing", "trans": "-"}),
                       [literal("likes")]);
 
@@ -446,7 +354,7 @@ describe.only("DRT", function() {
      .equalsTo('V[num=sing, trans=-] -> "likes"');
   });
 
-  it("Fin", function() {
+  it("fin", function() {
     let rule = phrase(term("VP", {"fin": 1}),
                       [term("V", {"fin": 1})]);
 
@@ -460,7 +368,7 @@ describe.only("DRT", function() {
      .equalsTo("VP[fin=-] -> V[fin=-]");
   });
 
-  it("Combines nums with fins", function() {
+  it("combines nums with fins", function() {
     let rule = phrase(term("VP'", {"num": 1, "fin": 2}),
                       [term("VP", {"num": 1, "fin": 2})]);
 
@@ -523,7 +431,7 @@ function node(type, types, children) {
    return result.join("\n");
   }
 
-  it("Generate on tail", function() {
+  it("generate on tail", function() {
     let rule = phrase(term("S"),
                       [term("S", {"num": 1})]);
     
@@ -586,7 +494,7 @@ S ->
   });
 
 
-  it("Simplest", function() {
+  it("simplest", function() {
     let grammar = [];
 
     // Root
@@ -681,77 +589,6 @@ S ->
                 ]);
   });
 
-  it.skip("Expand two vars", function() {
-    let rule = phrase(term("VP", {"num": -1}),
-                      [term("V", {"num": -1}),
-                       term("NP", {"num": -2})]);
-
-    assertThat(print(rule)).equalsTo("VP[num=A] -> V[num=A] NP[num=B]");
-
-    // console.log(JSON.stringify(rule, undefined, 2));
-
-    function* expand(rule) {
-     let result = clone(rule);
-     if (result.head.types.num < 0) {
-      for (let num of ["S", "P"]) {
-       let tmp = clone(result);
-       for (let line of tmp.tail) {
-        for (let term of line) {
-         if (term.types.num == result.head.types.num) {
-          term.types.num = num;
-         }
-        }
-       }
-       tmp.head.types.num = num;
-       yield* expand(tmp);
-      }
-      return;
-     }
-
-     for (let line of result.tail) {
-      for (let term of line) {
-       if (term.types.num < 0) {
-        for (let num of ["S", "P"]) {
-         for (let line2 of tmp.tail) {
-          for (let term2 of line) {
-           if (term2.types.num == term.types.num) {
-            term2.types.num = num;
-           }
-          }
-         }
-         term.types.num = num;
-         yield* expand(tmp);
-        }
-        return;
-       }
-      }
-     }
-
-     yield rule;
-    }
-
-    let result = [];
-
-    for (let r of expand(rule)) {
-     console.log(print(r));
-     // result.push(r);
-    }
-
-    return;
-
-    assertThat(result.length).equalsTo(4);
-    assertThat(print(result[0])).equalsTo("VP[num=S] -> V[num=P] NP[num=P]");
-    assertThat(print(result[1])).equalsTo("VP[num=S] -> V[num=P] NP[num=P]");
-    assertThat(print(result[2])).equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
-    assertThat(print(result[3])).equalsTo("VP[num=P] -> V[num=P] NP[num=P]");
-    return;
-
-    let rules = expand(rule);
-
-    assertThat(rules.length).equalsTo(2);
-    assertThat(print(rules[0])).equalsTo("VP[num=s] -> V[num=s] NP[num=B]");
-    assertThat(print(rules[1])).equalsTo("VP[num=p] -> V[num=p] NP[num=B]");
-   });
 
   it("compiler compiler", function() {
 
@@ -996,147 +833,11 @@ V ->
     fs.writeFileSync("./tests/foo.ne", lines.join("\n"));
   });
 
-  it.skip("tests", function() {
-    const grammar = require("./foo.js");
-
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-    parser.feed("Smith stinks");
-    let node = (type, ...children) => { return {"@type": type, children: children} };
-    assertThat(parser.results)
-     .equalsTo([node("S", 
-                     node("NP", 
-                          node("PN", "Smith")),
-                     node("VP_", 
-                          node("VP", 
-                               node("V", "stinks"))))
-                ]);
-  });
-
-  it.skip("nearly", function() {
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-    parser.feed("foo\n");
-    assertThat(parser.results).equalsTo([[[[["foo"], "\n"] ]]]);
-  });
-
   function parse(code) {
    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
    parser.feed(code);
    return parser.results;
   }
-
-  it("basic", function() { 
-   assertThat(parse("Jones likes Mary."))
-     .equalsTo([S(NP(PN("Jones")), 
-                  VP(V("likes"), 
-                     NP(PN("Mary"))))]);
-    assertThat(parse("Mary likes Jones."))
-     .equalsTo([S(NP(PN("Mary")), 
-                  VP(V("likes"), 
-                     NP(PN("Jones"))))]);
-    assertThat(parse("Mary likes him."))
-     .equalsTo([S(NP(PN("Mary")), 
-                  VP(V("likes"), 
-                     NP(PRO("him"))))]);
-    assertThat(parse("she likes him."))
-     .equalsTo([S(NP(PRO("she")), 
-                  VP(V("likes"), 
-                     NP(PRO("him"))))]);
-    assertThat(parse("she likes every car."))
-     .equalsTo([S(NP(PRO("she")), 
-                  VP(V("likes"), 
-                     NP(DET("every"), N("car"))))]);
-    assertThat(parse("a man likes a woman."))
-     .equalsTo([S(NP(DET("a"), N("man")), 
-                  VP(V("likes"), 
-                     NP(DET("a"), N("woman"))))]);
-
-    assertThat(parse("a man likes a woman and a car."))
-     .equalsTo([S(NP(DET("a"), N("man")), 
-                 VP(V("likes"), 
-                    NP(AND(NP(DET("a"), N("woman")),
-                           NP(DET("a"), N("car")))
-                       )))]);
-    assertThat(parse("a man and a woman likes a car."))
-     .equalsTo([S(NP(AND(NP(DET("a"), N("man")),
-                         NP(DET("a"), N("woman")))
-                     ), 
-                  VP(V("likes"), 
-                     NP(DET("a"), N("car"))
-                     ))]);
-    
-
-   });
-   
-  it("basic", function() {
-    const parser = peg.generate(`
-      S = "foo" /
-          "bar"                                
-    `);
-    assertThat(parser.parse("foo")).equalsTo("foo");
-    assertThat(parser.parse("bar")).equalsTo("bar");
-  });
-
-  it("S = NP VP", function() {
-    const parser = peg.generate(`
-      S = np:NP vp:VP PERIOD {return {"@type": "Sentence", np: np, vp: vp}}
-      VP = v:V np:NP { return {"@type": "VerbPhrase", verb: v, np: np}; }
-      NP = pn:PN { return { "@type": "NounPhrase", children: [pn]}; } /
-           pro:PRO { return { "@type": "NounPhrase", children: [pro]}; } /
-           det:DET n:N { return { "@type": "NounPhrase", children: [det, n]}; }
-
-      PN = _ name:names _ { return {"@type": "ProperName", "name": name} }
-      V = _ name:verbs _ { return {"@type": "Verb", "name": name} }
-      N = _ name:nouns _ { return {"@type": "Noun", "name": name} }
-
-      PRO = _ name:pronous _ { return {"@type": "Pronoun", "name": name} }
-      DET = _ name:determiners _ { return {"@type": "Determiner", "name": name} }
-
-      _ = [ ]*
-
-      PERIOD = _ "." _
-
-      names = "Jones" /
-              "Mary"
-
-      verbs = "likes" /
-              "loves"
-
-      nouns = "book" /
-              "man" /
-              "woman" /
-              "donkey" /
-              "car"
-
-      determiners = "a" / "every" / "the" / "some" / "all" / "most"
-
-      pronous = "he" / "him" / "she" / "her" / "it" / "they"
-
-    `);
-    assertThat(parser.parse("Jones loves Mary."))
-     .equalsTo(S(NP(PN("Jones")), 
-                 VP(V("loves"), 
-                    NP(PN("Mary")))));
-    assertThat(parser.parse("Mary likes Jones."))
-     .equalsTo(S(NP(PN("Mary")), 
-                 VP(V("likes"), 
-                    NP(PN("Jones")))));
-    assertThat(parser.parse("Mary likes him."))
-     .equalsTo(S(NP(PN("Mary")), 
-                 VP(V("likes"), 
-                    NP(PRO("him")))));
-    assertThat(parser.parse("she likes him."))
-     .equalsTo(S(NP(PRO("she")), 
-                 VP(V("likes"), 
-                    NP(PRO("him")))));
-    assertThat(parser.parse("she likes every car."))
-     .equalsTo(S(NP(PRO("she")), 
-                 VP(V("likes"), 
-                    NP(DET("every"), N("car")))));
-    assertThat(parser.parse("a man likes a woman."))
-     .equalsTo(S(NP(DET("a"), N("man")), 
-                 VP(V("likes"), 
-                    NP(DET("a"), N("woman")))));
-   });
 
   function assertThat(x) {
    return {
