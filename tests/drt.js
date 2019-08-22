@@ -277,8 +277,10 @@ describe.only("DRT", function() {
 
     for (let line of result.tail) {
      for (let term of line) {
-      if (Number.isInteger(term.types[feature])) {
-      term.types[feature] = vars[term.types[feature]];
+      if (!term.types) {
+       continue;
+      } else if (Number.isInteger(term.types[feature])) {
+       term.types[feature] = vars[term.types[feature]];
       }
      }
     }
@@ -383,25 +385,18 @@ describe.only("DRT", function() {
      .equalsTo("NP[num=plur, case=-nom] -> PRO[num=plur, case=-nom]");
   });
 
-  it.skip("Generate with array values", function() {
-    let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "nom"]}),
+  it("Generate with array values", function() {
+    let rule = phrase(term("PRO", {"num": "sing", "case": ["-nom", "+nom"]}),
                       [literal("it")]);
 
     let result = generate(rule);
 
     assertThat(result.length).equalsTo(2);
 
-    return;
-
-    assertThat(result.length).equalsTo(4);
     assertThat(print(result[0]))
-     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=sing]");
+     .equalsTo("PRO[num=sing, case=-nom] -> it");
     assertThat(print(result[1]))
-     .equalsTo("NP[num=plur] -> NP[num=sing] NP[num=plur]");
-    assertThat(print(result[2]))
-     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=sing]");
-    assertThat(print(result[3]))
-     .equalsTo("NP[num=plur] -> NP[num=plur] NP[num=plur]");
+     .equalsTo("PRO[num=sing, case=+nom] -> it");
   });
 
   it.skip("Expand two vars", function() {
