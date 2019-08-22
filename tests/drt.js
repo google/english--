@@ -416,6 +416,17 @@ describe.only("DRT", function() {
      .equalsTo("NP[gen=-hum] -> PRO[gen=-hum]");
   });
 
+  it("Transitive verbs", function() {
+    let rule = phrase(term("V", {"num": "sing", "trans": "-"}),
+                      [literal("likes")]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(1);
+
+    assertThat(print(result[0]))
+     .equalsTo("V[num=sing, trans=-] -> likes");
+  });
 
   it.skip("Expand two vars", function() {
     let rule = phrase(term("VP", {"num": -1}),
