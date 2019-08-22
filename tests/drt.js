@@ -198,6 +198,8 @@ describe.only("DRT", function() {
    "num": ["sing", "plur"],
    "case": ["+nom", "-nom"],    
    "gen": ["male", "fem", "-hum"],    
+   "trans": ["+", "-"],
+   "fin": ["+", "-"],
   };
 
   function collect(rule) {
@@ -426,6 +428,20 @@ describe.only("DRT", function() {
 
     assertThat(print(result[0]))
      .equalsTo("V[num=sing, trans=-] -> likes");
+  });
+
+  it("Fin", function() {
+    let rule = phrase(term("VP", {"fin": 1}),
+                      [term("V", {"fin": 1})]);
+
+    let result = generate(rule);
+
+    assertThat(result.length).equalsTo(2);
+
+    assertThat(print(result[0]))
+     .equalsTo("VP[fin=+] -> V[fin=+]");
+    assertThat(print(result[1]))
+     .equalsTo("VP[fin=-] -> V[fin=-]");
   });
 
   it.skip("Expand two vars", function() {
