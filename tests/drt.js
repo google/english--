@@ -518,12 +518,21 @@ A ->
     grammar.push(phrase(term("VP", {"num": 1, "fin": 2}),
                         [term("V", {"num": 1, "fin": 2, "trans": "-"})]));
 
-    // PS 10
     // page 36 makes a simplification, which we introduce back manually:
     // The intended meaning is that the left-hand side can have either of 
     // the case values +nom and -nom. 
+
+    // PS 9
+    grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3}),
+                        [term("DET", {"num": 1}), term("N", {"num": 1, "gen": 2})]));
+
+    // PS 10
     grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3}),
                         [term("PN", {"num": 1, "gen": 2})]));
+
+    // LI 1
+    grammar.push(rule(term("DET", {"num": "sing"}),
+                      [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
 
     // LI 9
     grammar.push(rule(term("PN", {"num": "sing", "gen": "male"}),
@@ -532,6 +541,18 @@ A ->
     // LI 11
     grammar.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
                       [[literal("Mary")], [literal("Anna")]]));
+
+    // LI 12
+    grammar.push(rule(term("N", {"num": "sing", "gen": "male"}),
+                      [[literal("stockbroker")], [literal("man")]]));
+
+    // LI 13
+    grammar.push(rule(term("N", {"num": "sing", "gen": "fem"}),
+                      [[literal("stockbroker")], [literal("woman")], [literal("widow")]]));
+
+    // LI 14
+    grammar.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
+                      [[literal("book")], [literal("donkey")], [literal("horse")]]));
 
     // LI 19
     // Manually expanding into the third person.
@@ -547,13 +568,23 @@ A ->
     assertThat(print(grammar[3]))
      .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]");
     assertThat(print(grammar[4]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> DET[num=@1] N[num=@1, gen=@2]")
     assertThat(print(grammar[5]))
-     .equalsTo(`PN[num=sing, gen=male] -> "Jones" "John"`);
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
     assertThat(print(grammar[6]))
-     .equalsTo(`PN[num=sing, gen=fem] -> "Mary" "Anna"`);
+     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(grammar[7]))
-     .equalsTo(`V[num=sing/plur, fin=+, trans=@1] -> "loves" "stinks"`);
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
+    assertThat(print(grammar[8]))
+     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
+    assertThat(print(grammar[9]))
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+    assertThat(print(grammar[10]))
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+    assertThat(print(grammar[11]))
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+    assertThat(print(grammar[12]))
+     .equalsTo('V[num=sing/plur, fin=+, trans=@1] -> "loves" "stinks"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -579,6 +610,8 @@ A ->
   let VP_ = (...children) => node("VP'", ...children);
   let VP = (...children) => node("VP", ...children);
   let V = (...children) => node("V", ...children);
+  let DET = (...children) => node("DET", ...children);
+  let N = (...children) => node("N", ...children);
 
   function clear(node) {
    if (Array.isArray(node)) {
@@ -614,6 +647,15 @@ A ->
     assertThat(clear(parse("John stinks")))
      .equalsTo([S(S(NP(PN("John")),
                     VP_(VP(V("stinks")))))]);
+    assertThat(clear(parse("a man loves")))
+     .equalsTo([S(S(NP(DET("a"), N("man")),
+                    VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("every donkey stinks")))
+     .equalsTo([S(S(NP(DET("every"), N("donkey")),
+                    VP_(VP(V("stinks")))))]);
+    assertThat(clear(parse("the woman loves")))
+     .equalsTo([S(S(NP(DET("the"), N("woman")),
+                    VP_(VP(V("loves")))))]);
   });
 
 
