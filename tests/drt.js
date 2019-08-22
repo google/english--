@@ -557,7 +557,7 @@ S ->
     // "infinitival" verb forms are used with negations.
 
     const fs = require("fs");
-    fs.writeFileSync("./tests/foo.ne", compile(grammar));
+    fs.writeFileSync("./tests/grammar.ne", compile(grammar));
 
     // console.log(compile(grammar));
   });
@@ -574,7 +574,7 @@ S ->
   let V = (types, ...children) => node("V", types, ...children);
 
   it("grammar", function() {
-    const grammar = require("./foo.js");
+    const grammar = require("./grammar.js");
 
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     parser.feed("Jones loves");

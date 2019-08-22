@@ -1,25 +1,71 @@
-@builtin "whitespace.ne" # `_` means arbitrary amount of whitespace
-@builtin "number.ne"     # `int`, `decimal`, and `percentage`
+@builtin "whitespace.ne"
 
-@{% const {S, VP, NP, PN, V, PRO, DET, N, AND} = require("./ast.js"); %}
+@{%
+function node(type, types, children) {
+  return {
+    "@type": type, 
+    "types": types, 
+    "children": children.filter(child => child)
+  }; 
+}
+%}
 
 S -> 
-  NP VP "." {% ([np, vp]) => S(np, vp) %}
-
-VP -> 
-  V _ NP {% ([v, _, np]) => VP(V(v[0]), np) %}
-
-NP -> 
-  PN _ {% ([pn]) => NP(PN(pn[0])) %} |
-  PRO _ {% ([pro]) => NP(PRO(pro[0])) %} |
-  DET _ N _ {% ([det, _, n]) => NP(DET(det[0]), N(n[0])) %}  |
-  NP "and" _ NP {% ([np1, sp1, sp2, np2]) => NP(AND(np1, np2)) %} 
-
-PN -> "Jones" | "Smith" | "Mary"
-V -> "likes" | "loves"
-N -> "book" | "man" | "woman" | "donkey" | "car"
-DET -> "a" | "every" | "the" | "some" | "all" | "most"
-PRO -> "he" | "him" | "she" | "her" | "it" | "they"
-
-
-
+  S_num_sing {% (args) => node("S", {}, args) %} |
+  S_num_plur {% (args) => node("S", {}, args) %}
+S_num_sing -> 
+  NP_num_sing_gen_male_case_pnom _ VP__num_sing_fin_p {% (args) => node("S", {"num":"sing"}, args) %} |
+  NP_num_sing_gen_fem_case_pnom _ VP__num_sing_fin_p {% (args) => node("S", {"num":"sing"}, args) %} |
+  NP_num_sing_gen_nhum_case_pnom _ VP__num_sing_fin_p {% (args) => node("S", {"num":"sing"}, args) %}
+S_num_plur -> 
+  NP_num_plur_gen_male_case_pnom _ VP__num_plur_fin_p {% (args) => node("S", {"num":"plur"}, args) %} |
+  NP_num_plur_gen_fem_case_pnom _ VP__num_plur_fin_p {% (args) => node("S", {"num":"plur"}, args) %} |
+  NP_num_plur_gen_nhum_case_pnom _ VP__num_plur_fin_p {% (args) => node("S", {"num":"plur"}, args) %}
+VP__num_sing_fin_p -> 
+  VP_num_sing_fin_p {% (args) => node("VP'", {"num":"sing","fin":"+"}, args) %}
+VP__num_plur_fin_p -> 
+  VP_num_plur_fin_p {% (args) => node("VP'", {"num":"plur","fin":"+"}, args) %}
+VP_num_sing_fin_p -> 
+  V_num_sing_fin_p_trans_n {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %}
+VP_num_sing_fin_n -> 
+  V_num_sing_fin_n_trans_n {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %}
+VP_num_plur_fin_p -> 
+  V_num_plur_fin_p_trans_n {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %}
+VP_num_plur_fin_n -> 
+  V_num_plur_fin_n_trans_n {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %}
+NP_num_sing_gen_male_case_pnom -> 
+  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %}
+NP_num_sing_gen_male_case_nnom -> 
+  PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom"}, args) %}
+NP_num_sing_gen_fem_case_pnom -> 
+  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom"}, args) %}
+NP_num_sing_gen_fem_case_nnom -> 
+  PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom"}, args) %}
+NP_num_sing_gen_nhum_case_pnom -> 
+  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom"}, args) %}
+NP_num_sing_gen_nhum_case_nnom -> 
+  PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom"}, args) %}
+NP_num_plur_gen_male_case_pnom -> 
+  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom"}, args) %}
+NP_num_plur_gen_male_case_nnom -> 
+  PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom"}, args) %}
+NP_num_plur_gen_fem_case_pnom -> 
+  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom"}, args) %}
+NP_num_plur_gen_fem_case_nnom -> 
+  PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom"}, args) %}
+NP_num_plur_gen_nhum_case_pnom -> 
+  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom"}, args) %}
+NP_num_plur_gen_nhum_case_nnom -> 
+  PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
+PN_num_sing_gen_male -> 
+  "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+PN_num_sing_gen_fem -> 
+  "Mary" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
+V_num_sing_fin_p_trans_p -> 
+  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
+V_num_plur_fin_p_trans_p -> 
+  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
+V_num_sing_fin_p_trans_n -> 
+  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+V_num_plur_fin_p_trans_n -> 
+  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
