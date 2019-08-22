@@ -566,6 +566,13 @@ S ->
    return {"@type": type, "types": types, "children": children} 
   }
 
+  let S = (types, ...children) => node("S", types, ...children);
+  let NP = (types, ...children) => node("NP", types, ...children);
+  let PN = (types, ...children) => node("PN", types, ...children);
+  let VP_ = (types, ...children) => node("VP'", types, ...children);
+  let VP = (types, ...children) => node("VP", types, ...children);
+  let V = (types, ...children) => node("V", types, ...children);
+
   it("grammar", function() {
     const grammar = require("./foo.js");
 
@@ -573,16 +580,16 @@ S ->
     parser.feed("Jones loves");
 
     assertThat(parser.results)
-     .equalsTo([node("S", {},
-                     node("S", {"num": "sing"},
-                          node("NP", {"gen": "male", "num": "sing", "case": "+nom"},
-                               node("PN", {"gen": "male", "num": "sing"}, "Jones")),
-                          node("VP'", {"num": "sing", "fin": "+"},
-                               node("VP", {"num": "sing", "fin": "+"},
-                                    node("V", {"fin": "+", "num": "sing", "trans": "-"}, "loves"))
-                               )
-                          )
-                     )
+     .equalsTo([S({},
+                  S({"num": "sing"},
+                    NP({"gen": "male", "num": "sing", "case": "+nom"},
+                       PN({"gen": "male", "num": "sing"}, "Jones")),
+                    VP_({"num": "sing", "fin": "+"},
+                        VP({"num": "sing", "fin": "+"},
+                           V({"fin": "+", "num": "sing", "trans": "-"}, "loves"))
+                        )
+                    )
+                  )
                 ]);
   });
 
