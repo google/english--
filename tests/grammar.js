@@ -190,13 +190,13 @@ var grammar = {
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
     {"name": "V_num_sing_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$2"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
-    {"name": "V_num_plur_fin_p_trans_n$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_n$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)},
-    {"name": "V_num_plur_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$2"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)},
-    {"name": "V_num_plur_fin_p_trans_p$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_p$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_p", "symbols": ["V_num_plur_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args)},
-    {"name": "V_num_plur_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_plur_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_p", "symbols": ["V_num_plur_fin_p_trans_p$string$2"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args)}
 ]
   , ParserStart: "S"

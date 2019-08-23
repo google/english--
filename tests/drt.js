@@ -619,11 +619,16 @@ A ->
                       [[literal("love")], [literal("stink")]]));
 
     // LI 19
-    // Manually expanding into the third person.
-    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": ["-", "+"]}),
+    // Manually expanding into the present / third person.
+    grammar.push(rule(term("V", {"num": ["sing"], "fin": "+", "trans": ["-", "+"]}),
                       [[literal("loves")], [literal("stinks")]]));
 
-    assertThat(grammar.length).equalsTo(27);
+    // LI 20
+    // Manually expanding into the present / plural.
+    grammar.push(rule(term("V", {"num": ["plur"], "fin": "+", "trans": ["-", "+"]}),
+                      [[literal("love")], [literal("stink")]]));
+
+    assertThat(grammar.length).equalsTo(28);
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
@@ -678,7 +683,9 @@ A ->
     assertThat(print(grammar[25]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[26]))
-     .equalsTo('V[num=sing/plur, fin=+, trans=-/+] -> "loves" "stinks"');
+     .equalsTo('V[num=sing, fin=+, trans=-/+] -> "loves" "stinks"');
+    assertThat(print(grammar[27]))
+     .equalsTo('V[num=plur, fin=+, trans=-/+] -> "love" "stink"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -790,6 +797,23 @@ A ->
      .equalsTo([S(S(NP(PN("John")),
                     VP_(AUX("does"), "not", 
                         VP(V("like"), NP(DET("the"), N("book"))))))]);
+    // There are three interpretations to this phrase because
+    // "they" can have three genders: male, female or non-human.
+    assertThat(parse("they love him").length).equalsTo(3);
+    // We just check the first one because we ignore types, but 
+    // all are valid ones.
+    assertThat(clear(parse("they love him"))[0])
+     .equalsTo(S(S(NP(PRO("they")),
+                    VP_(VP(V("love"), NP(PRO("him")))))));
+    assertThat(clear(parse("they do not love him"))[0])
+     .equalsTo(S(S(NP(PRO("they")),
+                   VP_(AUX("do"), "not", VP(V("love"), NP(PRO("him"))))
+                   )));
+    assertThat(clear(parse("they do not love the book"))[0])
+     .equalsTo(S(S(NP(PRO("they")),
+                   VP_(AUX("do"), "not", 
+                       VP(V("love"), NP(DET("the"), N("book"))))
+                   )));
    });
 
 
