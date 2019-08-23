@@ -409,11 +409,13 @@ describe.only("DRT", function() {
     result.push(``);
     result.push(`@{%
 function node(type, types, children) {
-   // console.log(type + ": " + JSON.stringify(types) + " => ");
+  // console.log(type + ": " + JSON.stringify(types) + " => ");
   return {
     "@type": type, 
     "types": types, 
-    "children": children.filter(child => child)
+     "children": children
+       .filter(child => child)
+       .filter(child => child != '.')
   }; 
 }
 %}`);
@@ -532,7 +534,7 @@ A ->
 
     // Root
     grammar.push(phrase(term("S"),
-                        [term("S", {"num": 1})]));
+                        [term("S", {"num": 1}), '"."']));
 
     // PS 1
     grammar.push(phrase(term("S", {"num": 1}),
@@ -616,7 +618,7 @@ A ->
                          term("S", {"num": 3, "gap": 1})]));
 
     // LI 1
-    grammar.push(rule(term("DET", {"num": "sing"}),
+    grammar.push(rule(term("DET", {"num": ["sing"]}),
                       [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
 
     // LI 2
@@ -719,7 +721,7 @@ A ->
     assertThat(grammar.length).equalsTo(40);
 
     assertThat(print(grammar[0]))
-     .equalsTo("S -> S[num=@1]");
+     .equalsTo('S -> S[num=@1] "."');
     assertThat(print(grammar[1]))
      .equalsTo("S[num=@1] -> NP[num=@1, gen=@2, case=+nom, gap=-] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(grammar[2]))
@@ -847,78 +849,78 @@ A ->
   }
 
   it("parse", function() {
-    assertThat(clear(parse("Jones loves")))
+    assertThat(clear(parse("Jones loves.")))
      .equalsTo([S(S(NP(PN("Jones")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("Mary loves")))
+    assertThat(clear(parse("Mary loves.")))
      .equalsTo([S(S(NP(PN("Mary")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("Anna loves")))
+    assertThat(clear(parse("Anna loves.")))
      .equalsTo([S(S(NP(PN("Anna")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("John stinks")))
+    assertThat(clear(parse("John stinks.")))
      .equalsTo([S(S(NP(PN("John")),
                     VP_(VP(V("stinks")))))]);
-    assertThat(clear(parse("a man loves")))
+    assertThat(clear(parse("a man loves.")))
      .equalsTo([S(S(NP(DET("a"), N("man")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("every donkey stinks")))
+    assertThat(clear(parse("every donkey stinks.")))
      .equalsTo([S(S(NP(DET("every"), N("donkey")),
                     VP_(VP(V("stinks")))))]);
-    assertThat(clear(parse("the woman loves")))
+    assertThat(clear(parse("the woman loves.")))
      .equalsTo([S(S(NP(DET("the"), N("woman")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("he loves")))
+    assertThat(clear(parse("he loves.")))
      .equalsTo([S(S(NP(PRO("he")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("she loves")))
+    assertThat(clear(parse("she loves.")))
      .equalsTo([S(S(NP(PRO("she")),
                     VP_(VP(V("loves")))))]);
-    assertThat(clear(parse("it stinks")))
+    assertThat(clear(parse("it stinks.")))
      .equalsTo([S(S(NP(PRO("it")),
                     VP_(VP(V("stinks")))))]);
-    assertThat(clear(parse("it does not stink")))
+    assertThat(clear(parse("it does not stink.")))
      .equalsTo([S(S(NP(PRO("it")),
                     VP_(AUX("does"), "not", VP(V("stink")))))]);
-    assertThat(clear(parse("the book does not stink")))
+    assertThat(clear(parse("the book does not stink.")))
      .equalsTo([S(S(NP(DET("the"), N("book")),
                     VP_(AUX("does"), "not", VP(V("stink")))))]);
-    assertThat(clear(parse("he loves her")))
+    assertThat(clear(parse("he loves her.")))
      .equalsTo([S(S(NP(PRO("he")),
                     VP_(VP(V("loves"), NP(PRO("her"))))))]);
-    assertThat(clear(parse("she loves the book")))
+    assertThat(clear(parse("she loves the book.")))
      .equalsTo([S(S(NP(PRO("she")),
                     VP_(VP(V("loves"), NP(DET("the"), N("book"))))))]);
-    assertThat(clear(parse("every man loves her")))
+    assertThat(clear(parse("every man loves her.")))
      .equalsTo([S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), NP(PRO("her"))))))]);
-    assertThat(clear(parse("every man loves John")))
+    assertThat(clear(parse("every man loves John.")))
      .equalsTo([S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), NP(PN("John"))))))]);
-    assertThat(clear(parse("she does not love")))
+    assertThat(clear(parse("she does not love.")))
      .equalsTo([S(S(NP(PRO("she")),
                     VP_(AUX("does"), "not", VP(V("love")))))]);
-    assertThat(clear(parse("she does not love him")))
+    assertThat(clear(parse("she does not love him.")))
      .equalsTo([S(S(NP(PRO("she")),
                     VP_(AUX("does"), "not", 
                         VP(V("love"), NP(PRO("him"))))))]);
-    assertThat(clear(parse("John does not like the book")))
+    assertThat(clear(parse("John does not like the book.")))
      .equalsTo([S(S(NP(PN("John")),
                     VP_(AUX("does"), "not", 
                         VP(V("like"), NP(DET("the"), N("book"))))))]);
     // There are three interpretations to this phrase because
     // "they" can have three genders: male, female or non-human.
-    assertThat(parse("they love him").length).equalsTo(3);
+    assertThat(parse("they love him.").length).equalsTo(3);
     // We just check the first one because we ignore types, but 
     // all are valid ones.
-    assertThat(clear(parse("they love him"))[0])
+    assertThat(clear(parse("they love him."))[0])
      .equalsTo(S(S(NP(PRO("they")),
                     VP_(VP(V("love"), NP(PRO("him")))))));
-    assertThat(clear(parse("they do not love him"))[0])
+    assertThat(clear(parse("they do not love him."))[0])
      .equalsTo(S(S(NP(PRO("they")),
                    VP_(AUX("do"), "not", VP(V("love"), NP(PRO("him"))))
                    )));
-    assertThat(clear(parse("they do not love the book"))[0])
+    assertThat(clear(parse("they do not love the book."))[0])
      .equalsTo(S(S(NP(PRO("they")),
                    VP_(AUX("do"), "not", 
                        VP(V("love"), NP(DET("the"), N("book"))))
@@ -928,34 +930,34 @@ A ->
     // has 3 gender values: male, fem and -hum.
     // TODO(goto): when both sides agree, we should probably make
     // the rule agree too.
-    assertThat(clear(parse("he and she love her"))[0])
+    assertThat(clear(parse("he and she love her."))[0])
      .equalsTo(S(S(NP(NP(PRO("he")), "and", NP(PRO("she"))),
                     VP_(VP(V("love"), NP(PRO("her")))))));
-    assertThat(clear(parse("they love him and her"))[0])
+    assertThat(clear(parse("they love him and her."))[0])
      .equalsTo(S(S(NP(PRO("they")),
                    VP_(VP(V("love"), 
                           NP(NP(PRO("him")), "and", NP(PRO("her")))
                           )))));
-    assertThat(clear(parse("every man loves a book and a woman"))[0])
+    assertThat(clear(parse("every man loves a book and a woman."))[0])
      .equalsTo(S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), 
                            NP(NP(DET("a"), N("book")), "and", NP(DET("a"), N("woman")))
                            )))));
-    assertThat(clear(parse("Brazil loves her")))
+    assertThat(clear(parse("Brazil loves her.")))
      .equalsTo([S(S(NP(PN("Brazil")),
                     VP_(VP(V("loves"), NP(PRO("her"))))))]);
-    assertThat(clear(parse("Brazil loves Italy")))
+    assertThat(clear(parse("Brazil loves Italy.")))
      .equalsTo([S(S(NP(PN("Brazil")),
                     VP_(VP(V("loves"), NP(PN("Italy"))))))]);
-    assertThat(clear(parse("every man loves Italy and Brazil"))[0])
+    assertThat(clear(parse("every man loves Italy and Brazil."))[0])
      .equalsTo(S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), 
                            NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            )))));
     // TODO(goto): investigate why there are 12 possible interpretations.
     // This is possibly related to the expansions of gender / number.
-    assertThat(clear(parse("Anna loves a man who loves her")).length).equalsTo(12);
-    assertThat(clear(parse("Anna loves a man who loves her"))[0])
+    assertThat(clear(parse("Anna loves a man who loves her.")).length).equalsTo(12);
+    assertThat(clear(parse("Anna loves a man who loves her."))[0])
      .equalsTo(S(S(NP(PN("Anna")),
                    VP_(VP(V("loves"),
                           NP(DET("a"), 
@@ -965,8 +967,8 @@ A ->
                                   ))))))));
 
 
-    assertThat(clear(parse("Anna loves a book which surprises her")).length).equalsTo(12);
-    assertThat(clear(parse("Anna loves a book which surprises her"))[0])
+    assertThat(clear(parse("Anna loves a book which surprises her.")).length).equalsTo(12);
+    assertThat(clear(parse("Anna loves a book which surprises her."))[0])
      .equalsTo(S(S(NP(PN("Anna")),
                    VP_(VP(V("loves"),
                           NP(DET("a"), 
@@ -975,7 +977,7 @@ A ->
                                   S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
                                   ))))))));
 
-    assertThat(clear(parse("every book which she loves surprises him"))[0])
+    assertThat(clear(parse("every book which she loves surprises him."))[0])
      .equalsTo(S(S(NP(DET("every"), 
                       N(N("book"), RC(RPRO("which"), 
                                       S(NP(PRO("she")),
@@ -984,7 +986,7 @@ A ->
                    VP_(VP(V("surprises"), NP(PRO("him"))))
                    )));
 
-    assertThat(clear(parse("every man who knows her loves her"))[0])
+    assertThat(clear(parse("every man who knows her loves her."))[0])
      .equalsTo(S(S(NP(DET("every"), 
                       N(N("man"), RC(RPRO("who"), 
                                      S(NP(GAP()),
