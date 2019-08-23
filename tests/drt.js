@@ -405,6 +405,7 @@ describe.only("DRT", function() {
     result.push(``);
     result.push(`@{%
 function node(type, types, children) {
+  // console.log(type + ": " + JSON.stringify(types));
   return {
     "@type": type, 
     "types": types, 
@@ -510,6 +511,15 @@ A ->
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom"}),
                          term("VP'", {"num": 1, "fin": "+"})]));
 
+    // PS 4
+    // NOTE(goto): this is slightly different in that the "num" variable
+    // is tied to the same variable rather than a different one. This
+    // may be a typo in the paper.
+    grammar.push(phrase(term("VP'", {"num": 1, "fin": "+"}),
+                        [term("AUX", {"num": 1, "fin": "+"}),
+                         literal("not"),
+                         term("VP", {"num": 1, "fin": "-"})]));
+
     // PS 5
     grammar.push(phrase(term("VP'", {"num": 1, "fin": "+"}),
                         [term("VP", {"num": 1, "fin": "+"})]));
@@ -542,6 +552,30 @@ A ->
     grammar.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "+nom"}),
                       [[literal("he")]]));
 
+    // LI 3
+    grammar.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom"}),
+                      [[literal("him")]]));
+
+    // LI 4
+    grammar.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "+nom"}),
+                      [[literal("she")]]));
+
+    // LI 5
+    grammar.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom"}),
+                      [[literal("her")]]));
+
+    // LI 6
+    grammar.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": ["-nom", "+nom"]}),
+                      [[literal("it")]]));
+
+    // LI 7
+    grammar.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "+nom"}),
+                      [[literal("they")]]));
+
+    // LI 8
+    grammar.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "-nom"}),
+                      [[literal("them")]]));
+
     // LI 9
     grammar.push(rule(term("PN", {"num": "sing", "gen": "male"}),
                       [[literal("Jones")], [literal("John")]]));
@@ -562,41 +596,76 @@ A ->
     grammar.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
                       [[literal("book")], [literal("donkey")], [literal("horse")]]));
 
+    // LI 15
+    grammar.push(rule(term("AUX", {"num": "sing", "fin": "+"}),
+                      [[literal("does")]]));
+
+    // LI 16
+    grammar.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
+                      [[literal("do")]]));
+
+    // LI 18
+    // Manually expanding into the transitivity.
+    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
+                      [[literal("love")], [literal("stink")]]));
+
     // LI 19
     // Manually expanding into the third person.
-    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": 1}),
+    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": ["-", "+"]}),
                       [[literal("loves")], [literal("stinks")]]));
+
+    assertThat(grammar.length).equalsTo(25);
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
     assertThat(print(grammar[1]))
      .equalsTo("S[num=@1] -> NP[num=@1, gen=@2, case=+nom] VP'[num=@1, fin=+]");
     assertThat(print(grammar[2]))
-     .equalsTo("VP'[num=@1, fin=+] -> VP[num=@1, fin=+]");
+     .equalsTo("VP'[num=@1, fin=+] -> AUX[num=@1, fin=+] \"not\" VP[num=@1, fin=-]");
     assertThat(print(grammar[3]))
-     .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]");
+     .equalsTo("VP'[num=@1, fin=+] -> VP[num=@1, fin=+]");
     assertThat(print(grammar[4]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3] -> DET[num=@1] N[num=@1, gen=@2]")
+     .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]");
     assertThat(print(grammar[5]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> DET[num=@1] N[num=@1, gen=@2]")
     assertThat(print(grammar[6]))
-     .equalsTo('NP[num=@1, gen=@2, case=@3] -> PRO[num=@1, gen=@2, case=@3]');
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
     assertThat(print(grammar[7]))
-     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
+     .equalsTo('NP[num=@1, gen=@2, case=@3] -> PRO[num=@1, gen=@2, case=@3]');
     assertThat(print(grammar[8]))
-     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');
+     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(grammar[9]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
+     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');    
     assertThat(print(grammar[10]))
-     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
+     .equalsTo('PRO[num=sing, gen=male, case=-nom] -> "him"');
     assertThat(print(grammar[11]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+     .equalsTo('PRO[num=sing, gen=fem, case=+nom] -> "she"');
     assertThat(print(grammar[12]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+     .equalsTo('PRO[num=sing, gen=fem, case=-nom] -> "her"');
     assertThat(print(grammar[13]))
-     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+     .equalsTo('PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"');
     assertThat(print(grammar[14]))
-     .equalsTo('V[num=sing/plur, fin=+, trans=@1] -> "loves" "stinks"');
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"');
+    assertThat(print(grammar[15]))
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
+    assertThat(print(grammar[16]))
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
+    assertThat(print(grammar[17]))
+     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
+    assertThat(print(grammar[18]))
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+    assertThat(print(grammar[19]))
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+    assertThat(print(grammar[20]))
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+    assertThat(print(grammar[21]))
+     .equalsTo('AUX[num=sing, fin=+] -> "does"');
+    assertThat(print(grammar[22]))
+     .equalsTo('AUX[num=plur, fin=+] -> "do"');
+    assertThat(print(grammar[23]))
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+    assertThat(print(grammar[24]))
+     .equalsTo('V[num=sing/plur, fin=+, trans=-/+] -> "loves" "stinks"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -625,6 +694,7 @@ A ->
   let DET = (...children) => node("DET", ...children);
   let N = (...children) => node("N", ...children);
   let PRO = (...children) => node("PRO", ...children);
+  let AUX = (...children) => node("AUX", ...children);
 
   function clear(node) {
    if (Array.isArray(node)) {
@@ -672,6 +742,15 @@ A ->
     assertThat(clear(parse("he loves")))
      .equalsTo([S(S(NP(PRO("he")),
                     VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("she loves")))
+     .equalsTo([S(S(NP(PRO("she")),
+                    VP_(VP(V("loves")))))]);
+    assertThat(clear(parse("it stinks")))
+     .equalsTo([S(S(NP(PRO("it")),
+                    VP_(VP(V("stinks")))))]);
+    assertThat(clear(parse("it does not stink")))
+     .equalsTo([S(S(NP(PRO("it")),
+                    VP_(AUX("does"), "not", VP(V("stink")))))]);
   });
 
 

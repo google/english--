@@ -2,6 +2,7 @@
 
 @{%
 function node(type, types, children) {
+  // console.log(type + ": " + JSON.stringify(types));
   return {
     "@type": type, 
     "types": types, 
@@ -22,8 +23,10 @@ S_num_plur ->
   NP_num_plur_gen_fem_case_pnom _ VP__num_plur_fin_p {% (args) => node("S", {"num":"plur"}, args) %} |
   NP_num_plur_gen_nhum_case_pnom _ VP__num_plur_fin_p {% (args) => node("S", {"num":"plur"}, args) %}
 VP__num_sing_fin_p -> 
+  AUX_num_sing_fin_p _ "not" _ VP_num_sing_fin_n {% (args) => node("VP'", {"num":"sing","fin":"+"}, args) %} |
   VP_num_sing_fin_p {% (args) => node("VP'", {"num":"sing","fin":"+"}, args) %}
 VP__num_plur_fin_p -> 
+  AUX_num_plur_fin_p _ "not" _ VP_num_plur_fin_n {% (args) => node("VP'", {"num":"plur","fin":"+"}, args) %} |
   VP_num_plur_fin_p {% (args) => node("VP'", {"num":"plur","fin":"+"}, args) %}
 VP_num_sing_fin_p -> 
   V_num_sing_fin_p_trans_n {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %}
@@ -88,6 +91,28 @@ DET_num_sing ->
   "some" {% (args) => node("DET", {"num":"sing"}, args) %}
 PRO_num_sing_gen_male_case_pnom -> 
   "he" {% (args) => node("PRO", {"num":"sing","gen":"male","case":"+nom"}, args) %}
+PRO_num_sing_gen_male_case_nnom -> 
+  "him" {% (args) => node("PRO", {"num":"sing","gen":"male","case":"-nom"}, args) %}
+PRO_num_sing_gen_fem_case_pnom -> 
+  "she" {% (args) => node("PRO", {"num":"sing","gen":"fem","case":"+nom"}, args) %}
+PRO_num_sing_gen_fem_case_nnom -> 
+  "her" {% (args) => node("PRO", {"num":"sing","gen":"fem","case":"-nom"}, args) %}
+PRO_num_sing_gen_nhum_case_nnom -> 
+  "it" {% (args) => node("PRO", {"num":"sing","gen":"-hum","case":"-nom"}, args) %}
+PRO_num_sing_gen_nhum_case_pnom -> 
+  "it" {% (args) => node("PRO", {"num":"sing","gen":"-hum","case":"+nom"}, args) %}
+PRO_num_plur_gen_male_case_pnom -> 
+  "they" {% (args) => node("PRO", {"num":"plur","gen":"male","case":"+nom"}, args) %}
+PRO_num_plur_gen_fem_case_pnom -> 
+  "they" {% (args) => node("PRO", {"num":"plur","gen":"fem","case":"+nom"}, args) %}
+PRO_num_plur_gen_nhum_case_pnom -> 
+  "they" {% (args) => node("PRO", {"num":"plur","gen":"-hum","case":"+nom"}, args) %}
+PRO_num_plur_gen_male_case_nnom -> 
+  "them" {% (args) => node("PRO", {"num":"plur","gen":"male","case":"-nom"}, args) %}
+PRO_num_plur_gen_fem_case_nnom -> 
+  "them" {% (args) => node("PRO", {"num":"plur","gen":"fem","case":"-nom"}, args) %}
+PRO_num_plur_gen_nhum_case_nnom -> 
+  "them" {% (args) => node("PRO", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
 PN_num_sing_gen_male -> 
   "Jones" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "John" {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
@@ -105,15 +130,25 @@ N_num_sing_gen_nhum ->
   "book" {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "donkey" {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "horse" {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %}
-V_num_sing_fin_p_trans_p -> 
-  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
-V_num_plur_fin_p_trans_p -> 
-  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
+AUX_num_sing_fin_p -> 
+  "does" {% (args) => node("AUX", {"num":"sing","fin":"+"}, args) %}
+AUX_num_plur_fin_p -> 
+  "do" {% (args) => node("AUX", {"num":"plur","fin":"+"}, args) %}
+V_num_sing_fin_n_trans_n -> 
+  "love" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %} |
+  "stink" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %}
+V_num_plur_fin_n_trans_n -> 
+  "love" {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
+  "stink" {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
 V_num_sing_fin_p_trans_n -> 
   "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
   "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+V_num_sing_fin_p_trans_p -> 
+  "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
 V_num_plur_fin_p_trans_n -> 
   "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
   "stinks" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
+V_num_plur_fin_p_trans_p -> 
+  "loves" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "stinks" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
