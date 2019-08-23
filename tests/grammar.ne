@@ -29,12 +29,36 @@ VP__num_plur_fin_p ->
   AUX_num_plur_fin_p _ "not" _ VP_num_plur_fin_n {% (args) => node("VP'", {"num":"plur","fin":"+"}, args) %} |
   VP_num_plur_fin_p {% (args) => node("VP'", {"num":"plur","fin":"+"}, args) %}
 VP_num_sing_fin_p -> 
+  V_num_sing_fin_p_trans_p _ NP_num_sing_gen_male_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
+  V_num_sing_fin_p_trans_p _ NP_num_sing_gen_fem_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
+  V_num_sing_fin_p_trans_p _ NP_num_sing_gen_nhum_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
+  V_num_sing_fin_p_trans_p _ NP_num_plur_gen_male_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
+  V_num_sing_fin_p_trans_p _ NP_num_plur_gen_fem_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
+  V_num_sing_fin_p_trans_p _ NP_num_plur_gen_nhum_case_nnom {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %} |
   V_num_sing_fin_p_trans_n {% (args) => node("VP", {"num":"sing","fin":"+"}, args) %}
 VP_num_sing_fin_n -> 
+  V_num_sing_fin_n_trans_p _ NP_num_sing_gen_male_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
+  V_num_sing_fin_n_trans_p _ NP_num_sing_gen_fem_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
+  V_num_sing_fin_n_trans_p _ NP_num_sing_gen_nhum_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
+  V_num_sing_fin_n_trans_p _ NP_num_plur_gen_male_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
+  V_num_sing_fin_n_trans_p _ NP_num_plur_gen_fem_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
+  V_num_sing_fin_n_trans_p _ NP_num_plur_gen_nhum_case_nnom {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %} |
   V_num_sing_fin_n_trans_n {% (args) => node("VP", {"num":"sing","fin":"-"}, args) %}
 VP_num_plur_fin_p -> 
+  V_num_plur_fin_p_trans_p _ NP_num_sing_gen_male_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
+  V_num_plur_fin_p_trans_p _ NP_num_sing_gen_fem_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
+  V_num_plur_fin_p_trans_p _ NP_num_sing_gen_nhum_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
+  V_num_plur_fin_p_trans_p _ NP_num_plur_gen_male_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
+  V_num_plur_fin_p_trans_p _ NP_num_plur_gen_fem_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
+  V_num_plur_fin_p_trans_p _ NP_num_plur_gen_nhum_case_nnom {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %} |
   V_num_plur_fin_p_trans_n {% (args) => node("VP", {"num":"plur","fin":"+"}, args) %}
 VP_num_plur_fin_n -> 
+  V_num_plur_fin_n_trans_p _ NP_num_sing_gen_male_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
+  V_num_plur_fin_n_trans_p _ NP_num_sing_gen_fem_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
+  V_num_plur_fin_n_trans_p _ NP_num_sing_gen_nhum_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
+  V_num_plur_fin_n_trans_p _ NP_num_plur_gen_male_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
+  V_num_plur_fin_n_trans_p _ NP_num_plur_gen_fem_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
+  V_num_plur_fin_n_trans_p _ NP_num_plur_gen_nhum_case_nnom {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %} |
   V_num_plur_fin_n_trans_n {% (args) => node("VP", {"num":"plur","fin":"-"}, args) %}
 NP_num_sing_gen_male_case_pnom -> 
   DET_num_sing _ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom"}, args) %} |
