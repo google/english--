@@ -751,6 +751,9 @@ A ->
     assertThat(clear(parse("it does not stink")))
      .equalsTo([S(S(NP(PRO("it")),
                     VP_(AUX("does"), "not", VP(V("stink")))))]);
+    assertThat(clear(parse("the book does not stink")))
+     .equalsTo([S(S(NP(DET("the"), N("book")),
+                    VP_(AUX("does"), "not", VP(V("stink")))))]);
   });
 
 
