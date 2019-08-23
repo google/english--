@@ -628,37 +628,64 @@ A ->
     grammar.push(rule(term("V", {"num": ["plur"], "fin": "+", "trans": ["-", "+"]}),
                       [[literal("love")], [literal("stink")]]));
 
-    assertThat(grammar.map((rule) => print(rule)).join("\n"))
-     .equalsTo(`
-S -> S[num=@1]
-S[num=@1] -> NP[num=@1, gen=@2, case=+nom] VP\'[num=@1, fin=+]
-VP\'[num=@1, fin=+] -> AUX[num=@1, fin=+] "not" VP[num=@1, fin=-]
-VP\'[num=@1, fin=+] -> VP[num=@1, fin=+]
-VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=+] NP[num=@3, gen=@4, case=-nom]
-VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]
-NP[num=@1, gen=@2, case=@3] -> DET[num=@1] N[num=@1, gen=@2]
-NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]
-NP[num=@1, gen=@2, case=@3] -> PRO[num=@1, gen=@2, case=@3]
-DET[num=sing] -> "a" "every" "the" "some"
-PRO[num=sing, gen=male, case=+nom] -> "he"
-PRO[num=sing, gen=male, case=-nom] -> "him"
-PRO[num=sing, gen=fem, case=+nom] -> "she"
-PRO[num=sing, gen=fem, case=-nom] -> "her"
-PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"
-PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"
-PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"
-PN[num=sing, gen=male] -> "Jones" "John"
-PN[num=sing, gen=fem] -> "Mary" "Anna"
-N[num=sing, gen=male] -> "stockbroker" "man"
-N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"
-N[num=sing, gen=-hum] -> "book" "donkey" "horse"
-AUX[num=sing, fin=+] -> "does"
-AUX[num=plur, fin=+] -> "do"
-V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"
-V[num=sing/plur, fin=-, trans=-] -> "love" "stink"
-V[num=sing, fin=+, trans=-/+] -> "loves" "stinks"
-V[num=plur, fin=+, trans=-/+] -> "love" "stink"
-    `.trim());
+    assertThat(grammar.length).equalsTo(28);
+
+    assertThat(print(grammar[0]))
+     .equalsTo("S -> S[num=@1]");
+    assertThat(print(grammar[1]))
+     .equalsTo("S[num=@1] -> NP[num=@1, gen=@2, case=+nom] VP'[num=@1, fin=+]");
+    assertThat(print(grammar[2]))
+     .equalsTo("VP'[num=@1, fin=+] -> AUX[num=@1, fin=+] \"not\" VP[num=@1, fin=-]");
+    assertThat(print(grammar[3]))
+     .equalsTo("VP'[num=@1, fin=+] -> VP[num=@1, fin=+]");
+    assertThat(print(grammar[4]))
+     .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=+] NP[num=@3, gen=@4, case=-nom]");
+    assertThat(print(grammar[5]))
+     .equalsTo("VP[num=@1, fin=@2] -> V[num=@1, fin=@2, trans=-]");
+    assertThat(print(grammar[6]))
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> DET[num=@1] N[num=@1, gen=@2]")
+    assertThat(print(grammar[7]))
+     .equalsTo("NP[num=@1, gen=@2, case=@3] -> PN[num=@1, gen=@2]")
+    assertThat(print(grammar[8]))
+     .equalsTo('NP[num=@1, gen=@2, case=@3] -> PRO[num=@1, gen=@2, case=@3]');
+    assertThat(print(grammar[9]))
+     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
+    assertThat(print(grammar[10]))
+     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');    
+    assertThat(print(grammar[11]))
+     .equalsTo('PRO[num=sing, gen=male, case=-nom] -> "him"');
+    assertThat(print(grammar[12]))
+     .equalsTo('PRO[num=sing, gen=fem, case=+nom] -> "she"');
+    assertThat(print(grammar[13]))
+     .equalsTo('PRO[num=sing, gen=fem, case=-nom] -> "her"');
+    assertThat(print(grammar[14]))
+     .equalsTo('PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"');
+    assertThat(print(grammar[15]))
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"');
+    assertThat(print(grammar[16]))
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
+    assertThat(print(grammar[17]))
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
+    assertThat(print(grammar[18]))
+     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
+    assertThat(print(grammar[19]))
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+    assertThat(print(grammar[20]))
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+    assertThat(print(grammar[21]))
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+    assertThat(print(grammar[22]))
+     .equalsTo('AUX[num=sing, fin=+] -> "does"');
+    assertThat(print(grammar[23]))
+     .equalsTo('AUX[num=plur, fin=+] -> "do"');
+    assertThat(print(grammar[24]))
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
+    assertThat(print(grammar[25]))
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+    assertThat(print(grammar[26]))
+     .equalsTo('V[num=sing, fin=+, trans=-/+] -> "loves" "stinks"');
+    assertThat(print(grammar[27]))
+     .equalsTo('V[num=plur, fin=+, trans=-/+] -> "love" "stink"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
