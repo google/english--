@@ -2,7 +2,7 @@
 
 @{%
 function node(type, types, children) {
- // console.log(type + ": " + JSON.stringify(types) + " => ");
+   // console.log(type + ": " + JSON.stringify(types) + " => ");
   return {
     "@type": type, 
     "types": types, 
@@ -159,29 +159,29 @@ VP_num_plur_fin_n_gap_n ->
   V_num_plur_fin_n_trans_p _ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args) %} |
   V_num_plur_fin_n_trans_n {% (args) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args) %}
 NP_num_sing_gen_male_case_pnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args) %}
 NP_num_sing_gen_male_case_nnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args) %}
 NP_num_sing_gen_fem_case_pnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args) %}
 NP_num_sing_gen_fem_case_nnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args) %}
 NP_num_sing_gen_nhum_case_pnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args) %}
 NP_num_sing_gen_nhum_case_nnom_gap_sing -> 
-  null {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args) %}
+  GAP {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args) %}
 NP_num_plur_gen_male_case_pnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args) %}
 NP_num_plur_gen_male_case_nnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args) %}
 NP_num_plur_gen_fem_case_pnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args) %}
 NP_num_plur_gen_fem_case_nnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args) %}
 NP_num_plur_gen_nhum_case_pnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args) %}
 NP_num_plur_gen_nhum_case_nnom_gap_plur -> 
-  null {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args) %}
+  GAP {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args) %}
 NP_num_sing_gen_male_case_pnom_gap_n -> 
   DET_num_sing _ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %} |
   PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %} |
@@ -544,17 +544,29 @@ V_num_plur_fin_n_trans_n ->
   "stink" {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
 V_num_sing_fin_p_trans_p -> 
   "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "surprises" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
 V_num_sing_fin_p_trans_n -> 
   "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
+  "surprises" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
 V_num_plur_fin_p_trans_p -> 
   "love" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "stink" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
 V_num_plur_fin_p_trans_n -> 
   "love" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
   "stink" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
+RPRO_num_sing_gen_male -> 
+  "who" {% (args) => node("RPRO", {"num":"sing","gen":"male"}, args) %}
+RPRO_num_sing_gen_fem -> 
+  "who" {% (args) => node("RPRO", {"num":"sing","gen":"fem"}, args) %}
+RPRO_num_plur_gen_male -> 
+  "who" {% (args) => node("RPRO", {"num":"plur","gen":"male"}, args) %}
+RPRO_num_plur_gen_fem -> 
+  "who" {% (args) => node("RPRO", {"num":"plur","gen":"fem"}, args) %}
 RPRO_num_sing_gen_nhum -> 
   "which" {% (args) => node("RPRO", {"num":"sing","gen":"-hum"}, args) %}
 RPRO_num_plur_gen_nhum -> 
   "which" {% (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args) %}
+GAP -> 
+  null {% (args) => node("GAP", {}, args) %}

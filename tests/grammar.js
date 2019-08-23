@@ -4,7 +4,7 @@
 function id(x) { return x[0]; }
 
 function node(type, types, children) {
- // console.log(type + ": " + JSON.stringify(types) + " => ");
+   // console.log(type + ": " + JSON.stringify(types) + " => ");
   return {
     "@type": type, 
     "types": types, 
@@ -147,18 +147,18 @@ var grammar = {
     {"name": "VP_num_plur_fin_n_gap_n", "symbols": ["V_num_plur_fin_n_trans_p", "_", "NP_num_plur_gen_fem_case_nnom_gap_n"], "postprocess": (args) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args)},
     {"name": "VP_num_plur_fin_n_gap_n", "symbols": ["V_num_plur_fin_n_trans_p", "_", "NP_num_plur_gen_nhum_case_nnom_gap_n"], "postprocess": (args) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args)},
     {"name": "VP_num_plur_fin_n_gap_n", "symbols": ["V_num_plur_fin_n_trans_n"], "postprocess": (args) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args)},
-    {"name": "NP_num_sing_gen_male_case_pnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args)},
-    {"name": "NP_num_sing_gen_male_case_nnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args)},
-    {"name": "NP_num_sing_gen_fem_case_pnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args)},
-    {"name": "NP_num_sing_gen_fem_case_nnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args)},
-    {"name": "NP_num_sing_gen_nhum_case_pnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args)},
-    {"name": "NP_num_sing_gen_nhum_case_nnom_gap_sing", "symbols": [], "postprocess": (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args)},
-    {"name": "NP_num_plur_gen_male_case_pnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args)},
-    {"name": "NP_num_plur_gen_male_case_nnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args)},
-    {"name": "NP_num_plur_gen_fem_case_pnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args)},
-    {"name": "NP_num_plur_gen_fem_case_nnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args)},
-    {"name": "NP_num_plur_gen_nhum_case_pnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args)},
-    {"name": "NP_num_plur_gen_nhum_case_nnom_gap_plur", "symbols": [], "postprocess": (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args)},
+    {"name": "NP_num_sing_gen_male_case_pnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args)},
+    {"name": "NP_num_sing_gen_male_case_nnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args)},
+    {"name": "NP_num_sing_gen_fem_case_pnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args)},
+    {"name": "NP_num_sing_gen_fem_case_nnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args)},
+    {"name": "NP_num_sing_gen_nhum_case_pnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args)},
+    {"name": "NP_num_sing_gen_nhum_case_nnom_gap_sing", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args)},
+    {"name": "NP_num_plur_gen_male_case_pnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args)},
+    {"name": "NP_num_plur_gen_male_case_nnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args)},
+    {"name": "NP_num_plur_gen_fem_case_pnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args)},
+    {"name": "NP_num_plur_gen_fem_case_nnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args)},
+    {"name": "NP_num_plur_gen_nhum_case_pnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args)},
+    {"name": "NP_num_plur_gen_nhum_case_nnom_gap_plur", "symbols": ["GAP"], "postprocess": (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args)},
     {"name": "NP_num_sing_gen_male_case_pnom_gap_n", "symbols": ["DET_num_sing", "_", "N_num_sing_gen_male"], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args)},
     {"name": "NP_num_sing_gen_male_case_pnom_gap_n", "symbols": ["PN_num_sing_gen_male"], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args)},
     {"name": "NP_num_sing_gen_male_case_pnom_gap_n", "symbols": ["PRO_num_sing_gen_male_case_pnom"], "postprocess": (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args)},
@@ -736,10 +736,14 @@ var grammar = {
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
     {"name": "V_num_sing_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$2"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
+    {"name": "V_num_sing_fin_p_trans_p$string$3", "symbols": [{"literal":"s"}, {"literal":"u"}, {"literal":"r"}, {"literal":"p"}, {"literal":"r"}, {"literal":"i"}, {"literal":"s"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$string$3"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args)},
     {"name": "V_num_sing_fin_p_trans_n$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args)},
     {"name": "V_num_sing_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n$string$2"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args)},
+    {"name": "V_num_sing_fin_p_trans_n$string$3", "symbols": [{"literal":"s"}, {"literal":"u"}, {"literal":"r"}, {"literal":"p"}, {"literal":"r"}, {"literal":"i"}, {"literal":"s"}, {"literal":"e"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n$string$3"], "postprocess": (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args)},
     {"name": "V_num_plur_fin_p_trans_p$string$1", "symbols": [{"literal":"l"}, {"literal":"o"}, {"literal":"v"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_p", "symbols": ["V_num_plur_fin_p_trans_p$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args)},
     {"name": "V_num_plur_fin_p_trans_p$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}], "postprocess": function joiner(d) {return d.join('');}},
@@ -748,10 +752,19 @@ var grammar = {
     {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$1"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)},
     {"name": "V_num_plur_fin_p_trans_n$string$2", "symbols": [{"literal":"s"}, {"literal":"t"}, {"literal":"i"}, {"literal":"n"}, {"literal":"k"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "V_num_plur_fin_p_trans_n", "symbols": ["V_num_plur_fin_p_trans_n$string$2"], "postprocess": (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args)},
+    {"name": "RPRO_num_sing_gen_male$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"o"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "RPRO_num_sing_gen_male", "symbols": ["RPRO_num_sing_gen_male$string$1"], "postprocess": (args) => node("RPRO", {"num":"sing","gen":"male"}, args)},
+    {"name": "RPRO_num_sing_gen_fem$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"o"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "RPRO_num_sing_gen_fem", "symbols": ["RPRO_num_sing_gen_fem$string$1"], "postprocess": (args) => node("RPRO", {"num":"sing","gen":"fem"}, args)},
+    {"name": "RPRO_num_plur_gen_male$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"o"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "RPRO_num_plur_gen_male", "symbols": ["RPRO_num_plur_gen_male$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"male"}, args)},
+    {"name": "RPRO_num_plur_gen_fem$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"o"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "RPRO_num_plur_gen_fem", "symbols": ["RPRO_num_plur_gen_fem$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"fem"}, args)},
     {"name": "RPRO_num_sing_gen_nhum$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"i"}, {"literal":"c"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "RPRO_num_sing_gen_nhum", "symbols": ["RPRO_num_sing_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"sing","gen":"-hum"}, args)},
     {"name": "RPRO_num_plur_gen_nhum$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"i"}, {"literal":"c"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "RPRO_num_plur_gen_nhum", "symbols": ["RPRO_num_plur_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args)}
+    {"name": "RPRO_num_plur_gen_nhum", "symbols": ["RPRO_num_plur_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args)},
+    {"name": "GAP", "symbols": [], "postprocess": (args) => node("GAP", {}, args)}
 ]
   , ParserStart: "S"
 }

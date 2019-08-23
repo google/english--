@@ -409,7 +409,7 @@ describe.only("DRT", function() {
     result.push(``);
     result.push(`@{%
 function node(type, types, children) {
- // console.log(type + ": " + JSON.stringify(types) + " => ");
+   // console.log(type + ": " + JSON.stringify(types) + " => ");
   return {
     "@type": type, 
     "types": types, 
@@ -582,7 +582,7 @@ A ->
 
     // PS 8
     grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 1}),
-                        ["null"]));
+                        [term("GAP")]));
 
     // page 36 makes a simplification, which we introduce back manually:
     // The intended meaning is that the left-hand side can have either of 
@@ -639,6 +639,10 @@ A ->
     grammar.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": ["-nom", "+nom"]}),
                       [[literal("it")]]));
 
+    //console.log(print(grammar[grammar.length - 1]));
+    //console.log(grammar.length);
+    //return;
+
     // LI 7
     grammar.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "+nom"}),
                       [[literal("they")]]));
@@ -691,18 +695,28 @@ A ->
     // LI 19
     // Manually expanding into the present / third person.
     grammar.push(rule(term("V", {"num": "sing", "fin": "+", "trans": ["+", "-"]}),
-                      [[literal("loves")], [literal("stinks")]]));
+                      [[literal("loves")], [literal("stinks")], [literal("surprises")]]));
 
     // LI 20
     // Manually expanding into the present / plural.
     grammar.push(rule(term("V", {"num": "plur", "fin": "+", "trans": ["+", "-"]}),
                       [[literal("love")], [literal("stink")]]));
 
+    // LI 21
+    grammar.push(rule(term("RPRO", {"num": ["sing", "plur"], "gen": ["male", "fem"]}),
+                      [[literal("who")]]));
     // LI 22
     grammar.push(rule(term("RPRO", {"num": ["sing", "plur"], "gen": "-hum"}),
                       [[literal("which")]]));
 
-    assertThat(grammar.length).equalsTo(38);
+    // GAP
+    grammar.push(rule(term("GAP"),
+                      [["null"]]));
+
+    const fs = require("fs");
+    fs.writeFileSync("./tests/grammar.ne", compile(clone(grammar)));
+
+    assertThat(grammar.length).equalsTo(40);
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
@@ -725,7 +739,7 @@ A ->
     assertThat(print(grammar[9]))
      .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=-]");
     assertThat(print(grammar[10]))
-     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=@1] -> null')
+     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=@1] -> GAP')
     assertThat(print(grammar[11]))
      .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] N[num=@1, gen=@2]")
     assertThat(print(grammar[12]))
@@ -775,11 +789,15 @@ A ->
     assertThat(print(grammar[34]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[35]))
-     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks"');
+     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks" "surprises"');
     assertThat(print(grammar[36]))
      .equalsTo('V[num=plur, fin=+, trans=+/-] -> "love" "stink"');
     assertThat(print(grammar[37]))
+     .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"');
+    assertThat(print(grammar[38]))
      .equalsTo('RPRO[num=sing/plur, gen=-hum] -> "which"');
+    assertThat(print(grammar[39]))
+     .equalsTo('GAP -> null');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -788,9 +806,6 @@ A ->
     // "fin" makes the distinction between "infinitival" and
     // "finite" verb forms (- and +, respectively). 
     // "infinitival" verb forms are used with negations.
-
-    const fs = require("fs");
-    fs.writeFileSync("./tests/grammar.ne", compile(grammar));
 
     // console.log(compile(grammar));
   });
@@ -809,6 +824,9 @@ A ->
   let N = (...children) => node("N", ...children);
   let PRO = (...children) => node("PRO", ...children);
   let AUX = (...children) => node("AUX", ...children);
+  let RC = (...children) => node("RC", ...children);
+  let RPRO = (...children) => node("RPRO", ...children);
+  let GAP = (...children) => node("GAP", ...children);
 
   function clear(node) {
    if (Array.isArray(node)) {
@@ -934,23 +952,32 @@ A ->
                     VP_(VP(V("loves"), 
                            NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            )))));
+    // TODO(goto): investigate why there are 12 possible interpretations.
+    // This is possibly related to the expansions of gender / number.
+    assertThat(clear(parse("Anna loves a man who loves her")).length).equalsTo(12);
+    assertThat(clear(parse("Anna loves a man who loves her"))[0])
+     .equalsTo(S(S(NP(PN("Anna")),
+                   VP_(VP(V("loves"),
+                          NP(DET("a"), 
+                             N(N("man"), 
+                               RC(RPRO("who"), 
+                                  S(NP(GAP()), VP_(VP(V("loves"), NP(PRO("her")))))
+                                  ))))))));
+
+
+    assertThat(clear(parse("Anna loves a book which surprises her")).length).equalsTo(12);
+    assertThat(clear(parse("Anna loves a book which surprises her"))[0])
+     .equalsTo(S(S(NP(PN("Anna")),
+                   VP_(VP(V("loves"),
+                          NP(DET("a"), 
+                             N(N("book"), 
+                               RC(RPRO("which"), 
+                                  S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
+                                  ))))))));
+
    });
 
-  it.skip("debug", function() {
-    assertThat(clear(parse("a book which John likes")))
-     .equalsTo([S(S(NP(PRO("it")),
-                    VP_(VP(V("stinks")))))]);
-    //assertThat(clear(parse("a man loves")))
-    // .equalsTo([S(S(NP(DET("a"), N("man")),
-    //                VP_(VP(V("loves")))))]);
-    //assertThat(clear(parse("Jones loves")))
-    // .equalsTo([S(S(NP(PN("Jones")),
-    //                VP_(VP(V("loves")))))]);
-    //assertThat(clear(parse("he loves her")))
-    // .equalsTo([S(S(NP(PRO("he")),
-    //                VP_(VP(V("loves"), NP(PRO("her"))))))]);
-    //console.log(JSON.stringify(parse("he and she love her")[1], undefined, 2));
-    //return;
+  it("debug", function() {
   });
 
 
