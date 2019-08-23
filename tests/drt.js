@@ -695,7 +695,7 @@ A ->
     // LI 19
     // Manually expanding into the present / third person.
     grammar.push(rule(term("V", {"num": "sing", "fin": "+", "trans": ["+", "-"]}),
-                      [[literal("loves")], [literal("stinks")], [literal("surprises")]]));
+                      [[literal("loves")], [literal("stinks")], [literal("surprises")], [literal("knows")]]));
 
     // LI 20
     // Manually expanding into the present / plural.
@@ -789,7 +789,7 @@ A ->
     assertThat(print(grammar[34]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[35]))
-     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks" "surprises"');
+     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks" "surprises" "knows"');
     assertThat(print(grammar[36]))
      .equalsTo('V[num=plur, fin=+, trans=+/-] -> "love" "stink"');
     assertThat(print(grammar[37]))
@@ -982,6 +982,15 @@ A ->
                                         VP_(VP(V("loves"), NP(GAP()))))
                                       ))),
                    VP_(VP(V("surprises"), NP(PRO("him"))))
+                   )));
+
+    assertThat(clear(parse("every man who knows her loves her"))[0])
+     .equalsTo(S(S(NP(DET("every"), 
+                      N(N("man"), RC(RPRO("who"), 
+                                     S(NP(GAP()),
+                                       VP_(VP(V("knows"), NP(PRO("her")))))
+                                     ))),
+                   VP_(VP(V("loves"), NP(PRO("her"))))
                    )));
 
    });
