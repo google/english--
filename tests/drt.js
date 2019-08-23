@@ -975,6 +975,15 @@ A ->
                                   S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
                                   ))))))));
 
+    assertThat(clear(parse("every book which she loves surprises him"))[0])
+     .equalsTo(S(S(NP(DET("every"), 
+                      N(N("book"), RC(RPRO("which"), 
+                                      S(NP(PRO("she")),
+                                        VP_(VP(V("loves"), NP(GAP()))))
+                                      ))),
+                   VP_(VP(V("surprises"), NP(PRO("him"))))
+                   )));
+
    });
 
   it("debug", function() {
