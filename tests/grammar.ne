@@ -359,6 +359,9 @@ PN_num_sing_gen_male ->
 PN_num_sing_gen_fem -> 
   "Mary" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
   "Anna" {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
+PN_num_sing_gen_nhum -> 
+  "Brazil" {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %} |
+  "Italy" {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %}
 N_num_sing_gen_male -> 
   "stockbroker" {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "man" {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}

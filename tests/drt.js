@@ -591,9 +591,13 @@ A ->
     grammar.push(rule(term("PN", {"num": "sing", "gen": "male"}),
                       [[literal("Jones")], [literal("John")]]));
 
-    // LI 11
+    // LI 10
     grammar.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
                       [[literal("Mary")], [literal("Anna")]]));
+
+    // LI 11
+    grammar.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
+                      [[literal("Brazil")], [literal("Italy")]]));
 
     // LI 12
     grammar.push(rule(term("N", {"num": "sing", "gen": "male"}),
@@ -634,7 +638,7 @@ A ->
     grammar.push(rule(term("V", {"num": ["plur"], "fin": "+", "trans": ["-", "+"]}),
                       [[literal("love")], [literal("stink")]]));
 
-    assertThat(grammar.length).equalsTo(29);
+    assertThat(grammar.length).equalsTo(30);
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
@@ -677,22 +681,24 @@ A ->
     assertThat(print(grammar[19]))
      .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
     assertThat(print(grammar[20]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy"');
     assertThat(print(grammar[21]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
     assertThat(print(grammar[22]))
-     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
     assertThat(print(grammar[23]))
-     .equalsTo('AUX[num=sing, fin=+] -> "does"');
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
     assertThat(print(grammar[24]))
-     .equalsTo('AUX[num=plur, fin=+] -> "do"');
+     .equalsTo('AUX[num=sing, fin=+] -> "does"');
     assertThat(print(grammar[25]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
+     .equalsTo('AUX[num=plur, fin=+] -> "do"');
     assertThat(print(grammar[26]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
     assertThat(print(grammar[27]))
-     .equalsTo('V[num=sing, fin=+, trans=-/+] -> "loves" "stinks"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[28]))
+     .equalsTo('V[num=sing, fin=+, trans=-/+] -> "loves" "stinks"');
+    assertThat(print(grammar[29]))
      .equalsTo('V[num=plur, fin=+, trans=-/+] -> "love" "stink"');
     
     // "case" makes the distinction between "nominative case"
@@ -839,6 +845,17 @@ A ->
      .equalsTo(S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), 
                            NP(NP(DET("a"), N("book")), "and", NP(DET("a"), N("woman")))
+                           )))));
+    assertThat(clear(parse("Brazil loves her")))
+     .equalsTo([S(S(NP(PN("Brazil")),
+                    VP_(VP(V("loves"), NP(PRO("her"))))))]);
+    assertThat(clear(parse("Brazil loves Italy")))
+     .equalsTo([S(S(NP(PN("Brazil")),
+                    VP_(VP(V("loves"), NP(PN("Italy"))))))]);
+    assertThat(clear(parse("every man loves Italy and Brazil"))[0])
+     .equalsTo(S(S(NP(DET("every"), N("man")),
+                    VP_(VP(V("loves"), 
+                           NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            )))));
    });
 
