@@ -158,6 +158,16 @@ AUX_num_sing_fin_p ->
   "does" {% (args) => node("AUX", {"num":"sing","fin":"+"}, args) %}
 AUX_num_plur_fin_p -> 
   "do" {% (args) => node("AUX", {"num":"plur","fin":"+"}, args) %}
+V_num_sing_fin_n_trans_p -> 
+  "like" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "love" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "own" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "fascinate" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %}
+V_num_plur_fin_n_trans_p -> 
+  "like" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "love" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "own" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "fascinate" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %}
 V_num_sing_fin_n_trans_n -> 
   "love" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %} |
   "stink" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %}

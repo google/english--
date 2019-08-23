@@ -609,6 +609,10 @@ A ->
     grammar.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
                       [[literal("do")]]));
 
+    // LI 17
+    grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),
+                      [[literal("like")], [literal("love")], [literal("own")], [literal("fascinate")]]));
+
     // LI 18
     // Manually expanding into the transitivity.
     grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
@@ -619,7 +623,7 @@ A ->
     grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "+", "trans": ["-", "+"]}),
                       [[literal("loves")], [literal("stinks")]]));
 
-    assertThat(grammar.length).equalsTo(26);
+    assertThat(grammar.length).equalsTo(27);
 
     assertThat(print(grammar[0]))
      .equalsTo("S -> S[num=@1]");
@@ -670,8 +674,10 @@ A ->
     assertThat(print(grammar[23]))
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
     assertThat(print(grammar[24]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
     assertThat(print(grammar[25]))
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+    assertThat(print(grammar[26]))
      .equalsTo('V[num=sing/plur, fin=+, trans=-/+] -> "loves" "stinks"');
     
     // "case" makes the distinction between "nominative case"
@@ -773,7 +779,18 @@ A ->
     assertThat(clear(parse("every man loves John")))
      .equalsTo([S(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), NP(PN("John"))))))]);
-  });
+    assertThat(clear(parse("she does not love")))
+     .equalsTo([S(S(NP(PRO("she")),
+                    VP_(AUX("does"), "not", VP(V("love")))))]);
+    assertThat(clear(parse("she does not love him")))
+     .equalsTo([S(S(NP(PRO("she")),
+                    VP_(AUX("does"), "not", 
+                        VP(V("love"), NP(PRO("him"))))))]);
+    assertThat(clear(parse("John does not like the book")))
+     .equalsTo([S(S(NP(PN("John")),
+                    VP_(AUX("does"), "not", 
+                        VP(V("like"), NP(DET("the"), N("book"))))))]);
+   });
 
 
   function assertThat(x) {
