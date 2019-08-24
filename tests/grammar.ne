@@ -13,9 +13,9 @@ function node(type, types, children) {
 }
 %}
 
-S -> 
-  S_num_sing _ "." {% (args) => node("S", {}, args) %} |
-  S_num_plur _ "." {% (args) => node("S", {}, args) %}
+Root -> 
+  S_num_sing _ "." {% (args) => node("Root", {}, args) %} |
+  S_num_plur _ "." {% (args) => node("Root", {}, args) %}
 S_num_sing -> 
   NP_num_sing_gen_male_case_pnom_gap_n _ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |
   NP_num_sing_gen_fem_case_pnom_gap_n _ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |
