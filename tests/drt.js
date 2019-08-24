@@ -4,7 +4,7 @@ const grammar = require("./grammar.js");
 
 describe.only("DRT", function() {
   let l = (value) => { return literal(value); };
-  let space = (space) => { return {"@type": "Space"} };
+  let space = (optional = false) => { return optional ? "_" : "__"};
   let rule = (head = {}, tail = []) => { return {"@type": "Rule", head: head, tail: tail}};
   let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
   let literal = (value) => { return {"@type": "Literal", name: value} };
@@ -401,7 +401,7 @@ describe.only("DRT", function() {
       for (let term of line) {
        list.push(name(term, true));
       }
-      rules[head].push([list.join(" _ "), processor(expansion)]);
+      rules[head].push([list.join(" "), processor(expansion)]);
      }
     }
    }
@@ -442,8 +442,8 @@ function node(type, types, children) {
    }
 
    if (header) {
-    result.push(``);
-    result.push(``);
+    result.push("");
+    result.push("# extensible proper names");
     let names = rule(term("PN", {"num": "sing", "gen": 1}),
                      [["FULLNAME"]]);
     for (let exp of generate(names)) {
@@ -451,6 +451,16 @@ function node(type, types, children) {
     }
     result.push(`FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}`);
     result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
+
+    result.push("");
+    result.push("#  whitespaces");
+
+    let whitespaces = rule(term("WS", {"gap": ["sing", "plur", "-"]}));
+    for (let whitespace of generate(whitespaces)) {
+     let gap = whitespace.head.types.gap != "-";
+     result.push(`${print(whitespace, true)} ${gap ? "_" : "__"} {% () => null %}`);
+    }
+
    }
 
    return result.join("\n");
@@ -556,26 +566,32 @@ A ->
 
     // Root
     grammar.push(phrase(term("Sentence"),
-                        [term("S", {"num": 1}), '"."']));
+                        [term("S", {"num": 1}), 
+                         space(true),
+                         '"."']));
 
     // PS 1
     grammar.push(phrase(term("S", {"num": 1}),
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
+                         space(),
                          term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
 
     // PS 2
     grammar.push(phrase(term("S", {"num": 1, "gap": 3}),
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": 3}),
+                         term("WS", {"gap": 3}),
                          term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
 
     // PS 2.5
     grammar.push(phrase(term("S", {"num": 1, "gap": 3}),
                         [term("NP", {"num": 3, "gen": 2, "case": "+nom", "gap": 3}),
+                         term("WS", {"gap": 3}),
                          term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
 
     // PS 3
     grammar.push(phrase(term("S", {"num": 1, "gap": 3}),
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
+                         space(),
                          term("VP'", {"num": 1, "fin": "+", "gap": 3})]));
 
     // PS 4
@@ -584,7 +600,9 @@ A ->
     // may be a typo in the paper.
     grammar.push(phrase(term("VP'", {"num": 1, "fin": "+", "gap": 2}),
                         [term("AUX", {"num": 1, "fin": "+"}),
+                         space(),
                          literal("not"),
+                         space(),
                          term("VP", {"num": 1, "fin": "-", "gap": 2})]));
 
     // PS 5
@@ -594,10 +612,12 @@ A ->
     // PS 6
     grammar.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
                         [term("V", {"num": 1, "fin": 2, "trans": "+"}),
+                         space(),
                          term("NP", {"num": 3, "gen": 4, "case": "-nom", "gap": 3})]));
 
     grammar.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
                         [term("V", {"num": 1, "fin": 2, "trans": "+"}),
+                         space(),
                          term("NP", {"num": 3, "gen": 4, "case": "-nom", "gap": "-"})]));
 
     // PS 7
@@ -614,7 +634,9 @@ A ->
 
     // PS 9
     grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
-                        [term("DET", {"num": 1}), term("N", {"num": 1, "gen": 2})]));
+                        [term("DET", {"num": 1}), 
+                         space(),
+                         term("N", {"num": 1, "gen": 2})]));
 
     // PS 10
     grammar.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
@@ -627,16 +649,20 @@ A ->
     // PS 12
     grammar.push(phrase(term("NP", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
                         [term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                         space(),
                          literal("and"),
+                         space(),
                          term("NP", {"num": 5, "gen": 6, "case": 2, "gap": "-"})]));
 
     // PS 13
     grammar.push(phrase(term("N", {"num": 1, "gen": 2}),
                         [term("N", {"num": 1, "gen": 2}),
+                         space(),
                          term("RC", {"num": 1, "gen": 2})]));
     // PS 14
     grammar.push(phrase(term("RC", {"num": 1, "gen": 2}),
                         [term("RPRO", {"num": 1, "gen": 2}),
+                         space(),
                          term("S", {"num": 3, "gap": 1})]));
 
     // LI 1
@@ -767,39 +793,39 @@ A ->
 
     let i = 0;
     assertThat(print(grammar[i++]))
-     .equalsTo('Sentence -> S[num=@1] "."');
+     .equalsTo('Sentence -> S[num=@1] _ "."');
     assertThat(print(grammar[i++]))
-     .equalsTo('S[num=@1] -> NP[num=@1, gen=@2, case=+nom, gap=-] VP\'[num=@1, fin=+, gap=-]');
+     .equalsTo('S[num=@1] -> NP[num=@1, gen=@2, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(grammar[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(grammar[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP[num=@3, gen=@2, case=+nom, gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, gap=@3] -> NP[num=@3, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(grammar[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] VP'[num=@1, fin=+, gap=@3]");
+     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
     assertThat(print(grammar[i++]))
-     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] \"not\" VP[num=@1, fin=-, gap=@2]");
+     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, gap=@2]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> VP[num=@1, fin=+, gap=@2]");
     assertThat(print(grammar[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] NP[num=@3, gen=@4, case=-nom, gap=@3]");
+     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] __ NP[num=@3, gen=@4, case=-nom, gap=@3]");
     assertThat(print(grammar[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] NP[num=@3, gen=@4, case=-nom, gap=-]");
+     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] __ NP[num=@3, gen=@4, case=-nom, gap=-]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=-]");
     assertThat(print(grammar[i++]))
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=@1] -> GAP')
     assertThat(print(grammar[i++]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] N[num=@1, gen=@2]")
+     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] __ N[num=@1, gen=@2]")
     assertThat(print(grammar[i++]))
      .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> PN[num=@1, gen=@2]")
     assertThat(print(grammar[i++]))
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> PRO[num=@1, gen=@2, case=@3]');
     assertThat(print(grammar[i++]))
-     .equalsTo('NP[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@4, case=@2, gap=-] "and" NP[num=@5, gen=@6, case=@2, gap=-]');
+     .equalsTo('NP[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@4, case=@2, gap=-] __ "and" __ NP[num=@5, gen=@6, case=@2, gap=-]');
     assertThat(print(grammar[i++]))
-     .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] RC[num=@1, gen=@2]');
+     .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ RC[num=@1, gen=@2]');
     assertThat(print(grammar[i++]))
-     .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] S[num=@3, gap=@1]');
+     .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@3, gap=@1]');
     assertThat(print(grammar[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(grammar[i++]))
@@ -1012,6 +1038,7 @@ A ->
                     VP_(VP(V("loves"), 
                            NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            ))));
+
     // TODO(goto): investigate why there are 12 possible interpretations.
     // This is possibly related to the expansions of gender / number.
     // assertThat(first(parse("Anna loves a man who loves her.")).length).equalsTo(12);
@@ -1034,8 +1061,9 @@ A ->
                                RC(RPRO("which"), 
                                   S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
                                   )))))));
+    // return;
 
-    assertThat(first(parse("every book which she loves surprises him.")))
+    assertThat(first(parse("every book which she loves  surprises him.")))
      .equalsTo(S(NP(DET("every"), 
                       N(N("book"), RC(RPRO("which"), 
                                       S(NP(PRO("she")),
@@ -1054,6 +1082,11 @@ A ->
                  ));
 
    });
+
+  it("debug", function() {
+    parse("Anna loves a man who loves her.");
+    parse("every book which she loves  surprises him.");
+  });
 
   it("discourse", function() {
     assertThat(clean(parse("Anna loves John. John loves Anna. a man loves her.")[0]))
