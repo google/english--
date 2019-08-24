@@ -863,17 +863,6 @@ A ->
    return clean(clone(results[0].children[0]).children[0]);
   }
 
-  it("discourse", function() {
-    assertThat(clean(parse("Anna loves John. John loves Anna.")[0]))
-     .equalsTo(Discourse(Sentence(S(NP(PN("Anna")),
-                                    VP_(VP(V("loves"), NP(PN("John")))))
-                                  ),
-                         Sentence(S(NP(PN("John")),
-                                    VP_(VP(V("loves"), NP(PN("Anna")))))
-                                  )
-                         ));
-  });
-
   it("parse", function() {
     assertThat(first(parse("Jones loves.")))
      .equalsTo(S(NP(PN("Jones")),
@@ -1021,6 +1010,20 @@ A ->
                  VP_(VP(V("loves"), NP(PRO("her"))))
                  ));
 
+   });
+
+  it("discourse", function() {
+    assertThat(clean(parse("Anna loves John. John loves Anna. a man loves her.")[0]))
+     .equalsTo(Discourse(Sentence(S(NP(PN("Anna")),
+                                    VP_(VP(V("loves"), NP(PN("John")))))
+                                  ),
+                         Sentence(S(NP(PN("John")),
+                                    VP_(VP(V("loves"), NP(PN("Anna")))))
+                                  ),
+                         Sentence(S(NP(DET("a"), N("man")),
+                                    VP_(VP(V("loves"), NP(PRO("her")))))
+                                  )
+                         ));
    });
 
   it("debug", function() {
