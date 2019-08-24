@@ -799,7 +799,17 @@ var grammar = {
     {"name": "RPRO_num_sing_gen_nhum", "symbols": ["RPRO_num_sing_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"sing","gen":"-hum"}, args)},
     {"name": "RPRO_num_plur_gen_nhum$string$1", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"i"}, {"literal":"c"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "RPRO_num_plur_gen_nhum", "symbols": ["RPRO_num_plur_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args)},
-    {"name": "GAP", "symbols": [], "postprocess": (args) => node("GAP", {}, args)}
+    {"name": "GAP", "symbols": [], "postprocess": (args) => node("GAP", {}, args)},
+    {"name": "PN_num_sing_gen_male", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
+    {"name": "PN_num_sing_gen_fem", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
+    {"name": "PN_num_sing_gen_nhum", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
+    {"name": "NAME$subexpression$1$ebnf$1", "symbols": [/[A-Z]/]},
+    {"name": "NAME$subexpression$1$ebnf$1", "symbols": ["NAME$subexpression$1$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME$subexpression$1", "symbols": ["NAME$subexpression$1$ebnf$1"], "postprocess": ([args]) => args.join("")},
+    {"name": "NAME$subexpression$2$ebnf$1", "symbols": [/[a-z]/]},
+    {"name": "NAME$subexpression$2$ebnf$1", "symbols": ["NAME$subexpression$2$ebnf$1", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME$subexpression$2", "symbols": ["NAME$subexpression$2$ebnf$1"], "postprocess": ([args]) => args.join("")},
+    {"name": "NAME", "symbols": ["NAME$subexpression$1", "NAME$subexpression$2"], "postprocess": (args) => args.join("")}
 ]
   , ParserStart: "Discourse"
 }

@@ -388,6 +388,10 @@ describe.only("DRT", function() {
 
   function compile(grammar, header = true) {
    let rules = {};
+
+   let flatten = (expansion) => {
+   };
+
    for (let rule of grammar) {
     for (let expansion of generate(rule)) {
      let head = name(expansion.head, true);
@@ -435,6 +439,17 @@ function node(type, types, children) {
      all.push(`  ${line} {% ${processor} %}`);
     }
     result.push(all.join(" |\n"));
+   }
+
+   if (header) {
+    result.push(``);
+    result.push(``);
+    let names = rule(term("PN", {"num": "sing", "gen": 1}),
+                     [["NAME"]]);
+    for (let exp of generate(names)) {
+     result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
+    }
+    result.push(`NAME -> ([A-Z]:+ {% ([args]) => args.join("") %}) ([a-z]:+ {% ([args]) => args.join("") %}) {% (args) => args.join("") %}`);
    }
 
    return result.join("\n");
@@ -1053,7 +1068,18 @@ A ->
                          ));
    });
 
-  it("debug", function() {
+  it("extensible proper names", function() {
+    assertThat(first(parse("Sam loves her.")))
+     .equalsTo(S(NP(PN("Sam")),
+                 VP_(VP(V("loves"), NP(PRO("her"))))));
+    assertThat(first(parse("Sam loves Dani.")))
+     .equalsTo(S(NP(PN("Sam")),
+                 VP_(VP(V("loves"), NP(PN("Dani"))))));
+    assertThat(first(parse("Sam and Dani love Anna and Leo.")))
+     .equalsTo(S(NP(NP(PN("Sam")), "and", NP(PN("Dani"))),
+                 VP_(VP(V("love"), 
+                        NP(NP(PN("Anna")), "and", NP(PN("Leo")))
+                        ))));
   });
 
 

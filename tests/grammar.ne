@@ -590,3 +590,9 @@ RPRO_num_plur_gen_nhum ->
   "which" {% (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args) %}
 GAP -> 
   null {% (args) => node("GAP", {}, args) %}
+
+
+PN_num_sing_gen_male -> NAME {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+PN_num_sing_gen_fem -> NAME {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
+PN_num_sing_gen_nhum -> NAME {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %}
+NAME -> ([A-Z]:+ {% ([args]) => args.join("") %}) ([a-z]:+ {% ([args]) => args.join("") %}) {% (args) => args.join("") %}
