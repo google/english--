@@ -535,13 +535,19 @@ AUX_num_plur_fin_p ->
 V_num_sing_fin_n_trans_p -> 
   "like" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "love" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "know" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "own" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
-  "fascinate" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %}
+  "fascinate" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "rotate" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "surprise" {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %}
 V_num_plur_fin_n_trans_p -> 
   "like" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "love" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "know" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "own" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
-  "fascinate" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %}
+  "fascinate" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "rotate" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "surprise" {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %}
 V_num_sing_fin_n_trans_n -> 
   "love" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %} |
   "stink" {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %}
@@ -549,18 +555,24 @@ V_num_plur_fin_n_trans_n ->
   "love" {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
   "stink" {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
 V_num_sing_fin_p_trans_p -> 
+  "likes" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
-  "surprises" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
-  "knows" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
+  "knows" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "owns" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "fascinates" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "rotates" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "surprises" {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
 V_num_sing_fin_p_trans_n -> 
   "loves" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
-  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
-  "surprises" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
-  "knows" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+  "stinks" {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
 V_num_plur_fin_p_trans_p -> 
+  "like" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "love" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
-  "stink" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
+  "know" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "own" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "fascinate" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "rotate" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "surprise" {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
 V_num_plur_fin_p_trans_n -> 
   "love" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
   "stink" {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}

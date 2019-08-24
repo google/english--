@@ -683,6 +683,10 @@ A ->
     grammar.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
                       [[literal("book")], [literal("donkey")], [literal("horse")]]));
 
+    // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+    // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+    // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+
     // LI 15
     grammar.push(rule(term("AUX", {"num": "sing", "fin": "+"}),
                       [[literal("does")]]));
@@ -691,24 +695,43 @@ A ->
     grammar.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
                       [[literal("do")]]));
 
+    // Verbs in their inifinitive form.
+    const transitive = ["like", "love", "know", "own", "fascinate", "rotate", "surprise"];
+    const intransitive = ["love", "stink"];
+
     // LI 17
     grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),
-                      [[literal("like")], [literal("love")], [literal("own")], [literal("fascinate")]]));
+                      transitive.map((verb) => [literal(verb)])));
 
     // LI 18
     // Manually expanding into the transitivity.
     grammar.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
-                      [[literal("love")], [literal("stink")]]));
+                      intransitive.map((verb) => [literal(verb)])));
 
     // LI 19
     // Manually expanding into the present / third person.
-    grammar.push(rule(term("V", {"num": "sing", "fin": "+", "trans": ["+", "-"]}),
-                      [[literal("loves")], [literal("stinks")], [literal("surprises")], [literal("knows")]]));
+    // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+    // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+    // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+    // It seems like the same applies to verbs:
+    // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+    grammar.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
+                      transitive.map((verb) => [literal(verb + "s")])
+                      ));
+
+    grammar.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
+                      intransitive.map((verb) => [literal(verb + "s")])
+                      ));
 
     // LI 20
     // Manually expanding into the present / plural.
-    grammar.push(rule(term("V", {"num": "plur", "fin": "+", "trans": ["+", "-"]}),
-                      [[literal("love")], [literal("stink")]]));
+    // > Except for the verb be, plural verb forms we want here - i.e. the third person plural of the
+    // > present tense - are identical with the infinitival forms, which we already have (They were needed
+    // > for negation). 
+    grammar.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "+"}),
+                      transitive.map((verb) => [literal(verb)])));
+    grammar.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "-"}),
+                      intransitive.map((verb) => [literal(verb)])));
 
     // LI 21
     grammar.push(rule(term("RPRO", {"num": ["sing", "plur"], "gen": ["male", "fem"]}),
@@ -724,7 +747,7 @@ A ->
     const fs = require("fs");
     fs.writeFileSync("./tests/grammar.ne", compile(clone(grammar)));
 
-    assertThat(grammar.length).equalsTo(40);
+    assertThat(grammar.length).equalsTo(42);
 
     let i = 0;
     assertThat(print(grammar[i++]))
@@ -794,13 +817,17 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(grammar[i++]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks" "surprises" "knows"');
+     .equalsTo('V[num=sing, fin=+, trans=+] -> "likes" "loves" "knows" "owns" "fascinates" "rotates" "surprises"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=+/-] -> "love" "stink"');
+     .equalsTo('V[num=sing, fin=+, trans=-] -> "loves" "stinks"');
+    assertThat(print(grammar[i++]))
+     .equalsTo('V[num=plur, fin=+, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
+    assertThat(print(grammar[i++]))
+     .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink"');
     assertThat(print(grammar[i++]))
      .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"');
     assertThat(print(grammar[i++]))
