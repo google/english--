@@ -14,7 +14,7 @@ describe.only("DRT", function() {
     return term;
    }
    if (term["@type"] == "Literal") {
-    return `"${term.name}"i`;
+    return `"${term.name}"`;
    }
    if (!term.types) {
     return term.name;
@@ -187,11 +187,11 @@ describe.only("DRT", function() {
                       [literal("it")]);
 
     assertThat(print(rule))
-     .equalsTo('PRO[num=sing, case=-nom/+nom] -> "it"i');
+     .equalsTo('PRO[num=sing, case=-nom/+nom] -> "it"');
     assertThat(collect(rule)).equalsTo({"-1": ["-nom", "+nom"]});
     // console.log(rule);
     assertThat(print(rule))
-     .equalsTo('PRO[num=sing, case=@-1] -> "it"i');
+     .equalsTo('PRO[num=sing, case=@-1] -> "it"');
   });
 
   function replace(rule, vars) {
@@ -321,9 +321,9 @@ describe.only("DRT", function() {
     assertThat(result.length).equalsTo(2);
 
     assertThat(print(result[0]))
-     .equalsTo('PRO[num=sing, case=-nom] -> "it"i');
+     .equalsTo('PRO[num=sing, case=-nom] -> "it"');
     assertThat(print(result[1]))
-     .equalsTo('PRO[num=sing, case=+nom] -> "it"i');
+     .equalsTo('PRO[num=sing, case=+nom] -> "it"');
   });
 
   it("gender", function() {
@@ -351,7 +351,7 @@ describe.only("DRT", function() {
     assertThat(result.length).equalsTo(1);
 
     assertThat(print(result[0]))
-     .equalsTo('V[num=sing, trans=-] -> "likes"i');
+     .equalsTo('V[num=sing, trans=-] -> "likes"');
   });
 
   it("fin", function() {
@@ -530,8 +530,8 @@ S ->
     let grammar = [rule(term("A"), [[literal("b")], [literal("c")]])];
     assertThat(compile(grammar, false)).equalsTo(`
 A -> 
-  "b"i {% (args) => node("A", {}, args) %} |
-  "c"i {% (args) => node("A", {}, args) %}
+  "b" {% (args) => node("A", {}, args) %} |
+  "c" {% (args) => node("A", {}, args) %}
      `.trim());
   });
 
@@ -738,7 +738,7 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] VP'[num=@1, fin=+, gap=@3]");
     assertThat(print(grammar[i++]))
-     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] \"not\"i VP[num=@1, fin=-, gap=@2]");
+     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] \"not\" VP[num=@1, fin=-, gap=@2]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> VP[num=@1, fin=+, gap=@2]");
     assertThat(print(grammar[i++]))
@@ -756,55 +756,55 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> PRO[num=@1, gen=@2, case=@3]');
     assertThat(print(grammar[i++]))
-     .equalsTo('NP[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@4, case=@2, gap=-] "and"i NP[num=@5, gen=@6, case=@2, gap=-]');
+     .equalsTo('NP[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@4, case=@2, gap=-] "and" NP[num=@5, gen=@6, case=@2, gap=-]');
     assertThat(print(grammar[i++]))
      .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] RC[num=@1, gen=@2]');
     assertThat(print(grammar[i++]))
      .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] S[num=@3, gap=@1]');
     assertThat(print(grammar[i++]))
-     .equalsTo('DET[num=sing] -> "a"i "every"i "the"i "some"i');
+     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"i');    
+     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=sing, gen=male, case=-nom] -> "him"i');
+     .equalsTo('PRO[num=sing, gen=male, case=-nom] -> "him"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=sing, gen=fem, case=+nom] -> "she"i');
+     .equalsTo('PRO[num=sing, gen=fem, case=+nom] -> "she"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=sing, gen=fem, case=-nom] -> "her"i');
+     .equalsTo('PRO[num=sing, gen=fem, case=-nom] -> "her"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"i');
+     .equalsTo('PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"i');
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"i');
+     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones"i "John"i');
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PN[num=sing, gen=fem] -> "Mary"i "Anna"i');
+     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
     assertThat(print(grammar[i++]))
-     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil"i "Italy"i');
+     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy"');
     assertThat(print(grammar[i++]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker"i "man"i');
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
     assertThat(print(grammar[i++]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker"i "woman"i "widow"i');
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
     assertThat(print(grammar[i++]))
-     .equalsTo('N[num=sing, gen=-hum] -> "book"i "donkey"i "horse"i');
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
     assertThat(print(grammar[i++]))
-     .equalsTo('AUX[num=sing, fin=+] -> "does"i');
+     .equalsTo('AUX[num=sing, fin=+] -> "does"');
     assertThat(print(grammar[i++]))
-     .equalsTo('AUX[num=plur, fin=+] -> "do"i');
+     .equalsTo('AUX[num=plur, fin=+] -> "do"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like"i "love"i "own"i "fascinate"i');
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "own" "fascinate"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love"i "stink"i');
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves"i "stinks"i "surprises"i "knows"i');
+     .equalsTo('V[num=sing, fin=+, trans=+/-] -> "loves" "stinks" "surprises" "knows"');
     assertThat(print(grammar[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=+/-] -> "love"i "stink"i');
+     .equalsTo('V[num=plur, fin=+, trans=+/-] -> "love" "stink"');
     assertThat(print(grammar[i++]))
-     .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"i');
+     .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"');
     assertThat(print(grammar[i++]))
-     .equalsTo('RPRO[num=sing/plur, gen=-hum] -> "which"i');
+     .equalsTo('RPRO[num=sing/plur, gen=-hum] -> "which"');
     assertThat(print(grammar[i++]))
      .equalsTo('GAP -> null');
     
@@ -1001,8 +1001,8 @@ A ->
                    VP_(VP(V("surprises"), NP(PRO("him")))
                    )));
 
-    assertThat(first(parse("Every man who knows her loves her.")))
-     .equalsTo(S(NP(DET("Every"), 
+    assertThat(first(parse("every man who knows her loves her.")))
+     .equalsTo(S(NP(DET("every"), 
                       N(N("man"), RC(RPRO("who"), 
                                      S(NP(GAP()),
                                        VP_(VP(V("knows"), NP(PRO("her")))))
@@ -1013,14 +1013,14 @@ A ->
    });
 
   it("discourse", function() {
-    assertThat(clean(parse("Anna loves John. John loves Anna. A man loves her.")[0]))
+    assertThat(clean(parse("Anna loves John. John loves Anna. a man loves her.")[0]))
      .equalsTo(Discourse(Sentence(S(NP(PN("Anna")),
                                     VP_(VP(V("loves"), NP(PN("John")))))
                                   ),
                          Sentence(S(NP(PN("John")),
                                     VP_(VP(V("loves"), NP(PN("Anna")))))
                                   ),
-                         Sentence(S(NP(DET("A"), N("man")),
+                         Sentence(S(NP(DET("a"), N("man")),
                                     VP_(VP(V("loves"), NP(PRO("her")))))
                                   )
                          ));
