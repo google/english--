@@ -449,7 +449,7 @@ function node(type, types, children) {
     for (let exp of generate(names)) {
      result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
     }
-    result.push(`NAME -> ([A-Z]:+ {% ([args]) => args.join("") %}) ([a-z]:+ {% ([args]) => args.join("") %}) {% (args) => args.join("") %}`);
+    result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
    }
 
    return result.join("\n");

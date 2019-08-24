@@ -803,13 +803,11 @@ var grammar = {
     {"name": "PN_num_sing_gen_male", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
     {"name": "PN_num_sing_gen_fem", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
     {"name": "PN_num_sing_gen_nhum", "symbols": ["NAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
-    {"name": "NAME$subexpression$1$ebnf$1", "symbols": [/[A-Z]/]},
-    {"name": "NAME$subexpression$1$ebnf$1", "symbols": ["NAME$subexpression$1$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "NAME$subexpression$1", "symbols": ["NAME$subexpression$1$ebnf$1"], "postprocess": ([args]) => args.join("")},
-    {"name": "NAME$subexpression$2$ebnf$1", "symbols": [/[a-z]/]},
-    {"name": "NAME$subexpression$2$ebnf$1", "symbols": ["NAME$subexpression$2$ebnf$1", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "NAME$subexpression$2", "symbols": ["NAME$subexpression$2$ebnf$1"], "postprocess": ([args]) => args.join("")},
-    {"name": "NAME", "symbols": ["NAME$subexpression$1", "NAME$subexpression$2"], "postprocess": (args) => args.join("")}
+    {"name": "NAME$ebnf$1", "symbols": [/[A-Z]/]},
+    {"name": "NAME$ebnf$1", "symbols": ["NAME$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME$ebnf$2", "symbols": [/[a-z]/]},
+    {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b]) => a.join("") + b.join("")}
 ]
   , ParserStart: "Discourse"
 }
