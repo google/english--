@@ -591,7 +591,7 @@ A ->
     // PS 3
     grammar.push(phrase(term("S", {"num": 1, "gap": 3}),
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
-                         space(),
+                         term("WS", {"gap": 3}),
                          term("VP'", {"num": 1, "fin": "+", "gap": 3})]));
 
     // PS 4
@@ -612,7 +612,7 @@ A ->
     // PS 6
     grammar.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
                         [term("V", {"num": 1, "fin": 2, "trans": "+"}),
-                         space(),
+                         term("WS", {"gap": 3}),
                          term("NP", {"num": 3, "gen": 4, "case": "-nom", "gap": 3})]));
 
     grammar.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
@@ -801,13 +801,13 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo("S[num=@1, gap=@3] -> NP[num=@3, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(grammar[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
+     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] WS[gap=@3] VP'[num=@1, fin=+, gap=@3]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, gap=@2]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> VP[num=@1, fin=+, gap=@2]");
     assertThat(print(grammar[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] __ NP[num=@3, gen=@4, case=-nom, gap=@3]");
+     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] WS[gap=@3] NP[num=@3, gen=@4, case=-nom, gap=@3]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] __ NP[num=@3, gen=@4, case=-nom, gap=-]");
     assertThat(print(grammar[i++]))
@@ -1085,7 +1085,7 @@ A ->
 
   it("debug", function() {
     parse("Anna loves a man who loves her.");
-    parse("every book which she loves  surprises him.");
+    parse("every book which she loves surprises him.");
   });
 
   it("discourse", function() {
