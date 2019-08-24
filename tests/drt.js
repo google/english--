@@ -14,7 +14,7 @@ describe.only("DRT", function() {
     return term;
    }
    if (term["@type"] == "Literal") {
-    return `"${term.name}"`;
+    return `"${term.name}"${pretty ? "i" : ""}`;
    }
    if (!term.types) {
     return term.name;
@@ -556,8 +556,8 @@ S ->
     let grammar = [rule(term("A"), [[literal("b")], [literal("c")]])];
     assertThat(compile(grammar, false)).equalsTo(`
 A -> 
-  "b" {% (args) => node("A", {}, args) %} |
-  "c" {% (args) => node("A", {}, args) %}
+  "b"i {% (args) => node("A", {}, args) %} |
+  "c"i {% (args) => node("A", {}, args) %}
      `.trim());
   });
 
@@ -1061,10 +1061,8 @@ A ->
                                RC(RPRO("which"), 
                                   S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
                                   )))))));
-    // return;
-
-    assertThat(first(parse("every book which she loves  surprises him.")))
-     .equalsTo(S(NP(DET("every"), 
+    assertThat(first(parse("Every book which she loves  surprises him.")))
+     .equalsTo(S(NP(DET("Every"), 
                       N(N("book"), RC(RPRO("which"), 
                                       S(NP(PRO("she")),
                                         VP_(VP(V("loves"), NP(GAP()))))
@@ -1072,8 +1070,8 @@ A ->
                    VP_(VP(V("surprises"), NP(PRO("him")))
                    )));
 
-    assertThat(first(parse("every man who knows her loves her.")))
-     .equalsTo(S(NP(DET("every"), 
+    assertThat(first(parse("Every man who knows her loves her.")))
+     .equalsTo(S(NP(DET("Every"), 
                       N(N("man"), RC(RPRO("who"), 
                                      S(NP(GAP()),
                                        VP_(VP(V("knows"), NP(PRO("her")))))
@@ -1085,18 +1083,18 @@ A ->
 
   it("debug", function() {
     parse("Anna loves a man who loves her.");
-    parse("every book which she loves surprises him.");
+    parse("Every book which she loves surprises him.");
   });
 
   it("discourse", function() {
-    assertThat(clean(parse("Anna loves John. John loves Anna. a man loves her.")[0]))
+    assertThat(clean(parse("Anna loves John. John loves Anna. A man loves her.")[0]))
      .equalsTo(Discourse(Sentence(S(NP(PN("Anna")),
                                     VP_(VP(V("loves"), NP(PN("John")))))
                                   ),
                          Sentence(S(NP(PN("John")),
                                     VP_(VP(V("loves"), NP(PN("Anna")))))
                                   ),
-                         Sentence(S(NP(DET("a"), N("man")),
+                         Sentence(S(NP(DET("A"), N("man")),
                                     VP_(VP(V("loves"), NP(PRO("her")))))
                                   )
                          ));
