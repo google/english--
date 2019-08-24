@@ -7,14 +7,14 @@ function node(type, types, children) {
     "@type": type, 
     "types": types, 
      "children": children
-       .filter(child => child)
+       .filter(child => child != null)
        .filter(child => child != '.')
   }; 
 }
 %}
 
 
-Discourse -> (Sentence):+ {% (args) => node("Discourse", {}, ...args[0]) %}
+Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Discourse", {}, ...args) %}
 
 
 Sentence -> 
