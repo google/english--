@@ -23,8 +23,13 @@ var grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "Root", "symbols": ["S_num_sing", "_", {"literal":"."}], "postprocess": (args) => node("Root", {}, args)},
-    {"name": "Root", "symbols": ["S_num_plur", "_", {"literal":"."}], "postprocess": (args) => node("Root", {}, args)},
+    {"name": "Discourse$ebnf$1$subexpression$1", "symbols": ["Sentence"]},
+    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1$subexpression$1"]},
+    {"name": "Discourse$ebnf$1$subexpression$2", "symbols": ["Sentence"]},
+    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1", "Discourse$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "Discourse", "symbols": ["Discourse$ebnf$1"], "postprocess": (args) => node("Discourse", {}, ...args[0])},
+    {"name": "Sentence", "symbols": ["S_num_sing", "_", {"literal":"."}], "postprocess": (args) => node("Sentence", {}, args)},
+    {"name": "Sentence", "symbols": ["S_num_plur", "_", {"literal":"."}], "postprocess": (args) => node("Sentence", {}, args)},
     {"name": "S_num_sing", "symbols": ["NP_num_sing_gen_male_case_pnom_gap_n", "_", "VP__num_sing_fin_p_gap_n"], "postprocess": (args) => node("S", {"num":"sing"}, args)},
     {"name": "S_num_sing", "symbols": ["NP_num_sing_gen_fem_case_pnom_gap_n", "_", "VP__num_sing_fin_p_gap_n"], "postprocess": (args) => node("S", {"num":"sing"}, args)},
     {"name": "S_num_sing", "symbols": ["NP_num_sing_gen_nhum_case_pnom_gap_n", "_", "VP__num_sing_fin_p_gap_n"], "postprocess": (args) => node("S", {"num":"sing"}, args)},
@@ -772,7 +777,7 @@ var grammar = {
     {"name": "RPRO_num_plur_gen_nhum", "symbols": ["RPRO_num_plur_gen_nhum$string$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args)},
     {"name": "GAP", "symbols": [], "postprocess": (args) => node("GAP", {}, args)}
 ]
-  , ParserStart: "Root"
+  , ParserStart: "Discourse"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;

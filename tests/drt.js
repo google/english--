@@ -420,6 +420,12 @@ function node(type, types, children) {
 }
 %}`);
     result.push(``);
+    result.push(``);
+
+    result.push(`Discourse -> (Sentence):+ {% (args) => node("Discourse", {}, ...args[0]) %}`);
+
+    result.push(``);
+    result.push(``);
    }
 
    for (let [key, list] of Object.entries(rules)) {
@@ -533,7 +539,7 @@ A ->
     let grammar = [];
 
     // Root
-    grammar.push(phrase(term("Root"),
+    grammar.push(phrase(term("Sentence"),
                         [term("S", {"num": 1}), '"."']));
 
     // PS 1
@@ -722,7 +728,7 @@ A ->
 
     let i = 0;
     assertThat(print(grammar[i++]))
-     .equalsTo('Root -> S[num=@1] "."');
+     .equalsTo('Sentence -> S[num=@1] "."');
     assertThat(print(grammar[i++]))
      .equalsTo('S[num=@1] -> NP[num=@1, gen=@2, case=+nom, gap=-] VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(grammar[i++]))
@@ -846,13 +852,16 @@ A ->
   function parse(source) {
    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
    parser.feed(source);
-   return clone(parser.results)[0].children[0];
+   let discourse = parser.results[0];
+   // console.log(JSON.stringify(discourse.children));
+   return clone(discourse.children[0]).children[0];
   }
 
   it("parse", function() {
     assertThat(clear(parse("Jones loves.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("loves")))));
+    // return;
     assertThat(clear(parse("Mary loves.")))
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(V("loves")))));
