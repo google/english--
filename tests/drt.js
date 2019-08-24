@@ -445,10 +445,11 @@ function node(type, types, children) {
     result.push(``);
     result.push(``);
     let names = rule(term("PN", {"num": "sing", "gen": 1}),
-                     [["NAME"]]);
+                     [["FULLNAME"]]);
     for (let exp of generate(names)) {
      result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
     }
+    result.push(`FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}`);
     result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
    }
 
@@ -1080,6 +1081,9 @@ A ->
                  VP_(VP(V("love"), 
                         NP(NP(PN("Anna")), "and", NP(PN("Leo")))
                         ))));
+    assertThat(first(parse("Sam Goto loves Dani Fonsechi.")))
+     .equalsTo(S(NP(PN("Sam Goto")),
+                 VP_(VP(V("loves"), NP(PN("Dani Fonsechi"))))));
   });
 
 
