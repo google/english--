@@ -660,10 +660,14 @@ A ->
                          space(),
                          term("RC", {"num": 1, "gen": 2})]));
     // PS 14
+    // NOTE(goto): this is in slight disagreement with the book, because it is forcing
+    // the sentence to agree with the relative clause number feature to disallow the
+    // following example:
+    // A stockbroker who DO not love her likes him.
     grammar.push(phrase(term("RC", {"num": 1, "gen": 2}),
                         [term("RPRO", {"num": 1, "gen": 2}),
                          space(),
-                         term("S", {"num": 3, "gap": 1})]));
+                         term("S", {"num": 1, "gap": 1})]));
 
     // LI 1
     grammar.push(rule(term("DET", {"num": ["sing"]}),
@@ -825,7 +829,7 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ RC[num=@1, gen=@2]');
     assertThat(print(grammar[i++]))
-     .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@3, gap=@1]');
+     .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@1, gap=@1]');
     assertThat(print(grammar[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(grammar[i++]))
@@ -1061,6 +1065,7 @@ A ->
                                RC(RPRO("which"), 
                                   S(NP(GAP()), VP_(VP(V("surprises"), NP(PRO("her")))))
                                   )))))));
+
     assertThat(first(parse("Every book which she loves  surprises him.")))
      .equalsTo(S(NP(DET("Every"), 
                       N(N("book"), RC(RPRO("which"), 
@@ -1079,11 +1084,21 @@ A ->
                  VP_(VP(V("loves"), NP(PRO("her"))))
                  ));
 
+    assertThat(first(parse("A stockbroker who does not love her surprises him.")))
+     .equalsTo(S(NP(DET("A"),
+                    N(N("stockbroker"), RC(RPRO("who"), 
+                                           S(NP(GAP()),
+                                             VP_(AUX("does"), "not", VP(V("love"), NP(PRO("her")))))
+                                           ))),
+                 VP_(VP(V("surprises"), NP(PRO("him"))))
+                 ));
+
    });
 
   it("debug", function() {
     parse("Anna loves a man who loves her.");
     parse("Every book which she loves surprises him.");
+    parse("A stockbroker who does not love her surprises him.");
   });
 
   it("discourse", function() {

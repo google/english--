@@ -473,22 +473,16 @@ N_num_plur_gen_fem ->
 N_num_plur_gen_nhum -> 
   N_num_plur_gen_nhum __ RC_num_plur_gen_nhum {% (args) => node("N", {"num":"plur","gen":"-hum"}, args) %}
 RC_num_sing_gen_male -> 
-  RPRO_num_sing_gen_male __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"male"}, args) %} |
-  RPRO_num_sing_gen_male __ S_num_plur_gap_sing {% (args) => node("RC", {"num":"sing","gen":"male"}, args) %}
+  RPRO_num_sing_gen_male __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"male"}, args) %}
 RC_num_sing_gen_fem -> 
-  RPRO_num_sing_gen_fem __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"fem"}, args) %} |
-  RPRO_num_sing_gen_fem __ S_num_plur_gap_sing {% (args) => node("RC", {"num":"sing","gen":"fem"}, args) %}
+  RPRO_num_sing_gen_fem __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"fem"}, args) %}
 RC_num_sing_gen_nhum -> 
-  RPRO_num_sing_gen_nhum __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"-hum"}, args) %} |
-  RPRO_num_sing_gen_nhum __ S_num_plur_gap_sing {% (args) => node("RC", {"num":"sing","gen":"-hum"}, args) %}
+  RPRO_num_sing_gen_nhum __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"-hum"}, args) %}
 RC_num_plur_gen_male -> 
-  RPRO_num_plur_gen_male __ S_num_sing_gap_plur {% (args) => node("RC", {"num":"plur","gen":"male"}, args) %} |
   RPRO_num_plur_gen_male __ S_num_plur_gap_plur {% (args) => node("RC", {"num":"plur","gen":"male"}, args) %}
 RC_num_plur_gen_fem -> 
-  RPRO_num_plur_gen_fem __ S_num_sing_gap_plur {% (args) => node("RC", {"num":"plur","gen":"fem"}, args) %} |
   RPRO_num_plur_gen_fem __ S_num_plur_gap_plur {% (args) => node("RC", {"num":"plur","gen":"fem"}, args) %}
 RC_num_plur_gen_nhum -> 
-  RPRO_num_plur_gen_nhum __ S_num_sing_gap_plur {% (args) => node("RC", {"num":"plur","gen":"-hum"}, args) %} |
   RPRO_num_plur_gen_nhum __ S_num_plur_gap_plur {% (args) => node("RC", {"num":"plur","gen":"-hum"}, args) %}
 DET_num_sing -> 
   "a"i {% (args) => node("DET", {"num":"sing"}, args) %} |
