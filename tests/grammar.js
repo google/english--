@@ -3,17 +3,17 @@
 (function () {
 function id(x) { return x[0]; }
 
-function node(type, types, children) {
-  // console.log(type + ": " + JSON.stringify(types) + " => ");
-  return {
-    "@type": type, 
-    "types": types, 
-     "children": children
+    function node(type, types, children) {
+     // console.log(type + ": " + JSON.stringify(types) + " => ");
+     return {
+      "@type": type, 
+       "types": types, 
+       "children": children
        .filter(child => child != null)
        .filter(child => child != '.')
-  }; 
-}
-var grammar = {
+       }; 
+    }
+    var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},

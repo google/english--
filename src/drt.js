@@ -278,6 +278,250 @@ function parse(source) {
  return parser.results;
 }
 
+function grammar() {
+ let result = [];
+
+ // Root
+ result.push(phrase(term("Sentence"),
+                     [term("S", {"num": 1}), 
+                      space(true),
+                      '"."']));
+
+ // PS 1
+ result.push(phrase(term("S", {"num": 1}),
+                     [term("NP'", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
+                      space(),
+                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+ 
+ // PS 2
+ result.push(phrase(term("S", {"num": 1, "gap": 3}),
+                     [term("NP'", {"num": 1, "gen": 2, "case": "+nom", "gap": 3}),
+                      term("WS", {"gap": 3}),
+                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+ 
+ // PS 2.5
+ result.push(phrase(term("S", {"num": 1, "gap": 3}),
+                     [term("NP'", {"num": 3, "gen": 2, "case": "+nom", "gap": 3}),
+                      term("WS", {"gap": 3}),
+                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+
+ // PS 3
+ result.push(phrase(term("S", {"num": 1, "gap": 3}),
+                     [term("NP'", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
+                      space(),
+                      term("VP'", {"num": 1, "fin": "+", "gap": 3})]));
+ 
+ // PS 4
+ // NOTE(goto): this is slightly different in that the "num" variable
+ // is tied to the same variable rather than a different one. This
+ // may be a typo in the paper.
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "gap": 2}),
+                     [term("AUX", {"num": 1, "fin": "+"}),
+                      space(),
+                      literal("not"),
+                      space(),
+                      term("VP", {"num": 1, "fin": "-", "gap": 2})]));
+ 
+ // PS 5
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "gap": 2}),
+                     [term("VP", {"num": 1, "fin": "+", "gap": 2})]));
+
+ // PS 6
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                     [term("V", {"num": 1, "fin": 2, "trans": "+"}),
+                      term("WS", {"gap": 3}),
+                      term("NP'", {"num": 3, "gen": 4, "case": "-nom", "gap": 3})]));
+ 
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
+                     [term("V", {"num": 1, "fin": 2, "trans": "+"}),
+                      space(),
+                      term("NP'", {"num": 3, "gen": 4, "case": "-nom", "gap": "-"})]));
+ 
+ // PS 7
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
+                     [term("V", {"num": 1, "fin": 2, "trans": "-"})]));
+ 
+ // PS 8
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 1}),
+                     [term("GAP")]));
+ 
+ // page 36 makes a simplification, which we introduce back manually:
+ // The intended meaning is that the left-hand side can have either of 
+ // the case values +nom and -nom. 
+ 
+ // PS 9
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                     [term("DET", {"num": 1}), 
+                      space(),
+                      term("N", {"num": 1, "gen": 2})]));
+ 
+ // PS 10
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                     [term("PN", {"num": 1, "gen": 2})]));
+ 
+ // PS 11
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                     [term("PRO", {"num": 1, "gen": 2, "case": 3})]));
+ 
+ // PS 12
+ result.push(phrase(term("NP'", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
+                     [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
+                      space(),
+                      literal("and"),
+                      space(),
+                      term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})]));
+ 
+ result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
+                     [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
+                      space(),
+                      literal("and"),
+                      space(),
+                      term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})]));
+ 
+ // PS 12.5
+ result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
+                     [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})]));
+ 
+
+ // PS 13
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                     [term("N", {"num": 1, "gen": 2}),
+                      space(),
+                      term("RC", {"num": 1, "gen": 2})]));
+ // PS 14
+ // NOTE(goto): this is in slight disagreement with the book, because it is forcing
+ // the sentence to agree with the relative clause number feature to disallow the
+ // following example:
+ // A stockbroker who DO not love her likes him.
+ result.push(phrase(term("RC", {"num": 1, "gen": 2}),
+                     [term("RPRO", {"num": 1, "gen": 2}),
+                      space(),
+                      term("S", {"num": 1, "gap": 1})]));
+ 
+ // LI 1
+ result.push(rule(term("DET", {"num": ["sing"]}),
+                   [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
+ 
+ // LI 2
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "+nom"}),
+                   [[literal("he")]]));
+ 
+ // LI 3
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom"}),
+                   [[literal("him")]]));
+ 
+ // LI 4
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "+nom"}),
+                   [[literal("she")]]));
+ 
+ // LI 5
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom"}),
+                   [[literal("her")]]));
+ 
+ // LI 6
+ result.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": ["-nom", "+nom"]}),
+                   [[literal("it")]]));
+ 
+ //console.log(print(result[result.length - 1]));
+ //console.log(result.length);
+ //return;
+ 
+ // LI 7
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "+nom"}),
+                   [[literal("they")]]));
+ 
+ // LI 8
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "-nom"}),
+                   [[literal("them")]]));
+ 
+ // LI 9
+ result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
+                   [[literal("Jones")], [literal("John")]]));
+ 
+ // LI 10
+ result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
+                   [[literal("Mary")], [literal("Anna")]]));
+ 
+ // LI 11
+ result.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
+                   [[literal("Brazil")], [literal("Italy")]]));
+ 
+ // LI 12
+ result.push(rule(term("N", {"num": "sing", "gen": "male"}),
+                   [[literal("stockbroker")], [literal("man")]]));
+ 
+ // LI 13
+ result.push(rule(term("N", {"num": "sing", "gen": "fem"}),
+                   [[literal("stockbroker")], [literal("woman")], [literal("widow")]]));
+ 
+ // LI 14
+ result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
+                   [[literal("book")], [literal("donkey")], [literal("horse")]]));
+ 
+ // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+ // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+ // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+ 
+ // LI 15
+ result.push(rule(term("AUX", {"num": "sing", "fin": "+"}),
+                   [[literal("does")]]));
+ 
+ // LI 16
+ result.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
+                   [[literal("do")]]));
+ 
+ // Verbs in their inifinitive form.
+ const transitive = ["like", "love", "know", "own", "fascinate", "rotate", "surprise"];
+ const intransitive = ["love", "stink"];
+ 
+ // LI 17
+ result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),
+                   transitive.map((verb) => [literal(verb)])));
+ 
+ // LI 18
+ // Manually expanding into the transitivity.
+ result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
+                   intransitive.map((verb) => [literal(verb)])));
+ 
+ // LI 19
+ // Manually expanding into the present / third person.
+ // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+ // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+ // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+ // It seems like the same applies to verbs:
+ // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
+                   transitive.map((verb) => [literal(verb + "s")])
+                   ));
+ 
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
+                   intransitive.map((verb) => [literal(verb + "s")])
+                   ));
+ 
+ // LI 20
+ // Manually expanding into the present / plural.
+ // > Except for the verb be, plural verb forms we want here - i.e. the third person plural of the
+ // > present tense - are identical with the infinitival forms, which we already have (They were needed
+ // > for negation). 
+ result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "+"}),
+                   transitive.map((verb) => [literal(verb)])));
+ result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "-"}),
+                   intransitive.map((verb) => [literal(verb)])));
+ 
+ // LI 21
+ result.push(rule(term("RPRO", {"num": ["sing", "plur"], "gen": ["male", "fem"]}),
+                   [[literal("who")]]));
+ // LI 22
+ result.push(rule(term("RPRO", {"num": ["sing", "plur"], "gen": "-hum"}),
+                   [[literal("which")]]));
+ 
+ // GAP
+ result.push(rule(term("GAP"),
+                   [["null"]]));
+ 
+ return result;
+}
+
 module.exports = {
  space: space,
  rule: rule,
@@ -293,4 +537,5 @@ module.exports = {
  compile: compile,
  clone: clone,
  parse: parse,
+ grammar: grammar
 };
