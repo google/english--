@@ -1,5 +1,5 @@
 const {Parser} = require("nearley");
-const {ParserRules, ParserStart} = require("./../tests/grammar.js");
+const {ParserRules, ParserStart} = require("./grammar.js");
 
 let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};

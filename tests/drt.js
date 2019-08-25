@@ -1,6 +1,5 @@
 const Assert = require("assert");
 const {Parser} = require("nearley");
-const {ParserRules, ParserStart} = require("./grammar.js");
 const {parse, parser, term, rule, phrase, space, clone, literal, compile, print, generate, expand, collect, processor, grammar} = require("../src/drt.js");
 
 describe.only("DRT", function() {
@@ -302,7 +301,7 @@ A ->
     let result = grammar();
 
     const fs = require("fs");
-    fs.writeFileSync("./tests/grammar.ne", compile(clone(result)));
+    fs.writeFileSync("./src/grammar.ne", compile(clone(result)));
   });
 
   it("grammar", function() {
@@ -653,10 +652,10 @@ A ->
   });
 
   it("autocomplete", function() {
-   const parser = new Parser(ParserRules, ParserStart, {
-     keepHistory: true
-    });
-   parser.feed("");
+   //const parser = new Parser(ParserRules, ParserStart, {
+   //  keepHistory: true
+   // });
+   //parser.feed("");
    // console.log(parser.table[0].states);
    // for (let row of parser.table) {
    //  console.log(row.wants);
