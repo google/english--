@@ -1,6 +1,6 @@
 const Assert = require("assert");
-const nearley = require("nearley");
-const grammar = require("./grammar.js");
+const {Parser} = require("nearley");
+const {ParserRules, ParserStart} = require("./grammar.js");
 
 describe.only("DRT", function() {
   let l = (value) => { return literal(value); };
@@ -944,9 +944,10 @@ A ->
   }
 
   function parse(source) {
-   const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+   const parser = new Parser(ParserRules, ParserStart, {
+     keepHistory: true
+    });
    parser.feed(source);
-   // console.log("done");
    return parser.results;
   }
 
