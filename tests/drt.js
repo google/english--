@@ -591,7 +591,7 @@ A ->
     // PS 3
     grammar.push(phrase(term("S", {"num": 1, "gap": 3}),
                         [term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
-                         term("WS", {"gap": 3}),
+                         space(),
                          term("VP'", {"num": 1, "fin": "+", "gap": 3})]));
 
     // PS 4
@@ -805,7 +805,7 @@ A ->
     assertThat(print(grammar[i++]))
      .equalsTo("S[num=@1, gap=@3] -> NP[num=@3, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(grammar[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] WS[gap=@3] VP'[num=@1, fin=+, gap=@3]");
+     .equalsTo("S[num=@1, gap=@3] -> NP[num=@1, gen=@2, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
     assertThat(print(grammar[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, gap=@2]");
     assertThat(print(grammar[i++]))
@@ -1099,6 +1099,7 @@ A ->
     parse("Anna loves a man who loves her.");
     parse("Every book which she loves surprises him.");
     parse("A stockbroker who does not love her surprises him.");
+    parse("A stockbroker who Sam likes loves him.");
   });
 
   it("discourse", function() {
