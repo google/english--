@@ -1157,6 +1157,17 @@ A ->
                  VP_(VP(V("loves"), NP_(NP(PN("Dani Fonsechi")))))));
   });
 
+  it("autocomplete", function() {
+   const parser = new Parser(ParserRules, ParserStart, {
+     keepHistory: true
+    });
+   parser.feed("");
+   // console.log(parser.table[0].states);
+   // for (let row of parser.table) {
+   //  console.log(row.wants);
+   // }
+  });
+
 
   function assertThat(x) {
    return {
