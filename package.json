@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha -w tests",
-    "build": "nearleyc tests/grammar.ne -o tests/grammar.js"
+    "build": "nearleyc src/grammar.ne -o src/grammar.js"
   },
   "repository": {
     "type": "git",
