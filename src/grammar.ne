@@ -467,9 +467,13 @@ PRO_num_plur_gen_nhum_case_nnom ->
   "them"i {% (args) => node("PRO", {"num":"plur","gen":"-hum","case":"-nom"}, args) %}
 PN_num_sing_gen_male -> 
   "Jones"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
-  "John"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+  "John"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "Mel"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "Leo"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "Yuji"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
 PN_num_sing_gen_fem -> 
   "Mary"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
+  "Dani"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
   "Anna"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
 PN_num_sing_gen_nhum -> 
   "Brazil"i {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %} |
@@ -536,13 +540,6 @@ RPRO_num_plur_gen_nhum ->
   "which"i {% (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args) %}
 GAP -> 
   null {% (args) => node("GAP", {}, args) %}
-
-# extensible proper names
-PN_num_sing_gen_male -> FULLNAME {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
-PN_num_sing_gen_fem -> FULLNAME {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
-PN_num_sing_gen_nhum -> FULLNAME {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %}
-FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}
-NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}
 
 #  whitespaces
 WS_gap_sing -> _ {% () => null %}

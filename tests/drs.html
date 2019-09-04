@@ -1,0 +1,90 @@
+<body>
+  <style>
+    .node {
+      /** border: 1px solid black; **/
+      float: left;
+      padding: 1.5em;
+      text-align: center;
+      margin-top: 0.5em;
+    }
+    .edge {
+      border: 1px solid black;
+      transform: rotate(90deg) translate(15px, 15px);
+      width: 30px;
+      position: relative;
+      margin-left: 50%;
+    }
+  </style>
+
+  <div class="node">
+    <div>S</div>
+
+    <div class="edge" style="transform: rotate(-15deg) translate(-45px); width: 40px;"></div>
+    <div class="edge" style="transform: rotate(195deg) translate(0, -10px); width: 40px;"></div>
+
+    <div class="node">
+      <div>NP</div>
+      <div class="edge"></div>
+      <div class="node">
+        <div>PP</div>
+        <div class="edge"></div>
+        <div class="node">
+          <div>Sam</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node">
+      <div>VP</div>
+      <div class="edge"></div>
+      <div class="node">
+        <div>V</div>
+        <div class="edge"></div>
+        <div class="node">
+          <div>loves</div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!--
+
+  <div class="node">
+    <div>S</div>
+
+    <div class="node">
+      <div>NP</div>
+      <div class="node">
+        <div>PP</div>
+        <div class="node">
+          <div>Sam</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node">
+      <div>VP</div>
+      <div class="node">
+        <div>V</div>
+        <div class="node">
+          <div>loves</div>
+        </div>
+      </div>
+
+      <div class="node">
+        <div>NP</div>
+        <div class="node">
+          <div>PN</div>
+          <div class="node">
+            <div>Dani</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  -->
+
+</body>

@@ -1,4 +1,4 @@
-// Generated automatically by nearley, version 2.18.0
+// Generated automatically by nearley, version 2.13.0
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
@@ -494,10 +494,18 @@ function id(x) { return x[0]; }
     {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$subexpression$1"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
     {"name": "PN_num_sing_gen_male$subexpression$2", "symbols": [/[jJ]/, /[oO]/, /[hH]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$subexpression$2"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
+    {"name": "PN_num_sing_gen_male$subexpression$3", "symbols": [/[mM]/, /[eE]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$subexpression$3"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
+    {"name": "PN_num_sing_gen_male$subexpression$4", "symbols": [/[lL]/, /[eE]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$subexpression$4"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
+    {"name": "PN_num_sing_gen_male$subexpression$5", "symbols": [/[yY]/, /[uU]/, /[jJ]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_male", "symbols": ["PN_num_sing_gen_male$subexpression$5"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
     {"name": "PN_num_sing_gen_fem$subexpression$1", "symbols": [/[mM]/, /[aA]/, /[rR]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "PN_num_sing_gen_fem", "symbols": ["PN_num_sing_gen_fem$subexpression$1"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
-    {"name": "PN_num_sing_gen_fem$subexpression$2", "symbols": [/[aA]/, /[nN]/, /[nN]/, /[aA]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_fem$subexpression$2", "symbols": [/[dD]/, /[aA]/, /[nN]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "PN_num_sing_gen_fem", "symbols": ["PN_num_sing_gen_fem$subexpression$2"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
+    {"name": "PN_num_sing_gen_fem$subexpression$3", "symbols": [/[aA]/, /[nN]/, /[nN]/, /[aA]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_fem", "symbols": ["PN_num_sing_gen_fem$subexpression$3"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
     {"name": "PN_num_sing_gen_nhum$subexpression$1", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "PN_num_sing_gen_nhum", "symbols": ["PN_num_sing_gen_nhum$subexpression$1"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
     {"name": "PN_num_sing_gen_nhum$subexpression$2", "symbols": [/[iI]/, /[tT]/, /[aA]/, /[lL]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
@@ -591,19 +599,6 @@ function id(x) { return x[0]; }
     {"name": "RPRO_num_plur_gen_nhum$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[iI]/, /[cC]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "RPRO_num_plur_gen_nhum", "symbols": ["RPRO_num_plur_gen_nhum$subexpression$1"], "postprocess": (args) => node("RPRO", {"num":"plur","gen":"-hum"}, args)},
     {"name": "GAP", "symbols": [], "postprocess": (args) => node("GAP", {}, args)},
-    {"name": "PN_num_sing_gen_male", "symbols": ["FULLNAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"male"}, args)},
-    {"name": "PN_num_sing_gen_fem", "symbols": ["FULLNAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"fem"}, args)},
-    {"name": "PN_num_sing_gen_nhum", "symbols": ["FULLNAME"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
-    {"name": "FULLNAME$ebnf$1$subexpression$1", "symbols": ["NAME", "_"]},
-    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1$subexpression$1"]},
-    {"name": "FULLNAME$ebnf$1$subexpression$2", "symbols": ["NAME", "_"]},
-    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1", "FULLNAME$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "FULLNAME", "symbols": ["FULLNAME$ebnf$1"], "postprocess": ([args]) => args.map(name => name[0]).join(" ")},
-    {"name": "NAME$ebnf$1", "symbols": [/[A-Z]/]},
-    {"name": "NAME$ebnf$1", "symbols": ["NAME$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "NAME$ebnf$2", "symbols": [/[a-z]/]},
-    {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b]) => a.join("") + b.join("")},
     {"name": "WS_gap_sing", "symbols": ["_"], "postprocess": () => null},
     {"name": "WS_gap_plur", "symbols": ["_"], "postprocess": () => null},
     {"name": "WS_gap_n", "symbols": ["__"], "postprocess": () => null}

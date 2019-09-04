@@ -365,9 +365,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John"');
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Anna"');
+     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy"');
     assertThat(print(result[i++]))
@@ -556,9 +556,6 @@ A ->
                            NP_(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            ))));
 
-    // TODO(goto): investigate why there are 12 possible interpretations.
-    // This is possibly related to the expansions of gender / number.
-    // assertThat(first(parse("Anna loves a man who loves her.")).length).equalsTo(12);
     assertThat(first(parse("Anna loves a man who loves her.")))
      .equalsTo(S(NP_(NP(PN("Anna"))),
                  VP_(VP(V("loves"),
@@ -617,7 +614,7 @@ A ->
     parse("Anna loves a man who loves her.");
     parse("Every book which she loves surprises him.");
     parse("A stockbroker who does not love her surprises him.");
-    parse("A stockbroker who Sam likes loves him.");
+    parse("A stockbroker who Mel likes loves him.");
   });
 
   it("discourse", function() {
@@ -634,7 +631,7 @@ A ->
                          ));
    });
 
-  it("extensible proper names", function() {
+  it.skip("extensible proper names", function() {
     assertThat(first(parse("Sam loves her.")))
      .equalsTo(S(NP_(NP(PN("Sam"))),
                  VP_(VP(V("loves"), NP_(NP(PRO("her")))))));
@@ -661,6 +658,21 @@ A ->
    //  console.log(row.wants);
    // }
   });
+
+  it("ambiguities", function() {
+     assertThat(parse("Mel loves Dani.").length).equalsTo(1);
+     // TODO(goto): investigate why there are 6 possible interpretations.
+     // This is possibly related to the expansions of gender / number.
+     assertThat(parse("Anna loves a man.", "Sentence").length).equalsTo(1);
+     assertThat(parse("A man loves Dani.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Mel loves a book.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Mel loves a book and Dani.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Mel and Dani love Anna and Leo.", "Sentence").length).equalsTo(1);
+     console.log(JSON.stringify(parse("Mel and Dani like Brazil.", "Sentence")[1], undefined, 2));
+     //assertThat(parse("Mel and Dani like Brazil.", "Sentence").length).equalsTo(1);
+     //assertThat(parse("Yuji and Mel like Dani.", "Sentence").length).equalsTo(1);
+     //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
+   });
 
 
   function assertThat(x) {

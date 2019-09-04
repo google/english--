@@ -226,15 +226,15 @@ function compile(grammar, header = true) {
  }
  
  if (header) {
-  result.push("");
-  result.push("# extensible proper names");
-  let names = rule(term("PN", {"num": "sing", "gen": 1}),
-                   [["FULLNAME"]]);
-  for (let exp of generate(names)) {
-   result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
-  }
-  result.push(`FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}`);
-  result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
+  //result.push("");
+  //result.push("# extensible proper names");
+  //let names = rule(term("PN", {"num": "sing", "gen": 1}),
+  //                 [["FULLNAME"]]);
+  //for (let exp of generate(names)) {
+  // result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
+  //}
+  //result.push(`FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}`);
+  //result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
   
   result.push("");
   result.push("#  whitespaces");
@@ -270,8 +270,8 @@ function processor(rule) {
  return result.join("");
 }
 
-function parse(source) {
- const parser = new Parser(ParserRules, ParserStart, {
+function parse(source, start = ParserStart) {
+ const parser = new Parser(ParserRules, start, {
    keepHistory: true
   });
  parser.feed(source);
@@ -436,11 +436,11 @@ function grammar() {
  
  // LI 9
  result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
-                   [[literal("Jones")], [literal("John")]]));
+                   [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")]]));
  
  // LI 10
  result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
-                   [[literal("Mary")], [literal("Anna")]]));
+                   [[literal("Mary")], [literal("Dani")], [literal("Anna")]]));
  
  // LI 11
  result.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
