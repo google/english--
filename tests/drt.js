@@ -1,8 +1,23 @@
 const Assert = require("assert");
 const {Parser} = require("nearley");
-const {parse, parser, term, rule, phrase, space, clone, literal, compile, print, generate, expand, collect, processor, grammar} = require("../src/drt.js");
+const {
+  parse, 
+  parser, 
+  term, 
+  rule, 
+  phrase, 
+  space, 
+  clone, 
+  literal, 
+  compile, 
+  print, 
+  generate, 
+  expand, 
+  collect, 
+  processor, 
+  grammar} = require("../src/drt.js");
 
-describe.only("Discourse Representation Theory", function() {
+describe("Discourse Representation Theory", function() {
   
   it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),
@@ -674,12 +689,101 @@ A ->
      //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
    });
 
+  function toString(node) {
+   if (typeof node == "string") {
+    return node;
+   } else if (node["@type"] == "Referent") {
+    return node.name;
+   }
+   let result = [];
+   for (let child of node.children || []) {
+    result.push(toString(child));
+   }
+   return result.join(" ").trim();
+  }
+  
+  it("toString", function() {
+    assertThat(toString(first(parse("Mel loves Dani."))))
+     .equalsTo("Mel loves Dani");
+    assertThat(toString(first(parse("A stockbroker who does not love her surprises him."))))
+     .equalsTo("A stockbroker who does not love her surprises him");
+  });
 
-  it.skip("CR.PN", function() {
+  it("CR.PN", function() {
     let drs = {
-     conditions: parse("Mel loves Dani.")
+     head: [],
+     body: [first(parse("Mel loves Dani."))]
     };
-    console.log(drs);
+
+    for (let root of drs.body || []) {
+     if (root["@type"] == "S" &&
+         root["children"].length == 2 &&
+         root["children"][0]["@type"] == "NP'" &&
+         root["children"][1]["@type"] == "VP'" &&
+         root["children"][0]["children"].length == 1 &&
+         root["children"][0]["children"][0]["@type"] == "NP" &&
+         root["children"][0]["children"][0]["children"].length == 1 &&
+         root["children"][0]["children"][0]["children"][0]["@type"] == "PN"
+         ) {
+      let name = root["children"][0]["children"][0]["children"][0].children[0];
+      let referent = {"@type": "Referent", "name": "u"};
+      drs.head.push(referent);
+      drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
+      root["children"][0] = referent;
+     }
+
+     if (root["@type"] == "S" &&
+         root["children"].length == 2 &&
+         root["children"][1]["@type"] == "VP'" &&
+         root["children"][1]["children"].length == 1 &&
+         root["children"][1]["children"][0]["@type"] == "VP" &&
+         root["children"][1]["children"][0]["children"].length == 2 &&
+         root["children"][1]["children"][0]["children"][0]["@type"] == "V" &&
+         root["children"][1]["children"][0]["children"][1]["@type"] == "NP'" &&
+         root["children"][1]["children"][0]["children"][1]["children"].length == 1 &&
+         root["children"][1]["children"][0]["children"][1]["children"][0]["@type"] == "NP" &&
+         root["children"][1]["children"][0]["children"][1]["children"][0]["children"].length == 1 &&
+         root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["@type"] == "PN" &&
+         root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["children"].length == 1
+         ) {
+      let name = root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["children"][0];
+      let referent = {"@type": "Referent", "name": "v"};
+      drs.head.push(referent);
+      drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
+      root["children"][1]["children"][0]["children"][1] = referent;
+     }
+    }
+    
+    // Two new discourse referents introduced.
+    assertThat(drs.head.length).equalsTo(2);
+    assertThat(drs.head[0].name).equalsTo("u");
+    assertThat(drs.head[1].name).equalsTo("v");
+
+    // Two new conditions added to the body.
+    assertThat(drs.body.length).equalsTo(3);
+
+    // Proper names rewritten.
+    assertThat(toString(drs.body[0])).equalsTo("u loves v");
+
+    // First name binded.
+    assertThat(drs.body[1]).equalsTo({
+      "@type": "Predicate", 
+      "name": "Mel", 
+      "arguments": [{
+        "@type": "Referent", 
+        "name": "u"
+      }]
+    });
+
+    // Second name binded.
+    assertThat(drs.body[2]).equalsTo({
+      "@type": "Predicate", 
+      "name": "Dani", 
+      "arguments": [{
+        "@type": "Referent", 
+        "name": "v"
+      }]
+    });
   });
 
   function assertThat(x) {
