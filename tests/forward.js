@@ -16,7 +16,7 @@ const {
  or, 
  negation} = Parser;
 
-describe("Forward", function() {
+describe("Forward chaining", function() {
   it("a => b, a |= b", function() {
     assertThat(Forward.modusPonens(Parser.parse(`
       a => b.

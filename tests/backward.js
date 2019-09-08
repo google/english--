@@ -16,7 +16,7 @@ const {
  or, 
  negation} = Parser;
 
-describe("Backward", function() {
+describe("Backward chaining", function() {
     
   it("a => b, a |= b?", function() {
     assertThat(`
