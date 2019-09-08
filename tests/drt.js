@@ -2,7 +2,7 @@ const Assert = require("assert");
 const {Parser} = require("nearley");
 const {parse, parser, term, rule, phrase, space, clone, literal, compile, print, generate, expand, collect, processor, grammar} = require("../src/drt.js");
 
-describe.only("DRT", function() {
+describe("DRT", function() {
   
   it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),

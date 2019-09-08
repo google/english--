@@ -1,4 +1,4 @@
-const logic = require("./grammar.js");
+const logic = require("./logic.js");
 
 class Parser {
   static parse(code) {

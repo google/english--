@@ -3,7 +3,7 @@
     .node {
       /** border: 1px solid black; **/
       float: left;
-      padding: 1.5em;
+      padding: 1.5em 0;
       text-align: center;
       margin-top: 0.5em;
     }
@@ -14,34 +14,56 @@
       position: relative;
       margin-left: 50%;
     }
+    .label {
+      border: 1px solid black;
+      padding: 1em 0;
+    }
+    .word {
+      border: 1px solid black;
+      padding: 1.5em;
+    }
   </style>
 
   <div class="node">
-    <div>S</div>
+    <div class="label">S</div>
 
-    <div class="edge" style="transform: rotate(-15deg) translate(-45px); width: 40px;"></div>
-    <div class="edge" style="transform: rotate(195deg) translate(0, -10px); width: 40px;"></div>
+    <div class="edge" style="transform: rotate(-15deg) translate(-70px); width: 70px;"></div>
+    <div class="edge" style="transform: rotate(+15deg) translate(5px, 15px); width: 70px;"></div>
 
     <div class="node">
-      <div>NP</div>
+      <div class="label">NP</div>
       <div class="edge"></div>
       <div class="node">
-        <div>PP</div>
+        <div class="label">PP</div>
         <div class="edge"></div>
         <div class="node">
-          <div>Sam</div>
+          <div class="word">Sam</div>
         </div>
       </div>
     </div>
 
     <div class="node">
-      <div>VP</div>
-      <div class="edge"></div>
+      <div class="label">VP</div>
+
+      <div class="edge" style="transform: rotate(-15deg) translate(-70px); width: 70px;"></div>
+      <div class="edge" style="transform: rotate(+15deg) translate(5px, 15px); width: 70px;"></div>
+
       <div class="node">
-        <div>V</div>
+        <div class="label">V</div>
         <div class="edge"></div>
         <div class="node">
-          <div>loves</div>
+          <div class="word">loves</div>
+        </div>
+      </div>
+      <div class="node">
+        <div class="label">NP</div>
+        <div class="edge"></div>
+        <div class="node">
+          <div class="label">PP</div>
+          <div class="edge"></div>
+          <div class="node">
+            <div class="word">Dani</div>
+          </div>
         </div>
       </div>
     </div>
