@@ -1,22 +1,22 @@
 {
-  "name": "english--",
+  "name": "logic",
   "version": "1.0.0",
-  "description": "",
+  "description": "A series of studies in logic",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha -w tests",
-    "build-en": "nearleyc src/english.ne -o src/english.js",
-    "build-lg": "pegjs src/logic.pegjs"
+    "english": "nearleyc src/english.ne -o src/english.js",
+    "logic": "pegjs src/logic.pegjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/samuelgoto/english.git"
+    "url": "git+https://github.com/samuelgoto/logic.git"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/samuelgoto/english/issues"
+    "url": "https://github.com/samuelgoto/logic/issues"
   },
-  "homepage": "https://github.com/samuelgoto/english",
+  "homepage": "https://github.com/samuelgoto/logic",
   "dependencies": {
     "nearley": "^2.18.0",
     "pegjs": "^0.10.0"
