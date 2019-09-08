@@ -2,7 +2,7 @@ const Assert = require("assert");
 const {Parser} = require("nearley");
 const {parse, parser, term, rule, phrase, space, clone, literal, compile, print, generate, expand, collect, processor, grammar} = require("../src/drt.js");
 
-describe("Discourse Representation Theory", function() {
+describe.only("Discourse Representation Theory", function() {
   
   it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),
@@ -446,7 +446,7 @@ A ->
   }
 
   function first(results) {
-   return clean(clone(results[0].children[0]).children[0]);
+   return clean(clone(results[0]).children[0]);
   }
 
   it("parse", function() {
@@ -618,7 +618,7 @@ A ->
   });
 
   it("discourse", function() {
-    assertThat(clean(parse("Anna loves John. John loves Anna. A man loves her.")[0]))
+    assertThat(clean(parse("Anna loves John. John loves Anna. A man loves her.", "Discourse")[0]))
      .equalsTo(Discourse(Sentence(S(NP_(NP(PN("Anna"))),
                                     VP_(VP(V("loves"), NP_(NP(PN("John"))))))
                                   ),
@@ -668,12 +668,19 @@ A ->
      assertThat(parse("Mel loves a book.", "Sentence").length).equalsTo(1);
      assertThat(parse("Mel loves a book and Dani.", "Sentence").length).equalsTo(1);
      assertThat(parse("Mel and Dani love Anna and Leo.", "Sentence").length).equalsTo(1);
-     console.log(JSON.stringify(parse("Mel and Dani like Brazil.", "Sentence")[1], undefined, 2));
+     // console.log(JSON.stringify(parse("Mel and Dani like Brazil.", "Sentence")[1], undefined, 2));
      //assertThat(parse("Mel and Dani like Brazil.", "Sentence").length).equalsTo(1);
      //assertThat(parse("Yuji and Mel like Dani.", "Sentence").length).equalsTo(1);
      //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
    });
 
+
+  it.skip("CR.PN", function() {
+    let drs = {
+     conditions: parse("Mel loves Dani.")
+    };
+    console.log(drs);
+  });
 
   function assertThat(x) {
    return {

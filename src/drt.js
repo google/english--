@@ -270,7 +270,7 @@ function processor(rule) {
  return result.join("");
 }
 
-function parse(source, start = ParserStart) {
+function parse(source, start = "Sentence") {
  const parser = new Parser(ParserRules, start, {
    keepHistory: true
   });
