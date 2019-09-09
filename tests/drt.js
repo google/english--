@@ -17,6 +17,27 @@ const {
   processor, 
   grammar} = require("../src/drt.js");
 
+const Logic = require("../src/parser.js");
+const {
+  program, 
+  forall, 
+  exists, 
+  implies, 
+  predicate, 
+  func,
+  binary, 
+  constant, 
+  and, 
+  or, 
+  negation,
+  argument} = Logic.Parser;
+
+const {stringify} = require("../src/forward.js");
+
+const {Reasoner} = require("../src/fol.js");
+
+const {rewrite} = require("../src/unify.js");
+
 describe("Discourse Representation Theory", function() {
   
   it("expand var", function() {
@@ -783,6 +804,8 @@ A ->
 
   let Referent = (name) => { return { "@type": "Referent", "name": name } };
 
+  let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
+
   it("CR.PN", function() {
     let drs = {
      head: [],
@@ -797,7 +820,7 @@ A ->
      if (m1) {
       let name = m1.name.children[0];
       drs.head.push(Referent("u"));
-      drs.body.push({"@type": "Predicate", "name": name, "arguments": [Referent("u")]});
+      drs.body.push(predicate(name, [arg("u")]));
       root.children[0] = Referent("u");
      }
 
@@ -805,8 +828,18 @@ A ->
      if (m2) {
       let name = m2.name.children[0];
       drs.head.push(Referent("v"));
-      drs.body.push({"@type": "Predicate", "name": name, "arguments": [Referent("v")]});
+      drs.body.push(predicate(name, [arg("v")]));
       root.children[1].children[0].children[1] = Referent("v");
+     }
+    }
+
+    // Maps to Logic
+
+    let matcher3 = S(capture("Referent", "alpha"), VP_(VP(capture("V", "verb"), capture("Referent", "beta"))));
+    for (let i = 0; i < drs.body.length; i++ ) {
+     let m3 = match(matcher3, drs.body[i]);
+     if (m3) {
+      drs.body[i] = predicate(m3.verb.children[0], [arg(m3.alpha.name), arg(m3.beta.name)]);
      }
     }
     
@@ -820,9 +853,20 @@ A ->
     assertThat(drs.body.length).equalsTo(3);
 
     // Proper names rewritten.
-    assertThat(toString(drs.body[0])).equalsTo("u loves v");
-    assertThat(toString(drs.body[1])).equalsTo("Mel(u)");
-    assertThat(toString(drs.body[2])).equalsTo("Dani(v)");
+    assertThat(stringify(drs.body[0])).equalsTo("loves(u, v)");
+    assertThat(stringify(drs.body[1])).equalsTo("Mel(u)");
+    assertThat(stringify(drs.body[2])).equalsTo("Dani(v)");
+
+    let stream = new Reasoner(rewrite(program(drs.body)))
+     .go(rewrite(Logic.Rule.of("exists(x) exists(y) loves(x, y)?")));
+    let {done, value} = stream.next();
+    assertThat(done).equalsTo(false);
+    assertThat(value.toString()).equalsTo(
+`loves(u, v).
+
+exists (x = u) exists (y = v) loves(x, y).
+`);
+
   });
 
   function assertThat(x) {
