@@ -472,8 +472,9 @@ A ->
    return node;
   }
 
-  function first(results) {
-   return clean(clone(results[0]).children[0]);
+  function first(results, types = false) {
+   let root = clone(results[0]).children[0];
+   return types ? root : clean(root);
   }
 
   it("parse", function() {
@@ -700,6 +701,21 @@ A ->
      //assertThat(parse("Yuji and Mel like Dani.", "Sentence").length).equalsTo(1);
      //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
    });
+
+  it("keeps types", function() {
+    let s = first(parse("Mel loves Dani and Anna."), true);
+    let subject = S(NP(capture("mel")), VP_(capture("?")));
+    assertThat(match(subject, s).mel.types).equalsTo({gen: "male", num: "sing"});
+    let object = S(capture("?"), VP_(VP(V(capture("?")), capture("object"))));
+    assertThat(match(object, s).object["@type"]).equalsTo("NP'");
+    assertThat(match(object, s).object.types)
+     .equalsTo({
+       "case": "-nom", 
+       "gap": "-", 
+       "gen": "-hum", 
+       "num": "plur"
+    });
+  });
 
   function toString(node) {
    if (typeof node == "string") {
