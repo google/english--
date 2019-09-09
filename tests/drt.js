@@ -17,7 +17,7 @@ const {
   processor, 
   grammar} = require("../src/drt.js");
 
-describe.only("Discourse Representation Theory", function() {
+describe("Discourse Representation Theory", function() {
   
   it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),
