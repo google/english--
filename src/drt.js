@@ -188,6 +188,7 @@ function compile(grammar, header = true) {
     
     let prod = processor(expansion);
     if (rule.skip) {
+     // console.log(expansion);
      prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion)})(args)`;
     }
     rules[head].push([list.join(" "), prod]);

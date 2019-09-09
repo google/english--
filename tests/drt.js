@@ -754,48 +754,32 @@ A ->
     assertThat(match(m2, s)).equalsTo({name: "Dani"});
    });
 
-  it.skip("CR.PN", function() {
+  it("CR.PN", function() {
     let drs = {
      head: [],
      body: [first(parse("Mel loves Dani."))]
     };
 
+    let matcher1 = S(NP(PN(capture("name"))), VP_(capture("?")));
+    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(PN(capture("name"))))));
+
     for (let root of drs.body || []) {
-     if (root["@type"] == "S" &&
-         root["children"].length == 2 &&
-         root["children"][0]["@type"] == "NP'" &&
-         root["children"][1]["@type"] == "VP'" &&
-         root["children"][0]["children"].length == 1 &&
-         root["children"][0]["children"][0]["@type"] == "NP" &&
-         root["children"][0]["children"][0]["children"].length == 1 &&
-         root["children"][0]["children"][0]["children"][0]["@type"] == "PN"
-         ) {
-      let name = root["children"][0]["children"][0]["children"][0].children[0];
+     let m1 = match(matcher1, root);
+     if (m1) {
+      let name = m1.name;
       let referent = {"@type": "Referent", "name": "u"};
       drs.head.push(referent);
       drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
-      root["children"][0] = referent;
+      root.children[0] = referent;
      }
 
-     if (root["@type"] == "S" &&
-         root["children"].length == 2 &&
-         root["children"][1]["@type"] == "VP'" &&
-         root["children"][1]["children"].length == 1 &&
-         root["children"][1]["children"][0]["@type"] == "VP" &&
-         root["children"][1]["children"][0]["children"].length == 2 &&
-         root["children"][1]["children"][0]["children"][0]["@type"] == "V" &&
-         root["children"][1]["children"][0]["children"][1]["@type"] == "NP'" &&
-         root["children"][1]["children"][0]["children"][1]["children"].length == 1 &&
-         root["children"][1]["children"][0]["children"][1]["children"][0]["@type"] == "NP" &&
-         root["children"][1]["children"][0]["children"][1]["children"][0]["children"].length == 1 &&
-         root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["@type"] == "PN" &&
-         root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["children"].length == 1
-         ) {
-      let name = root["children"][1]["children"][0]["children"][1]["children"][0]["children"][0]["children"][0];
+     let m2 = match(matcher2, root);
+     if (m2) {
+      let name = m2.name;
       let referent = {"@type": "Referent", "name": "v"};
       drs.head.push(referent);
       drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
-      root["children"][1]["children"][0]["children"][1] = referent;
+      root.children[1].children[0].children[1] = referent;
      }
     }
     
