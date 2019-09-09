@@ -510,6 +510,8 @@ function id(x) { return x[0]; }
     {"name": "PN_num_sing_gen_nhum", "symbols": ["PN_num_sing_gen_nhum$subexpression$1"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
     {"name": "PN_num_sing_gen_nhum$subexpression$2", "symbols": [/[iI]/, /[tT]/, /[aA]/, /[lL]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "PN_num_sing_gen_nhum", "symbols": ["PN_num_sing_gen_nhum$subexpression$2"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
+    {"name": "PN_num_sing_gen_nhum$subexpression$3", "symbols": [/[uU]/, /[lL]/, /[yY]/, /[sS]/, /[sS]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN_num_sing_gen_nhum", "symbols": ["PN_num_sing_gen_nhum$subexpression$3"], "postprocess": (args) => node("PN", {"num":"sing","gen":"-hum"}, args)},
     {"name": "AUX_num_sing_fin_p$subexpression$1", "symbols": [/[dD]/, /[oO]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "AUX_num_sing_fin_p", "symbols": ["AUX_num_sing_fin_p$subexpression$1"], "postprocess": (args) => node("AUX", {"num":"sing","fin":"+"}, args)},
     {"name": "AUX_num_plur_fin_p$subexpression$1", "symbols": [/[dD]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},

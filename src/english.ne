@@ -477,7 +477,8 @@ PN_num_sing_gen_fem ->
   "Anna"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %}
 PN_num_sing_gen_nhum -> 
   "Brazil"i {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %} |
-  "Italy"i {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %}
+  "Italy"i {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %} |
+  "Ulysses"i {% (args) => node("PN", {"num":"sing","gen":"-hum"}, args) %}
 AUX_num_sing_fin_p -> 
   "does"i {% (args) => node("AUX", {"num":"sing","fin":"+"}, args) %}
 AUX_num_plur_fin_p -> 

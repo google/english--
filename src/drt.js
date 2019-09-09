@@ -451,7 +451,7 @@ function grammar() {
  
  // LI 11
  result.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
-                   [[literal("Brazil")], [literal("Italy")]]));
+                   [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]]));
  
  // LI 12
  result.push(rule(term("N", {"num": "sing", "gen": "male"}),

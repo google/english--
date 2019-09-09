@@ -417,7 +417,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy"');
+     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
     assertThat(print(result[i++]))
@@ -867,14 +867,25 @@ A ->
    }
   }
 
-  it("CR.PN", function() {
-    let drs = {
-     head: [],
-     body: [first(parse("Mel loves Dani."), true)]
-    };
+  class Interpreter {
+   constructor() {
+    this.drs = {head: [], body: []};
+   }
+   feed(s) {
+    this.drs.body.push(first(parse(s), true));
+    construct(this.drs);
+    return this.drs;
+   }
+   ask(s) {
+    return new Reasoner(rewrite(program(this.drs.body)))
+     .go(rewrite(Logic.Rule.of(s)));
+   }
+  }
 
-    construct(drs);
-    
+  it("CR.PN", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Mel loves Dani.");
+
     // Two new discourse referents introduced.
     assertThat(drs.head.length).equalsTo(2);
     assertThat(drs.head[0].name).equalsTo("u");
@@ -888,11 +899,10 @@ A ->
     assertThat(Forward.stringify(drs.body[1])).equalsTo("Name(u, Mel)");
     assertThat(Forward.stringify(drs.body[2])).equalsTo("Name(v, Dani)");
 
-    let stream = new Reasoner(rewrite(program(drs.body)))
-     .go(rewrite(Logic.Rule.of("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?")));
+    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
 
     assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
-       .equalsTo(Forward.toString(Logic.Parser.parse(`
+     .equalsTo(Forward.toString(Logic.Parser.parse(`
     Name(u, Mel).
     exists (p = u) exists (q) exists (r) Name(p, Mel).
     loves(u, v).
@@ -902,8 +912,11 @@ A ->
     exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
     exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
     `)));
+  });
 
-
+  it("CR.PRO", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Jones owns Ulysses.");
   });
 
   function assertThat(x) {
