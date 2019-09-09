@@ -3,10 +3,10 @@ const {ParserRules, ParserStart} = require("./english.js");
 
 let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};
-let rule = (head = {}, tail = []) => { return {"@type": "Rule", head: head, tail: tail}};
+let rule = (head = {}, tail = [], skip = false) => { return {"@type": "Rule", head: head, tail: tail, skip: skip}};
 let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
 let literal = (value) => { return {"@type": "Literal", name: value} };
-let phrase = (head, tail) => { return rule(head, [tail]); };
+let phrase = (head, tail, skip) => { return rule(head, [tail], skip); };
 
 function name(term, pretty) {
  if (typeof term == "string") {
@@ -185,7 +185,12 @@ function compile(grammar, header = true) {
     for (let term of line) {
      list.push(name(term, true));
     }
-    rules[head].push([list.join(" "), processor(expansion)]);
+    
+    let prod = processor(expansion);
+    if (rule.skip) {
+     prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion)})(args)`;
+    }
+    rules[head].push([list.join(" "), prod]);
    }
   }
  }
@@ -369,18 +374,21 @@ function grammar() {
                       space(),
                       literal("and"),
                       space(),
-                      term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})]));
+                      term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
+                    true));
  
  result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
-                     [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
-                      space(),
-                      literal("and"),
-                      space(),
-                      term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})]));
+                    [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
+                    true));
  
  // PS 12.5
  result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
-                     [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})]));
+                    [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})], 
+                    true));
  
 
  // PS 13
