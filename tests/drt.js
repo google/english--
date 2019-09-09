@@ -820,7 +820,7 @@ A ->
      if (m1) {
       let name = m1.name.children[0];
       drs.head.push(Referent("u"));
-      drs.body.push(predicate(name, [arg("u")]));
+      drs.body.push(predicate("Name", [arg("u"), arg(name)]));
       root.children[0] = Referent("u");
      }
 
@@ -828,7 +828,7 @@ A ->
      if (m2) {
       let name = m2.name.children[0];
       drs.head.push(Referent("v"));
-      drs.body.push(predicate(name, [arg("v")]));
+      drs.body.push(predicate("Name", [arg("v"), arg(name)]));
       root.children[1].children[0].children[1] = Referent("v");
      }
     }
@@ -854,11 +854,12 @@ A ->
 
     // Proper names rewritten.
     assertThat(stringify(drs.body[0])).equalsTo("loves(u, v)");
-    assertThat(stringify(drs.body[1])).equalsTo("Mel(u)");
-    assertThat(stringify(drs.body[2])).equalsTo("Dani(v)");
+    assertThat(stringify(drs.body[1])).equalsTo("Name(u, Mel)");
+    assertThat(stringify(drs.body[2])).equalsTo("Name(v, Dani)");
 
     let stream = new Reasoner(rewrite(program(drs.body)))
      .go(rewrite(Logic.Rule.of("exists(x) exists(y) loves(x, y)?")));
+
     let {done, value} = stream.next();
     assertThat(done).equalsTo(false);
     assertThat(value.toString()).equalsTo(
@@ -866,6 +867,23 @@ A ->
 
 exists (x = u) exists (y = v) loves(x, y).
 `);
+
+    let s1 = new Reasoner(rewrite(program(drs.body)))
+     .go(rewrite(Logic.Rule.of("exists (n) Name(u, n)?")));
+    assertThat(s1.next().value.toString()).equalsTo(
+`Name(u, Mel).
+
+exists (n = Mel) Name(u, n).
+`);
+
+    let s2 = new Reasoner(rewrite(program(drs.body)))
+     .go(rewrite(Logic.Rule.of("exists (n) Name(v, n)?")));
+    assertThat(s2.next().value.toString()).equalsTo(
+`Name(v, Dani).
+
+exists (n = Dani) Name(v, n).
+`);
+
 
   });
 
