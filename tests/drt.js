@@ -709,6 +709,39 @@ A ->
      .equalsTo("A stockbroker who does not love her surprises him");
   });
 
+  let capture = (name) => { return {"@type": "Match", "name": name} };
+  
+  function match(a, b) {
+   if (a["@type"] == "Match") {
+    // console.log(b);
+    return a.name == "?" ? {} : {[a.name]: b};
+   } else if (typeof a != typeof b || 
+              a["@type"] != b["@type"] || 
+              a.children.length != b.children.length) {
+    return false;
+   }
+
+   let result = {};
+
+   for (let i = 0; i < a.children.length; i++) {
+    let capture = match(a.children[i], b.children[i]);
+    if (!capture) {
+     return false;
+    }
+    result = Object.assign(result, capture);
+   }
+
+   return result;
+  }
+
+  it("match", function() {
+    let s = first(parse("Mel loves Dani."));
+    let m1 = S(NP_(NP(PN(capture("name")))), VP_(capture("?")));
+    assertThat(match(m1, s)).equalsTo({name: "Mel"});
+    let m2 = S(capture("?"), VP_(VP(V(capture("?")), NP_(NP(PN(capture("name")))))));
+    assertThat(match(m2, s)).equalsTo({name: "Dani"});
+   });
+
   it("CR.PN", function() {
     let drs = {
      head: [],
