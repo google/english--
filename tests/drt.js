@@ -724,6 +724,8 @@ A ->
     return node;
    } else if (node["@type"] == "Referent") {
     return node.name;
+   } else if (node["@type"] == "Predicate") {
+    return `${node.name}(${node.arguments.map(x => x.name).join(", ")})`;
    }
    let result = [];
    for (let child of node.children || []) {
@@ -819,20 +821,8 @@ A ->
 
     // Proper names rewritten.
     assertThat(toString(drs.body[0])).equalsTo("u loves v");
-
-    // First name binded.
-    assertThat(drs.body[1]).equalsTo({
-      "@type": "Predicate", 
-      "name": "Mel", 
-      "arguments": [Referent("u")]
-    });
-
-    // Second name binded.
-    assertThat(drs.body[2]).equalsTo({
-      "@type": "Predicate", 
-      "name": "Dani", 
-      "arguments": [Referent("v")]
-    });
+    assertThat(toString(drs.body[1])).equalsTo("Mel(u)");
+    assertThat(toString(drs.body[2])).equalsTo("Dani(v)");
   });
 
   function assertThat(x) {
