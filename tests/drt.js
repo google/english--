@@ -32,7 +32,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-const {stringify} = require("../src/forward.js");
+const Forward = require("../src/forward.js");
 
 const {Reasoner} = require("../src/fol.js");
 
@@ -853,36 +853,26 @@ A ->
     assertThat(drs.body.length).equalsTo(3);
 
     // Proper names rewritten.
-    assertThat(stringify(drs.body[0])).equalsTo("loves(u, v)");
-    assertThat(stringify(drs.body[1])).equalsTo("Name(u, Mel)");
-    assertThat(stringify(drs.body[2])).equalsTo("Name(v, Dani)");
+    assertThat(Forward.stringify(drs.body[0])).equalsTo("loves(u, v)");
+    assertThat(Forward.stringify(drs.body[1])).equalsTo("Name(u, Mel)");
+    assertThat(Forward.stringify(drs.body[2])).equalsTo("Name(v, Dani)");
 
     let stream = new Reasoner(rewrite(program(drs.body)))
-     .go(rewrite(Logic.Rule.of("exists(x) exists(y) loves(x, y)?")));
+     .go(rewrite(Logic.Rule.of("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?")));
 
-    let {done, value} = stream.next();
-    assertThat(done).equalsTo(false);
-    assertThat(value.toString()).equalsTo(
-`loves(u, v).
+    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
+       .equalsTo(Forward.toString(Logic.Parser.parse(`
 
-exists (x = u) exists (y = v) loves(x, y).
-`);
+    Name(u, Mel).
+    exists (p = u) exists (q) exists (r) Name(p, Mel).
+    loves(u, v).
+    exists (p = u) exists (q = v) exists (r) loves(u, q).
+    Name(v, Dani).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
+    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
 
-    let s1 = new Reasoner(rewrite(program(drs.body)))
-     .go(rewrite(Logic.Rule.of("exists (n) Name(u, n)?")));
-    assertThat(s1.next().value.toString()).equalsTo(
-`Name(u, Mel).
-
-exists (n = Mel) Name(u, n).
-`);
-
-    let s2 = new Reasoner(rewrite(program(drs.body)))
-     .go(rewrite(Logic.Rule.of("exists (n) Name(v, n)?")));
-    assertThat(s2.next().value.toString()).equalsTo(
-`Name(v, Dani).
-
-exists (n = Dani) Name(v, n).
-`);
+    `)));
 
 
   });
