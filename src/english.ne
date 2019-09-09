@@ -237,173 +237,173 @@ NP_num_plur_gen_nhum_case_nnom_gap_n ->
   PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
   PRO_num_plur_gen_nhum_case_nnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %}
 NP__num_plur_gen_male_case_pnom_gap_n -> 
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_plur_gen_male_case_nnom_gap_n -> 
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_plur_gen_fem_case_pnom_gap_n -> 
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_plur_gen_fem_case_nnom_gap_n -> 
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_plur_gen_nhum_case_pnom_gap_n -> 
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_plur_gen_nhum_case_nnom_gap_n -> 
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
-  NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_sing_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_male_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_fem_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n __ "and"i __ NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %} |
+  NP_num_plur_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_male_case_pnom_gap_n -> 
-  NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_male_case_pnom_gap_sing -> 
-  NP_num_sing_gen_male_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_male_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_male_case_pnom_gap_plur -> 
-  NP_num_sing_gen_male_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_male_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_sing_gen_male_case_nnom_gap_n -> 
-  NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_male_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_male_case_nnom_gap_sing -> 
-  NP_num_sing_gen_male_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_male_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_male_case_nnom_gap_plur -> 
-  NP_num_sing_gen_male_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"male","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_male_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"plur"}, args))(args) %}
 NP__num_sing_gen_fem_case_pnom_gap_n -> 
-  NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_fem_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_fem_case_pnom_gap_sing -> 
-  NP_num_sing_gen_fem_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_fem_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_fem_case_pnom_gap_plur -> 
-  NP_num_sing_gen_fem_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_fem_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_sing_gen_fem_case_nnom_gap_n -> 
-  NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_fem_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_fem_case_nnom_gap_sing -> 
-  NP_num_sing_gen_fem_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_fem_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_fem_case_nnom_gap_plur -> 
-  NP_num_sing_gen_fem_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"fem","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_fem_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"plur"}, args))(args) %}
 NP__num_sing_gen_nhum_case_pnom_gap_n -> 
-  NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_nhum_case_pnom_gap_sing -> 
-  NP_num_sing_gen_nhum_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_nhum_case_pnom_gap_plur -> 
-  NP_num_sing_gen_nhum_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_sing_gen_nhum_case_nnom_gap_n -> 
-  NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_nnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args))(args) %}
 NP__num_sing_gen_nhum_case_nnom_gap_sing -> 
-  NP_num_sing_gen_nhum_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_sing_gen_nhum_case_nnom_gap_plur -> 
-  NP_num_sing_gen_nhum_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"sing","gen":"-hum","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_sing_gen_nhum_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_male_case_pnom_gap_sing -> 
-  NP_num_plur_gen_male_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_male_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_male_case_pnom_gap_plur -> 
-  NP_num_plur_gen_male_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_male_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_male_case_nnom_gap_sing -> 
-  NP_num_plur_gen_male_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_male_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_male_case_nnom_gap_plur -> 
-  NP_num_plur_gen_male_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_male_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_fem_case_pnom_gap_sing -> 
-  NP_num_plur_gen_fem_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_fem_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_fem_case_pnom_gap_plur -> 
-  NP_num_plur_gen_fem_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_fem_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_fem_case_nnom_gap_sing -> 
-  NP_num_plur_gen_fem_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_fem_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_fem_case_nnom_gap_plur -> 
-  NP_num_plur_gen_fem_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_fem_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_nhum_case_pnom_gap_sing -> 
-  NP_num_plur_gen_nhum_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_nhum_case_pnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_nhum_case_pnom_gap_plur -> 
-  NP_num_plur_gen_nhum_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_nhum_case_pnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"plur"}, args))(args) %}
 NP__num_plur_gen_nhum_case_nnom_gap_sing -> 
-  NP_num_plur_gen_nhum_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"sing"}, args))(args) %}
+  NP_num_plur_gen_nhum_case_nnom_gap_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"sing"}, args))(args) %}
 NP__num_plur_gen_nhum_case_nnom_gap_plur -> 
-  NP_num_plur_gen_nhum_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP'", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args))(args) %}
+  NP_num_plur_gen_nhum_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args))(args) %}
 N_num_sing_gen_male -> 
   N_num_sing_gen_male __ RC_num_sing_gen_male {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |

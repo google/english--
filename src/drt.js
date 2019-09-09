@@ -188,8 +188,7 @@ function compile(grammar, header = true) {
     
     let prod = processor(expansion);
     if (rule.skip) {
-     // console.log(expansion);
-     prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion)})(args)`;
+     prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion, rule.skip)})(args)`;
     }
     rules[head].push([list.join(" "), prod]);
    }
@@ -256,8 +255,7 @@ function compile(grammar, header = true) {
  return result.join("\n");
 }
 
-
-function processor(rule) {
+function processor(rule, name) {
  let result = [];
  result.push("(args)");
  // let args = [];
@@ -271,7 +269,7 @@ function processor(rule) {
  result.push(" => ");
  result.push("node(");
  //console.log(rule);
- result.push(`"${rule.head.name}", ${JSON.stringify(rule.head.types || {})}, args`);
+ result.push(`"${name ? name : rule.head.name}", ${JSON.stringify(rule.head.types || {})}, args`);
  result.push(")");
  return result.join("");
 }
@@ -376,7 +374,7 @@ function grammar() {
                       literal("and"),
                       space(),
                       term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
-                    true));
+                    "NP"));
  
  result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
                     [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
@@ -384,12 +382,12 @@ function grammar() {
                      literal("and"),
                      space(),
                      term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
-                    true));
+                    "NP"));
  
  // PS 12.5
  result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
                     [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})], 
-                    true));
+                    "NP"));
  
 
  // PS 13

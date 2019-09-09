@@ -305,13 +305,13 @@ S ->
 
   it("custom processor", function() {
     let rule = phrase(term("A"),
-                      [term("A", {"num": 1})], true);
+                      [term("A", {"num": 1})], "B");
 
     assertThat(compile([rule], false))
      .equalsTo(`
 A -> 
-  A_num_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("A", {}, args))(args) %} |
-  A_num_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("A", {}, args))(args) %}
+  A_num_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("B", {}, args))(args) %} |
+  A_num_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("B", {}, args))(args) %}
                `.trim());
   });
 
@@ -561,17 +561,17 @@ A ->
     // the rule agree too.
     // return;
     assertThat(first(parse("he and she love her.")))
-     .equalsTo(S(NP_(NP(PRO("he")), "and", NP(PRO("she"))),
+     .equalsTo(S(NP(NP(PRO("he")), "and", NP(PRO("she"))),
                  VP_(VP(V("love"), NP(PRO("her"))))));
     assertThat(first(parse("they love him and her.")))
      .equalsTo(S(NP(PRO("they")),
                  VP_(VP(V("love"), 
-                        NP_(NP(PRO("him")), "and", NP(PRO("her")))
+                        NP(NP(PRO("him")), "and", NP(PRO("her")))
                         ))));
     assertThat(first(parse("every man loves a book and a woman.")))
      .equalsTo(S(NP(DET("every"), N("man")),
                  VP_(VP(V("loves"), 
-                        NP_(NP(DET("a"), N("book")), "and", NP(DET("a"), N("woman")))
+                        NP(NP(DET("a"), N("book")), "and", NP(DET("a"), N("woman")))
                         ))));
     assertThat(first(parse("Brazil loves her.")))
      .equalsTo(S(NP(PN("Brazil")),
@@ -582,7 +582,7 @@ A ->
     assertThat(first(parse("every man loves Italy and Brazil.")))
      .equalsTo(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), 
-                           NP_(NP(PN("Italy")), "and", NP(PN("Brazil")))
+                           NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
                            ))));
 
     assertThat(first(parse("Anna loves a man who loves her.")))
@@ -707,7 +707,7 @@ A ->
     let subject = S(NP(capture("mel")), VP_(capture("?")));
     assertThat(match(subject, s).mel.types).equalsTo({gen: "male", num: "sing"});
     let object = S(capture("?"), VP_(VP(V(capture("?")), capture("object"))));
-    assertThat(match(object, s).object["@type"]).equalsTo("NP'");
+    assertThat(match(object, s).object["@type"]).equalsTo("NP");
     assertThat(match(object, s).object.types)
      .equalsTo({
        "case": "-nom", 
