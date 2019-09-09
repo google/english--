@@ -806,47 +806,78 @@ A ->
 
   let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
 
+  class CRPN {
+   match(node) {
+    let matcher1 = S(NP(capture("PN", "name")), VP_(capture("?")));
+    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
+
+    let result = [[], []];
+
+    let m1 = match(matcher1, node);
+    if (m1) {
+     let name = m1.name.children[0];
+     result[0].push(Referent("u"));
+     result[1].push(predicate("Name", [arg("u"), arg(name)]));
+     node.children[0] = Referent("u");
+    }
+
+    let m2 = match(matcher2, node);
+    if (m2) {
+     let name = m2.name.children[0];
+     result[0].push(Referent("v"));
+     result[1].push(predicate("Name", [arg("v"), arg(name)]));
+     node.children[1].children[0].children[1] = Referent("v");
+    }
+
+    return result;
+   }
+  }
+  
+  class Compiler {
+   compile(node) {
+    // Maps to Logic
+    let matcher = S(capture("Referent", "alpha"), VP_(VP(capture("V", "verb"), capture("Referent", "beta"))));
+    let m = match(matcher, node);
+
+    if (!m) {
+     return false;
+    }
+
+    return predicate(m.verb.children[0], 
+                     [arg(m.alpha.name), arg(m.beta.name)]);
+   }
+  }
+
+  function construct(drs) {
+   let crpn = new CRPN();
+
+   for (let root of drs.body || []) {
+    let [head, body] = crpn.match(root);
+    drs.head = drs.head.concat(head);
+    drs.body = drs.body.concat(body);
+   }
+
+   let compiler = new Compiler();
+
+   for (let i = 0; i < drs.body.length; i++ ) {
+    let result = compiler.compile(drs.body[i]);
+    if (result) {
+     drs.body[i] = result;
+    }
+   }
+  }
+
   it("CR.PN", function() {
     let drs = {
      head: [],
      body: [first(parse("Mel loves Dani."), true)]
     };
 
-    let matcher1 = S(NP(capture("PN", "name")), VP_(capture("?")));
-    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
-
-    for (let root of drs.body || []) {
-     let m1 = match(matcher1, root);
-     if (m1) {
-      let name = m1.name.children[0];
-      drs.head.push(Referent("u"));
-      drs.body.push(predicate("Name", [arg("u"), arg(name)]));
-      root.children[0] = Referent("u");
-     }
-
-     let m2 = match(matcher2, root);
-     if (m2) {
-      let name = m2.name.children[0];
-      drs.head.push(Referent("v"));
-      drs.body.push(predicate("Name", [arg("v"), arg(name)]));
-      root.children[1].children[0].children[1] = Referent("v");
-     }
-    }
-
-    // Maps to Logic
-
-    let matcher3 = S(capture("Referent", "alpha"), VP_(VP(capture("V", "verb"), capture("Referent", "beta"))));
-    for (let i = 0; i < drs.body.length; i++ ) {
-     let m3 = match(matcher3, drs.body[i]);
-     if (m3) {
-      drs.body[i] = predicate(m3.verb.children[0], [arg(m3.alpha.name), arg(m3.beta.name)]);
-     }
-    }
+    construct(drs);
     
     // Two new discourse referents introduced.
     assertThat(drs.head.length).equalsTo(2);
     assertThat(drs.head[0].name).equalsTo("u");
-    // assertThat(drs.head[0].types).equalsTo({});
     assertThat(drs.head[1].name).equalsTo("v");
 
     // Two new conditions added to the body.
@@ -862,7 +893,6 @@ A ->
 
     assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
        .equalsTo(Forward.toString(Logic.Parser.parse(`
-
     Name(u, Mel).
     exists (p = u) exists (q) exists (r) Name(p, Mel).
     loves(u, v).
@@ -871,7 +901,6 @@ A ->
     exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
     exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
     exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
-
     `)));
 
 
