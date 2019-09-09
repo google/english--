@@ -704,9 +704,11 @@ A ->
 
   it("keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
-    let subject = S(NP(capture("mel")), VP_(capture("?")));
-    assertThat(match(subject, s).mel.types).equalsTo({gen: "male", num: "sing"});
-    let object = S(capture("?"), VP_(VP(V(capture("?")), capture("object"))));
+    let subject = S(capture("NP", "mel"), VP_(capture("?")));
+    assertThat(match(subject, s).mel.types)
+     .equalsTo({
+       "gen": "male", "num": "sing", "case": "+nom", "gap": "-"});
+    let object = S(capture("?"), VP_(VP(V(capture("?")), capture("NP", "object"))));
     assertThat(match(object, s).object["@type"]).equalsTo("NP");
     assertThat(match(object, s).object.types)
      .equalsTo({
@@ -737,13 +739,20 @@ A ->
      .equalsTo("A stockbroker who does not love her surprises him");
   });
 
-  let capture = (name) => { return {"@type": "Match", "name": name} };
+  let capture = (type, name) => { return {"@type": "Match", "type": type, "name": name} };
   
   function match(a, b) {
    if (a["@type"] == "Match") {
-    // console.log(b);
-    return a.name == "?" ? {} : {[a.name]: b};
-   } else if (typeof a != typeof b || 
+    if (a.type == "?") {
+     return {};
+    } else if (a.type == b["@type"]) {
+     return {[a.name]: b};
+    } else {
+     return false;
+    }
+   }
+
+   if (typeof a != typeof b || 
               a["@type"] != b["@type"] || 
               a.children.length != b.children.length) {
     return false;
@@ -764,44 +773,45 @@ A ->
 
   it("match", function() {
     let s = first(parse("Mel loves Dani."));
-    let m1 = S(NP(PN(capture("name"))), VP_(capture("?")));
-    assertThat(match(m1, s)).equalsTo({name: "Mel"});
-    let m2 = S(capture("?"), VP_(VP(V(capture("?")), NP(PN(capture("name"))))));
-    assertThat(match(m2, s)).equalsTo({name: "Dani"});
+    let m1 = S(NP(capture("PN", "name")), VP_(capture("?")));
+    assertThat(match(m1, s)).equalsTo({name: PN("Mel")});
+    let m2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
+    assertThat(match(m2, s)).equalsTo({name: PN("Dani")});
    });
+
+  let Referent = (name) => { return { "@type": "Referent", "name": name } };
 
   it("CR.PN", function() {
     let drs = {
      head: [],
-     body: [first(parse("Mel loves Dani."))]
+     body: [first(parse("Mel loves Dani."), true)]
     };
 
-    let matcher1 = S(NP(PN(capture("name"))), VP_(capture("?")));
-    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(PN(capture("name"))))));
+    let matcher1 = S(NP(capture("PN", "name")), VP_(capture("?")));
+    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
 
     for (let root of drs.body || []) {
      let m1 = match(matcher1, root);
      if (m1) {
-      let name = m1.name;
-      let referent = {"@type": "Referent", "name": "u"};
-      drs.head.push(referent);
-      drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
-      root.children[0] = referent;
+      let name = m1.name.children[0];
+      drs.head.push(Referent("u"));
+      drs.body.push({"@type": "Predicate", "name": name, "arguments": [Referent("u")]});
+      root.children[0] = Referent("u");
      }
 
      let m2 = match(matcher2, root);
      if (m2) {
-      let name = m2.name;
-      let referent = {"@type": "Referent", "name": "v"};
-      drs.head.push(referent);
-      drs.body.push({"@type": "Predicate", "name": name, "arguments": [referent]});
-      root.children[1].children[0].children[1] = referent;
+      let name = m2.name.children[0];
+      drs.head.push(Referent("v"));
+      drs.body.push({"@type": "Predicate", "name": name, "arguments": [Referent("v")]});
+      root.children[1].children[0].children[1] = Referent("v");
      }
     }
     
     // Two new discourse referents introduced.
     assertThat(drs.head.length).equalsTo(2);
     assertThat(drs.head[0].name).equalsTo("u");
+    // assertThat(drs.head[0].types).equalsTo({});
     assertThat(drs.head[1].name).equalsTo("v");
 
     // Two new conditions added to the body.
@@ -814,20 +824,14 @@ A ->
     assertThat(drs.body[1]).equalsTo({
       "@type": "Predicate", 
       "name": "Mel", 
-      "arguments": [{
-        "@type": "Referent", 
-        "name": "u"
-      }]
+      "arguments": [Referent("u")]
     });
 
     // Second name binded.
     assertThat(drs.body[2]).equalsTo({
       "@type": "Predicate", 
       "name": "Dani", 
-      "arguments": [{
-        "@type": "Referent", 
-        "name": "v"
-      }]
+      "arguments": [Referent("v")]
     });
   });
 
