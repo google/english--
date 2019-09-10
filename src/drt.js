@@ -529,6 +529,29 @@ function grammar() {
  return result;
 }
 
+function node(type, ...children) {
+ return {"@type": type, "children": children} 
+}
+
+function clean(node) {
+ if (Array.isArray(node)) {
+  for (let entry of node) {
+   if (entry) {
+    clean(entry);
+   }
+  }
+ } else if (typeof node == "object") {
+  delete node.types;
+  clean(node.children);
+ }
+ return node;
+}
+
+function first(results, types = false) {
+ let root = clone(results[0]).children[0];
+ return types ? root : clean(root);
+}
+
 module.exports = {
  space: space,
  rule: rule,
@@ -544,5 +567,25 @@ module.exports = {
  compile: compile,
  clone: clone,
  parse: parse,
- grammar: grammar
+ grammar: grammar,
+ first: first,
+ clean: clean,
+ nodes: {
+  S: (...children) => node("S", ...children),
+  NP: (...children) => node("NP", ...children),
+  NP_: (...children) => node("NP'", ...children),
+  PN: (...children) => node("PN", ...children),
+  VP_: (...children) => node("VP'", ...children),
+  VP: (...children) => node("VP", ...children),
+  V: (...children) => node("V", ...children),
+  DET: (...children) => node("DET", ...children),
+  N: (...children) => node("N", ...children),
+  PRO: (...children) => node("PRO", ...children),
+  AUX: (...children) => node("AUX", ...children),
+  RC: (...children) => node("RC", ...children),
+  RPRO: (...children) => node("RPRO", ...children),
+  GAP: (...children) => node("GAP", ...children),
+  Discourse: (...children) => node("Discourse", ...children),
+  Sentence: (...children) => node("Sentence", ...children),
+ }
 };
