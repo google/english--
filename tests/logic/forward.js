@@ -1,7 +1,7 @@
 const Assert = require("assert");
-const logic = require("../src/logic.js");
-const {Forward, normalize, stringify, equals} = require("../src/forward.js");
-const {Parser, Rule} = require("../src/parser.js");
+const logic = require("../../src/logic/logic.js");
+const {Forward, normalize, stringify, equals} = require("../../src/logic/forward.js");
+const {Parser, Rule} = require("../../src/logic/parser.js");
 
 const {
  program, 

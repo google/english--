@@ -1,7 +1,7 @@
 const Assert = require("assert");
-const Forward = require("../src/forward.js");
-const {Reasoner} = require("../src/fol.js");
-const {rewrite} = require("../src/unify.js");
+const Forward = require("../../src/logic/forward.js");
+const {Reasoner} = require("../../src/logic/fol.js");
+const {rewrite} = require("../../src/logic/unify.js");
 
 const {
   parse, 
@@ -21,14 +21,14 @@ const {
   grammar,
   first,
   clean,
-  nodes} = require("../src/drt.js");
+  nodes} = require("../../src/drt/drt.js");
 
 const {
  S, NP, NP_, PN, VP_, VP, V, DET, N, PRO, AUX, RC, RPRO, GAP, 
  Discourse, Sentence
 } = nodes;
 
-const Logic = require("../src/parser.js");
+const Logic = require("../../src/logic/parser.js");
 const {
   program, 
   forall, 

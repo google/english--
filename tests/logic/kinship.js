@@ -1,8 +1,8 @@
 const Assert = require("assert");
-const {Forward, normalize, stringify, equals, explain, toString} = require("../src/forward.js");
-const {Parser, Rule} = require("../src/parser.js");
-const {Reasoner} = require("../src/fol.js");
-const {fill, unify, rewrite} = require("../src/unify.js");
+const {Forward, normalize, stringify, equals, explain, toString} = require("../../src/logic/forward.js");
+const {Parser, Rule} = require("../../src/logic/parser.js");
+const {Reasoner} = require("../../src/logic/fol.js");
+const {fill, unify, rewrite} = require("../../src/logic/unify.js");
 
 const {
  program, 

@@ -2,11 +2,10 @@
   "name": "logic",
   "version": "1.0.0",
   "description": "A series of studies in logic",
-  "main": "src/index.js",
   "scripts": {
-    "test": "mocha -w tests",
-    "english": "nearleyc src/english.ne -o src/english.js",
-    "logic": "pegjs src/logic.pegjs"
+    "test": "mocha -w tests/logic tests/drt",
+    "logic": "pegjs src/logic/logic.pegjs",
+    "drt": "nearleyc src/drt/english.ne -o src/drt/english.js"
   },
   "repository": {
     "type": "git",

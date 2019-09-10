@@ -1,8 +1,8 @@
 const Assert = require("assert");
-const {Forward, normalize, stringify, equals, explain, toString} = require("../src/forward.js");
-const {Parser, Rule} = require("../src/parser.js");
-const {Reasoner} = require("../src/fol.js");
-const {rewrite} = require("../src/unify.js");
+const {Forward, normalize, stringify, equals, explain, toString} = require("../../src/logic/forward.js");
+const {Parser, Rule} = require("../../src/logic/parser.js");
+const {Reasoner} = require("../../src/logic/fol.js");
+const {rewrite} = require("../../src/logic/unify.js");
 
 const {
   program, 
@@ -169,8 +169,8 @@ describe("First Order Logic", function() {
   
   it("a(x) => b(x), a(x) |= b(x)", function() {
     // modus ponens.
-    let {Backward} = require("../src/backward.js");
-    let {explain} = require("../src/forward.js");
+    let {Backward} = require("../../src/logic/backward.js");
+    let {explain} = require("../../src/logic/forward.js");
     let kb = Parser.parse("a(x) => b(x). a(x).");
     let result = new Backward(kb)
 	.backward(Rule.of("b(x)?"));
