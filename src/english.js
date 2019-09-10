@@ -449,6 +449,8 @@ function id(x) { return x[0]; }
     {"name": "N_num_sing_gen_nhum", "symbols": ["N_num_sing_gen_nhum$subexpression$2"], "postprocess": (args) => node("N", {"num":"sing","gen":"-hum"}, args)},
     {"name": "N_num_sing_gen_nhum$subexpression$3", "symbols": [/[hH]/, /[oO]/, /[rR]/, /[sS]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "N_num_sing_gen_nhum", "symbols": ["N_num_sing_gen_nhum$subexpression$3"], "postprocess": (args) => node("N", {"num":"sing","gen":"-hum"}, args)},
+    {"name": "N_num_sing_gen_nhum$subexpression$4", "symbols": [/[pP]/, /[oO]/, /[rR]/, /[sS]/, /[cC]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N_num_sing_gen_nhum", "symbols": ["N_num_sing_gen_nhum$subexpression$4"], "postprocess": (args) => node("N", {"num":"sing","gen":"-hum"}, args)},
     {"name": "N_num_plur_gen_male", "symbols": ["N_num_plur_gen_male", "__", "RC_num_plur_gen_male"], "postprocess": (args) => node("N", {"num":"plur","gen":"male"}, args)},
     {"name": "N_num_plur_gen_fem", "symbols": ["N_num_plur_gen_fem", "__", "RC_num_plur_gen_fem"], "postprocess": (args) => node("N", {"num":"plur","gen":"fem"}, args)},
     {"name": "N_num_plur_gen_nhum", "symbols": ["N_num_plur_gen_nhum", "__", "RC_num_plur_gen_nhum"], "postprocess": (args) => node("N", {"num":"plur","gen":"-hum"}, args)},

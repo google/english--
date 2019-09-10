@@ -417,7 +417,8 @@ N_num_sing_gen_nhum ->
   N_num_sing_gen_nhum __ RC_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "book"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "donkey"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
-  "horse"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %}
+  "horse"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
+  "porsche"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %}
 N_num_plur_gen_male -> 
   N_num_plur_gen_male __ RC_num_plur_gen_male {% (args) => node("N", {"num":"plur","gen":"male"}, args) %}
 N_num_plur_gen_fem -> 

@@ -423,7 +423,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse"');
+     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse" "porsche"');
     assertThat(print(result[i++]))
      .equalsTo('AUX[num=sing, fin=+] -> "does"');
     assertThat(print(result[i++]))
@@ -884,7 +884,7 @@ A ->
    }
   }
 
-  it("CRPN", function() {
+  it("CR.PN", function() {
     let node = first(parse("Mel loves Dani."), true);
     let rule = new CRPN();
     let [head, body] = rule.match(node);
@@ -934,7 +934,6 @@ A ->
    match(node, head) {
     let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
     let m1 = match(matcher1, node);
-
 
     if (m1) {
      let ref = this.find(m1.pronoun.types, head);
@@ -1003,6 +1002,54 @@ A ->
      assertThat(message).equalsTo("Invalid Reference");
     }
   });
+
+  class CRDET {
+   match(node) {
+    let matcher = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
+    let m = match(matcher, node.children[1].children[0]);
+
+    let head = [];
+    let body = [];
+
+    if (m && m.det.children[0] == "a") {
+     head.push(Referent("d"));
+     body.push(predicate(m.noun.children[0], [arg("d")]));
+     node.children[1].children[0].children[1] = Referent("d");
+    }
+
+    // assertThat(m.det.children[0]).equalsTo("a");
+    // assertThat(m.noun.children[0]).equalsTo("porsche");
+    return [head, body];
+   }
+  }
+
+  it("CR.DET", function() {
+    let node = first(parse("Jones owns a porsche."), true);
+
+    let rule = new CRDET();
+    
+    let [head, body] = rule.match(node);
+
+    // One new discourse referents introduced.
+    assertThat(head.length).equalsTo(1);
+    assertThat(head[0].name).equalsTo("d");
+
+    // Two new conditions added to the body.
+    assertThat(body.length).equalsTo(1);
+
+    // Noun predicates added.
+    assertThat(Forward.stringify(body[0])).equalsTo("porsche(d)");
+
+
+    // Before we compile, we have to pass through the 
+    // construction rules for the proper name too.
+    new CRPN().match(node);
+
+    // PNs rewritten.
+    let result = new Compiler().compile(node);
+
+    assertThat(Forward.stringify(result)).equalsTo("owns(u, d)");
+   });
 
   function assertThat(x) {
    return {

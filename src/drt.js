@@ -463,7 +463,7 @@ function grammar() {
  
  // LI 14
  result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
-                   [[literal("book")], [literal("donkey")], [literal("horse")]]));
+                  [[literal("book")], [literal("donkey")], [literal("horse")], [literal("porsche")]]));
  
  // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
  // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
