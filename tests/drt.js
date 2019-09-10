@@ -884,22 +884,31 @@ A ->
    }
   }
 
-  it("CR.PN", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Mel loves Dani.");
+  it("CRPN", function() {
+    let node = first(parse("Mel loves Dani."), true);
+    let rule = new CRPN();
+    let [head, body] = rule.match(node);
 
     // Two new discourse referents introduced.
-    assertThat(drs.head.length).equalsTo(2);
-    assertThat(drs.head[0].name).equalsTo("u");
-    assertThat(drs.head[1].name).equalsTo("v");
+    assertThat(head.length).equalsTo(2);
+    assertThat(head[0].name).equalsTo("u");
+    assertThat(head[1].name).equalsTo("v");
 
     // Two new conditions added to the body.
-    assertThat(drs.body.length).equalsTo(3);
+    assertThat(body.length).equalsTo(2);
 
-    // Proper names rewritten.
-    assertThat(Forward.stringify(drs.body[0])).equalsTo("loves(u, v)");
-    assertThat(Forward.stringify(drs.body[1])).equalsTo("Name(u, Mel)");
-    assertThat(Forward.stringify(drs.body[2])).equalsTo("Name(v, Dani)");
+    // Name predicates added.
+    assertThat(Forward.stringify(body[0])).equalsTo("Name(u, Mel)");
+    assertThat(Forward.stringify(body[1])).equalsTo("Name(v, Dani)");
+
+    // PNs rewritten.
+    let result = new Compiler().compile(node);
+    assertThat(Forward.stringify(result)).equalsTo("loves(u, v)");
+   });
+
+  it("Interpreter", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Mel loves Dani.");
 
     let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
 
@@ -954,6 +963,21 @@ A ->
     let interpreter = new Interpreter();
     let drs = interpreter.feed("Jones owns Ulysses.");
     let node = first(parse("It fascinates him."), true);
+    
+    let rule = new CRPRO();
+    rule.match(node, drs.head);
+
+    let result = new Compiler().compile(node);
+
+    assertThat(Forward.stringify(result))
+     .equalsTo("fascinates(v, u)");
+  });
+
+  it("CR.PRO", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Mel loves Dani.");
+
+    let node = first(parse("She fascinates him."), true);
     
     let rule = new CRPRO();
     rule.match(node, drs.head);
