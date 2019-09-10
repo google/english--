@@ -943,7 +943,7 @@ A ->
     if (m2) {
      let ref = this.find(m2.pronoun.types, head);
      if (!ref) {
-      throw new Error("Invalid reference");
+      throw new Error("Invalid Reference");
      }
      node.children[1].children[0].children[1] = ref;
     }
@@ -962,6 +962,22 @@ A ->
 
     assertThat(Forward.stringify(result))
      .equalsTo("fascinates(v, u)");
+  });
+
+  it("CR.PRO invalid reference", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Jones owns Ulysses.");
+    let node = first(parse("It fascinates her."), true);
+    
+    let rule = new CRPRO();
+    try {
+     // Ulysses is a -hum and Jones is male, so
+     // the pronoun "her" should fail.
+     rule.match(node, drs.head);
+     throw new Error();
+    } catch ({message}) {
+     assertThat(message).equalsTo("Invalid Reference");
+    }
   });
 
   function assertThat(x) {
