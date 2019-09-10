@@ -288,18 +288,29 @@ describe("DRT construction", function() {
 
   class CRID {
    match(node) {
-    let matcher = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
-    let m = match(matcher, node);
-
     let head = [];
     let body = [];
 
-    if (m && m.det.children[0] == "a") {
+    let matcher1 = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
+    let m1 = match(matcher1, node);
+
+    if (m1 && m1.det.children[0] == "a") {
      head.push(Referent("d"));
-     let n = clone(m.noun);
+     let n = clone(m1.noun);
      n.ref = Referent("d");
      body.push(n);
      node.children[1] = Referent("d");
+    }
+
+    let matcher2 = S(NP(DET(capture("det")), N(capture("noun"))), VP_());
+    let m2 = match(matcher2, node);
+
+    if (m2 && m2.det.children[0].toLowerCase() == "a") {
+     head.push(Referent("d"));
+     let n = clone(m2.noun);
+     n.ref = Referent("d");
+     body.push(n);
+     node.children[0] = Referent("d");
     }
 
     return [head, body];
@@ -364,6 +375,25 @@ describe("DRT construction", function() {
     assertThat(Forward.stringify(result)).equalsTo("owns(u, d)");
    });
 
+  it("CR.ID", function() {
+    let node = first(parse("A man likes Jones."), true);
+
+    let rule = new CRID();
+    
+    let [head, [id]] = rule.match(node);
+
+    assertThat(transcribe(node)).equalsTo("d likes Jones");
+
+    new CRLIN().match(id);
+
+    assertThat(Forward.stringify(id)).equalsTo("man(d)");
+
+    new CRPN().match(node);
+
+    assertThat(transcribe(node)).equalsTo("d likes v");
+  });
+
+
   class Override {
    static assign(a, b) {
      for (let key in a) {
@@ -387,7 +417,16 @@ describe("DRT construction", function() {
 
      let s = rc.children[1];
      // Binds gap to the referent.
-     s.children[1].children[0].children[1] = node.ref;
+     let object = s.children[1].children[0].children[1];
+     if (object.children[0]["@type"] == "GAP") {
+      Override.assign(object, node.ref);
+     }
+
+     let subject = s.children[0];
+     if (subject.children[0]["@type"] == "GAP") {
+      Override.assign(subject, node.ref);
+     }
+
      // console.log(JSON.stringify(s, undefined, 2));
 
      body.push(s);
@@ -473,8 +512,28 @@ describe("DRT construction", function() {
      .equalsTo("owns(u, d)");
    });
 
-  it.skip("CR.NRC", function() {
-    let node = first(parse("Jones who likes Smith owns a book."), true);
+  it("CR.NRC", function() {
+    let node = first(parse("A man who likes Smith owns a book."), true);
+
+    let [d, [id]] = new CRID().match(node);
+
+    assertThat(transcribe(node)).equalsTo("d owns a book");
+    assertThat(transcribe(id)).equalsTo("man who likes Smith");
+    assertThat(id.ref.name).equalsTo("d");
+
+    let [b, [rc]] = new CRNRC().match(id);
+
+    assertThat(transcribe(id)).equalsTo("man");
+    assertThat(transcribe(rc)).equalsTo("d likes Smith");
+
+    new CRPN().match(rc);
+
+    assertThat(transcribe(rc)).equalsTo("d likes v");
+
+    new CRID().match(node.children[1].children[0]);
+
+    // TODO(goto): introduce newly minted variables
+    assertThat(transcribe(node)).equalsTo("d owns d");
   });
 
   class Interpreter {
