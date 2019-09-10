@@ -43,7 +43,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe("DRT construction", function() {
+describe.only("DRT construction", function() {
 
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
@@ -412,7 +412,6 @@ describe("DRT construction", function() {
     let body = [];
 
     if (m) {
-     // console.log("hi");
      let rc = node.children.pop();
 
      let s = rc.children[1];
@@ -427,18 +426,11 @@ describe("DRT construction", function() {
       Override.assign(subject, node.ref);
      }
 
-     // console.log(JSON.stringify(s, undefined, 2));
-
      body.push(s);
 
      let noun = node.children.pop();
      noun.ref = node.ref;
      Override.assign(node, noun);
-
-     // console.log(m.rc);
-     // head.push(Referent("d"));
-     // body.push(predicate(m.noun.children[0], [arg("d")]));
-     // node.children[1].children[0].children[1] = Referent("d");
     }
 
     return [head, body];
@@ -452,9 +444,7 @@ describe("DRT construction", function() {
     return node.name;
    }
    let result = [];
-   // console.log(node);
    for (let child of node.children || []) {
-    // console.log(child);
     result.push(transcribe(child));
    }
    return result.join(" ").trim();
@@ -463,40 +453,26 @@ describe("DRT construction", function() {
   it("CR.NRC", function() {
     let node = first(parse("Jones owns a book which Smith likes."), true);
 
-    // Breaks into:
-    // - Jones(u)
-    // - u owns a book which Smith likes.
     let [h, [jones]] = new CRPN().match(node);
     assertThat(Forward.stringify(jones))
      .equalsTo("Name(u, Jones)");
     assertThat(transcribe(node))
      .equalsTo("u owns a book which Smith likes");
 
-    // Breaks into:
-    // - Jones(u)
-    // - u owns d
-    // - N(d) => a book which Smith likes
     let [ref, [id]] = new CRID().match(node.children[1].children[0]);
     assertThat(transcribe(node)).equalsTo("u owns d");
     assertThat(transcribe(id)).equalsTo("book which Smith likes");
 
     let rule = new CRNRC();
 
-    // Breaks "a book which Smith likes" into:
-    //   - N(d) => a book
-    //   - Smith likes d.
     let [head, [rc]] = rule.match(id);
     assertThat(transcribe(id)).equalsTo("book");
     assertThat(transcribe(rc)).equalsTo("Smith likes d");
 
-    // Breaks N(d) => a book into:
-    //   - book(d)
     new CRLIN().match(id);
 
-    // Noun predicates added.
     assertThat(Forward.stringify(id)).equalsTo("book(d)");
 
-    // One new discourse referents introduced.
     assertThat(head.length).equalsTo(0);
 
     let [h2, [smith]] = new CRPN().match(rc);
