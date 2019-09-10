@@ -512,48 +512,80 @@ describe("DRT construction", function() {
     assertThat(transcribe(node)).equalsTo("d owns d");
   });
 
-  it("construction", function() {
-    let node = first(parse("Mel loves Dani."), true);
+  class DRS {
+   constructor() {
+    this.head = [];
+    this.body = [];
+   }
 
-    let rules = [new CRPN()];
-
-    let result = [[], []];
+   feed(node) {
+    let rules = [new CRPN(), new CRID()];
 
     for (let rule of rules) {
      let [head, body] = rule.match(node);
-     result[0].push(...head);
-     result[1].push(...body);
+     this.head.push(...head);
+     this.body.push(...body);
+    }
+   }
+
+   serialize() {
+    let result = [];
+    let refs = [];
+    for (let ref of this.head) {
+     refs.push(`${ref.name}`);
     }
 
-    let serialize = ([head, body]) => {
-     let result = [];
-     let refs = [];
-     for (let ref of head) {
-      refs.push(`${ref.name}`);
-     }
+    result.push(refs.join(", "));
+    result.push("");
 
-     result.push(refs.join(", "));
+    for (let cond of this.body) {
+     result.push(transcribe(cond));
+    }
 
-     result.push("");
+    return result.join("\n");
+   }
+  }
 
-     for (let cond of body) {
-      // console.log(cond);
-      result.push(transcribe(cond));
-     }
+  it("DRS: CRPN", function() {
+    let node = first(parse("Mel loves Dani."), true);
+    let drs = new DRS();
+    drs.feed(node);
 
-     return result.join("\n");
-    };
-
-    let trim = (str) => str.trim().split("\n").map(line => line.trim()).join("\n");
-
-    assertThat(serialize(result))
-     .equalsTo(trim(`
+    assertThat(drs)
+     .equalsTo(`
        u, v
 
        Mel(u)
        Dani(v)
-     `));
+     `);
+  });
 
+  it("DRS: CRID", function() {
+    let node = first(parse("A man loves Dani."), true);
+    let drs = new DRS();
+    drs.feed(node);
+
+    assertThat(drs)
+     .equalsTo(`
+       v, d
+
+       Dani(v)
+       man(d)
+     `);
+  });
+
+  it.skip("DRS: CRID", function() {
+    let node = first(parse("Dani loves a man."), true);
+    let drs = new DRS();
+    drs.feed(node);
+
+    assertThat(drs)
+     .equalsTo(`
+       u, d
+
+       Dani(u)
+       man(d)
+     `);
   });
 
   class Interpreter {
@@ -590,9 +622,17 @@ describe("DRT construction", function() {
     `)));
   });
 
+  let trim = (str) => str.trim().split("\n").map(line => line.trim()).join("\n");
+
   function assertThat(x) {
    return {
     equalsTo(y) {
+
+     if (x instanceof DRS) {
+      assertThat(x.serialize()).equalsTo(trim(y));
+      return;
+     }
+
      Assert.deepEqual(x, y);
     }
    }
