@@ -916,33 +916,47 @@ A ->
     `)));
   });
 
-  it("CR.PRO", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Jones owns Ulysses.");
-    
-    let node = first(parse("It fascinates him."), true);
-    
+  class CRPRO {
+   find({gen, num}, head) {
+    return head.find((ref) => {
+      return ref.types.gen == gen && ref.types.num == num
+     });
+   }
+   match(node, head) {
     let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
     let m1 = match(matcher1, node);
-    assertThat(m1.pronoun.children[0]).equalsTo("It");
-    assertThat(m1.pronoun.types)
-     .equalsTo({"case": "+nom", "gen": "-hum", "num": "sing"});
-    assertThat(drs.head[1].types).equalsTo({"gen": "-hum", "num": "sing"});
 
-    // The types of head[1] agree with the types of the pronoun,
-    // so bind it to it.
-    node.children[0] = drs.head[1];
+
+    if (m1) {
+     let ref = this.find(m1.pronoun.types, head);
+     if (!ref) {
+      throw new Error("Invalid reference");
+     }
+     node.children[0] = ref;
+    }
 
     let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
     let m2 = match(matcher2, node.children[1].children[0]);
-    assertThat(m2.pronoun.children[0]).equalsTo("him");
-    assertThat(m2.pronoun.types)
-     .equalsTo({"case": "-nom", "gen": "male", "num": "sing"});
-    assertThat(drs.head[0].types).equalsTo({"gen": "male", "num": "sing"});
 
     // The types of head[2] agree with the types of the pronoun,
     // so bind it to it.
-    node.children[1].children[0].children[1] = drs.head[0];
+    if (m2) {
+     let ref = this.find(m2.pronoun.types, head);
+     if (!ref) {
+      throw new Error("Invalid reference");
+     }
+     node.children[1].children[0].children[1] = ref;
+    }
+   }
+  }
+
+  it("CR.PRO", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Jones owns Ulysses.");
+    let node = first(parse("It fascinates him."), true);
+    
+    let rule = new CRPRO();
+    rule.match(node, drs.head);
 
     let result = new Compiler().compile(node);
 
