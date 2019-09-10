@@ -43,7 +43,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe.only("DRT construction", function() {
+describe("DRT construction", function() {
 
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
@@ -139,17 +139,23 @@ describe.only("DRT construction", function() {
     let m1 = match(matcher1, node);
     if (m1) {
      let name = m1.name.children[0];
-     result[0].push(Referent("u", m1.name.types));
-     result[1].push(predicate("Name", [arg("u"), arg(name)]));
-     node.children[0] = Referent("u");
+     let ref = Referent("u", m1.name.types);
+     result[0].push(ref);
+     let pn = clone(m1.name);
+     pn.ref = ref;
+     result[1].push(pn);
+     node.children[0] = ref;
     }
 
     let m2 = match(matcher2, node.children[1].children[0]);
     if (m2) {
      let name = m2.name.children[0];
-     result[0].push(Referent("v", m2.name.types));
-     result[1].push(predicate("Name", [arg("v"), arg(name)]));
-     node.children[1].children[0].children[1] = Referent("v");
+     let ref = Referent("v", m2.name.types);
+     result[0].push(ref);
+     let pn = clone(m2.name);
+     pn.ref = ref;
+     result[1].push(pn);
+     node.children[1].children[0].children[1] = ref;
     }
 
     return result;
@@ -205,8 +211,8 @@ describe.only("DRT construction", function() {
     assertThat(body.length).equalsTo(2);
 
     // Name predicates added.
-    assertThat(Forward.stringify(body[0])).equalsTo("Name(u, Mel)");
-    assertThat(Forward.stringify(body[1])).equalsTo("Name(v, Dani)");
+    assertThat(transcribe(body[0])).equalsTo("Mel(u)");
+    assertThat(transcribe(body[1])).equalsTo("Dani(v)");
 
     // PNs rewritten.
     assertThat(transcribe(node)).equalsTo("u loves v");
@@ -325,6 +331,8 @@ describe.only("DRT construction", function() {
     let head = [];
     let body = [];
 
+    return [head, body];
+
     if (m && 
         m.noun.ref && 
         m.noun.children.length == 1 &&
@@ -357,22 +365,17 @@ describe.only("DRT construction", function() {
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
-    assertThat(transcribe(body[0])).equalsTo("porsche");
+    assertThat(transcribe(body[0])).equalsTo("porsche(d)");
 
     // Noun predicates added.
     new CRLIN().match(body[0]);
-    assertThat(Forward.stringify(body[0])).equalsTo("porsche(d)");
+    assertThat(transcribe(body[0])).equalsTo("porsche(d)");
 
     // Before we compile, we have to pass through the 
     // construction rules for the proper name too.
     new CRPN().match(node);
 
     assertThat(transcribe(node)).equalsTo("u owns d");
-
-    // PNs rewritten.
-    let result = new Compiler().compile(node);
-
-    assertThat(Forward.stringify(result)).equalsTo("owns(u, d)");
    });
 
   it("CR.ID", function() {
@@ -386,7 +389,7 @@ describe.only("DRT construction", function() {
 
     new CRLIN().match(id);
 
-    assertThat(Forward.stringify(id)).equalsTo("man(d)");
+    assertThat(transcribe(id)).equalsTo("man(d)");
 
     new CRPN().match(node);
 
@@ -447,45 +450,42 @@ describe.only("DRT construction", function() {
    for (let child of node.children || []) {
     result.push(transcribe(child));
    }
-   return result.join(" ").trim();
+   let suffix = node.ref ? `(${node.ref.name})` : "";
+   return result.join(" ").trim() + suffix;
   }
 
   it("CR.NRC", function() {
     let node = first(parse("Jones owns a book which Smith likes."), true);
 
     let [h, [jones]] = new CRPN().match(node);
-    assertThat(Forward.stringify(jones))
-     .equalsTo("Name(u, Jones)");
+    assertThat(transcribe(jones))
+     .equalsTo("Jones(u)");
     assertThat(transcribe(node))
      .equalsTo("u owns a book which Smith likes");
 
     let [ref, [id]] = new CRID().match(node.children[1].children[0]);
     assertThat(transcribe(node)).equalsTo("u owns d");
-    assertThat(transcribe(id)).equalsTo("book which Smith likes");
+    assertThat(transcribe(id)).equalsTo("book which Smith likes(d)");
 
     let rule = new CRNRC();
 
     let [head, [rc]] = rule.match(id);
-    assertThat(transcribe(id)).equalsTo("book");
+    assertThat(transcribe(id)).equalsTo("book(d)");
     assertThat(transcribe(rc)).equalsTo("Smith likes d");
 
     new CRLIN().match(id);
 
-    assertThat(Forward.stringify(id)).equalsTo("book(d)");
+    assertThat(transcribe(id)).equalsTo("book(d)");
 
     assertThat(head.length).equalsTo(0);
 
     let [h2, [smith]] = new CRPN().match(rc);
     assertThat(transcribe(rc)).equalsTo("u likes d");
-    assertThat(Forward.stringify(smith)).equalsTo("Name(u, Smith)");
-
-    assertThat(Forward.stringify(new Compiler().compile(rc)))
-     .equalsTo("likes(u, d)");
+    assertThat(transcribe(smith)).equalsTo("Smith(u)");
     
     new CRPN().match(node);
 
-    assertThat(Forward.stringify(new Compiler().compile(node)))
-     .equalsTo("owns(u, d)");
+    assertThat(transcribe(node)).equalsTo("u owns d");
    });
 
   it("CR.NRC", function() {
@@ -494,12 +494,12 @@ describe.only("DRT construction", function() {
     let [d, [id]] = new CRID().match(node);
 
     assertThat(transcribe(node)).equalsTo("d owns a book");
-    assertThat(transcribe(id)).equalsTo("man who likes Smith");
+    assertThat(transcribe(id)).equalsTo("man who likes Smith(d)");
     assertThat(id.ref.name).equalsTo("d");
 
     let [b, [rc]] = new CRNRC().match(id);
 
-    assertThat(transcribe(id)).equalsTo("man");
+    assertThat(transcribe(id)).equalsTo("man(d)");
     assertThat(transcribe(rc)).equalsTo("d likes Smith");
 
     new CRPN().match(rc);
@@ -510,6 +510,50 @@ describe.only("DRT construction", function() {
 
     // TODO(goto): introduce newly minted variables
     assertThat(transcribe(node)).equalsTo("d owns d");
+  });
+
+  it("construction", function() {
+    let node = first(parse("Mel loves Dani."), true);
+
+    let rules = [new CRPN()];
+
+    let result = [[], []];
+
+    for (let rule of rules) {
+     let [head, body] = rule.match(node);
+     result[0].push(...head);
+     result[1].push(...body);
+    }
+
+    let serialize = ([head, body]) => {
+     let result = [];
+     let refs = [];
+     for (let ref of head) {
+      refs.push(`${ref.name}`);
+     }
+
+     result.push(refs.join(", "));
+
+     result.push("");
+
+     for (let cond of body) {
+      // console.log(cond);
+      result.push(transcribe(cond));
+     }
+
+     return result.join("\n");
+    };
+
+    let trim = (str) => str.trim().split("\n").map(line => line.trim()).join("\n");
+
+    assertThat(serialize(result))
+     .equalsTo(trim(`
+       u, v
+
+       Mel(u)
+       Dani(v)
+     `));
+
   });
 
   class Interpreter {
@@ -527,7 +571,7 @@ describe.only("DRT construction", function() {
    }
   }
 
-  it("Interpreter", function() {
+  it.skip("Interpreter", function() {
     let interpreter = new Interpreter();
     let drs = interpreter.feed("Mel loves Dani.");
 
