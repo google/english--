@@ -606,6 +606,10 @@ A ->
     assertThat("A stockbroker who do not love her surprises him.").failsAt(20, " ");
   });
 
+  it.skip("debug", function() {
+    parse("Anna who likes Mel loves him.");
+   });
+
   it("debug", function() {
     parse("Anna loves a man who loves her.");
     parse("Every book which she loves surprises him.");

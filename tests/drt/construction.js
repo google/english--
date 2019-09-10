@@ -473,6 +473,10 @@ describe("DRT construction", function() {
      .equalsTo("owns(u, d)");
    });
 
+  it.skip("CR.NRC", function() {
+    let node = first(parse("Jones who likes Smith owns a book."), true);
+  });
+
   class Interpreter {
    constructor() {
     this.drs = {head: [], body: []};
