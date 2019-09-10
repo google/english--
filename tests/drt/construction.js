@@ -45,7 +45,7 @@ const {
 
 describe("DRT construction", function() {
 
-  it("keeps types", function() {
+  it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
     let subject = S(NP(capture("mel")), VP_());
     assertThat(match(subject, s).mel.types)
@@ -191,21 +191,6 @@ describe("DRT construction", function() {
    }
   }
 
-  class Interpreter {
-   constructor() {
-    this.drs = {head: [], body: []};
-   }
-   feed(s) {
-    this.drs.body.push(first(parse(s), true));
-    construct(this.drs);
-    return this.drs;
-   }
-   ask(s) {
-    return new Reasoner(rewrite(program(this.drs.body)))
-     .go(rewrite(Logic.Rule.of(s)));
-   }
-  }
-
   it("CR.PN", function() {
     let node = first(parse("Mel loves Dani."), true);
     let rule = new CRPN();
@@ -226,25 +211,6 @@ describe("DRT construction", function() {
     // PNs rewritten.
     assertThat(transcribe(node)).equalsTo("u loves v");
    });
-
-  it("Interpreter", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Mel loves Dani.");
-
-    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
-
-    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
-     .equalsTo(Forward.toString(Logic.Parser.parse(`
-    Name(u, Mel).
-    exists (p = u) exists (q) exists (r) Name(p, Mel).
-    loves(u, v).
-    exists (p = u) exists (q = v) exists (r) loves(u, q).
-    Name(v, Dani).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
-    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
-    `)));
-  });
 
   class CRPRO {
    find({gen, num}, head) {
@@ -303,7 +269,7 @@ describe("DRT construction", function() {
     assertThat(transcribe(node)).equalsTo("v fascinates u");
   });
 
-  it("CR.PRO invalid reference", function() {
+  it("CR.PRO", function() {
     let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates her."), true);
 
@@ -506,6 +472,40 @@ describe("DRT construction", function() {
     assertThat(Forward.stringify(new Compiler().compile(node)))
      .equalsTo("owns(u, d)");
    });
+
+  class Interpreter {
+   constructor() {
+    this.drs = {head: [], body: []};
+   }
+   feed(s) {
+    this.drs.body.push(first(parse(s), true));
+    construct(this.drs);
+    return this.drs;
+   }
+   ask(s) {
+    return new Reasoner(rewrite(program(this.drs.body)))
+     .go(rewrite(Logic.Rule.of(s)));
+   }
+  }
+
+  it("Interpreter", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Mel loves Dani.");
+
+    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
+
+    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
+     .equalsTo(Forward.toString(Logic.Parser.parse(`
+    Name(u, Mel).
+    exists (p = u) exists (q) exists (r) Name(p, Mel).
+    loves(u, v).
+    exists (p = u) exists (q = v) exists (r) loves(u, q).
+    Name(v, Dani).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
+    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
+    `)));
+  });
 
   function assertThat(x) {
    return {
