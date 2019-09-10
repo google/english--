@@ -336,7 +336,7 @@ A ->
     let result = grammar();
 
     const fs = require("fs");
-    fs.writeFileSync("./src/english.ne", compile(clone(result)));
+    fs.writeFileSync("./src/drt/english.ne", compile(clone(result)));
   });
 
   it("grammar", function() {
