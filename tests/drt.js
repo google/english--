@@ -1006,7 +1006,7 @@ A ->
   class CRID {
    match(node) {
     let matcher = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
-    let m = match(matcher, node.children[1].children[0]);
+    let m = match(matcher, node);
 
     let head = [];
     let body = [];
@@ -1015,9 +1015,8 @@ A ->
      head.push(Referent("d"));
      let n = clone(m.noun);
      n.ref = Referent("d");
-     // console.log(n);
      body.push(n);
-     node.children[1].children[0].children[1] = Referent("d");
+     node.children[1] = Referent("d");
     }
 
     return [head, body];
@@ -1054,7 +1053,9 @@ A ->
 
     let rule = new CRID();
     
-    let [head, body] = rule.match(node);
+    let [head, body] = rule.match(node.children[1].children[0]);
+
+    assertThat(transcribe(node)).equalsTo("Jones owns d");
 
     // One new discourse referents introduced.
     assertThat(head.length).equalsTo(1);
@@ -1062,6 +1063,7 @@ A ->
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
+    assertThat(transcribe(body[0])).equalsTo("porsche");
 
     // Noun predicates added.
     new CRLIN().match(body[0]);
@@ -1070,6 +1072,8 @@ A ->
     // Before we compile, we have to pass through the 
     // construction rules for the proper name too.
     new CRPN().match(node);
+
+    assertThat(transcribe(node)).equalsTo("u owns d");
 
     // PNs rewritten.
     let result = new Compiler().compile(node);
@@ -1150,7 +1154,7 @@ A ->
     // - Jones(u)
     // - u owns d
     // - N(d) => a book which Smith likes
-    let [ref, [id]] = new CRID().match(node);
+    let [ref, [id]] = new CRID().match(node.children[1].children[0]);
     assertThat(transcribe(node)).equalsTo("u owns d");
     assertThat(transcribe(id)).equalsTo("book which Smith likes");
 
