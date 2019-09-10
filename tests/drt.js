@@ -902,8 +902,7 @@ A ->
     assertThat(Forward.stringify(body[1])).equalsTo("Name(v, Dani)");
 
     // PNs rewritten.
-    let result = new Compiler().compile(node);
-    assertThat(Forward.stringify(result)).equalsTo("loves(u, v)");
+    assertThat(transcribe(node)).equalsTo("u loves v");
    });
 
   it("Interpreter", function() {
@@ -959,44 +958,40 @@ A ->
   }
 
   it("CR.PRO", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Jones owns Ulysses.");
+    let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates him."), true);
     
+    let [head, body] = new CRPN().match(sentence);
+
     let rule = new CRPRO();
-    rule.match(node, drs.head);
+    rule.match(node, head);
 
-    let result = new Compiler().compile(node);
-
-    assertThat(Forward.stringify(result))
-     .equalsTo("fascinates(v, u)");
+    assertThat(transcribe(node)).equalsTo("v fascinates u");
   });
 
   it("CR.PRO", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Mel loves Dani.");
-
+    let sentence = first(parse("Mel loves Dani."), true);
     let node = first(parse("She fascinates him."), true);
     
+    let [head, body] = new CRPN().match(sentence);
+
     let rule = new CRPRO();
-    rule.match(node, drs.head);
+    rule.match(node, head);
 
-    let result = new Compiler().compile(node);
-
-    assertThat(Forward.stringify(result))
-     .equalsTo("fascinates(v, u)");
+    assertThat(transcribe(node)).equalsTo("v fascinates u");
   });
 
   it("CR.PRO invalid reference", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Jones owns Ulysses.");
+    let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates her."), true);
+
+    let [head, body] = new CRPN().match(sentence);
     
     let rule = new CRPRO();
     try {
      // Ulysses is a -hum and Jones is male, so
      // the pronoun "her" should fail.
-     rule.match(node, drs.head);
+     rule.match(node, head);
      throw new Error();
     } catch ({message}) {
      assertThat(message).equalsTo("Invalid Reference");
