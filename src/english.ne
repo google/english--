@@ -471,7 +471,8 @@ PN_num_sing_gen_male ->
   "John"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "Mel"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "Leo"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
-  "Yuji"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+  "Yuji"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "Smith"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
 PN_num_sing_gen_fem -> 
   "Mary"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
   "Dani"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
@@ -502,10 +503,12 @@ V_num_plur_fin_n_trans_p ->
   "surprise"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %}
 V_num_sing_fin_n_trans_n -> 
   "love"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %} |
-  "stink"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %}
+  "stink"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %} |
+  "adore"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"-"}, args) %}
 V_num_plur_fin_n_trans_n -> 
   "love"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
-  "stink"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
+  "stink"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
+  "adore"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
 V_num_sing_fin_p_trans_p -> 
   "likes"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "loves"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
@@ -516,7 +519,8 @@ V_num_sing_fin_p_trans_p ->
   "surprises"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %}
 V_num_sing_fin_p_trans_n -> 
   "loves"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
-  "stinks"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
+  "stinks"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %} |
+  "adores"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"-"}, args) %}
 V_num_plur_fin_p_trans_p -> 
   "like"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "love"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
@@ -527,7 +531,8 @@ V_num_plur_fin_p_trans_p ->
   "surprise"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %}
 V_num_plur_fin_p_trans_n -> 
   "love"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
-  "stink"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
+  "stink"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %} |
+  "adore"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"-"}, args) %}
 RPRO_num_sing_gen_male -> 
   "who"i {% (args) => node("RPRO", {"num":"sing","gen":"male"}, args) %}
 RPRO_num_sing_gen_fem -> 

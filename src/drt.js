@@ -443,7 +443,7 @@ function grammar() {
  
  // LI 9
  result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
-                   [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")]]));
+                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")]]));
  
  // LI 10
  result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
@@ -479,7 +479,7 @@ function grammar() {
  
  // Verbs in their inifinitive form.
  const transitive = ["like", "love", "know", "own", "fascinate", "rotate", "surprise"];
- const intransitive = ["love", "stink"];
+ const intransitive = ["love", "stink", "adore"];
  
  // LI 17
  result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),

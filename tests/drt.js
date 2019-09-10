@@ -413,7 +413,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji"');
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith"');
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
@@ -431,15 +431,15 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink" "adore"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing, fin=+, trans=+] -> "likes" "loves" "knows" "owns" "fascinates" "rotates" "surprises"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=-] -> "loves" "stinks"');
+     .equalsTo('V[num=sing, fin=+, trans=-] -> "loves" "stinks" "adores"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=plur, fin=+, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink"');
+     .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink" "adore"');
     assertThat(print(result[i++]))
      .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"');
     assertThat(print(result[i++]))
@@ -797,7 +797,7 @@ A ->
     assertThat(match(m2, s)).equalsTo({name: PN("Dani")});
    });
 
-  let Referent = (name, types, children = []) => { return { 
+  let Referent = (name, types = {}, children = []) => { return { 
     "@type": "Referent", 
     "name": name, 
     "types": types, 
@@ -1003,7 +1003,7 @@ A ->
     }
   });
 
-  class CRDET {
+  class CRID {
    match(node) {
     let matcher = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
     let m = match(matcher, node.children[1].children[0]);
@@ -1013,20 +1013,46 @@ A ->
 
     if (m && m.det.children[0] == "a") {
      head.push(Referent("d"));
-     body.push(predicate(m.noun.children[0], [arg("d")]));
+     let n = clone(m.noun);
+     n.ref = Referent("d");
+     // console.log(n);
+     body.push(n);
      node.children[1].children[0].children[1] = Referent("d");
     }
 
-    // assertThat(m.det.children[0]).equalsTo("a");
-    // assertThat(m.noun.children[0]).equalsTo("porsche");
     return [head, body];
    }
   }
 
-  it("CR.DET", function() {
+  class CRLIN {
+   match(node) {
+    let matcher = N(capture("noun"));
+    let m = match(matcher, node);
+
+    let head = [];
+    let body = [];
+
+    if (m && 
+        m.noun.ref && 
+        m.noun.children.length == 1 &&
+        typeof m.noun.children[0] == "string") {
+     let name = m.noun.children[0];
+     let ref = m.noun.ref.name;
+
+     for (let key in node) {
+      delete node[key];
+     }
+     Override.assign(node, predicate(name, [arg(ref)]));
+    }
+
+    return [head, body];
+   }
+  }
+
+  it("CR.ID", function() {
     let node = first(parse("Jones owns a porsche."), true);
 
-    let rule = new CRDET();
+    let rule = new CRID();
     
     let [head, body] = rule.match(node);
 
@@ -1038,8 +1064,8 @@ A ->
     assertThat(body.length).equalsTo(1);
 
     // Noun predicates added.
+    new CRLIN().match(body[0]);
     assertThat(Forward.stringify(body[0])).equalsTo("porsche(d)");
-
 
     // Before we compile, we have to pass through the 
     // construction rules for the proper name too.
@@ -1049,6 +1075,115 @@ A ->
     let result = new Compiler().compile(node);
 
     assertThat(Forward.stringify(result)).equalsTo("owns(u, d)");
+   });
+
+  class Override {
+   static assign(a, b) {
+     for (let key in a) {
+      delete a[key];
+     }
+     Object.assign(a, b);
+   }
+  }
+
+  class CRNRC {
+   match(node) {
+    let matcher = N(N(), RC(capture("rc")));
+    let m = match(matcher, node);
+
+    let head = [];
+    let body = [];
+
+    if (m) {
+     // console.log("hi");
+     let rc = node.children.pop();
+
+     let s = rc.children[1];
+     // Binds gap to the referent.
+     s.children[1].children[0].children[1] = node.ref;
+     // console.log(JSON.stringify(s, undefined, 2));
+
+     body.push(s);
+
+     let noun = node.children.pop();
+     noun.ref = node.ref;
+     Override.assign(node, noun);
+
+     // console.log(m.rc);
+     // head.push(Referent("d"));
+     // body.push(predicate(m.noun.children[0], [arg("d")]));
+     // node.children[1].children[0].children[1] = Referent("d");
+    }
+
+    return [head, body];
+   }
+  }
+
+  function transcribe(node) {
+   if (typeof node == "string") {
+    return node;
+   } else if (node["@type"] == "Referent") {
+    return node.name;
+   }
+   let result = [];
+   // console.log(node);
+   for (let child of node.children || []) {
+    // console.log(child);
+    result.push(transcribe(child));
+   }
+   return result.join(" ").trim();
+  }
+
+  it("CR.NRC", function() {
+    let node = first(parse("Jones owns a book which Smith likes."), true);
+
+    // Breaks into:
+    // - Jones(u)
+    // - u owns a book which Smith likes.
+    let [h, [jones]] = new CRPN().match(node);
+    assertThat(Forward.stringify(jones))
+     .equalsTo("Name(u, Jones)");
+    assertThat(transcribe(node))
+     .equalsTo("u owns a book which Smith likes");
+
+    // Breaks into:
+    // - Jones(u)
+    // - u owns d
+    // - N(d) => a book which Smith likes
+    let [ref, [id]] = new CRID().match(node);
+    assertThat(transcribe(node)).equalsTo("u owns d");
+    assertThat(transcribe(id)).equalsTo("book which Smith likes");
+
+    let rule = new CRNRC();
+
+    // Breaks "a book which Smith likes" into:
+    //   - N(d) => a book
+    //   - Smith likes d.
+    let [head, [rc]] = rule.match(id);
+    assertThat(transcribe(id)).equalsTo("book");
+    assertThat(transcribe(rc)).equalsTo("Smith likes d");
+
+    // Breaks N(d) => a book into:
+    //   - book(d)
+    new CRLIN().match(id);
+
+    // Noun predicates added.
+    assertThat(Forward.stringify(id)).equalsTo("book(d)");
+
+    // One new discourse referents introduced.
+    assertThat(head.length).equalsTo(0);
+
+    let [h2, [smith]] = new CRPN().match(rc);
+    assertThat(transcribe(rc)).equalsTo("u likes d");
+    assertThat(Forward.stringify(smith)).equalsTo("Name(u, Smith)");
+
+    assertThat(Forward.stringify(new Compiler().compile(rc)))
+     .equalsTo("likes(u, d)");
+    
+    new CRPN().match(node);
+
+    assertThat(Forward.stringify(new Compiler().compile(node)))
+     .equalsTo("owns(u, d)");
    });
 
   function assertThat(x) {
