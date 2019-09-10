@@ -725,11 +725,11 @@ A ->
 
   it("keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
-    let subject = S(capture("NP", "mel"), VP_(capture("?")));
+    let subject = S(NP(capture("mel")), VP_());
     assertThat(match(subject, s).mel.types)
      .equalsTo({
        "gen": "male", "num": "sing", "case": "+nom", "gap": "-"});
-    let object = S(capture("?"), VP_(VP(V(capture("?")), capture("NP", "object"))));
+    let object = S(NP(), VP_(VP(V(), NP(capture("object")))));
     assertThat(match(object, s).object["@type"]).equalsTo("NP");
     assertThat(match(object, s).object.types)
      .equalsTo({
@@ -762,32 +762,27 @@ A ->
      .equalsTo("A stockbroker who does not love her surprises him");
   });
 
-  let capture = (type, name) => { return {"@type": "Match", "type": type, "name": name} };
+  let capture = (name) => { return {"@type": "Match", "name": name} };
   
   function match(a, b) {
-   if (a["@type"] == "Match") {
-    if (a.type == "?") {
-     return {};
-    } else if (a.type == b["@type"]) {
-     return {[a.name]: b};
-    } else {
-     return false;
-    }
-   }
-
-   if (typeof a != typeof b || 
-              a["@type"] != b["@type"] || 
-              a.children.length != b.children.length) {
+   if (a["@type"] != b["@type"]) {
     return false;
    }
 
    let result = {};
 
    for (let i = 0; i < a.children.length; i++) {
+    if (a.children[i]["@type"] == "Match") {
+     // console.log(`match ${a.children[i].name}`);
+     result[a.children[i].name] = b;
+     continue;
+    }
+
     let capture = match(a.children[i], b.children[i]);
     if (!capture) {
      return false;
     }
+
     result = Object.assign(result, capture);
    }
 
@@ -796,35 +791,41 @@ A ->
 
   it("match", function() {
     let s = first(parse("Mel loves Dani."));
-    let m1 = S(NP(capture("PN", "name")), VP_(capture("?")));
+    let m1 = S(NP(PN(capture("name"))), VP_());
     assertThat(match(m1, s)).equalsTo({name: PN("Mel")});
-    let m2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
+    let m2 = S(NP(), VP_(VP(V(), NP(PN(capture("name"))))));
     assertThat(match(m2, s)).equalsTo({name: PN("Dani")});
    });
 
-  let Referent = (name) => { return { "@type": "Referent", "name": name } };
+  let Referent = (name, types, children = []) => { return { 
+    "@type": "Referent", 
+    "name": name, 
+    "types": types, 
+    "children": children
+   } 
+  };
 
   let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
 
   class CRPN {
    match(node) {
-    let matcher1 = S(NP(capture("PN", "name")), VP_(capture("?")));
-    let matcher2 = S(capture("?"), VP_(VP(V(capture("?")), NP(capture("PN", "name")))));
+    let matcher1 = S(NP(PN(capture("name"))), VP_());
+    let matcher2 = VP(V(), NP(PN(capture("name"))));
 
     let result = [[], []];
 
     let m1 = match(matcher1, node);
     if (m1) {
      let name = m1.name.children[0];
-     result[0].push(Referent("u"));
+     result[0].push(Referent("u", m1.name.types));
      result[1].push(predicate("Name", [arg("u"), arg(name)]));
      node.children[0] = Referent("u");
     }
 
-    let m2 = match(matcher2, node);
+    let m2 = match(matcher2, node.children[1].children[0]);
     if (m2) {
      let name = m2.name.children[0];
-     result[0].push(Referent("v"));
+     result[0].push(Referent("v", m2.name.types));
      result[1].push(predicate("Name", [arg("v"), arg(name)]));
      node.children[1].children[0].children[1] = Referent("v");
     }
@@ -836,7 +837,8 @@ A ->
   class Compiler {
    compile(node) {
     // Maps to Logic
-    let matcher = S(capture("Referent", "alpha"), VP_(VP(capture("V", "verb"), capture("Referent", "beta"))));
+    let matcher = S(Referent("", {}, [capture("alpha")]), 
+                    VP_(VP(V(capture("verb")), Referent("", {}, [capture("beta")]))));
     let m = match(matcher, node);
 
     if (!m) {
@@ -917,6 +919,35 @@ A ->
   it("CR.PRO", function() {
     let interpreter = new Interpreter();
     let drs = interpreter.feed("Jones owns Ulysses.");
+    
+    let node = first(parse("It fascinates him."), true);
+    
+    let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
+    let m1 = match(matcher1, node);
+    assertThat(m1.pronoun.children[0]).equalsTo("It");
+    assertThat(m1.pronoun.types)
+     .equalsTo({"case": "+nom", "gen": "-hum", "num": "sing"});
+    assertThat(drs.head[1].types).equalsTo({"gen": "-hum", "num": "sing"});
+
+    // The types of head[1] agree with the types of the pronoun,
+    // so bind it to it.
+    node.children[0] = drs.head[1];
+
+    let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
+    let m2 = match(matcher2, node.children[1].children[0]);
+    assertThat(m2.pronoun.children[0]).equalsTo("him");
+    assertThat(m2.pronoun.types)
+     .equalsTo({"case": "-nom", "gen": "male", "num": "sing"});
+    assertThat(drs.head[0].types).equalsTo({"gen": "male", "num": "sing"});
+
+    // The types of head[2] agree with the types of the pronoun,
+    // so bind it to it.
+    node.children[1].children[0].children[1] = drs.head[0];
+
+    let result = new Compiler().compile(node);
+
+    assertThat(Forward.stringify(result))
+     .equalsTo("fascinates(v, u)");
   });
 
   function assertThat(x) {
