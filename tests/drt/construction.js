@@ -132,7 +132,6 @@ describe("DRT construction", function() {
   class CRPN {
    match(node) {
     let matcher1 = S(NP(PN(capture("name"))), VP_());
-    let matcher2 = VP(V(), NP(PN(capture("name"))));
 
     let result = [[], []];
 
@@ -147,8 +146,11 @@ describe("DRT construction", function() {
      node.children[0] = ref;
     }
 
+    let matcher2 = VP(V(), NP(PN(capture("name"))));
     let m2 = match(matcher2, node);
+    // console.log(`] ${node["@type"]}`);
     if (m2) {
+     // console.log("hi");
      let name = m2.name.children[0];
      let ref = Referent("v", m2.name.types);
      result[0].push(ref);
@@ -528,16 +530,17 @@ describe("DRT construction", function() {
 
     while (queue.length > 0) {
      let p = queue.shift();
-     console.log(">" + transcribe(p));
      // breadth first search: iterate over
      // this level first ...
      for (let rule of this.rules) {
-      let [head, body] = rule.match(node);
+      let [head, body] = rule.match(p);
       this.head.push(...head);
       this.body.push(...body);
      }
      // ... and recurse.
-     queue.push(...(p.children || []));
+     let next = (p.children || [])
+      .filter(c => c["@type"]);
+     queue.push(...next);
     }
    }
 
@@ -559,7 +562,7 @@ describe("DRT construction", function() {
    }
   }
 
-  it.skip("DRS: CRPN", function() {
+  it("DRS: CRPN", function() {
     let node = first(parse("Mel loves Dani."), true);
     let drs = new DRS();
     drs.feed(node);
@@ -573,21 +576,21 @@ describe("DRT construction", function() {
      `);
   });
 
-  it.skip("DRS: CRID", function() {
+  it("DRS: CRID", function() {
     let node = first(parse("A man loves Dani."), true);
     let drs = new DRS();
     drs.feed(node);
 
     assertThat(drs)
      .equalsTo(`
-       v, d
+       d, v
 
-       Dani(v)
        man(d)
+       Dani(v)
      `);
   });
 
-  it.skip("DRS: CRID", function() {
+  it("DRS: CRID", function() {
     let node = first(parse("Dani loves a man."), true);
     let drs = new DRS();
     drs.feed(node);
