@@ -420,6 +420,9 @@ describe("DRT construction", function() {
     let head = [];
     let body = [];
 
+    // console.log(`> ${node["@type"]}`);
+    // console.log(node);
+
     if (m) {
      let rc = node.children.pop();
 
@@ -522,11 +525,13 @@ describe("DRT construction", function() {
    constructor() {
     this.head = [];
     this.body = [];
-    this.rules = [new CRPN(), new CRID()];
+    this.rules = [new CRPN(), new CRID(), new CRNRC()];
    }
 
    feed(node) {
     let queue = [node];
+
+    this.body.push(node);
 
     while (queue.length > 0) {
      let p = queue.shift();
@@ -536,6 +541,7 @@ describe("DRT construction", function() {
       let [head, body] = rule.match(p);
       this.head.push(...head);
       this.body.push(...body);
+      queue.push(...body);
      }
      // ... and recurse.
      let next = (p.children || [])
@@ -571,6 +577,7 @@ describe("DRT construction", function() {
      .equalsTo(`
        u, v
 
+       u loves v
        Mel(u)
        Dani(v)
      `);
@@ -585,6 +592,7 @@ describe("DRT construction", function() {
      .equalsTo(`
        d, v
 
+       d loves v
        man(d)
        Dani(v)
      `);
@@ -599,8 +607,26 @@ describe("DRT construction", function() {
      .equalsTo(`
        u, d
 
+       u loves d
        Dani(u)
        man(d)
+     `);
+  });
+
+  it("DRS: CRNRC", function() {
+    let node = first(parse("A man who loves Dani fascinates Anna."), true);
+    let drs = new DRS();
+    drs.feed(node);
+
+    assertThat(drs)
+     .equalsTo(`
+       d, v, v
+
+       d fascinates v
+       man(d)
+       d loves v
+       Anna(v)
+       Dani(v)
      `);
   });
 
