@@ -43,7 +43,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe("DRT construction", function() {
+describe("DRT Builder", function() {
 
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
@@ -664,7 +664,7 @@ describe("DRT construction", function() {
    }
   }
 
-  it("DRS: CRPN", function() {
+  it("Mel loves Dani.", function() {
     assertThat("Mel loves Dani.", true)
      .equalsTo(true, `
        a, b
@@ -675,7 +675,7 @@ describe("DRT construction", function() {
     `);
   });
 
-  it("DRS: CRID", function() {
+  it("A man loves Dani.", function() {
     assertThat("A man loves Dani.")
      .equalsTo(true, `
        a, b
@@ -686,7 +686,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRID", function() {
+  it("Dani loves a man.", function() {
     assertThat("Dani loves a man.")
      .equalsTo(true, `
        a, b
@@ -697,7 +697,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRNRC", function() {
+  it("A man who loves Dani fascinates Anna.", function() {
     assertThat("A man who loves Dani fascinates Anna.")
      .equalsTo(true, `
        a, b, c
@@ -710,7 +710,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRNRC", function() {
+  it("Mel loves a book which fascinates Anna.", function() {
     assertThat("Mel loves a book which fascinates Anna.")
      .equalsTo(true, `
        a, b, c
@@ -723,7 +723,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRNRC", function() {
+  it("Jones owns a book which Smith loves.", function() {
     assertThat("Jones owns a book which Smith loves.")
      .equalsTo(true, `
        a, b, c
@@ -736,7 +736,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRPRO", function() {
+  it("Jones owns a book which fascinates him.", function() {
     assertThat("Jones owns a book which fascinates him.")
      .equalsTo(true, `
        a, b
@@ -748,7 +748,7 @@ describe("DRT construction", function() {
      `);
   });
 
-  it("DRS: CRNRC", function() {
+  it("A man who fascinates Dani loves a book which fascinates Anna.", function() {
     assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
      .equalsTo(true, `
        a, b, c, d

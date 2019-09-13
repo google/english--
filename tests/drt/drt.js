@@ -25,7 +25,7 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe("Discourse Representation Theory", function() {
+describe("DRT Parser", function() {
   
   it("expand var", function() {
     let rule = phrase(term("S", {"num": 1}),
