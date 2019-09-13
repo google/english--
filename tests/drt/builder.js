@@ -98,18 +98,21 @@ describe("DRT Builder", function() {
    let result = {};
 
    for (let i = 0; i < a.children.length; i++) {
-    if (a.children[i]["@type"] == "Match") {
-     // console.log(`match ${a.children[i].name}`);
+    if (typeof a.children[i] == "string") {
+     if (a.children[i] != b.children[i]) {
+      return false;
+     }
+    } else if (a.children[i]["@type"] == "Match") {
      result[a.children[i].name] = b;
      continue;
-    }
+    } else {
+     let capture = match(a.children[i], b.children[i]);
+     if (!capture) {
+      return false;
+     }
 
-    let capture = match(a.children[i], b.children[i]);
-    if (!capture) {
-     return false;
+     result = Object.assign(result, capture);
     }
-
-    result = Object.assign(result, capture);
    }
 
    return result;
@@ -121,6 +124,12 @@ describe("DRT Builder", function() {
     assertThat(match(m1, s)).equalsTo({name: PN("Mel")});
     let m2 = S(NP(), VP_(VP(V(), NP(PN(capture("name"))))));
     assertThat(match(m2, s)).equalsTo({name: PN("Dani")});
+
+    let m3 = S(NP(), VP_(AUX("does"), "not", VP(capture("vp"))));
+    let s3 = first(parse("Jones does not love Smith."));
+    assertThat(transcribe(match(m3, s3).vp))
+     .equalsTo("love Smith");
+
    });
 
   let Referent = (name, types = {}, children = []) => { return { 
@@ -420,7 +429,7 @@ describe("DRT Builder", function() {
    }
   }
 
-  class CRLIN {
+  class CRLIN extends Rule {
    match(node) {
     let matcher = N(capture("noun"));
     let m = match(matcher, node);
@@ -507,7 +516,7 @@ describe("DRT Builder", function() {
    }
   }
 
-  class CRNRC {
+  class CRNRC extends Rule {
    match(node) {
     let matcher = N(N(), RC(capture("rc")));
     let m = match(matcher, node);
@@ -598,6 +607,65 @@ describe("DRT Builder", function() {
     let ids = new Ids();
 
     let node = first(parse("A man who likes Smith owns a book."), true);
+
+    let [d, [id]] = new CRID(ids).match(node);
+
+    assertThat(transcribe(node)).equalsTo("a owns a book");
+    assertThat(transcribe(id)).equalsTo("man who likes Smith(a)");
+    assertThat(id.ref.name).equalsTo("a");
+
+    let [b, [rc]] = new CRNRC(ids).match(id);
+
+    assertThat(transcribe(id)).equalsTo("man(a)");
+    assertThat(transcribe(rc)).equalsTo("a likes Smith");
+
+    new CRPN(ids).match(rc.children[1].children[0]);
+
+    assertThat(transcribe(rc)).equalsTo("a likes b");
+
+    new CRID(ids).match(node.children[1].children[0]);
+
+    // TODO(goto): introduce newly minted variables
+    assertThat(transcribe(node)).equalsTo("a owns c");
+  });
+
+  class CRNEG extends Rule {
+   match(node) {
+    let matcher = S(NP(), VP_(AUX(capture("aux")), capture("not"), VP(capture("vp"))));
+    let m = match(matcher, node);
+
+    let head = [];
+    let body = [];
+
+    console.log(m);
+
+    return;
+
+    if (m && 
+        m.noun.ref && 
+        m.noun.children.length == 1 &&
+        typeof m.noun.children[0] == "string") {
+     let name = m.noun.children[0];
+     let ref = m.noun.ref.name;
+
+     for (let key in node) {
+      delete node[key];
+     }
+     Override.assign(node, predicate(name, [arg(ref)]));
+    }
+
+    return [head, body];
+   }
+  }
+
+  it.skip("CR.NEG", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones does not own a porsche."), true);
+
+    new CRNEG(ids).match(node);
+
+    return;
 
     let [d, [id]] = new CRID(ids).match(node);
 
