@@ -60,6 +60,10 @@ describe("DRT Builder", function() {
        "gen": "-hum", 
        "num": "plur"
     });
+
+    let root = first(parse("Mel owns a book."), true);
+    assertThat(root.children[1].children[0].children[1].types)
+     .equalsTo({"case": "-nom", "gap": "-", "gen": "-hum", "num": "sing"});
   });
 
   function toString(node) {
@@ -312,7 +316,8 @@ describe("DRT Builder", function() {
     if (m1) {
      let ref = this.find(m1.pronoun.types, refs);
      if (!ref) {
-      throw new Error("Invalid reference");
+      // console.log(refs);
+      throw new Error("Invalid reference: " + transcribe(node));
      }
      node.children[0] = ref;
     }
@@ -325,7 +330,7 @@ describe("DRT Builder", function() {
     if (m2) {
      let ref = this.find(m2.pronoun.types, refs);
      if (!ref) {
-      throw new Error("Invalid Reference");
+      throw new Error("Invalid Reference: " + transcribe(node));
      }
      node.children[1].children[0] = ref;
     }
@@ -377,7 +382,7 @@ describe("DRT Builder", function() {
      rule.match(node.children[1].children[0], [u, v]);
      throw new Error();
     } catch ({message}) {
-     assertThat(message).equalsTo("Invalid Reference");
+     assertThat(message).equalsTo("Invalid Reference: fascinates her");
     }
   });
 
@@ -390,7 +395,8 @@ describe("DRT Builder", function() {
     let m1 = match(matcher1, node);
 
     if (m1 && m1.det.children[0] == "a") {
-     let ref = Referent(this.id());
+     let ref = Referent(this.id(), m1.noun.types);
+     // console.log(m1.noun);
      head.push(ref);
      let n = clone(m1.noun);
      n.ref = ref;
@@ -772,6 +778,32 @@ describe("DRT Builder", function() {
        Jones(a)
        Ulysses(b)
        b fascinates a
+     `);
+  });
+
+  it("Mel owns a book.", function() {
+    assertThat("Mel owns a book. It fascinates him.")
+     .equalsTo(true, `
+       a, b
+
+       a owns b
+       Mel(a)
+       book(b)
+       b fascinates a
+     `);
+  });
+
+  it("Mel owns a book. It fascinates him. Dani loves him.", function() {
+    assertThat("Mel owns a book. It fascinates him. Dani loves him.")
+     .equalsTo(true, `
+       a, b, c
+
+       a owns b
+       Mel(a)
+       book(b)
+       b fascinates a
+       c loves a
+       Dani(c)
      `);
   });
 
