@@ -611,11 +611,7 @@ describe("DRT construction", function() {
   }
 
   it("DRS: CRPN", function() {
-    let node = first(parse("Mel loves Dani."), true);
-    let drs = new DRS();
-    drs.feed(node);
-
-    assertThat(drs)
+    assertThat("Mel loves Dani.")
      .equalsTo(`
        u, v
 
@@ -626,11 +622,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRID", function() {
-    let node = first(parse("A man loves Dani."), true);
-    let drs = new DRS();
-    drs.feed(node);
-
-    assertThat(drs)
+    assertThat("A man loves Dani.")
      .equalsTo(`
        d, v
 
@@ -641,11 +633,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRID", function() {
-    let node = first(parse("Dani loves a man."), true);
-    let drs = new DRS();
-    drs.feed(node);
-
-    assertThat(drs)
+    assertThat("Dani loves a man.")
      .equalsTo(`
        u, d
 
@@ -656,11 +644,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRNRC", function() {
-    let node = first(parse("A man who loves Dani fascinates Anna."), true);
-    let drs = new DRS();
-    drs.feed(node);
-
-    assertThat(drs)
+    assertThat("A man who loves Dani fascinates Anna.")
      .equalsTo(`
        d, v, v
 
@@ -673,11 +657,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRNRC", function() {
-    let node = first(parse("Mel loves a book which fascinates Anna."), true);
-    let drs = new DRS();
-    drs.feed(node);
-
-    assertThat(drs)
+    assertThat("Mel loves a book which fascinates Anna.")
      .equalsTo(`
        u, d, v
 
@@ -690,8 +670,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRNRC", function() {
-    const s = "Jones owns a book which Smith loves.";
-    assertThat(new DRS().feed(first(parse(s), true)))
+    assertThat("Jones owns a book which Smith loves.")
      .equalsTo(`
        u, d, u
 
@@ -704,8 +683,7 @@ describe("DRT construction", function() {
   });
 
   it("DRS: CRPRO", function() {
-    const s = "Jones owns a book which fascinates him.";
-    assertThat(new DRS().feed(first(parse(s), true)))
+    assertThat("Jones owns a book which fascinates him.")
      .equalsTo(`
        u, d
 
@@ -716,18 +694,26 @@ describe("DRT construction", function() {
      `);
   });
 
-  let trim = (str) => str.trim().split("\n").map(line => line.trim()).join("\n");
-
-  function assertThat(x) {
-   return {
-    equalsTo(y) {
+  function assertThat(x) { 
+  return {
+    trim (str) {
+     return str
+      .trim()
+      .split("\n")
+      .map(line => line.trim())
+      .join("\n");
+    },
+    equalsTo(y, deep = false) {
+     if (deep) {
+       Assert.deepEqual(x, y);
+     }
 
      if (x instanceof DRS) {
-      assertThat(x.serialize()).equalsTo(trim(y));
+      let drs = new DRS().feed(first(parse(y), true))
+      assertThat(drs.serialize()).equalsTo(this.trim(y), true);
       return;
      }
 
-     Assert.deepEqual(x, y);
     }
    }
   }
