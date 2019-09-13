@@ -631,28 +631,26 @@ describe("DRT Builder", function() {
 
   class CRNEG extends Rule {
    match(node) {
-    let matcher = S(NP(), VP_(AUX(capture("aux")), capture("not"), VP(capture("vp"))));
+    let matcher = S(NP(), VP_(AUX("does"), "not", VP(capture("vp"))));
     let m = match(matcher, node);
 
     let head = [];
     let body = [];
 
-    console.log(m);
-
-    return;
-
-    if (m && 
-        m.noun.ref && 
-        m.noun.children.length == 1 &&
-        typeof m.noun.children[0] == "string") {
-     let name = m.noun.children[0];
-     let ref = m.noun.ref.name;
-
-     for (let key in node) {
-      delete node[key];
-     }
-     Override.assign(node, predicate(name, [arg(ref)]));
+    if (!m) {
+     return [head, body];
     }
+
+    // console.log("hi");
+
+    // let name = m.noun.children[0];
+    // let ref = m.noun.ref.name;
+
+    //for (let key in node) {
+    // delete node[key];
+    //}
+
+    // Override.assign(node, predicate(name, [arg(ref)]));
 
     return [head, body];
    }
@@ -693,10 +691,16 @@ describe("DRT Builder", function() {
     this.head = [];
     this.body = [];
     let ids = new Ids();
-    this.rules = [new CRPN(ids), new CRID(ids), new CRNRC(ids), new CRPRO(ids)];
+    this.rules = 
+     [new CRPN(ids), 
+      new CRID(ids), 
+      new CRNRC(ids), 
+      new CRPRO(ids)];
    }
 
-   feed(node) {
+   feed(s) {
+    let node = first(parse(s), true);
+
     let queue = [node];
 
     this.body.push(node);
@@ -737,6 +741,10 @@ describe("DRT Builder", function() {
     return result.join("\n");
    }
   }
+
+  it("DRS", function() {
+    let drs = new DRS();
+  });
 
   it("Mel loves Dani.", function() {
     assertThat("Mel loves Dani.", true)
@@ -896,7 +904,7 @@ describe("DRT Builder", function() {
       if (s == "") {
        continue;
       }
-      drs.feed(first(parse(s.trim() + "."), true));
+      drs.feed(s.trim() + ".");
      }
      assertThat(drs.serialize()).equalsTo(this.trim(z));
     }
