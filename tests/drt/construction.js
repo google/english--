@@ -763,6 +763,18 @@ describe("DRT construction", function() {
      `);
   });
 
+  it("Jones owns Ulysses. It fascinates him.", function() {
+    assertThat("Jones owns Ulysses. It fascinates him.")
+     .equalsTo(true, `
+       a, b
+
+       a owns b
+       Jones(a)
+       Ulysses(b)
+       b fascinates a
+     `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {
@@ -778,8 +790,14 @@ describe("DRT construction", function() {
        return;
      }
 
-     let drs = new DRS().feed(first(parse(x), true));
-     // console.log(drs.serialize());
+     let drs = new DRS();
+
+     for (let s of x.split(".")) {
+      if (s == "") {
+       continue;
+      }
+      drs.feed(first(parse(s.trim() + "."), true));
+     }
      assertThat(drs.serialize()).equalsTo(this.trim(z));
     }
    }
