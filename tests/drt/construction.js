@@ -199,6 +199,42 @@ describe("DRT construction", function() {
    }
   }
 
+
+  class Interpreter {
+   constructor() {
+    this.drs = {head: [], body: []};
+   }
+   feed(s) {
+    this.drs.body.push(first(parse(s), true));
+    construct(this.drs);
+    return this.drs;
+   }
+   ask(s) {
+    return new Reasoner(rewrite(program(this.drs.body)))
+     .go(rewrite(Logic.Rule.of(s)));
+   }
+  }
+
+  it.skip("Interpreter", function() {
+    let interpreter = new Interpreter();
+    let drs = interpreter.feed("Mel loves Dani.");
+
+    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
+
+    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
+     .equalsTo(Forward.toString(Logic.Parser.parse(`
+    Name(u, Mel).
+    exists (p = u) exists (q) exists (r) Name(p, Mel).
+    loves(u, v).
+    exists (p = u) exists (q = v) exists (r) loves(u, q).
+    Name(v, Dani).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
+    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
+    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
+    `)));
+  });
+
+
   it("CR.PN", function() {
     let node = first(parse("Mel loves Dani."), true);
     let rule = new CRPN();
@@ -220,17 +256,20 @@ describe("DRT construction", function() {
    });
 
   class CRPRO {
-   find({gen, num}, head) {
-    return head.find((ref) => {
+   find({gen, num}, refs) {
+    return refs.find((ref) => {
       return ref.types.gen == gen && ref.types.num == num
      });
    }
-   match(node, head) {
+   match(node, refs) {
+    // console.log("hi");
+    let head = [];
+    let body = [];
     let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
     let m1 = match(matcher1, node);
 
     if (m1) {
-     let ref = this.find(m1.pronoun.types, head);
+     let ref = this.find(m1.pronoun.types, refs);
      if (!ref) {
       throw new Error("Invalid reference");
      }
@@ -243,12 +282,13 @@ describe("DRT construction", function() {
     // The types of head[2] agree with the types of the pronoun,
     // so bind it to it.
     if (m2) {
-     let ref = this.find(m2.pronoun.types, head);
+     let ref = this.find(m2.pronoun.types, refs);
      if (!ref) {
       throw new Error("Invalid Reference");
      }
      node.children[1].children[0] = ref;
     }
+    return [head, body];
    }
   }
 
@@ -525,7 +565,7 @@ describe("DRT construction", function() {
    constructor() {
     this.head = [];
     this.body = [];
-    this.rules = [new CRPN(), new CRID(), new CRNRC()];
+    this.rules = [new CRPN(), new CRID(), new CRNRC(), new CRPRO()];
    }
 
    feed(node) {
@@ -538,7 +578,7 @@ describe("DRT construction", function() {
      // breadth first search: iterate over
      // this level first ...
      for (let rule of this.rules) {
-      let [head, body] = rule.match(p);
+      let [head, body] = rule.match(p, this.head);
       this.head.push(...head);
       this.body.push(...body);
       queue.push(...body);
@@ -548,6 +588,8 @@ describe("DRT construction", function() {
       .filter(c => c["@type"]);
      queue.push(...next);
     }
+
+    return this;
    }
 
    serialize() {
@@ -630,38 +672,48 @@ describe("DRT construction", function() {
      `);
   });
 
-  class Interpreter {
-   constructor() {
-    this.drs = {head: [], body: []};
-   }
-   feed(s) {
-    this.drs.body.push(first(parse(s), true));
-    construct(this.drs);
-    return this.drs;
-   }
-   ask(s) {
-    return new Reasoner(rewrite(program(this.drs.body)))
-     .go(rewrite(Logic.Rule.of(s)));
-   }
-  }
+  it("DRS: CRNRC", function() {
+    let node = first(parse("Mel loves a book which fascinates Anna."), true);
+    let drs = new DRS();
+    drs.feed(node);
 
-  it.skip("Interpreter", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Mel loves Dani.");
+    assertThat(drs)
+     .equalsTo(`
+       u, d, v
 
-    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
+       u loves d
+       Mel(u)
+       book(d)
+       d fascinates v
+       Anna(v)
+     `);
+  });
 
-    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
-     .equalsTo(Forward.toString(Logic.Parser.parse(`
-    Name(u, Mel).
-    exists (p = u) exists (q) exists (r) Name(p, Mel).
-    loves(u, v).
-    exists (p = u) exists (q = v) exists (r) loves(u, q).
-    Name(v, Dani).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
-    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
-    `)));
+  it("DRS: CRNRC", function() {
+    const s = "Jones owns a book which Smith loves.";
+    assertThat(new DRS().feed(first(parse(s), true)))
+     .equalsTo(`
+       u, d, u
+
+       u owns d
+       Jones(u)
+       book(d)
+       u loves d
+       Smith(u)
+     `);
+  });
+
+  it("DRS: CRPRO", function() {
+    const s = "Jones owns a book which fascinates him.";
+    assertThat(new DRS().feed(first(parse(s), true)))
+     .equalsTo(`
+       u, d
+
+       u owns d
+       Jones(u)
+       book(d)
+       d fascinates u
+     `);
   });
 
   let trim = (str) => str.trim().split("\n").map(line => line.trim()).join("\n");
