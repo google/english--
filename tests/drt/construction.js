@@ -611,19 +611,19 @@ describe("DRT construction", function() {
   }
 
   it("DRS: CRPN", function() {
-    assertThat("Mel loves Dani.")
-     .equalsTo(`
+    assertThat("Mel loves Dani.", true)
+     .equalsTo(true, `
        u, v
 
        u loves v
        Mel(u)
        Dani(v)
-     `);
+    `);
   });
 
   it("DRS: CRID", function() {
     assertThat("A man loves Dani.")
-     .equalsTo(`
+     .equalsTo(true, `
        d, v
 
        d loves v
@@ -634,7 +634,7 @@ describe("DRT construction", function() {
 
   it("DRS: CRID", function() {
     assertThat("Dani loves a man.")
-     .equalsTo(`
+     .equalsTo(true, `
        u, d
 
        u loves d
@@ -645,7 +645,7 @@ describe("DRT construction", function() {
 
   it("DRS: CRNRC", function() {
     assertThat("A man who loves Dani fascinates Anna.")
-     .equalsTo(`
+     .equalsTo(true, `
        d, v, v
 
        d fascinates v
@@ -658,7 +658,7 @@ describe("DRT construction", function() {
 
   it("DRS: CRNRC", function() {
     assertThat("Mel loves a book which fascinates Anna.")
-     .equalsTo(`
+     .equalsTo(true, `
        u, d, v
 
        u loves d
@@ -671,7 +671,7 @@ describe("DRT construction", function() {
 
   it("DRS: CRNRC", function() {
     assertThat("Jones owns a book which Smith loves.")
-     .equalsTo(`
+     .equalsTo(true, `
        u, d, u
 
        u owns d
@@ -684,13 +684,26 @@ describe("DRT construction", function() {
 
   it("DRS: CRPRO", function() {
     assertThat("Jones owns a book which fascinates him.")
-     .equalsTo(`
+     .equalsTo(true, `
        u, d
 
        u owns d
        Jones(u)
        book(d)
        d fascinates u
+     `);
+  });
+
+  it.skip("DRS: CRNRC", function() {
+    assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
+     .equalsTo(`
+       d, v, v
+
+       d fascinates v
+       man(d)
+       d loves v
+       Anna(v)
+       Dani(v)
      `);
   });
 
@@ -703,17 +716,15 @@ describe("DRT construction", function() {
       .map(line => line.trim())
       .join("\n");
     },
-    equalsTo(y, deep = false) {
-     if (deep) {
+    equalsTo(y, z) {
+     if (!z) {
        Assert.deepEqual(x, y);
+       return;
      }
 
-     if (x instanceof DRS) {
-      let drs = new DRS().feed(first(parse(y), true))
-      assertThat(drs.serialize()).equalsTo(this.trim(y), true);
-      return;
-     }
-
+     let drs = new DRS().feed(first(parse(x), true));
+     // console.log(drs.serialize());
+     assertThat(drs.serialize()).equalsTo(this.trim(z));
     }
    }
   }
