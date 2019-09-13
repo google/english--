@@ -21,7 +21,7 @@ const {
   grammar,
   first,
   clean,
-  nodes} = require("../../src/drt/drt.js");
+  nodes} = require("../../src/drt/parser.js");
 
 const {
  S, NP, NP_, PN, VP_, VP, V, DET, N, PRO, AUX, RC, RPRO, GAP, 
