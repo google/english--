@@ -694,16 +694,18 @@ describe("DRT construction", function() {
      `);
   });
 
-  it.skip("DRS: CRNRC", function() {
+  it("DRS: CRNRC", function() {
     assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
-     .equalsTo(`
-       d, v, v
+     .equalsTo(true, `
+       d, d, v, v
 
-       d fascinates v
+       d loves d
        man(d)
-       d loves v
-       Anna(v)
+       d fascinates v
+       book(d)
+       d fascinates v
        Dani(v)
+       Anna(v)
      `);
   });
 
