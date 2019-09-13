@@ -43,7 +43,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe("DRT construction", function() {
+describe.only("DRT construction", function() {
 
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
@@ -129,41 +129,6 @@ describe("DRT construction", function() {
 
   let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
 
-  class CRPN {
-   match(node) {
-    let matcher1 = S(NP(PN(capture("name"))), VP_());
-
-    let result = [[], []];
-
-    let m1 = match(matcher1, node);
-    if (m1) {
-     let name = m1.name.children[0];
-     let ref = Referent("u", m1.name.types);
-     result[0].push(ref);
-     let pn = clone(m1.name);
-     pn.ref = ref;
-     result[1].push(pn);
-     node.children[0] = ref;
-    }
-
-    let matcher2 = VP(V(), NP(PN(capture("name"))));
-    let m2 = match(matcher2, node);
-    // console.log(`] ${node["@type"]}`);
-    if (m2) {
-     // console.log("hi");
-     let name = m2.name.children[0];
-     let ref = Referent("v", m2.name.types);
-     result[0].push(ref);
-     let pn = clone(m2.name);
-     pn.ref = ref;
-     result[1].push(pn);
-     node.children[1].children[0] = ref;
-    }
-
-    return result;
-   }
-  }
-  
   class Compiler {
    compile(node) {
     // Maps to Logic
@@ -234,25 +199,83 @@ describe("DRT construction", function() {
     `)));
   });
 
+  class Ids {
+   constructor(prefix) {
+    this.gen = (function*() {
+      let i = 0;
+      while (true) {
+       yield `${prefix}${i++}`;
+      }
+     })();
+   }
+   get() {
+    return this.gen.next().value;
+   }
+  }
 
+  it("ids", function() {
+    let ids = new Ids("u");
+    assertThat(ids.get()).equalsTo("u0");
+    assertThat(ids.get()).equalsTo("u1");
+    assertThat(ids.get()).equalsTo("u2");
+  });
+
+  class CRPN {
+   constructor() {
+    this.ids = new Ids("u");
+   }
+   match(node) {
+    let matcher1 = S(NP(PN(capture("name"))), VP_());
+
+    let result = [[], []];
+
+    let m1 = match(matcher1, node);
+    if (m1) {
+     let name = m1.name.children[0];
+     let ref = Referent(this.ids.get(), m1.name.types);
+     result[0].push(ref);
+     let pn = clone(m1.name);
+     pn.ref = ref;
+     result[1].push(pn);
+     node.children[0] = ref;
+    }
+
+    let matcher2 = VP(V(), NP(PN(capture("name"))));
+    let m2 = match(matcher2, node);
+    // console.log(`] ${node["@type"]}`);
+    if (m2) {
+     // console.log("hi");
+     let name = m2.name.children[0];
+     let ref = Referent(this.ids.get(), m2.name.types);
+     result[0].push(ref);
+     let pn = clone(m2.name);
+     pn.ref = ref;
+     result[1].push(pn);
+     node.children[1].children[0] = ref;
+    }
+
+    return result;
+   }
+  }
+  
   it("CR.PN", function() {
     let node = first(parse("Mel loves Dani."), true);
     let rule = new CRPN();
     let [[u], [mel]] = rule.match(node);
 
     // One new discourse referents introduced.
-    assertThat(u.name).equalsTo("u");
+    assertThat(u.name).equalsTo("u0");
     // Name predicates added.
-    assertThat(transcribe(mel)).equalsTo("Mel(u)");
+    assertThat(transcribe(mel)).equalsTo("Mel(u0)");
  
     let [[v], [dani]] = rule.match(node.children[1].children[0]);
     // One new discourse referents introduced.
-    assertThat(v.name).equalsTo("v");
+    assertThat(v.name).equalsTo("u1");
     // Name predicates added.
-    assertThat(transcribe(dani)).equalsTo("Dani(v)");
+    assertThat(transcribe(dani)).equalsTo("Dani(u1)");
 
     // PNs rewritten.
-    assertThat(transcribe(node)).equalsTo("u loves v");
+    assertThat(transcribe(node)).equalsTo("u0 loves u1");
    });
 
   class CRPRO {
@@ -295,29 +318,31 @@ describe("DRT construction", function() {
   it("CR.PRO", function() {
     let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates him."), true);
-    
-    let [[u], [jones]] = new CRPN().match(sentence);
-    let [[v], [ulysses]] = new CRPN().match(sentence.children[1].children[0]);
+
+    let crpn = new CRPN();
+    let [[u], [jones]] = crpn.match(sentence);
+    let [[v], [ulysses]] = crpn.match(sentence.children[1].children[0]);
 
     let rule = new CRPRO();
     rule.match(node, [u, v]);
     rule.match(node.children[1].children[0], [u, v]);
 
-    assertThat(transcribe(node)).equalsTo("v fascinates u");
+    assertThat(transcribe(node)).equalsTo("u1 fascinates u0");
   });
 
   it("CR.PRO", function() {
     let sentence = first(parse("Mel loves Dani."), true);
     let node = first(parse("She fascinates him."), true);
     
-    let [[u], [mel]] = new CRPN().match(sentence);
-    let [[v], [dani]] = new CRPN().match(sentence.children[1].children[0]);
+    let crpn = new CRPN();
+    let [[u], [mel]] = crpn.match(sentence);
+    let [[v], [dani]] = crpn.match(sentence.children[1].children[0]);
 
     let rule = new CRPRO();
     rule.match(node, [u, v]);
     rule.match(node.children[1].children[0], [u, v]);
 
-    assertThat(transcribe(node)).equalsTo("v fascinates u");
+    assertThat(transcribe(node)).equalsTo("u1 fascinates u0");
   });
 
   it("CR.PRO", function() {
@@ -421,7 +446,7 @@ describe("DRT construction", function() {
     // construction rules for the proper name too.
     new CRPN().match(node);
 
-    assertThat(transcribe(node)).equalsTo("u owns d");
+    assertThat(transcribe(node)).equalsTo("u0 owns d");
    });
 
   it("CR.ID", function() {
@@ -439,7 +464,7 @@ describe("DRT construction", function() {
 
     new CRPN().match(node.children[1].children[0]);
 
-    assertThat(transcribe(node)).equalsTo("d likes v");
+    assertThat(transcribe(node)).equalsTo("d likes u0");
   });
 
 
@@ -508,12 +533,12 @@ describe("DRT construction", function() {
 
     let [h, [jones]] = new CRPN().match(node);
     assertThat(transcribe(jones))
-     .equalsTo("Jones(u)");
+     .equalsTo("Jones(u0)");
     assertThat(transcribe(node))
-     .equalsTo("u owns a book which Smith likes");
+     .equalsTo("u0 owns a book which Smith likes");
 
     let [ref, [id]] = new CRID().match(node.children[1].children[0]);
-    assertThat(transcribe(node)).equalsTo("u owns d");
+    assertThat(transcribe(node)).equalsTo("u0 owns d");
     assertThat(transcribe(id)).equalsTo("book which Smith likes(d)");
 
     let rule = new CRNRC();
@@ -529,12 +554,12 @@ describe("DRT construction", function() {
     assertThat(head.length).equalsTo(0);
 
     let [h2, [smith]] = new CRPN().match(rc);
-    assertThat(transcribe(rc)).equalsTo("u likes d");
-    assertThat(transcribe(smith)).equalsTo("Smith(u)");
+    assertThat(transcribe(rc)).equalsTo("u0 likes d");
+    assertThat(transcribe(smith)).equalsTo("Smith(u0)");
     
     new CRPN().match(node);
 
-    assertThat(transcribe(node)).equalsTo("u owns d");
+    assertThat(transcribe(node)).equalsTo("u0 owns d");
    });
 
   it("CR.NRC", function() {
@@ -553,7 +578,7 @@ describe("DRT construction", function() {
 
     new CRPN().match(rc.children[1].children[0]);
 
-    assertThat(transcribe(rc)).equalsTo("d likes v");
+    assertThat(transcribe(rc)).equalsTo("d likes u0");
 
     new CRID().match(node.children[1].children[0]);
 
@@ -613,32 +638,32 @@ describe("DRT construction", function() {
   it("DRS: CRPN", function() {
     assertThat("Mel loves Dani.", true)
      .equalsTo(true, `
-       u, v
+       u0, u1
 
-       u loves v
-       Mel(u)
-       Dani(v)
+       u0 loves u1
+       Mel(u0)
+       Dani(u1)
     `);
   });
 
   it("DRS: CRID", function() {
     assertThat("A man loves Dani.")
      .equalsTo(true, `
-       d, v
+       d, u0
 
-       d loves v
+       d loves u0
        man(d)
-       Dani(v)
+       Dani(u0)
      `);
   });
 
   it("DRS: CRID", function() {
     assertThat("Dani loves a man.")
      .equalsTo(true, `
-       u, d
+       u0, d
 
-       u loves d
-       Dani(u)
+       u0 loves d
+       Dani(u0)
        man(d)
      `);
   });
@@ -646,66 +671,66 @@ describe("DRT construction", function() {
   it("DRS: CRNRC", function() {
     assertThat("A man who loves Dani fascinates Anna.")
      .equalsTo(true, `
-       d, v, v
+       d, u0, u1
 
-       d fascinates v
+       d fascinates u0
        man(d)
-       d loves v
-       Anna(v)
-       Dani(v)
+       d loves u1
+       Anna(u0)
+       Dani(u1)
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("Mel loves a book which fascinates Anna.")
      .equalsTo(true, `
-       u, d, v
+       u0, d, u1
 
-       u loves d
-       Mel(u)
+       u0 loves d
+       Mel(u0)
        book(d)
-       d fascinates v
-       Anna(v)
+       d fascinates u1
+       Anna(u1)
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("Jones owns a book which Smith loves.")
      .equalsTo(true, `
-       u, d, u
+       u0, d, u1
 
-       u owns d
-       Jones(u)
+       u0 owns d
+       Jones(u0)
        book(d)
-       u loves d
-       Smith(u)
+       u1 loves d
+       Smith(u1)
      `);
   });
 
   it("DRS: CRPRO", function() {
     assertThat("Jones owns a book which fascinates him.")
      .equalsTo(true, `
-       u, d
+       u0, d
 
-       u owns d
-       Jones(u)
+       u0 owns d
+       Jones(u0)
        book(d)
-       d fascinates u
+       d fascinates u0
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
      .equalsTo(true, `
-       d, d, v, v
+       d, d, u0, u1
 
        d loves d
        man(d)
-       d fascinates v
+       d fascinates u0
        book(d)
-       d fascinates v
-       Dani(v)
-       Anna(v)
+       d fascinates u1
+       Dani(u0)
+       Anna(u1)
      `);
   });
 
