@@ -231,10 +231,17 @@ describe("DRT construction", function() {
     assertThat(ids.get()).equalsTo("b1");
   });
 
-  class CRPN {
-   constructor() {
-    this.ids = new Ids("u");
+  class Rule {
+   constructor(ids) {
+    this.ids = ids || new Ids();
    }
+
+   id() {
+    return this.ids.get();
+   }
+  }
+
+  class CRPN extends Rule {
    match(node) {
     let matcher1 = S(NP(PN(capture("name"))), VP_());
 
@@ -243,7 +250,7 @@ describe("DRT construction", function() {
     let m1 = match(matcher1, node);
     if (m1) {
      let name = m1.name.children[0];
-     let ref = Referent(this.ids.get(), m1.name.types);
+     let ref = Referent(this.id(), m1.name.types);
      result[0].push(ref);
      let pn = clone(m1.name);
      pn.ref = ref;
@@ -257,7 +264,7 @@ describe("DRT construction", function() {
     if (m2) {
      // console.log("hi");
      let name = m2.name.children[0];
-     let ref = Referent(this.ids.get(), m2.name.types);
+     let ref = Referent(this.id(), m2.name.types);
      result[0].push(ref);
      let pn = clone(m2.name);
      pn.ref = ref;
@@ -289,7 +296,7 @@ describe("DRT construction", function() {
     assertThat(transcribe(node)).equalsTo("a loves b");
    });
 
-  class CRPRO {
+  class CRPRO extends Rule {
    find({gen, num}, refs) {
     return refs.find((ref) => {
       return ref.types.gen == gen && ref.types.num == num
@@ -374,7 +381,7 @@ describe("DRT construction", function() {
     }
   });
 
-  class CRID {
+  class CRID extends Rule {
    match(node) {
     let head = [];
     let body = [];
@@ -383,22 +390,24 @@ describe("DRT construction", function() {
     let m1 = match(matcher1, node);
 
     if (m1 && m1.det.children[0] == "a") {
-     head.push(Referent("d"));
+     let ref = Referent(this.id());
+     head.push(ref);
      let n = clone(m1.noun);
-     n.ref = Referent("d");
+     n.ref = ref;
      body.push(n);
-     node.children[1] = Referent("d");
+     node.children[1] = ref;
     }
 
     let matcher2 = S(NP(DET(capture("det")), N(capture("noun"))), VP_());
     let m2 = match(matcher2, node);
 
     if (m2 && m2.det.children[0].toLowerCase() == "a") {
-     head.push(Referent("d"));
+     let ref = Referent(this.id());
+     head.push(ref);
      let n = clone(m2.noun);
-     n.ref = Referent("d");
+     n.ref = ref;
      body.push(n);
-     node.children[0] = Referent("d");
+     node.children[0] = ref;
     }
 
     return [head, body];
@@ -433,49 +442,53 @@ describe("DRT construction", function() {
   }
 
   it("CR.ID", function() {
+    let ids = new Ids();
+
     let node = first(parse("Jones owns a porsche."), true);
 
-    let rule = new CRID();
+    let rule = new CRID(ids);
     
     let [head, body] = rule.match(node.children[1].children[0]);
 
-    assertThat(transcribe(node)).equalsTo("Jones owns d");
+    assertThat(transcribe(node)).equalsTo("Jones owns a");
 
     // One new discourse referents introduced.
     assertThat(head.length).equalsTo(1);
-    assertThat(head[0].name).equalsTo("d");
+    assertThat(head[0].name).equalsTo("a");
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
-    assertThat(transcribe(body[0])).equalsTo("porsche(d)");
+    assertThat(transcribe(body[0])).equalsTo("porsche(a)");
 
     // Noun predicates added.
-    new CRLIN().match(body[0]);
-    assertThat(transcribe(body[0])).equalsTo("porsche(d)");
+    new CRLIN(ids).match(body[0]);
+    assertThat(transcribe(body[0])).equalsTo("porsche(a)");
 
     // Before we compile, we have to pass through the 
     // construction rules for the proper name too.
-    new CRPN().match(node);
+    new CRPN(ids).match(node);
 
-    assertThat(transcribe(node)).equalsTo("a owns d");
+    assertThat(transcribe(node)).equalsTo("b owns a");
    });
 
   it("CR.ID", function() {
+    let ids = new Ids();
+
     let node = first(parse("A man likes Jones."), true);
 
-    let rule = new CRID();
+    let rule = new CRID(ids);
     
     let [head, [id]] = rule.match(node);
 
-    assertThat(transcribe(node)).equalsTo("d likes Jones");
+    assertThat(transcribe(node)).equalsTo("a likes Jones");
 
-    new CRLIN().match(id);
+    new CRLIN(ids).match(id);
 
-    assertThat(transcribe(id)).equalsTo("man(d)");
+    assertThat(transcribe(id)).equalsTo("man(a)");
 
-    new CRPN().match(node.children[1].children[0]);
+    new CRPN(ids).match(node.children[1].children[0]);
 
-    assertThat(transcribe(node)).equalsTo("d likes a");
+    assertThat(transcribe(node)).equalsTo("a likes b");
   });
 
 
@@ -540,68 +553,73 @@ describe("DRT construction", function() {
   }
 
   it("CR.NRC", function() {
+    let ids = new Ids();
+
     let node = first(parse("Jones owns a book which Smith likes."), true);
 
-    let [h, [jones]] = new CRPN().match(node);
+    let [h, [jones]] = new CRPN(ids).match(node);
     assertThat(transcribe(jones))
      .equalsTo("Jones(a)");
     assertThat(transcribe(node))
      .equalsTo("a owns a book which Smith likes");
 
-    let [ref, [id]] = new CRID().match(node.children[1].children[0]);
-    assertThat(transcribe(node)).equalsTo("a owns d");
-    assertThat(transcribe(id)).equalsTo("book which Smith likes(d)");
+    let [ref, [id]] = new CRID(ids).match(node.children[1].children[0]);
+    assertThat(transcribe(node)).equalsTo("a owns b");
+    assertThat(transcribe(id)).equalsTo("book which Smith likes(b)");
 
-    let rule = new CRNRC();
+    let rule = new CRNRC(ids);
 
     let [head, [rc]] = rule.match(id);
-    assertThat(transcribe(id)).equalsTo("book(d)");
-    assertThat(transcribe(rc)).equalsTo("Smith likes d");
+    assertThat(transcribe(id)).equalsTo("book(b)");
+    assertThat(transcribe(rc)).equalsTo("Smith likes b");
 
-    new CRLIN().match(id);
+    new CRLIN(ids).match(id);
 
-    assertThat(transcribe(id)).equalsTo("book(d)");
+    assertThat(transcribe(id)).equalsTo("book(b)");
 
     assertThat(head.length).equalsTo(0);
 
-    let [h2, [smith]] = new CRPN().match(rc);
-    assertThat(transcribe(rc)).equalsTo("a likes d");
-    assertThat(transcribe(smith)).equalsTo("Smith(a)");
+    let [h2, [smith]] = new CRPN(ids).match(rc);
+    assertThat(transcribe(rc)).equalsTo("c likes b");
+    assertThat(transcribe(smith)).equalsTo("Smith(c)");
     
-    new CRPN().match(node);
+    new CRPN(ids).match(node);
 
-    assertThat(transcribe(node)).equalsTo("a owns d");
+    assertThat(transcribe(node)).equalsTo("a owns b");
    });
 
   it("CR.NRC", function() {
+    let ids = new Ids();
+
     let node = first(parse("A man who likes Smith owns a book."), true);
 
-    let [d, [id]] = new CRID().match(node);
+    let [d, [id]] = new CRID(ids).match(node);
 
-    assertThat(transcribe(node)).equalsTo("d owns a book");
-    assertThat(transcribe(id)).equalsTo("man who likes Smith(d)");
-    assertThat(id.ref.name).equalsTo("d");
+    assertThat(transcribe(node)).equalsTo("a owns a book");
+    assertThat(transcribe(id)).equalsTo("man who likes Smith(a)");
+    assertThat(id.ref.name).equalsTo("a");
 
-    let [b, [rc]] = new CRNRC().match(id);
+    let [b, [rc]] = new CRNRC(ids).match(id);
 
-    assertThat(transcribe(id)).equalsTo("man(d)");
-    assertThat(transcribe(rc)).equalsTo("d likes Smith");
+    assertThat(transcribe(id)).equalsTo("man(a)");
+    assertThat(transcribe(rc)).equalsTo("a likes Smith");
 
-    new CRPN().match(rc.children[1].children[0]);
+    new CRPN(ids).match(rc.children[1].children[0]);
 
-    assertThat(transcribe(rc)).equalsTo("d likes a");
+    assertThat(transcribe(rc)).equalsTo("a likes b");
 
-    new CRID().match(node.children[1].children[0]);
+    new CRID(ids).match(node.children[1].children[0]);
 
     // TODO(goto): introduce newly minted variables
-    assertThat(transcribe(node)).equalsTo("d owns d");
+    assertThat(transcribe(node)).equalsTo("a owns c");
   });
 
   class DRS {
    constructor() {
     this.head = [];
     this.body = [];
-    this.rules = [new CRPN(), new CRID(), new CRNRC(), new CRPRO()];
+    let ids = new Ids();
+    this.rules = [new CRPN(ids), new CRID(ids), new CRNRC(ids), new CRPRO(ids)];
    }
 
    feed(node) {
@@ -660,88 +678,88 @@ describe("DRT construction", function() {
   it("DRS: CRID", function() {
     assertThat("A man loves Dani.")
      .equalsTo(true, `
-       d, a
+       a, b
 
-       d loves a
-       man(d)
-       Dani(a)
+       a loves b
+       man(a)
+       Dani(b)
      `);
   });
 
   it("DRS: CRID", function() {
     assertThat("Dani loves a man.")
      .equalsTo(true, `
-       a, d
+       a, b
 
-       a loves d
+       a loves b
        Dani(a)
-       man(d)
+       man(b)
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("A man who loves Dani fascinates Anna.")
      .equalsTo(true, `
-       d, a, b
+       a, b, c
 
-       d fascinates a
-       man(d)
-       d loves b
-       Anna(a)
-       Dani(b)
+       a fascinates b
+       man(a)
+       a loves c
+       Anna(b)
+       Dani(c)
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("Mel loves a book which fascinates Anna.")
      .equalsTo(true, `
-       a, d, b
+       a, b, c
 
-       a loves d
+       a loves b
        Mel(a)
-       book(d)
-       d fascinates b
-       Anna(b)
+       book(b)
+       b fascinates c
+       Anna(c)
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("Jones owns a book which Smith loves.")
      .equalsTo(true, `
-       a, d, b
+       a, b, c
 
-       a owns d
+       a owns b
        Jones(a)
-       book(d)
-       b loves d
-       Smith(b)
+       book(b)
+       c loves b
+       Smith(c)
      `);
   });
 
   it("DRS: CRPRO", function() {
     assertThat("Jones owns a book which fascinates him.")
      .equalsTo(true, `
-       a, d
+       a, b
 
-       a owns d
+       a owns b
        Jones(a)
-       book(d)
-       d fascinates a
+       book(b)
+       b fascinates a
      `);
   });
 
   it("DRS: CRNRC", function() {
     assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
      .equalsTo(true, `
-       d, d, a, b
+       a, b, c, d
 
-       d loves d
-       man(d)
-       d fascinates a
-       book(d)
-       d fascinates b
-       Dani(a)
-       Anna(b)
+       a loves b
+       man(a)
+       a fascinates c
+       book(b)
+       b fascinates d
+       Dani(c)
+       Anna(d)
      `);
   });
 
