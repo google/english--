@@ -643,7 +643,7 @@ describe("DRT Builder", function() {
     let noun = m.np.children[0];
 
     let sub = new DRS(this.ids);
-    sub.head = refs;
+    sub.head = clone(refs);
     sub.neg = true;
 
     let s = node;
@@ -916,6 +916,19 @@ describe("DRT Builder", function() {
          b fascinates a
          c loves a
          Dani(c)
+       }
+     `);
+  });
+
+  it("Jones does not own a porsche.", function() {
+    assertThat("Jones does not own a porsche.")
+     .equalsTo(true, `
+       drs(a) {
+         Jones(a)
+         ~drs(a, b) {
+           a own b
+           porsche(b)
+         }
        }
      `);
   });
