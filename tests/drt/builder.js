@@ -91,7 +91,7 @@ describe("DRT Builder", function() {
   let capture = (name) => { return {"@type": "Match", "name": name} };
   
   function match(a, b) {
-   if (a["@type"] != b["@type"]) {
+   if (!b || a["@type"] != b["@type"]) {
     return false;
    }
 
@@ -528,15 +528,17 @@ describe("DRT Builder", function() {
      return [[], [], [], []];
     }
 
+    // let positive = RC(RPRO(), S(NP(), VP_(VP(capture("vp")))));
+
     let rc = node.children.pop();
 
     let s = rc.children[1];
     // Binds gap to the referent.
     let object = s.children[1].children[0].children[1];
-    if (object.children[0]["@type"] == "GAP") {
+    if (object && object.children[0]["@type"] == "GAP") {
      object.children[0] = node.ref;
     }
-
+    
     let subject = s.children[0];
     if (subject.children[0]["@type"] == "GAP") {
      subject.children[0] = node.ref;
@@ -546,7 +548,7 @@ describe("DRT Builder", function() {
     noun.ref = node.ref;
     body.push(noun);
     remove.push(node);
-
+    
     body.push(s);
     
     return [head, body, [], remove];
@@ -627,6 +629,41 @@ describe("DRT Builder", function() {
     assertThat(print(node)).equalsTo("a owns c");
   });
 
+  it.skip("CR.NRC with negation", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones owns a book which he does not like."), true);
+
+    let [h, [jones], subs, [remove]] = new CRPN(ids).match(node);
+
+    assertThat(print(jones))
+     .equalsTo("Jones(a)");
+    assertThat(print(node))
+     .equalsTo("a owns a book which he does not like");
+
+    let [ref, [id]] = new CRID(ids).match(child(node, 1, 0));
+    assertThat(print(node)).equalsTo("a owns b");
+    assertThat(print(id)).equalsTo("book which he does not like(b)");
+
+    let rule = new CRNRC(ids);
+
+    let [head, [book, rc]] = rule.match(id);
+    assertThat(print(book)).equalsTo("book(b)");
+    assertThat(print(rc)).equalsTo("he does not like b");
+
+    new CRLIN(ids).match(id);
+
+    assertThat(head.length).equalsTo(0);
+
+    let [h2, [smith]] = new CRPN(ids).match(rc);
+    assertThat(print(rc)).equalsTo("c likes b");
+    assertThat(print(smith)).equalsTo("Smith(c)");
+    
+    new CRPN(ids).match(child(node, 0));
+
+    assertThat(print(node)).equalsTo("a owns b");
+   });
+
   class CRNEG extends Rule {
    match(node, refs) {
     let matcher = S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp"))));
@@ -648,7 +685,8 @@ describe("DRT Builder", function() {
 
     let s = node;
     s.children[1].children.splice(0, 2);
-    
+
+    // console.log(print(s));
     sub.push(s);
 
     // node.assign(noun);
@@ -942,6 +980,81 @@ describe("DRT Builder", function() {
          porsche(b)
          ~drs(a, b) {
            a like b
+         }
+       }
+     `);
+  });
+
+  it("Jones does not own a porsche. He likes it.", function() {
+    let drs = new DRS();
+    drs.feed("Jones does not own a porsche.");
+    assertThat(drs.print()).equalsTo(trim(`
+      drs(a) {
+        Jones(a)
+        ~drs(a, b) {
+          a own b
+          porsche(b)
+        }
+      }
+    `));
+    try {
+     // "it" in "he likes it" cannot bind to anything
+     // because porsche(b) is inside the negated sub
+     // drs.
+     drs.feed("He likes it.");
+     throw new Error("expected exception");
+    } catch (e) {
+     assertThat(e.message).equalsTo("Invalid Reference: it");
+    }
+  });
+
+  it.skip("Jones does not own Ulysses. He likes it.", function() {
+    // TODO(goto): promote PN referents from sub drs to the
+    // global drs.
+    assertThat("Jones does not own Ulysses. He likes it.")
+     .equalsTo(true, `
+     `);
+  });
+
+  it("A porsche does not stink", function() {
+    assertThat("A porsche does not stink.")
+     .equalsTo(true, `
+       drs(a) {
+         porsche(a)
+         ~drs(a) {
+           a stink
+         }
+       }
+     `);
+  });
+
+  it("Jones does not own a porsche which does not fascinate him", function() {
+    assertThat("Jones does not own a porsche which does not fascinate him.")
+     .equalsTo(true, `
+       drs(a) {
+         Jones(a)
+         ~drs(a, b) {
+           a own b
+           porsche(b)
+           ~drs(a, b) {
+             b fascinate a
+           }
+         }
+       }
+     `);
+  });
+
+  it.skip("Jones does not like a porsche which he does not own.", function() {
+    assertThat("Jones does not like a porsche which he does not own.")
+     .equalsTo(true, `
+       drs(a) {
+         Jones(a)
+         ~drs(a, b) {
+           a like b
+           porsche(b)
+           ~drs(a, b) {
+           a own b
+           }
          }
        }
      `);

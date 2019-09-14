@@ -606,8 +606,12 @@ A ->
     assertThat("A stockbroker who do not love her surprises him.").failsAt(20, " ");
   });
 
-  it.skip("debug", function() {
-    parse("Anna who likes Mel loves him.");
+  it("A porsche does not stink", function() {
+    assertThat(first(parse("A porsche does not stink.")))
+     .equalsTo(S(NP(DET("A"), N("porsche")),
+                 VP_(AUX("does"), "not", 
+                     VP(V("stink")))));
+    // parse("Anna who likes Mel loves him.");
    });
 
   it("debug", function() {
