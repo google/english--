@@ -1018,6 +1018,24 @@ describe("DRT Builder", function() {
      `);
   });
 
+  it("Jones loves a woman who does not admire him.", function() {
+    assertThat("Jones loves a woman who does not love him. She does not love a man.")
+     .equalsTo(true, `
+       drs(a, b) {
+         a loves b
+         Jones(a)
+         woman(b)
+         ~drs() {
+           b love a
+         }
+         ~drs(c) {
+           b love c
+           man(c)
+         }
+       }
+     `);
+  });
+
   it("A porsche does not stink", function() {
     assertThat("A porsche does not stink.")
      .equalsTo(true, `

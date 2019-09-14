@@ -611,8 +611,20 @@ A ->
      .equalsTo(S(NP(DET("A"), N("porsche")),
                  VP_(AUX("does"), "not", 
                      VP(V("stink")))));
-    // parse("Anna who likes Mel loves him.");
    });
+
+  it("Jones loves a woman who does not admire him.", function() {
+    assertThat(first(parse("Jones loves a woman who does not love him.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("loves"),
+                        NP(DET("a"), N(N("woman"), 
+                                       RC(RPRO("who"), S(NP(GAP()), 
+                                                         VP_(AUX("does"), "not", 
+                                                             VP(V("love"), NP(PRO("him"))))
+                                                         ))
+                                       ))))
+                 ));
+  });
 
   it("debug", function() {
     parse("Anna loves a man who loves her.");
