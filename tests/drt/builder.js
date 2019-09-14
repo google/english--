@@ -430,7 +430,7 @@ describe("DRT Builder", function() {
     let m2 = match(matcher2, node);
 
     if (m2 && m2.det.children[0].toLowerCase() == "a") {
-     let ref = new Referent(this.id());
+     let ref = new Referent(this.id(), m2.noun.types);
      head.push(ref);
      let n = m2.noun;
      n.ref = ref;
@@ -514,6 +514,23 @@ describe("DRT Builder", function() {
 
     assertThat(print(node)).equalsTo("a likes b");
   });
+
+  it("CR.ID: A man admires a woman.", function() {
+    let ids = new Ids();
+
+    let node = first(parse("A man admires a woman."), true);
+
+    let rule = new CRID(ids);
+    
+    let [head1, body1] = rule.match(node);
+    assertThat(head1).equalsTo([new Referent("a", {num: "sing", gen: "male"})]);
+
+    let [head2, body2] = rule.match(child(node, 1, 0));
+    assertThat(head2).equalsTo([new Referent("b", {num: "sing", gen: "fem"})]);
+
+    assertThat(print(node)).equalsTo("a admires b");
+
+   });
 
   class CRNRC extends Rule {
    match(node) {
@@ -823,13 +840,25 @@ describe("DRT Builder", function() {
      `));
   });
 
-  it.skip("A man admires a woman She likes him.", function() {
+  it("A man admires a woman.", function() {
+    assertThat("A man admires a woman.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a admires b
+         man(a)
+         woman(b)
+       }
+    `);
+  });
+
+  it("A man admires a woman. She likes him.", function() {
     assertThat("A man admires a woman. She likes him.", true)
      .equalsTo(true, `
        drs(a, b) {
-         a loves b
-         Mel(a)
-         Dani(b)
+         a admires b
+         man(a)
+         woman(b)
+         b likes a
        }
     `);
   });
