@@ -260,7 +260,7 @@ describe("DRT Builder", function() {
      head.push(ref);
      let pn = m1.name;
      pn.ref = ref;
-     body.push(new Node(pn));
+     body.push(pn);
      node.children[0] = ref;
     }
 
@@ -272,7 +272,7 @@ describe("DRT Builder", function() {
      head.push(ref);
      let pn = m2.name;
      pn.ref = ref;
-     body.push(new Node(pn));
+     body.push(pn);
      result.children[1].children[0] = ref;
     }
 
@@ -280,93 +280,46 @@ describe("DRT Builder", function() {
    }
   }
 
-  class Node {
-   constructor(node = {}) {
-    this.assign(node);
-   }
-   assign(node) {
-    this["@type"] = node["@type"];
-    this["types"] = node["types"];
-    this["ref"] = node["ref"];
-    this["name"] = node["name"];
-    this.children = [];
-    for (let child of node.children || []) {
-     if (typeof child == "string") {
-      this.children.push(child);
-      continue;
-     }
-     this.insert(new Node(child));
-    }
-    return this;
-   }
-   parent() {
-    return this.parentNode;
-   }
-   insert(child) {
-    this.children.push(child);
-    child.parentNode = this;
-    return this;
-   }
-   remove() {
-    let i = this.parentNode.children.indexOf(this);
-    this.parentNode.children.splice(i, 1);
-    return this.parentNode;
-   }
-   child(...path) {
-    let result = this;
-    for (let i of path) {
-     result = result.children[i];
-    }
-    return result;
-   }
-   print() {
-    return transcribe(this);
-   }
-  }
-
-  class Referent extends Node {
+  class Referent {
    constructor(name, types) {
-    super({"@type": "Referent", "types": types});
+    this["@type"] = "Referent";
+    this["types"] = types;
     this.name = name;
    }
   }
 
-  it("node", function() {
-    let node = new Node(first(parse("Mel loves Dani."), true));
-    // get
-    assertThat(node.print()).equalsTo("Mel loves Dani");
-    // console.log(node.child(0));
-    assertThat(node.child(0).print()).equalsTo("Mel");
-    // assign
-    assertThat(node.child(0).assign(NP(PN("Leo"))).parent().print())
-     .equalsTo("Leo loves Dani");
-    // remove
-    assertThat(node.child(0).children.length).equalsTo(1);
-    assertThat(node.child(0, 0).remove().print())
-     .equalsTo("");
-    assertThat(node.child(0).children.length).equalsTo(0);
-  });
+  function print(node) {
+   return transcribe(node);
+  }
+
+  function child(node, ...path) {
+   let result = node;
+   for (let i of path) {
+    result = result.children[i];
+   }
+   return result;
+  }
 
   it("CR.PN", function() {
-    let node = new Node(first(parse("Mel loves Dani."), true));
+    let node = first(parse("Mel loves Dani."), true);
     let rule = new CRPN();
     let [[u], [mel]] = rule.match(node);
 
     // One new discourse referents introduced.
     assertThat(u.name).equalsTo("a");
     // Name predicates added.
-    assertThat(mel.print()).equalsTo("Mel(a)");
+    assertThat(print(mel)).equalsTo("Mel(a)");
  
-    assertThat(node.print()).equalsTo("a loves Dani");
+    assertThat(print(node)).equalsTo("a loves Dani");
 
-    let [[v], [dani]] = rule.match(node.child(1, 0));
+    let [[v], [dani]] = rule.match(child(node, 1, 0));
     // One new discourse referents introduced.
     assertThat(v.name).equalsTo("b");
     // Name predicates added.
-    assertThat(dani.print()).equalsTo("Dani(b)");
+    assertThat(print(dani)).equalsTo("Dani(b)");
 
     // PNs rewritten.
-    assertThat(node.print()).equalsTo("a loves b");
+    assertThat(print(node)).equalsTo("a loves b");
    });
 
   class CRPRO extends Rule {
@@ -406,50 +359,50 @@ describe("DRT Builder", function() {
   }
 
   it("CR.PRO", function() {
-    let sentence = new Node(first(parse("Jones owns Ulysses."), true));
-    let node = new Node(first(parse("It fascinates him."), true));
+    let sentence = first(parse("Jones owns Ulysses."), true);
+    let node = first(parse("It fascinates him."), true);
 
     let crpn = new CRPN();
     let [[u], [jones]] = crpn.match(sentence);
-    let [[v], [ulysses]] = crpn.match(sentence.child(1, 0));
+    let [[v], [ulysses]] = crpn.match(child(sentence, 1, 0));
 
-    assertThat(jones.print()).equalsTo("Jones(a)");
-    assertThat(ulysses.print()).equalsTo("Ulysses(b)");
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(ulysses)).equalsTo("Ulysses(b)");
 
     let rule = new CRPRO();
     rule.match(node, [u, v]);
-    rule.match(node.child(1, 0), [u, v]);
+    rule.match(child(node, 1, 0), [u, v]);
 
-    assertThat(node.print()).equalsTo("b fascinates a");
+    assertThat(print(node)).equalsTo("b fascinates a");
   });
 
   it("CR.PRO", function() {
-    let sentence = new Node(first(parse("Mel loves Dani."), true));
-    let node = new Node(first(parse("She fascinates him."), true));
+    let sentence = first(parse("Mel loves Dani."), true);
+    let node = first(parse("She fascinates him."), true);
     
     let crpn = new CRPN();
     let [[u], [mel]] = crpn.match(sentence);
-    let [[v], [dani]] = crpn.match(sentence.child(1, 0));
+    let [[v], [dani]] = crpn.match(child(sentence, 1, 0));
 
     let rule = new CRPRO();
     rule.match(node, [u, v]);
-    rule.match(node.child(1, 0), [u, v]);
+    rule.match(child(node, 1, 0), [u, v]);
 
-    assertThat(node.print()).equalsTo("b fascinates a");
+    assertThat(print(node)).equalsTo("b fascinates a");
   });
 
   it("CR.PRO", function() {
-    let sentence = new Node(first(parse("Jones owns Ulysses."), true));
-    let node = new Node(first(parse("It fascinates her."), true));
+    let sentence = first(parse("Jones owns Ulysses."), true);
+    let node = first(parse("It fascinates her."), true);
 
     let [[u], [jones]] = new CRPN().match(sentence);
-    let [[v], [ulysses]] = new CRPN().match(sentence.child(1, 0));
+    let [[v], [ulysses]] = new CRPN().match(child(sentence, 1, 0));
     
     let rule = new CRPRO();
     try {
      // Ulysses is a -hum and Jones is male, so
      // the pronoun "her" should fail.
-     rule.match(node.child(1, 0), [u, v]);
+     rule.match(child(node, 1, 0), [u, v]);
      throw new Error();
     } catch ({message}) {
      assertThat(message).equalsTo("Invalid Reference: her");
@@ -467,7 +420,7 @@ describe("DRT Builder", function() {
     if (m1 && m1.det.children[0] == "a") {
      let ref = new Referent(this.id(), m1.noun.types);
      head.push(ref);
-     let n = new Node(m1.noun);
+     let n = m1.noun;
      n.ref = ref;
      body.push(n);
      node.children[1] = ref;
@@ -479,7 +432,7 @@ describe("DRT Builder", function() {
     if (m2 && m2.det.children[0].toLowerCase() == "a") {
      let ref = new Referent(this.id());
      head.push(ref);
-     let n = new Node(m2.noun);
+     let n = m2.noun;
      n.ref = ref;
      body.push(n);
      node.children[0] = ref;
@@ -515,13 +468,13 @@ describe("DRT Builder", function() {
   it("CR.ID", function() {
     let ids = new Ids();
 
-    let node = new Node(first(parse("Jones owns a porsche."), true));
+    let node = first(parse("Jones owns a porsche."), true);
 
     let rule = new CRID(ids);
     
-    let [head, body] = rule.match(node.child(1, 0));
+    let [head, body] = rule.match(child(node, 1, 0));
 
-    assertThat(node.print()).equalsTo("Jones owns a");
+    assertThat(print(node)).equalsTo("Jones owns a");
     
     // One new discourse referents introduced.
     assertThat(head.length).equalsTo(1);
@@ -529,37 +482,37 @@ describe("DRT Builder", function() {
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
-    assertThat(body[0].print()).equalsTo("porsche(a)");
+    assertThat(print(body[0])).equalsTo("porsche(a)");
 
     // Noun predicates added.
     new CRLIN(ids).match(body[0]);
-    assertThat(transcribe(body[0])).equalsTo("porsche(a)");
+    assertThat(print(body[0])).equalsTo("porsche(a)");
 
     // Before we compile, we have to pass through the 
     // construction rules for the proper name too.
     new CRPN(ids).match(node);
 
-    assertThat(node.print()).equalsTo("b owns a");
+    assertThat(print(node)).equalsTo("b owns a");
    });
 
   it("CR.ID", function() {
     let ids = new Ids();
 
-    let node = new Node(first(parse("A man likes Jones."), true));
+    let node = first(parse("A man likes Jones."), true);
 
     let rule = new CRID(ids);
     
     let [head, [id]] = rule.match(node);
 
-    assertThat(node.print()).equalsTo("a likes Jones");
+    assertThat(print(node)).equalsTo("a likes Jones");
 
     new CRLIN(ids).match(id);
 
-    assertThat(id.print()).equalsTo("man(a)");
+    assertThat(print(id)).equalsTo("man(a)");
 
-    new CRPN(ids).match(node.child(1, 0));
+    new CRPN(ids).match(child(node, 1, 0));
 
-    assertThat(node.print()).equalsTo("a likes b");
+    assertThat(print(node)).equalsTo("a likes b");
   });
 
   class CRNRC extends Rule {
@@ -569,30 +522,34 @@ describe("DRT Builder", function() {
 
     let head = [];
     let body = [];
+    let remove = [];
 
-    if (m) {
-     let rc = node.children.pop();
-
-     let s = rc.children[1];
-     // Binds gap to the referent.
-     let object = s.children[1].children[0].children[1];
-     if (object.children[0]["@type"] == "GAP") {
-      object.children[0] = node.ref;
-     }
-
-     let subject = s.children[0];
-     if (subject.children[0]["@type"] == "GAP") {
-      subject.children[0] = node.ref;
-     }
-
-     body.push(s);
-
-     let noun = node.children.pop();
-     noun.ref = node.ref;
-     node.assign(noun);
+    if (!m) {
+     return [[], [], [], []];
     }
 
-    return [head, body, [], []];
+    let rc = node.children.pop();
+
+    let s = rc.children[1];
+    // Binds gap to the referent.
+    let object = s.children[1].children[0].children[1];
+    if (object.children[0]["@type"] == "GAP") {
+     object.children[0] = node.ref;
+    }
+
+    let subject = s.children[0];
+    if (subject.children[0]["@type"] == "GAP") {
+     subject.children[0] = node.ref;
+    }
+
+    let noun = node.children.pop();
+    noun.ref = node.ref;
+    body.push(noun);
+    remove.push(node);
+
+    body.push(s);
+    
+    return [head, body, [], remove];
    }
   }
 
@@ -613,75 +570,61 @@ describe("DRT Builder", function() {
   it("CR.NRC", function() {
     let ids = new Ids();
 
-    let drs = new Node({"@type": "DRS"});
+    let node = first(parse("Jones owns a book which Smith likes."), true);
 
-    let node = new Node(first(parse("Jones owns a book which Smith likes."), true));
+    let [h, [jones], subs, [remove]] = new CRPN(ids).match(node);
 
-    drs.insert(node);
-
-    let [h, [jones]] = new CRPN(ids).match(node);
-
-    drs.insert(jones);
-
-    assertThat(jones.print())
+    assertThat(print(jones))
      .equalsTo("Jones(a)");
-    assertThat(node.print())
+    assertThat(print(node))
      .equalsTo("a owns a book which Smith likes");
 
-    let [ref, [id]] = new CRID(ids).match(node.child(1, 0));
-    assertThat(node.print()).equalsTo("a owns b");
-    assertThat(id.print()).equalsTo("book which Smith likes(b)");
-
-    drs.insert(id);
+    let [ref, [id]] = new CRID(ids).match(child(node, 1, 0));
+    assertThat(print(node)).equalsTo("a owns b");
+    assertThat(print(id)).equalsTo("book which Smith likes(b)");
 
     let rule = new CRNRC(ids);
 
-    let [head, [rc]] = rule.match(id);
-    assertThat(id.print()).equalsTo("book(b)");
-    assertThat(rc.print()).equalsTo("Smith likes b");
-
-    drs.insert(rc);
+    let [head, [book, rc]] = rule.match(id);
+    assertThat(print(book)).equalsTo("book(b)");
+    assertThat(print(rc)).equalsTo("Smith likes b");
 
     new CRLIN(ids).match(id);
-
-    assertThat(transcribe(id)).equalsTo("book(b)");
 
     assertThat(head.length).equalsTo(0);
 
     let [h2, [smith]] = new CRPN(ids).match(rc);
-    assertThat(rc.print()).equalsTo("c likes b");
-    assertThat(smith.print()).equalsTo("Smith(c)");
+    assertThat(print(rc)).equalsTo("c likes b");
+    assertThat(print(smith)).equalsTo("Smith(c)");
     
-    drs.insert(smith);
+    new CRPN(ids).match(child(node, 0));
 
-    new CRPN(ids).match(node.child(0));
-
-    assertThat(node.print()).equalsTo("a owns b");
+    assertThat(print(node)).equalsTo("a owns b");
    });
 
   it("CR.NRC", function() {
     let ids = new Ids();
 
-    let node = new Node(first(parse("A man who likes Smith owns a book."), true));
+    let node = first(parse("A man who likes Smith owns a book."), true);
 
     let [d, [id]] = new CRID(ids).match(node);
 
-    assertThat(node.print()).equalsTo("a owns a book");
-    assertThat(id.print()).equalsTo("man who likes Smith(a)");
+    assertThat(print(node)).equalsTo("a owns a book");
+    assertThat(print(id)).equalsTo("man who likes Smith(a)");
     assertThat(id.ref.name).equalsTo("a");
 
-    let [b, [rc]] = new CRNRC(ids).match(id);
+    let [b, [man, rc]] = new CRNRC(ids).match(id);
 
-    assertThat(id.print()).equalsTo("man(a)");
-    assertThat(rc.print()).equalsTo("a likes Smith");
+    assertThat(print(man)).equalsTo("man(a)");
+    assertThat(print(rc)).equalsTo("a likes Smith");
 
-    new CRPN(ids).match(rc.child(1, 0));
+    new CRPN(ids).match(child(rc, 1, 0));
 
-    assertThat(rc.print()).equalsTo("a likes b");
+    assertThat(print(rc)).equalsTo("a likes b");
 
-    new CRID(ids).match(node.child(1, 0));
+    new CRID(ids).match(child(node, 1, 0));
 
-    assertThat(node.print()).equalsTo("a owns c");
+    assertThat(print(node)).equalsTo("a owns c");
   });
 
   class CRNEG extends Rule {
@@ -703,10 +646,10 @@ describe("DRT Builder", function() {
     sub.head = refs;
     sub.neg = true;
 
-    let s = new Node(node);
+    let s = node;
     s.children[1].children.splice(0, 2);
     
-    sub.push(new Node(s));
+    sub.push(s);
 
     // node.assign(noun);
     // node.remove();
@@ -718,11 +661,11 @@ describe("DRT Builder", function() {
   it("CR.NEG", function() {
     let ids = new Ids();
 
-    let node = new Node(first(parse("Jones does not own a porsche."), true));
+    let node = first(parse("Jones does not own a porsche."), true);
 
     new CRPN(ids).match(node);
 
-    assertThat(node.print()).equalsTo("a does not own a porsche");
+    assertThat(print(node)).equalsTo("a does not own a porsche");
 
     let [head, body, subs, remove] = new CRNEG(ids).match(node, []);
 
@@ -752,7 +695,7 @@ describe("DRT Builder", function() {
    }
 
    feed(s) {
-    this.push(new Node(first(parse(s), true)));
+    this.push(first(parse(s), true));
    }
 
    push(node) {
@@ -778,7 +721,7 @@ describe("DRT Builder", function() {
      }
      // ... and recurse.
      let next = (p.children || [])
-      .filter(c => c instanceof Node);
+      .filter(c => typeof c != "string");
      queue.push(...next);
     }
 
