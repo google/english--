@@ -823,6 +823,17 @@ describe("DRT Builder", function() {
      `));
   });
 
+  it.skip("A man admires a woman She likes him.", function() {
+    assertThat("A man admires a woman. She likes him.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a loves b
+         Mel(a)
+         Dani(b)
+       }
+    `);
+  });
+
   it("Mel loves Dani.", function() {
     assertThat("Mel loves Dani.", true)
      .equalsTo(true, `

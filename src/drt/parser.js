@@ -478,7 +478,7 @@ function grammar() {
                    [[literal("do")]]));
  
  // Verbs in their inifinitive form.
- const transitive = ["like", "love", "know", "own", "fascinate", "rotate", "surprise"];
+ const transitive = ["like", "love", "admire", "know", "own", "fascinate", "rotate", "surprise"];
  const intransitive = ["love", "stink", "adore"];
  
  // LI 17

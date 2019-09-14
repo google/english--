@@ -488,6 +488,7 @@ AUX_num_plur_fin_p ->
 V_num_sing_fin_n_trans_p -> 
   "like"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "love"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
+  "admire"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "know"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "own"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
   "fascinate"i {% (args) => node("V", {"num":"sing","fin":"-","trans":"+"}, args) %} |
@@ -496,6 +497,7 @@ V_num_sing_fin_n_trans_p ->
 V_num_plur_fin_n_trans_p -> 
   "like"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "love"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
+  "admire"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "know"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "own"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
   "fascinate"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"+"}, args) %} |
@@ -512,6 +514,7 @@ V_num_plur_fin_n_trans_n ->
 V_num_sing_fin_p_trans_p -> 
   "likes"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "loves"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
+  "admires"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "knows"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "owns"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
   "fascinates"i {% (args) => node("V", {"num":"sing","fin":"+","trans":"+"}, args) %} |
@@ -524,6 +527,7 @@ V_num_sing_fin_p_trans_n ->
 V_num_plur_fin_p_trans_p -> 
   "like"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "love"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
+  "admire"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "know"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "own"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |
   "fascinate"i {% (args) => node("V", {"num":"plur","fin":"+","trans":"+"}, args) %} |

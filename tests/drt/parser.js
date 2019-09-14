@@ -416,15 +416,15 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
+     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink" "adore"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=+] -> "likes" "loves" "knows" "owns" "fascinates" "rotates" "surprises"');
+     .equalsTo('V[num=sing, fin=+, trans=+] -> "likes" "loves" "admires" "knows" "owns" "fascinates" "rotates" "surprises"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing, fin=+, trans=-] -> "loves" "stinks" "adores"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=+] -> "like" "love" "know" "own" "fascinate" "rotate" "surprise"');
+     .equalsTo('V[num=plur, fin=+, trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink" "adore"');
     assertThat(print(result[i++]))
