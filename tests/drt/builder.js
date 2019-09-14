@@ -276,7 +276,7 @@ describe("DRT Builder", function() {
      result.children[1].children[0] = ref;
     }
 
-    return [head, body, result];
+    return [head, body, []];
    }
   }
 
@@ -376,7 +376,6 @@ describe("DRT Builder", function() {
      });
    }
    match(node, refs) {
-    // console.log("hi");
     let head = [];
     let body = [];
     let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
@@ -385,8 +384,7 @@ describe("DRT Builder", function() {
     if (m1) {
      let u = this.find(m1.pronoun.types, refs);
      if (!u) {
-      // console.log(refs);
-      throw new Error("Invalid reference: " + transcribe(node));
+      throw new Error("Invalid reference: " + m1.pronoun.children[0]);
      }
      node.children[0] = u;
     }
@@ -399,11 +397,11 @@ describe("DRT Builder", function() {
     if (m2) {
      let ref = this.find(m2.pronoun.types, refs);
      if (!ref) {
-      throw new Error("Invalid Reference: " + transcribe(node));
+      throw new Error("Invalid Reference: " + m2.pronoun.children[0]);
      }
      node.children[1].children[0] = ref;
     }
-    return [head, body];
+    return [head, body, []];
    }
   }
 
@@ -454,7 +452,7 @@ describe("DRT Builder", function() {
      rule.match(node.child(1, 0), [u, v]);
      throw new Error();
     } catch ({message}) {
-     assertThat(message).equalsTo("Invalid Reference: fascinates her");
+     assertThat(message).equalsTo("Invalid Reference: her");
     }
   });
 
@@ -487,7 +485,7 @@ describe("DRT Builder", function() {
      node.children[0] = ref;
     }
 
-    return [head, body];
+    return [head, body, []];
    }
   }
 
@@ -510,7 +508,7 @@ describe("DRT Builder", function() {
      node.assign(predicate(name, [arg(u)]));
     }
 
-    return [head, body];
+    return [head, body, []];
    }
   }
 
@@ -594,7 +592,7 @@ describe("DRT Builder", function() {
      node.assign(noun);
     }
 
-    return [head, body];
+    return [head, body, []];
    }
   }
 
@@ -687,21 +685,22 @@ describe("DRT Builder", function() {
   });
 
   class CRNEG extends Rule {
-   match(node, refs, ids) {
+   match(node, refs) {
     let matcher = S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp"))));
     let m = match(matcher, node);
 
     let head = [];
     let body = [];
+    let subs = [];
 
     if (!m) {
-     return [head, body];
+     return [head, body, []];
     }
     
     let noun = m.np.children[0];
 
-    let sub = new DRS(ids);
-
+    let sub = new DRS(this.ids);
+    sub.head = refs;
     sub.neg = true;
 
     let s = new Node(node);
@@ -724,7 +723,7 @@ describe("DRT Builder", function() {
 
     assertThat(node.print()).equalsTo("a does not own a porsche");
 
-    let [head, body, subs] = new CRNEG(ids).match(node, [], ids);
+    let [head, body, subs] = new CRNEG(ids).match(node, []);
 
     assertThat(node.print()).equalsTo("a");
 
@@ -746,7 +745,8 @@ describe("DRT Builder", function() {
      [new CRPN(ids),
       new CRID(ids), 
       new CRNRC(ids), 
-      new CRPRO(ids)];
+      new CRPRO(ids),
+      new CRNEG(ids)];
    }
 
    feed(s) {
@@ -766,7 +766,7 @@ describe("DRT Builder", function() {
       let [head, body, drs] = rule.match(p, this.head);
       this.head.push(...head);
       this.body.push(...body);
-      this.subs.push(drs);
+      this.subs.push(...drs);
       queue.push(...body);
      }
      // ... and recurse.
@@ -791,6 +791,10 @@ describe("DRT Builder", function() {
 
     for (let cond of this.body) {
      result.push(transcribe(cond));
+    }
+
+    for (let sub of this.subs) {
+     result.push(sub.print());
     }
 
     result.push("}");
@@ -962,6 +966,21 @@ describe("DRT Builder", function() {
          b fascinates a
          c loves a
          Dani(c)
+       }
+     `);
+  });
+
+  it("Jones owns a porsche. He does not like it.", function() {
+    assertThat("Jones owns a porsche. He does not like it.")
+     .equalsTo(true, `
+       drs(a, b) {
+         a owns b
+         Jones(a)
+         porsche(b)
+         a
+         ~drs(a, b) {
+           a like b
+         }
        }
      `);
   });
