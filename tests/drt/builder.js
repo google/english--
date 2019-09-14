@@ -291,9 +291,6 @@ describe("DRT Builder", function() {
    constructor(node = {}) {
     this.assign(node);
    }
-   static create(node) {
-    return new Node({"@type": "Root", "children": [node]});
-   }
    assign(node) {
     this["@type"] = node["@type"];
     this["types"] = node["types"];
@@ -314,6 +311,7 @@ describe("DRT Builder", function() {
    insert(child) {
     this.children.push(child);
     child.parentNode = this;
+    return this;
    }
    remove() {
     let i = this.parentNode.children.indexOf(this);
@@ -333,22 +331,19 @@ describe("DRT Builder", function() {
   }
 
   it("node", function() {
-    let a = new Node();
-    let b = new Node();
-    a.insert(b);
-
-    let node = Node.create(first(parse("Mel loves Dani."), true));
+    let node = new Node(first(parse("Mel loves Dani."), true));
     // get
     assertThat(node.print()).equalsTo("Mel loves Dani");
-    assertThat(node.child(0, 0).print()).equalsTo("Mel");
+    // console.log(node.child(0));
+    assertThat(node.child(0).print()).equalsTo("Mel");
     // assign
-    assertThat(node.child(0, 0).assign(NP(PN("Leo"))).parent().print())
+    assertThat(node.child(0).assign(NP(PN("Leo"))).parent().print())
      .equalsTo("Leo loves Dani");
     // remove
-    assertThat(node.children.length).equalsTo(1);
-    assertThat(node.child(0).remove().print())
+    assertThat(node.child(0).children.length).equalsTo(1);
+    assertThat(node.child(0, 0).remove().print())
      .equalsTo("");
-    assertThat(node.children.length).equalsTo(0);
+    assertThat(node.child(0).children.length).equalsTo(0);
   });
 
   it("CR.PN", function() {
@@ -568,16 +563,6 @@ describe("DRT Builder", function() {
     assertThat(node.print()).equalsTo("a likes b");
   });
 
-
-  class Override {
-   static assign(a, b) {
-     for (let key in a) {
-      delete a[key];
-     }
-     Object.assign(a, b);
-   }
-  }
-
   class CRNRC extends Rule {
    match(node) {
     let matcher = N(N(), RC(capture("rc")));
@@ -770,7 +755,7 @@ describe("DRT Builder", function() {
    }
 
    feed(s) {
-    let node = first(parse(s), true);
+    let node = new Node(first(parse(s), true));
 
     let queue = [node];
 
@@ -788,7 +773,7 @@ describe("DRT Builder", function() {
      }
      // ... and recurse.
      let next = (p.children || [])
-      .filter(c => c["@type"]);
+      .filter(c => c instanceof Node);
      queue.push(...next);
     }
 
