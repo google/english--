@@ -129,24 +129,22 @@ describe("DRT Builder", function() {
     let s3 = first(parse("Jones does not love Smith."));
     assertThat(transcribe(match(m3, s3).vp))
      .equalsTo("love Smith");
-
    });
 
-  let Referent = (name, types = {}, children = []) => { return { 
-    "@type": "Referent", 
-    "name": name, 
-    "types": types, 
-    "children": children
-   } 
-  };
+  class Referent {
+   constructor(name, types) {
+    this.name = name;
+    this.types = types;
+   }
+  }
 
   let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
 
   class Compiler {
    compile(node) {
     // Maps to Logic
-    let matcher = S(Referent("", {}, [capture("alpha")]), 
-                    VP_(VP(V(capture("verb")), Referent("", {}, [capture("beta")]))));
+    let matcher = S(REF("", {}, [capture("alpha")]), 
+                    VP_(VP(V(capture("verb")), REF("", {}, [capture("beta")]))));
     let m = match(matcher, node);
 
     if (!m) {
@@ -263,7 +261,7 @@ describe("DRT Builder", function() {
     let m1 = match(matcher1, node);
     if (m1) {
      let name = m1.name.children[0];
-     let ref = Referent(this.id(), m1.name.types);
+     let ref = new Referent(this.id(), m1.name.types);
      result[0].push(ref);
      let pn = clone(m1.name);
      pn.ref = ref;
@@ -273,11 +271,9 @@ describe("DRT Builder", function() {
 
     let matcher2 = VP(V(), NP(PN(capture("name"))));
     let m2 = match(matcher2, node);
-    // console.log(`] ${node["@type"]}`);
     if (m2) {
-     // console.log("hi");
      let name = m2.name.children[0];
-     let ref = Referent(this.id(), m2.name.types);
+     let ref = new Referent(this.id(), m2.name.types);
      result[0].push(ref);
      let pn = clone(m2.name);
      pn.ref = ref;
@@ -323,12 +319,12 @@ describe("DRT Builder", function() {
     let m1 = match(matcher1, node);
 
     if (m1) {
-     let ref = this.find(m1.pronoun.types, refs);
-     if (!ref) {
+     let u = this.find(m1.pronoun.types, refs);
+     if (!u) {
       // console.log(refs);
       throw new Error("Invalid reference: " + transcribe(node));
      }
-     node.children[0] = ref;
+     node.children[0] = u;
     }
 
     let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
@@ -404,8 +400,7 @@ describe("DRT Builder", function() {
     let m1 = match(matcher1, node);
 
     if (m1 && m1.det.children[0] == "a") {
-     let ref = Referent(this.id(), m1.noun.types);
-     // console.log(m1.noun);
+     let ref = new Referent(this.id(), m1.noun.types);
      head.push(ref);
      let n = clone(m1.noun);
      n.ref = ref;
@@ -417,7 +412,7 @@ describe("DRT Builder", function() {
     let m2 = match(matcher2, node);
 
     if (m2 && m2.det.children[0].toLowerCase() == "a") {
-     let ref = Referent(this.id());
+     let ref = new Referent(this.id());
      head.push(ref);
      let n = clone(m2.noun);
      n.ref = ref;
@@ -444,12 +439,12 @@ describe("DRT Builder", function() {
         m.noun.children.length == 1 &&
         typeof m.noun.children[0] == "string") {
      let name = m.noun.children[0];
-     let ref = m.noun.ref.name;
+     let u = m.noun.ref.name;
 
      for (let key in node) {
       delete node[key];
      }
-     Override.assign(node, predicate(name, [arg(ref)]));
+     Override.assign(node, predicate(name, [arg(u)]));
     }
 
     return [head, body];
@@ -524,9 +519,6 @@ describe("DRT Builder", function() {
     let head = [];
     let body = [];
 
-    // console.log(`> ${node["@type"]}`);
-    // console.log(node);
-
     if (m) {
      let rc = node.children.pop();
 
@@ -534,12 +526,12 @@ describe("DRT Builder", function() {
      // Binds gap to the referent.
      let object = s.children[1].children[0].children[1];
      if (object.children[0]["@type"] == "GAP") {
-      Override.assign(object, node.ref);
+      object.children[0] = node.ref;
      }
 
      let subject = s.children[0];
      if (subject.children[0]["@type"] == "GAP") {
-      Override.assign(subject, node.ref);
+      subject.children[0] = node.ref;
      }
 
      body.push(s);
@@ -556,7 +548,7 @@ describe("DRT Builder", function() {
   function transcribe(node) {
    if (typeof node == "string") {
     return node;
-   } else if (node["@type"] == "Referent") {
+   } else if (node instanceof Referent) {
     return node.name;
    }
    let result = [];
@@ -687,11 +679,11 @@ describe("DRT Builder", function() {
   });
 
   class DRS {
-   constructor() {
+   constructor(rules) {
     this.head = [];
     this.body = [];
     let ids = new Ids();
-    this.rules = 
+    this.rules = rules ? rules :
      [new CRPN(ids), 
       new CRID(ids), 
       new CRNRC(ids), 
@@ -724,7 +716,7 @@ describe("DRT Builder", function() {
     return this;
    }
 
-   serialize() {
+   print() {
     let result = [];
     let refs = [];
     for (let ref of this.head) {
@@ -743,7 +735,20 @@ describe("DRT Builder", function() {
   }
 
   it("DRS", function() {
-    let drs = new DRS();
+    class TestRule extends Rule {
+     match(node) {
+      return [[], []];
+     }
+    }
+
+    let drs = new DRS([new TestRule()]);
+
+    drs.feed("Mel loves Dani.");
+
+    assertThat(drs.head).equalsTo([]);
+    assertThat(drs.body.length).equalsTo(1);
+    assertThat(transcribe(drs.body[0]))
+      .equalsTo("Mel loves Dani");
   });
 
   it("Mel loves Dani.", function() {
@@ -883,15 +888,16 @@ describe("DRT Builder", function() {
      `);
   });
 
+  function trim (str) {
+   return str
+    .trim()
+    .split("\n")
+    .map(line => line.trim())
+    .join("\n");
+  };
+
   function assertThat(x) { 
   return {
-    trim (str) {
-     return str
-      .trim()
-      .split("\n")
-      .map(line => line.trim())
-      .join("\n");
-    },
     equalsTo(y, z) {
      if (!z) {
        Assert.deepEqual(x, y);
@@ -906,7 +912,7 @@ describe("DRT Builder", function() {
       }
       drs.feed(s.trim() + ".");
      }
-     assertThat(drs.serialize()).equalsTo(this.trim(z));
+     assertThat(drs.print()).equalsTo(trim(z));
     }
    }
   }
