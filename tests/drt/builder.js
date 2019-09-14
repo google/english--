@@ -682,6 +682,7 @@ describe("DRT Builder", function() {
 
     let sub = new DRS(this.ids);
     sub.head = clone(refs);
+    sub.head.forEach(ref => ref.closure = true);
     sub.neg = true;
 
     let s = node;
@@ -770,7 +771,7 @@ describe("DRT Builder", function() {
    print() {
     let result = [];
     let refs = [];
-    for (let ref of this.head) {
+    for (let ref of this.head.filter(ref => !ref.closure)) {
      refs.push(`${ref.name}`);
     }
 
@@ -964,7 +965,7 @@ describe("DRT Builder", function() {
      .equalsTo(true, `
        drs(a) {
          Jones(a)
-         ~drs(a, b) {
+         ~drs(b) {
            a own b
            porsche(b)
          }
@@ -979,7 +980,7 @@ describe("DRT Builder", function() {
          a owns b
          Jones(a)
          porsche(b)
-         ~drs(a, b) {
+         ~drs() {
            a like b
          }
        }
@@ -992,7 +993,7 @@ describe("DRT Builder", function() {
     assertThat(drs.print()).equalsTo(trim(`
       drs(a) {
         Jones(a)
-        ~drs(a, b) {
+        ~drs(b) {
           a own b
           porsche(b)
         }
@@ -1022,7 +1023,7 @@ describe("DRT Builder", function() {
      .equalsTo(true, `
        drs(a) {
          porsche(a)
-         ~drs(a) {
+         ~drs() {
            a stink
          }
        }
@@ -1034,10 +1035,10 @@ describe("DRT Builder", function() {
      .equalsTo(true, `
        drs(a) {
          Jones(a)
-         ~drs(a, b) {
+         ~drs(b) {
            a own b
            porsche(b)
-           ~drs(a, b) {
+           ~drs() {
              b fascinate a
            }
          }
@@ -1050,11 +1051,11 @@ describe("DRT Builder", function() {
      .equalsTo(true, `
        drs(a) {
          Jones(a)
-         ~drs(a, b) {
+         ~drs(b) {
            a like b
            porsche(b)
-           ~drs(a, b) {
-           a own b
+           ~drs() {
+             a own b
            }
          }
        }
