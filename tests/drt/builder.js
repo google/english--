@@ -276,7 +276,7 @@ describe("DRT Builder", function() {
      result.children[1].children[0] = ref;
     }
 
-    return [head, body, []];
+    return [head, body, [], []];
    }
   }
 
@@ -401,7 +401,7 @@ describe("DRT Builder", function() {
      }
      node.children[1].children[0] = ref;
     }
-    return [head, body, []];
+    return [head, body, [], []];
    }
   }
 
@@ -485,7 +485,7 @@ describe("DRT Builder", function() {
      node.children[0] = ref;
     }
 
-    return [head, body, []];
+    return [head, body, [], []];
    }
   }
 
@@ -497,7 +497,7 @@ describe("DRT Builder", function() {
     let head = [];
     let body = [];
 
-    return [head, body];
+    return [head, body, [], []];
 
     if (m && 
         m.noun.ref && 
@@ -508,7 +508,7 @@ describe("DRT Builder", function() {
      node.assign(predicate(name, [arg(u)]));
     }
 
-    return [head, body, []];
+    return [head, body, [], []];
    }
   }
 
@@ -592,7 +592,7 @@ describe("DRT Builder", function() {
      node.assign(noun);
     }
 
-    return [head, body, []];
+    return [head, body, [], []];
    }
   }
 
@@ -694,7 +694,7 @@ describe("DRT Builder", function() {
     let subs = [];
 
     if (!m) {
-     return [head, body, []];
+     return [head, body, [], []];
     }
     
     let noun = m.np.children[0];
@@ -708,9 +708,10 @@ describe("DRT Builder", function() {
     
     sub.push(new Node(s));
 
-    node.assign(noun);
+    // node.assign(noun);
+    // node.remove();
 
-    return [head, body, [sub]];
+    return [head, body, [sub], [node]];
    }
   }
 
@@ -723,9 +724,10 @@ describe("DRT Builder", function() {
 
     assertThat(node.print()).equalsTo("a does not own a porsche");
 
-    let [head, body, subs] = new CRNEG(ids).match(node, []);
+    let [head, body, subs, remove] = new CRNEG(ids).match(node, []);
 
-    assertThat(node.print()).equalsTo("a");
+    assertThat(remove.length).equalsTo(1);
+    assertThat(remove[0]).equalsTo(node);
 
     assertThat(subs.length).equalsTo(1);
     assertThat(subs[0].print()).equalsTo(trim(`
@@ -763,10 +765,15 @@ describe("DRT Builder", function() {
      // breadth first search: iterate over
      // this level first ...
      for (let rule of this.rules) {
-      let [head, body, drs] = rule.match(p, this.head);
+      let [head, body, drs, remove] = rule.match(p, this.head);
       this.head.push(...head);
       this.body.push(...body);
       this.subs.push(...drs);
+      for (let del of remove) {
+       let i = this.body.indexOf(del);
+       // console.log(i);
+       this.body.splice(i, 1);
+      }
       queue.push(...body);
      }
      // ... and recurse.
@@ -977,7 +984,6 @@ describe("DRT Builder", function() {
          a owns b
          Jones(a)
          porsche(b)
-         a
          ~drs(a, b) {
            a like b
          }
