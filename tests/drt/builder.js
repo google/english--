@@ -528,13 +528,18 @@ describe("DRT Builder", function() {
      return [[], [], [], []];
     }
 
-    // let positive = RC(RPRO(), S(NP(), VP_(VP(capture("vp")))));
-
     let rc = node.children.pop();
 
     let s = rc.children[1];
+
+    // let g1 = ;
+    const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
+    if (match(g1, s)) {
+     child(s, 1, 2, 1).children[0] = node.ref;
+    }
+
     // Binds gap to the referent.
-    let object = s.children[1].children[0].children[1];
+    let object = child(s, 1, 0, 1);
     if (object && object.children[0]["@type"] == "GAP") {
      object.children[0] = node.ref;
     }
@@ -629,12 +634,12 @@ describe("DRT Builder", function() {
     assertThat(print(node)).equalsTo("a owns c");
   });
 
-  it.skip("CR.NRC with negation", function() {
+  it("CR.NRC with negation", function() {
     let ids = new Ids();
 
     let node = first(parse("Jones owns a book which he does not like."), true);
 
-    let [h, [jones], subs, [remove]] = new CRPN(ids).match(node);
+    let [refs, [jones], subs, [remove]] = new CRPN(ids).match(node);
 
     assertThat(print(jones))
      .equalsTo("Jones(a)");
@@ -651,14 +656,10 @@ describe("DRT Builder", function() {
     assertThat(print(book)).equalsTo("book(b)");
     assertThat(print(rc)).equalsTo("he does not like b");
 
-    new CRLIN(ids).match(id);
+    new CRPRO(ids).match(rc, refs);
 
-    assertThat(head.length).equalsTo(0);
+    assertThat(print(rc)).equalsTo("a does not like b");
 
-    let [h2, [smith]] = new CRPN(ids).match(rc);
-    assertThat(print(rc)).equalsTo("c likes b");
-    assertThat(print(smith)).equalsTo("Smith(c)");
-    
     new CRPN(ids).match(child(node, 0));
 
     assertThat(print(node)).equalsTo("a owns b");
@@ -1044,7 +1045,7 @@ describe("DRT Builder", function() {
      `);
   });
 
-  it.skip("Jones does not like a porsche which he does not own.", function() {
+  it("Jones does not like a porsche which he does not own.", function() {
     assertThat("Jones does not like a porsche which he does not own.")
      .equalsTo(true, `
        drs(a) {
