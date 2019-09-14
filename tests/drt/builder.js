@@ -730,14 +730,11 @@ describe("DRT Builder", function() {
 
     assertThat(subs.length).equalsTo(1);
     assertThat(subs[0].print()).equalsTo(trim(`
-      ~
-
-      b
-       
-      a own b
-      porsche(b)
+      ~drs(b) {
+        a own b
+        porsche(b)
+      }
     `));
-
   });
 
   class DRS {
@@ -788,17 +785,15 @@ describe("DRT Builder", function() {
      refs.push(`${ref.name}`);
     }
 
-    if (this.neg) {
-     result.push("~");
-     result.push("");
-    }
-
-    result.push(refs.join(", "));
-    result.push("");
+    let args = refs.join(", ");
+    let neg = this.neg ? "~" : "";
+    result.push(`${neg}drs(${args}) \{`);
 
     for (let cond of this.body) {
      result.push(transcribe(cond));
     }
+
+    result.push("}");
     
     return result.join("\n");
    }
@@ -821,140 +816,153 @@ describe("DRT Builder", function() {
       .equalsTo("Mel loves Dani");
   });
 
+  it("DRS print()", function() {
+    let drs = new DRS();
+    drs.feed("Mel loves Dani.");
+    assertThat(drs.print())
+     .equalsTo(trim(`
+       drs(a, b) {
+         a loves b
+         Mel(a)
+         Dani(b)
+       }
+     `));
+  });
+
   it("Mel loves Dani.", function() {
     assertThat("Mel loves Dani.", true)
      .equalsTo(true, `
-       a, b
-
-       a loves b
-       Mel(a)
-       Dani(b)
+       drs(a, b) {
+         a loves b
+         Mel(a)
+         Dani(b)
+       }
     `);
   });
 
   it("A man loves Dani.", function() {
     assertThat("A man loves Dani.")
      .equalsTo(true, `
-       a, b
-
-       a loves b
-       man(a)
-       Dani(b)
+       drs(a, b) {
+         a loves b
+         man(a)
+         Dani(b)
+       }
      `);
   });
 
   it("Dani loves a man.", function() {
     assertThat("Dani loves a man.")
      .equalsTo(true, `
-       a, b
-
-       a loves b
-       Dani(a)
-       man(b)
+       drs(a, b) {
+         a loves b
+         Dani(a)
+         man(b)
+       }
      `);
   });
 
   it("A man who loves Dani fascinates Anna.", function() {
     assertThat("A man who loves Dani fascinates Anna.")
      .equalsTo(true, `
-       a, b, c
-
-       a fascinates b
-       man(a)
-       a loves c
-       Anna(b)
-       Dani(c)
+       drs(a, b, c) {
+         a fascinates b
+         man(a)
+         a loves c
+         Anna(b)
+         Dani(c)
+       }
      `);
   });
 
   it("Mel loves a book which fascinates Anna.", function() {
     assertThat("Mel loves a book which fascinates Anna.")
      .equalsTo(true, `
-       a, b, c
-
-       a loves b
-       Mel(a)
-       book(b)
-       b fascinates c
-       Anna(c)
+       drs(a, b, c) {
+         a loves b
+         Mel(a)
+         book(b)
+         b fascinates c
+         Anna(c)
+       }
      `);
   });
 
   it("Jones owns a book which Smith loves.", function() {
     assertThat("Jones owns a book which Smith loves.")
      .equalsTo(true, `
-       a, b, c
-
-       a owns b
-       Jones(a)
-       book(b)
-       c loves b
-       Smith(c)
+       drs(a, b, c) {
+         a owns b
+         Jones(a)
+         book(b)
+         c loves b
+         Smith(c)
+       }
      `);
   });
 
   it("Jones owns a book which fascinates him.", function() {
     assertThat("Jones owns a book which fascinates him.")
      .equalsTo(true, `
-       a, b
-
-       a owns b
-       Jones(a)
-       book(b)
-       b fascinates a
+       drs(a, b) {
+         a owns b
+         Jones(a)
+         book(b)
+         b fascinates a
+       }
      `);
   });
 
   it("A man who fascinates Dani loves a book which fascinates Anna.", function() {
     assertThat("A man who fascinates Dani loves a book which fascinates Anna.")
      .equalsTo(true, `
-       a, b, c, d
-
-       a loves b
-       man(a)
-       a fascinates c
-       book(b)
-       b fascinates d
-       Dani(c)
-       Anna(d)
+       drs(a, b, c, d) {
+         a loves b
+         man(a)
+         a fascinates c
+         book(b)
+         b fascinates d
+         Dani(c)
+         Anna(d)
+       }
      `);
   });
 
   it("Jones owns Ulysses. It fascinates him.", function() {
     assertThat("Jones owns Ulysses. It fascinates him.")
      .equalsTo(true, `
-       a, b
-
-       a owns b
-       Jones(a)
-       Ulysses(b)
-       b fascinates a
+       drs(a, b) {
+         a owns b
+         Jones(a)
+         Ulysses(b)
+         b fascinates a
+       }
      `);
   });
 
   it("Mel owns a book.", function() {
     assertThat("Mel owns a book. It fascinates him.")
      .equalsTo(true, `
-       a, b
-
-       a owns b
-       Mel(a)
-       book(b)
-       b fascinates a
+       drs(a, b) {
+         a owns b
+         Mel(a)
+         book(b)
+         b fascinates a
+       }
      `);
   });
 
   it("Mel owns a book. It fascinates him. Dani loves him.", function() {
     assertThat("Mel owns a book. It fascinates him. Dani loves him.")
      .equalsTo(true, `
-       a, b, c
-
-       a owns b
-       Mel(a)
-       book(b)
-       b fascinates a
-       c loves a
-       Dani(c)
+       drs(a, b, c) {
+         a owns b
+         Mel(a)
+         book(b)
+         b fascinates a
+         c loves a
+         Dani(c)
+       }
      `);
   });
 
