@@ -1208,6 +1208,17 @@ describe("DRT Builder", function() {
     `);
   });
 
+  it.skip("Jones is not happy.", function() {
+    // TODO(goto): deal with the negative case of adjectives.
+    assertThat("Jones is not happy.", true)
+     .equalsTo(true, `
+       drs(a) {
+         Jones(a)
+         happy(a)
+       }
+    `);
+  });
+
   it("A man is happy.", function() {
     assertThat("A man is happy.", true)
      .equalsTo(true, `
