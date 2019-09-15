@@ -24,7 +24,7 @@ const {
   nodes} = require("../../src/drt/parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, DET, N, PRO, AUX, RC, RPRO, GAP, 
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,
  Discourse, Sentence
 } = nodes;
 
@@ -549,7 +549,6 @@ describe("DRT Builder", function() {
 
     let s = rc.children[1];
 
-    // let g1 = ;
     const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
     if (match(g1, s)) {
      child(s, 1, 2, 1).children[0] = node.ref;
@@ -563,7 +562,7 @@ describe("DRT Builder", function() {
     
     let subject = s.children[0];
     if (subject.children[0]["@type"] == "GAP") {
-     subject.children[0] = node.ref;
+     s.children[0] = node.ref;
     }
 
     let noun = node.children.pop();
@@ -738,6 +737,72 @@ describe("DRT Builder", function() {
     `));
   });
 
+  class CRBE extends Rule {
+   match(node, refs) {
+    let matcher = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
+    let m = match(matcher, node);
+
+    let body = [];
+
+    if (!m) {
+     return [[], body, [], [], []];
+    }
+
+    let ref = m.ref.children[0];
+    let adj = m.adj;
+    adj.ref = ref;
+
+    return [[], [adj], [], [node]];
+   }
+  }
+
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones is happy."), true);
+
+    new CRPN(ids).match(node);
+
+    assertThat(print(node)).equalsTo("a is happy");
+
+    let [head, body, subs, remove] = new CRBE(ids).match(node, []);
+
+    assertThat(head.length).equalsTo(0);
+    assertThat(subs.length).equalsTo(0);
+
+    // remove current node
+    assertThat(remove.length).equalsTo(1);
+    assertThat(remove[0]).equalsTo(node);
+
+    assertThat(body.length).equalsTo(1);
+    assertThat(print(body[0])).equalsTo(trim(`
+      happy(a)
+    `));
+  });
+
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones loves a woman who is happy."), true);
+
+    new CRPN(ids).match(node);
+
+    assertThat(print(node)).equalsTo("a loves a woman who is happy");
+
+    let [, [id]] = new CRID(ids).match(child(node, 1, 0));
+
+    assertThat(print(id)).equalsTo("woman who is happy(b)");
+
+    let [, [woman, rc]] = new CRNRC(ids).match(id);
+
+    assertThat(print(woman)).equalsTo("woman(b)");
+    assertThat(print(rc)).equalsTo("b is happy");
+
+    let [, [be]] = new CRBE(ids).match(rc);
+
+    assertThat(print(be)).equalsTo("happy(b)");
+  });
+
   class DRS {
    constructor(ids = new Ids()) {
     this.head = [];
@@ -748,7 +813,8 @@ describe("DRT Builder", function() {
       new CRID(ids), 
       new CRNRC(ids), 
       new CRPRO(ids),
-      new CRNEG(ids)];
+      new CRNEG(ids),
+      new CRBE(ids)];
    }
 
    feed(s) {
@@ -1130,6 +1196,50 @@ describe("DRT Builder", function() {
          }
        }
      `);
+  });
+
+  it("Jones is happy.", function() {
+    assertThat("Jones is happy.", true)
+     .equalsTo(true, `
+       drs(a) {
+         Jones(a)
+         happy(a)
+       }
+    `);
+  });
+
+  it("A man is happy.", function() {
+    assertThat("A man is happy.", true)
+     .equalsTo(true, `
+       drs(a) {
+         man(a)
+         happy(a)
+       }
+    `);
+  });
+
+  it("Jones loves a woman who is happy.", function() {
+    assertThat("Jones loves a woman who is happy.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a loves b
+         Jones(a)
+         woman(b)
+         happy(b)
+       }
+    `);
+  });
+
+  it("A woman who is happy loves Jones.", function() {
+    assertThat("A woman who is happy loves Jones.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a loves b
+         woman(a)
+         happy(a)
+         Jones(b)
+       }
+    `);
   });
 
   function trim (str) {
