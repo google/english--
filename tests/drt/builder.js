@@ -863,6 +863,18 @@ describe("DRT Builder", function() {
     `);
   });
 
+  it("Jones admires a woman who likes him.", function() {
+    assertThat("Jones admires a woman who likes him.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a admires b
+         Jones(a)
+         woman(b)
+         b likes a
+       }
+    `);
+  });
+
   it("Mel loves Dani.", function() {
     assertThat("Mel loves Dani.", true)
      .equalsTo(true, `

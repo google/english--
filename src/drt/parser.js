@@ -404,6 +404,19 @@ function grammar() {
                      [term("RPRO", {"num": 1, "gen": 2}),
                       space(),
                       term("S", {"num": 1, "gap": 1})]));
+
+ // PS Adjectives (page 57)
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                    [term("BE", {"num": 1, "fin": 2}),
+                     space(),
+                     term("ADJ")]));
+
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                    [term("BE", {"num": 1, "fin": 2}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("ADJ")]));
  
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
@@ -525,6 +538,17 @@ function grammar() {
  // GAP
  result.push(rule(term("GAP"),
                    [["null"]]));
+
+ // ADJ
+ result.push(rule(term("ADJ"),
+                  [[literal("happy")], [literal("unhappy")], [literal("foolish")], [literal("fat")]]));
+
+ // BE
+ result.push(rule(term("BE", {"num": "sing", "fin": 1}),
+                  [[literal("is")]]));
+
+ result.push(rule(term("BE", {"num": "plur", "fin": 1}),
+                  [[literal("are")]]));
  
  return result;
 }
@@ -578,6 +602,7 @@ module.exports = {
   VP_: (...children) => node("VP'", ...children),
   VP: (...children) => node("VP", ...children),
   V: (...children) => node("V", ...children),
+  BE: (...children) => node("BE", ...children),
   DET: (...children) => node("DET", ...children),
   N: (...children) => node("N", ...children),
   PRO: (...children) => node("PRO", ...children),
@@ -585,6 +610,7 @@ module.exports = {
   RC: (...children) => node("RC", ...children),
   RPRO: (...children) => node("RPRO", ...children),
   GAP: (...children) => node("GAP", ...children),
+  ADJ: (...children) => node("ADJ", ...children),
   Discourse: (...children) => node("Discourse", ...children),
   Sentence: (...children) => node("Sentence", ...children),
  }

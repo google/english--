@@ -21,7 +21,7 @@ const {
   nodes} = require("../../src/drt/parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, DET, N, PRO, AUX, RC, RPRO, GAP, 
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,
  Discourse, Sentence
 } = nodes;
 
@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(44);
+    assertThat(result.length).equalsTo(49);
 
     let i = 0;
     assertThat(print(result[i++]))
@@ -383,6 +383,10 @@ A ->
      .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ RC[num=@1, gen=@2]');
     assertThat(print(result[i++]))
      .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@1, gap=@1]');
+    assertThat(print(result[i++]))
+     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
+    assertThat(print(result[i++]))
+     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(result[i++]))
@@ -433,6 +437,12 @@ A ->
      .equalsTo('RPRO[num=sing/plur, gen=-hum] -> "which"');
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
+    assertThat(print(result[i++]))
+     .equalsTo('ADJ -> "happy" "unhappy" "foolish" "fat"');
+    assertThat(print(result[i++]))
+     .equalsTo('BE[num=sing, fin=@1] -> "is"');
+    assertThat(print(result[i++]))
+     .equalsTo('BE[num=plur, fin=@1] -> "are"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and
@@ -606,12 +616,18 @@ A ->
     assertThat("A stockbroker who do not love her surprises him.").failsAt(20, " ");
   });
 
+  it("He is happy.", function() {
+    assertThat(first(parse("He is happy.")))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(BE("is"), ADJ("happy")))));
+   });
+
   it("A porsche does not stink", function() {
     assertThat(first(parse("A porsche does not stink.")))
      .equalsTo(S(NP(DET("A"), N("porsche")),
                  VP_(AUX("does"), "not", 
                      VP(V("stink")))));
-   });
+  });
 
   it("Jones loves a woman who does not admire him.", function() {
     assertThat(first(parse("Jones loves a woman who does not love him.")))
