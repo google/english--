@@ -1242,6 +1242,18 @@ describe("DRT Builder", function() {
     `);
   });
 
+  it("Jones owns a porsche. He is happy.", function() {
+    assertThat("Jones owns a porsche. He is happy.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a owns b
+         Jones(a)
+         porsche(b)
+         happy(a)
+       }
+    `);
+  });
+
   function trim (str) {
    return str
     .trim()
