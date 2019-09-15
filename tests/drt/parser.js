@@ -622,6 +622,12 @@ A ->
                  VP_(VP(BE("is"), ADJ("happy")))));
    });
 
+  it("He is not happy.", function() {
+    assertThat(first(parse("He is not happy.")))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(BE("is"), "not", ADJ("happy")))));
+   });
+
   it("A porsche does not stink", function() {
     assertThat(first(parse("A porsche does not stink.")))
      .equalsTo(S(NP(DET("A"), N("porsche")),

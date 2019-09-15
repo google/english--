@@ -587,7 +587,8 @@ describe("DRT Builder", function() {
     result.push(transcribe(child));
    }
    let suffix = node.ref ? `(${node.ref.name})` : "";
-   return result.join(" ").trim() + suffix;
+   let prefix = node.neg ? "~" : "";
+   return prefix + result.join(" ").trim() + suffix;
   }
 
   it("CR.NRC", function() {
@@ -739,20 +740,26 @@ describe("DRT Builder", function() {
 
   class CRBE extends Rule {
    match(node, refs) {
-    let matcher = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
-    let m = match(matcher, node);
-
-    let body = [];
-
-    if (!m) {
-     return [[], body, [], [], []];
+    let matcher1 = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
+    let m1 = match(matcher1, node);
+    if (m1) {
+     let ref = m1.ref.children[0];
+     let adj = m1.adj;
+     adj.ref = ref;
+     return [[], [adj], [], [node]];
     }
 
-    let ref = m.ref.children[0];
-    let adj = m.adj;
-    adj.ref = ref;
+    let matcher2 = S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj")))));
+    let m2 = match(matcher2, node);
+    if (m2) {
+     let ref = m2.ref.children[0];
+     let adj = m2.adj;
+     adj.ref = ref;
+     adj.neg = true;
+     return [[], [adj], [], [node]];
+    }
 
-    return [[], [adj], [], [node]];
+    return [[], [], [], [], []];
    }
   }
 
@@ -777,6 +784,30 @@ describe("DRT Builder", function() {
     assertThat(body.length).equalsTo(1);
     assertThat(print(body[0])).equalsTo(trim(`
       happy(a)
+    `));
+  });
+
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones is not happy."), true);
+
+    new CRPN(ids).match(node);
+
+    assertThat(print(node)).equalsTo("a is not happy");
+
+    let [head, body, subs, remove] = new CRBE(ids).match(node, []);
+
+    assertThat(head.length).equalsTo(0);
+    assertThat(subs.length).equalsTo(0);
+
+    // remove current node
+    assertThat(remove.length).equalsTo(1);
+    assertThat(remove[0]).equalsTo(node);
+
+    assertThat(body.length).equalsTo(1);
+    assertThat(print(body[0])).equalsTo(trim(`
+      ~happy(a)
     `));
   });
 
@@ -1208,13 +1239,12 @@ describe("DRT Builder", function() {
     `);
   });
 
-  it.skip("Jones is not happy.", function() {
-    // TODO(goto): deal with the negative case of adjectives.
+  it("Jones is not happy.", function() {
     assertThat("Jones is not happy.", true)
      .equalsTo(true, `
        drs(a) {
          Jones(a)
-         happy(a)
+         ~happy(a)
        }
     `);
   });
