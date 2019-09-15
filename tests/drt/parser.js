@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(49);
+    assertThat(result.length).equalsTo(50);
 
     let i = 0;
     assertThat(print(result[i++]))
@@ -383,10 +383,14 @@ A ->
      .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ RC[num=@1, gen=@2]');
     assertThat(print(result[i++]))
      .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@1, gap=@1]');
+    // Adjectives
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
+    // Conditionals
+    assertThat(print(result[i++]))
+     .equalsTo('S[num=@1] -> "if" __ S[num=@1] __ "then" __ S[num=@1]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(result[i++]))
@@ -646,6 +650,14 @@ A ->
                                                          ))
                                        ))))
                  ));
+  });
+
+  it("If Jones owns a book then he likes it.", function() {
+    assertThat(first(parse("If Jones owns a book then he likes it.")))
+     .equalsTo(S("If", 
+                 S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("a"), N("book"))))), 
+                 "then", 
+                 S(NP(PRO("he")), VP_(VP(V("likes"), NP(PRO("it")))))));
   });
 
   it("debug", function() {

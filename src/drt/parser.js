@@ -417,6 +417,16 @@ function grammar() {
                      literal("not"),
                      space(),
                      term("ADJ")]));
+
+ // Conditionals
+ result.push(phrase(term("S", {"num": 1}),
+                    [literal("if"),
+                     space(),
+                     term("S", {"num": 1}),
+                     space(),
+                     literal("then"),
+                     space(),
+                     term("S", {"num": 1})]));
  
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
