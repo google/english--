@@ -809,6 +809,13 @@ A ->
                  S(NP(PRO("he")), VP_(VP(V("likes"), NP(PRO("it")))))));
   });
 
+  it("every man who owns a book likes it.", function() {
+    assertThat(first(parse("every man who owns a book likes it.")))
+     .equalsTo(S(NP(DET("every"), N(N("man"), RC(RPRO("who"), 
+                                                 S(NP(GAP()), VP_(VP(V("owns"), NP(DET("a"), N("book")))))))), 
+                 VP_(VP(V("likes"), NP(PRO("it"))))));
+  });
+
   it("debug", function() {
     parse("Anna loves a man who loves her.");
     parse("Every book which she loves surprises him.");

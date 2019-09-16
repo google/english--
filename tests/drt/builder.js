@@ -877,6 +877,52 @@ describe("DRT Builder", function() {
     `));
   });
 
+  class CREVERY extends Rule {
+   match(node, refs) {
+    let matcher = S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb")));
+    let m = match(matcher, node);
+
+    if (m) {
+     let ref = new Referent(this.id(), m.noun.types);
+     let noun = new DRS(this.ids);
+     noun.head.push(...clone(refs));
+     noun.head.forEach(ref => ref.closure = true);
+     noun.head.push(ref);
+     m.noun.ref = ref;
+     noun.push(m.noun);
+
+     let verb = new DRS(this.ids);
+     verb.head.push(...clone(noun.head));
+     verb.head.forEach(ref => ref.closure = true);
+     node.children[0] = ref;
+     verb.push(node);
+
+     let implication = new Implication(noun, verb);
+
+     return [[], [], [implication], [node]];
+    }
+
+     return [[], [], [], []];
+   }
+  }
+
+  it("CR.EVERY", function() {
+    let ids = new Ids();
+
+    let node = first(parse("every man loves Jones."), true);
+
+    let [, , [sub]] = new CREVERY(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a) {
+        man(a)
+      } => drs(b) {
+        a loves b
+        Jones(b)
+      }
+    `));
+  });
+
   class DRS {
    constructor(ids = new Ids()) {
     this.head = [];
@@ -889,7 +935,8 @@ describe("DRT Builder", function() {
       new CRPRO(ids),
       new CRNEG(ids),
       new CRBE(ids),
-      new CRCOND(ids)];
+      new CRCOND(ids),
+      new CREVERY(ids)];
    }
 
    feed(s) {
@@ -1422,6 +1469,55 @@ describe("DRT Builder", function() {
          }
        }
     `);
+  });
+
+  it("Every man loves Jones.", function() {
+    assertThat("Every man loves Jones.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a) {
+           man(a)
+         } => drs(b) {
+           a loves b
+           Jones(b)
+         }
+       }
+    `);
+  });
+
+  it("Every man is happy.", function() {
+    assertThat("Every man is happy.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a) {
+           man(a)
+         } => drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
+  it("Every man is happy. He likes it.", function() {
+    try {
+     let drs = new DRS();
+     drs.feed("Every man is happy.");
+     drs.feed("He likes it.");
+     throw new Error("expected reference 'He' to fail");
+    } catch (e) {
+     assertThat(e.message).equalsTo("Invalid reference: He");
+    }
+  });
+
+  it("Every man owns a book. It is happy.", function() {
+    try {
+     let drs = new DRS();
+     drs.feed("Every man owns a book.");
+     drs.feed("It is happy.");
+     throw new Error("expected reference 'It' to fail");
+    } catch (e) {
+     assertThat(e.message).equalsTo("Invalid reference: It");
+    }
   });
 
   function trim (str) {
