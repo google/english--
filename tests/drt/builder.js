@@ -43,7 +43,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe("DRT Builder", function() {
+describe("Builder", function() {
 
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
