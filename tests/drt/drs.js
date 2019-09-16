@@ -529,6 +529,16 @@ describe("DRS", function() {
     }
   });
 
+  it.skip("Jones loves every man.", function() {
+    assertThat("Jones loves every man.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         a loves every man
+       }
+    `);
+  });
+
   it("Jones loves Mary or Smith loves her.", function() {
     assertThat("Jones loves Mary or Smith loves her.")
      .equalsTo(`
@@ -608,6 +618,94 @@ describe("DRS", function() {
          } or drs(c) {
            Smith(c)
            c love a
+         }
+       }
+    `);
+  });
+
+  it.skip("If a woman fascinates a man then he likes her or she likes him.", function() {
+    // "she" can't be bound because the search algorithm isn't walking up the drs chain.
+    assertThat("If a woman fascinates a man then he likes her or she likes him.")
+     .equalsTo(`
+       drs(a) {
+         Mary(a)
+         happy(a)
+         drs(b) {
+           Jones(b)
+           b love a
+         } or drs(c) {
+           Smith(c)
+           c love a
+         }
+       }
+    `);
+  });
+
+  it("Jones loves or likes Mary.", function() {
+    assertThat("Jones loves or likes Mary.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         Mary(b)
+         drs() {
+           a loves
+         } or drs() {
+           a likes b
+         }
+       }
+    `);
+  });
+
+  it("Jones loves Mary or likes a woman who Smith loves.", function() {
+    assertThat("Jones loves Mary or likes a woman who Smith loves.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         Mary(b)
+         Smith(c)
+         drs() {
+           a loves b
+         } or drs(d) {
+           a likes d
+           woman(d)
+           c loves d
+         }
+       }
+    `);
+  });
+
+  it("Jones likes every woman who Smith loves.", function() {
+    assertThat("Jones likes every woman who Smith loves.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         Smith(b)
+         drs(c) {
+           woman(c)
+           b loves c
+         } => drs() {
+           a likes c
+         }
+       }
+     `);
+  });
+
+  it("Jones loves Mary or likes a woman who Smith loves.", function() {
+    assertThat("Jones loves Mary or likes every woman who Smith loves.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         Mary(b)
+         Smith(c)
+         drs() {
+           a loves b
+         } or drs() {
+           drs(d) {
+             woman(d)
+             c loves d
+           } => drs() {
+             a likes d
+           }
          }
        }
     `);

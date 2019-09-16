@@ -16,6 +16,7 @@ const {
   CRBE,
   CRCOND,
   CREVERY,
+  CRVPEVERY,
   CROR,
   CRVPOR,
   CRNPOR,
@@ -453,6 +454,42 @@ describe("Rules", function() {
         Jones(b)
         a loves b
       }
+    `));
+  });
+
+  it("CR.VPEVERY", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones loves every man."), true);
+
+    let [, , [sub]] = new CRVPEVERY(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a) {
+        man(a)
+      } => drs(b) {
+        Jones(b)
+        b loves a
+      }
+    `));
+  });
+
+  it("CR.VPEVERY", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones likes every woman who Smith loves."), true);
+
+    let [, , [sub]] = new CRVPEVERY(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+         Smith(b)
+         woman(a)
+         b loves a
+       } => drs(c) {
+         Jones(c)
+         c likes a
+       }
     `));
   });
 

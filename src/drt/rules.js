@@ -399,6 +399,39 @@ class CREVERY extends Rule {
  }
 }
 
+class CRVPEVERY extends Rule {
+ match(node, refs) {
+  let matcher = S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun"))))));
+  let m = match(matcher, node);
+  
+  // console.log(print(node));
+
+  if (!m) {
+   return [[], [], [], []];
+  }
+  
+  // console.log("hi");
+
+  let ref = new Referent(this.id(), m.noun.types);
+  let noun = new DRS(this.ids);
+  noun.head.push(...clone(refs));
+  noun.head.forEach(ref => ref.closure = true);
+  noun.head.push(ref);
+  m.noun.ref = ref;
+  noun.push(m.noun);
+   
+  let verb = new DRS(this.ids);
+  verb.head.push(...clone(noun.head));
+  verb.head.forEach(ref => ref.closure = true);
+  child(node, 1, 0).children[1] = ref;
+  verb.push(node);
+   
+  let implication = new Implication(noun, verb);
+  
+  return [[], [], [implication], [node]];
+ }
+}
+
 class CROR extends Rule {
  match(node, refs) {
   let matcher = S(S(capture("a")), "or", S(capture("b")));
@@ -492,6 +525,7 @@ class DRS {
     new CRBE(ids),
     new CRCOND(ids),
     new CREVERY(ids),
+    new CRVPEVERY(ids),
     new CROR(ids),
     new CRVPOR(ids),
     new CRNPOR(ids)];
@@ -540,7 +574,7 @@ class DRS {
     queue.push(...body);
    }
    // ... and recurse.
-   let next = (p.children || [])
+   let next = (p && p.children || [])
     .filter(c => typeof c != "string");
    queue.push(...next);
   }
@@ -609,6 +643,7 @@ module.exports = {
  CRBE: CRBE,
  CRCOND: CRCOND,
  CREVERY: CREVERY,
+ CRVPEVERY: CRVPEVERY,
  CROR: CROR,
  CRVPOR: CRVPOR,
  CRNPOR: CRNPOR,
