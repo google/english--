@@ -272,7 +272,7 @@ class CRNRC extends Rule {
   }
   
   let subject = s.children[0];
-  if (subject.children[0]["@type"] == "GAP") {
+  if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
    s.children[0] = node.ref;
   }
   
@@ -483,9 +483,9 @@ class DRS {
   this.head = [];
   this.body = [];
   this.subs = [];
+  this.names = new CRPN(ids);
   this.rules =
-   [new CRPN(ids),
-    new CRID(ids), 
+   [new CRID(ids), 
     new CRNRC(ids), 
     new CRPRO(ids),
     new CRNEG(ids),
@@ -501,7 +501,25 @@ class DRS {
   this.push(first(parse(s), true));
  }
  
+ bind(node) {
+  let queue = [node];
+  while (queue.length > 0) {
+   let p = queue.shift();
+   // console.log(print(p));
+   let [refs, names] = this.names.match(p);
+   this.head.push(...refs);
+   this.body.push(...names);
+   // ... and recurse.
+   let next = (p.children || [])
+    .filter(c => typeof c != "string");
+   queue.push(...next);
+  }
+ }
+
  push(node) {
+  // Resolve all proper names first.
+  this.bind(node);
+
   let queue = [node];
 
   this.body.push(node);

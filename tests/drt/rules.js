@@ -430,8 +430,8 @@ describe("Rules", function() {
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
-        a owns b
         Jones(a)
+        a owns b
         book(b)
       } => drs() {
         a likes b
@@ -450,8 +450,8 @@ describe("Rules", function() {
       drs(a) {
         man(a)
       } => drs(b) {
-        a loves b
         Jones(b)
+        a loves b
       }
     `));
   });
@@ -465,13 +465,13 @@ describe("Rules", function() {
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
-        a loves b
         Jones(a)
         Mary(b)
+        a loves b
       } or drs(c, d) {
-        c loves d
         Smith(c)
         Mary(d)
+        c loves d
       }
     `));
   });
@@ -485,13 +485,13 @@ describe("Rules", function() {
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
-        a loves b
         Mary(a)
         Jones(b)
+        a loves b
       } or drs(c, d) {
-        c likes d
         Mary(c)
         Smith(d)
+        c likes d
       }
     `));
   });
@@ -505,13 +505,13 @@ describe("Rules", function() {
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
-        a love b
         Jones(a)
         Mary(b)
+        a love b
       } or drs(c, d) {
-        c love d
         Smith(c)
         Mary(d)
+        c love d
       }
     `));
   });
@@ -539,9 +539,9 @@ describe("Rules", function() {
     assertThat(drs.print())
      .equalsTo(trim(`
        drs(a, b) {
-         a loves b
          Mel(a)
          Dani(b)
+         a loves b
        }
      `));
   });
