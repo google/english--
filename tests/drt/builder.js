@@ -100,6 +100,7 @@ describe("DRT Builder", function() {
    for (let i = 0; i < a.children.length; i++) {
     if (typeof a.children[i] == "string") {
      if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
+      // console.log(a.children[i]);
       return false;
      }
     } else if (a.children[i]["@type"] == "Match") {
@@ -923,12 +924,58 @@ describe("DRT Builder", function() {
     `));
   });
 
+  class CROR extends Rule {
+   match(node, refs) {
+    let matcher = S(S(capture("a")), "or", S(capture("b")));
+    let m = match(matcher, node);
+
+    if (!m) {
+     return [[], [], [], []];
+    }
+
+
+    let a = new DRS(this.ids);
+    a.head.push(...clone(refs));
+    a.head.forEach(ref => ref.closure = true);
+    a.push(m.a);
+
+    let b = new DRS(this.ids);
+    b.head.push(...clone(a.head));
+    b.head.forEach(ref => ref.closure = true);
+    b.push(m.b);
+    
+    let disjunction = new Disjunction(a, b);
+
+    return [[], [], [disjunction], [node]];
+   }
+  }
+
+  it("CR.OR", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones loves Mary or Smith loves Mary."), true);
+
+    let [, , [sub]] = new CROR(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        a loves b
+        Jones(a)
+        Mary(b)
+      } or drs(c, d) {
+        c loves d
+        Smith(c)
+        Mary(d)
+      }
+    `));
+  });
+
   class DRS {
    constructor(ids = new Ids()) {
     this.head = [];
     this.body = [];
     this.subs = [];
-    this.rules = 
+    this.rules =
      [new CRPN(ids),
       new CRID(ids), 
       new CRNRC(ids), 
@@ -936,7 +983,8 @@ describe("DRT Builder", function() {
       new CRNEG(ids),
       new CRBE(ids),
       new CRCOND(ids),
-      new CREVERY(ids)];
+      new CREVERY(ids),
+      new CROR(ids)];
    }
 
    feed(s) {
@@ -998,14 +1046,23 @@ describe("DRT Builder", function() {
    }
   }
 
-  class Implication extends DRS {
-   constructor(antecedent, consequent, ids) {
-    super(ids);
+  class Implication {
+   constructor(antecedent, consequent) {
     this.antecedent = antecedent;
     this.consequent = consequent;
    }
    print() {
     return this.antecedent.print() + " => " + this.consequent.print()
+   }
+  }
+
+  class Disjunction {
+   constructor(a, b) {
+    this.a = a;
+    this.b = b;
+   }
+   print() {
+    return this.a.print() + " or " + this.b.print()
    }
   }
 
@@ -1518,6 +1575,38 @@ describe("DRT Builder", function() {
     } catch (e) {
      assertThat(e.message).equalsTo("Invalid reference: It");
     }
+  });
+
+  it("Jones loves Mary or Smith loves Mary.", function() {
+    assertThat("Jones loves Mary or Smith loves Mary.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a, b) {
+           a loves b
+           Jones(a)
+           Mary(b)
+         } or drs(c, d) {
+           c loves d
+           Smith(c)
+           Mary(d)
+         }
+       }
+    `);
+  });
+
+  it("Jones owns a porsche or he likes it.", function() {
+    assertThat("Jones owns a porsche or he likes it.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a, b) {
+           a owns b
+           Jones(a)
+           porsche(b)
+         } or drs() {
+           a likes b
+         }
+       }
+    `);
   });
 
   function trim (str) {
