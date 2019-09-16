@@ -377,28 +377,42 @@ class CRNEG extends Rule {
  }
 }
 
-class CRBE extends Rule {
+class CRPOSBE extends Rule {
  match(node, refs) {
   let matcher1 = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
   let m1 = match(matcher1, node);
-  if (m1) {
-   let ref = m1.ref.children[0];
-   let adj = m1.adj;
-   adj.ref = ref;
-   return [[], [adj], [], [node]];
+
+  if (!m1) {
+   return [[], [], [], [], []];
   }
 
+  let ref = m1.ref.children[0];
+  let adj = m1.adj;
+  adj.ref = ref;
+  return [[], [adj], [], [node]];
+ }
+}
+
+class CRNEGBE extends Rule {
+ match(node, refs) {
   let matcher2 = S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj")))));
   let m2 = match(matcher2, node);
-  if (m2) {
-   let ref = m2.ref.children[0];
-   let adj = m2.adj;
-   adj.ref = ref;
-   adj.neg = true;
-   return [[], [adj], [], [node]];
+
+  if (!m2) {
+   return [[], [], [], [], []];
   }
 
-  return [[], [], [], [], []];
+  let ref = m2.ref.children[0];
+  let adj = m2.adj;
+  adj.ref = ref;
+  adj.neg = true;
+  return [[], [adj], [], [node]];
+ }
+}
+
+class CRBE extends CompositeRule {
+ constructor(ids) {
+  super([new CRPOSBE(ids), new CRNEGBE(ids)]);
  }
 }
 
