@@ -87,43 +87,47 @@ class Ids {
 }
 
 class Rule {
- constructor(ids) {
+ constructor(ids, trigger) {
   this.ids = ids || new Ids();
+  this.trigger = trigger;
  }
  
+ match(node, refs) {
+  let m = match(this.trigger, node);
+
+  if (!m) {
+   return [[], [], [], []];
+  }
+
+  return this.apply(m, node, refs);
+ }
+
  id() {
   return this.ids.get();
  }
 }
 
 class CRSPN extends Rule {
- match(node) {
-  let matcher1 = S(NP(PN(capture("name"))), VP_());
-  
-  let m1 = match(matcher1, node);
-  if (!m1) {
-   return [[], [], [], []];
-  }
+ constructor(ids) {
+  super(ids, S(NP(PN(capture("name"))), VP_()));
+ }
 
+ apply(m1, node) {
   let name = m1.name.children[0];
   let ref = new Referent(this.id(), m1.name.types);
   let pn = m1.name;
   pn.ref = ref;
   node.children[0] = ref;
- 
+
   return [[ref], [pn], [], []];
  }
 }
 
 class CRVPPN extends Rule {
- match(node) {
-  let matcher2 = VP(V(), NP(PN(capture("name"))));
-  let m2 = match(matcher2, node);
-
-  if (!m2) {
-   return [[], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, VP(V(), NP(PN(capture("name")))));
+ }
+ apply(m2, node) {
   let name = m2.name.children[0];
   let ref = new Referent(this.id(), m2.name.types);
   let pn = m2.name;
@@ -186,14 +190,11 @@ function find({gen, num}, refs) {
 
 
 class CRSPRO extends Rule {
- match(node, refs) {
-  let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
-  let m1 = match(matcher1, node);
-  
-  if (!m1) {
-   return [[], [], [], []];
-  }
+ constructor(ids) {
+  super(ids, S(NP(PRO(capture("pronoun"))), VP_(capture("?"))));
+ }
 
+ apply(m1, node, refs) {
   let u = find(m1.pronoun.types, refs);
 
   if (!u) {
@@ -207,16 +208,11 @@ class CRSPRO extends Rule {
 }
 
 class CRVPPRO extends Rule {
- match(node, refs) {
-  let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
-  let m2 = match(matcher2, node);
-  
-  // The types of head[2] agree with the types of the pronoun,
-  // so bind it to it.
-  if (!m2) {
-   return [[], [], [], []];
-  }
+ constructor(ids) {
+  super(ids, VP(V(), NP(PRO(capture("pronoun")))));
+ }
 
+ apply(m2, node, refs) {
   let ref = find(m2.pronoun.types, refs);
 
   if (!ref) {
@@ -236,11 +232,12 @@ class CRPRO extends CompositeRule {
 }
 
 class CRSID extends Rule {
- match(node) {
-  let matcher1 = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
-  let m1 = match(matcher1, node);
-  
-  if (!(m1 && m1.det.children[0] == "a")) {
+ constructor(ids) {
+  super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
+ }
+
+ apply(m1, node) {
+  if (m1.det.children[0] != "a") {
    return [[], [], [], []];
   }
 
@@ -254,11 +251,12 @@ class CRSID extends Rule {
 }
 
 class CRVPID extends Rule {
- match(node) {
-  let matcher2 = S(NP(DET(capture("det")), N(capture("noun"))), VP_());
-  let m2 = match(matcher2, node);
+ constructor(ids) {
+  super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_()));
+ }
 
-  if (!(m2 && m2.det.children[0].toLowerCase() == "a")) {
+ apply(m2, node) {
+  if (m2.det.children[0].toLowerCase() != "a") {
    return [[], [], [], []];
   }
 
@@ -301,17 +299,14 @@ class CRLIN extends Rule {
 }
 
 class CRNRC extends Rule {
- match(node) {
-  let matcher = N(N(), RC(capture("rc")));
-  let m = match(matcher, node);
+ constructor(ids) {
+  super(ids, N(N(), RC(capture("rc"))));
+ }
 
+ apply(m, node) {
   let head = [];
   let body = [];
   let remove = [];
-  
-  if (!m) {
-   return [[], [], [], []];
-  }
   
   let rc = node.children.pop();
     
@@ -345,17 +340,14 @@ class CRNRC extends Rule {
 }
 
 class CRNEG extends Rule {
- match(node, refs) {
-  let matcher = S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp"))));
-  let m = match(matcher, node);
+ constructor(ids) {
+  super(ids, S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp")))));
+ }
 
+ apply(m, node, refs) {
   let head = [];
   let body = [];
   let subs = [];
-  
-  if (!m) {
-   return [head, body, [], []];
-  }
     
   let noun = m.np.children[0];
   
@@ -378,14 +370,10 @@ class CRNEG extends Rule {
 }
 
 class CRPOSBE extends Rule {
- match(node, refs) {
-  let matcher1 = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
-  let m1 = match(matcher1, node);
-
-  if (!m1) {
-   return [[], [], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
+ }
+ apply(m1, node, refs) {
   let ref = m1.ref.children[0];
   let adj = m1.adj;
   adj.ref = ref;
@@ -394,14 +382,10 @@ class CRPOSBE extends Rule {
 }
 
 class CRNEGBE extends Rule {
- match(node, refs) {
-  let matcher2 = S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj")))));
-  let m2 = match(matcher2, node);
-
-  if (!m2) {
-   return [[], [], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
+ }
+ apply(m2, node, refs) {
   let ref = m2.ref.children[0];
   let adj = m2.adj;
   adj.ref = ref;
@@ -417,14 +401,10 @@ class CRBE extends CompositeRule {
 }
 
 class CRCOND extends Rule {
- match(node, refs) {
-  let matcher = S("if", capture("antecedent"), "then", capture("consequent"));
-  let m = match(matcher, node);
-  
-  if (!m) {
-   return [[], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S("if", capture("antecedent"), "then", capture("consequent")));
+ }
+ apply(m, node, refs) {
   let antecedent = new DRS(this.ids);
   antecedent.head.push(...clone(refs));
   antecedent.head.forEach(ref => ref.closure = true);
@@ -442,14 +422,10 @@ class CRCOND extends Rule {
 }
 
 class CREVERY extends Rule {
- match(node, refs) {
-  let matcher = S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb")));
-  let m = match(matcher, node);
-  
-  if (!m) {
-   return [[], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb"))));
+ }
+ apply(m, node, refs) {
   let ref = new Referent(this.id(), m.noun.types);
   let noun = new DRS(this.ids);
   noun.head.push(...clone(refs));
@@ -471,14 +447,10 @@ class CREVERY extends Rule {
 }
 
 class CRVPEVERY extends Rule {
- match(node, refs) {
-  let matcher = S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun"))))));
-  let m = match(matcher, node);
-  
-  if (!m) {
-   return [[], [], [], []];
-  }
-  
+ constructor(ids) {
+  super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
+ }
+ apply(m, node, refs) {
   let ref = new Referent(this.id(), m.noun.types);
   let noun = new DRS(this.ids);
   noun.head.push(...clone(refs));
@@ -500,14 +472,10 @@ class CRVPEVERY extends Rule {
 }
 
 class CROR extends Rule {
- match(node, refs) {
-  let matcher = S(S(capture("a")), "or", S(capture("b")));
-  let m = match(matcher, node);
-
-  if (!m) {
-   return [[], [], [], []];
-  }
-    
+ constructor(ids) {
+  super(ids, S(S(capture("a")), "or", S(capture("b"))));
+ }
+ apply(m, node, refs) {
   let a = new DRS(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
@@ -525,17 +493,10 @@ class CROR extends Rule {
 }
 
 class CRVPOR extends Rule {
- match(node, refs) {
-  let matcher = S(capture("n"), 
-                  VP_(VP(VP(capture("a")), 
-                         "or", 
-                         VP(capture("b")))));
-  let m = match(matcher, node);
-
-  if (!m) {
-   return [[], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S(capture("n"), VP_(VP(VP(capture("a")), "or", VP(capture("b"))))));
+ }
+ apply(m, node, refs) {
   let a = new DRS(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
@@ -553,15 +514,11 @@ class CRVPOR extends Rule {
 }
 
 class CRNPOR extends Rule {
- match(node, refs) {
-  let matcher = S(NP(NP(capture("a")), "or", NP(capture("b"))), 
-                  VP_(capture("vp")));
-  let m = match(matcher, node);
-
-  if (!m) {
-   return [[], [], [], []];
-  }
-
+ constructor(ids) {
+  super(ids, S(NP(NP(capture("a")), "or", NP(capture("b"))), 
+                  VP_(capture("vp"))));
+ }
+ apply(m, node, refs) {
   let a = new DRS(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
