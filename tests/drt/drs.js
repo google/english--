@@ -529,12 +529,16 @@ describe("DRS", function() {
     }
   });
 
-  it.skip("Jones loves every man.", function() {
+  it("Jones loves every man.", function() {
     assertThat("Jones loves every man.")
      .equalsTo(`
        drs(a) {
          Jones(a)
-         a loves every man
+         drs(b) {
+           man(b)
+         } => drs() {
+           a loves b
+         }
        }
     `);
   });
