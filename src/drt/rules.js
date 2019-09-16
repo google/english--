@@ -523,6 +523,27 @@ class CRNPOR extends Rule {
  }
 }
 
+class CRAND extends Rule {
+ constructor(ids) {
+  super(ids, S(S(capture("a")), "and", S(capture("b"))));
+ }
+ apply({a, b}, node, refs) {
+  let first = new DRS(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(a);
+
+  let second = new DRS(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(b);
+  
+  let result = new Conjunction(first, second);
+  
+  return [[], [], [result], [node]];
+ }
+}
+
 class DRS {
  constructor(ids = new Ids()) {
   this.head = [];
@@ -540,7 +561,8 @@ class DRS {
     new CRVPEVERY(ids),
     new CROR(ids),
     new CRVPOR(ids),
-    new CRNPOR(ids)];
+    new CRNPOR(ids),
+    new CRAND(ids)];
  }
  
  feed(s) {
@@ -639,6 +661,16 @@ class Disjunction {
  }
 }
 
+class Conjunction {
+ constructor(a, b) {
+  this.a = a;
+  this.b = b;
+ }
+ print() {
+  return this.a.print() + " and " + this.b.print();
+ }
+}
+
 module.exports = {
  match: match,
  capture: capture,
@@ -659,4 +691,5 @@ module.exports = {
  CROR: CROR,
  CRVPOR: CRVPOR,
  CRNPOR: CRNPOR,
+ CRAND: CRAND,
 };

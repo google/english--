@@ -715,6 +715,21 @@ describe("DRS", function() {
     `);
   });
 
+  it("Mary loves Smith and he lovers her.", function() {
+    assertThat("Mary loves Smith and he loves her.")
+     .equalsTo(`
+       drs(a, b) {
+         Mary(a)
+         Smith(b)
+         drs() {
+           a loves b
+         } and drs() {
+           b loves a
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

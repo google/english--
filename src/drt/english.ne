@@ -25,13 +25,15 @@ S_num_sing ->
   NP__num_sing_gen_fem_case_pnom_gap_n __ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |
   NP__num_sing_gen_nhum_case_pnom_gap_n __ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |
   "if"i __ S_num_sing __ "then"i __ S_num_sing {% (args) => node("S", {"num":"sing"}, args) %} |
-  S_num_sing __ "or"i __ S_num_sing {% (args) => node("S", {"num":"sing"}, args) %}
+  S_num_sing __ "or"i __ S_num_sing {% (args) => node("S", {"num":"sing"}, args) %} |
+  S_num_sing __ "and"i __ S_num_sing {% (args) => node("S", {"num":"sing"}, args) %}
 S_num_plur -> 
   NP__num_plur_gen_male_case_pnom_gap_n __ VP__num_plur_fin_p_gap_n {% (args) => node("S", {"num":"plur"}, args) %} |
   NP__num_plur_gen_fem_case_pnom_gap_n __ VP__num_plur_fin_p_gap_n {% (args) => node("S", {"num":"plur"}, args) %} |
   NP__num_plur_gen_nhum_case_pnom_gap_n __ VP__num_plur_fin_p_gap_n {% (args) => node("S", {"num":"plur"}, args) %} |
   "if"i __ S_num_plur __ "then"i __ S_num_plur {% (args) => node("S", {"num":"plur"}, args) %} |
-  S_num_plur __ "or"i __ S_num_plur {% (args) => node("S", {"num":"plur"}, args) %}
+  S_num_plur __ "or"i __ S_num_plur {% (args) => node("S", {"num":"plur"}, args) %} |
+  S_num_plur __ "and"i __ S_num_plur {% (args) => node("S", {"num":"plur"}, args) %}
 S_num_sing_gap_n -> 
   NP__num_sing_gen_male_case_pnom_gap_n WS_gap_n VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing","gap":"-"}, args) %} |
   NP__num_sing_gen_fem_case_pnom_gap_n WS_gap_n VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing","gap":"-"}, args) %} |

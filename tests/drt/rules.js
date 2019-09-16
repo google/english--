@@ -20,6 +20,7 @@ const {
   CROR,
   CRVPOR,
   CRNPOR,
+  CRAND,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -555,6 +556,35 @@ describe("Rules", function() {
         c love d
       }
     `));
+  });
+
+  it("CR.AND", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Mary likes Smith and she loves him."), true);
+
+    let [, , [sub]] = new CRAND(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        Mary(a)
+        Smith(b)
+        a likes b
+      } and drs() {
+        a loves b
+      }
+    `));
+  });
+
+  it("CR.AND", function() {
+    // She can't be bound to Mary because Mary hasn't been processed
+    // yet.
+    let node = first(parse("She loves him and Mary likes Smith."), true);
+    try {
+     new CRAND(new Ids()).match(node, []);
+    } catch (e) {
+     Assert.deepEqual(e.message, "Invalid reference: She");
+    }
   });
 
   it.skip("DRS", function() {
