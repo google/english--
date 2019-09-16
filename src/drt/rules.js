@@ -421,23 +421,23 @@ class CRCOND extends Rule {
   let matcher = S("if", capture("antecedent"), "then", capture("consequent"));
   let m = match(matcher, node);
   
-  if (m) {
-   let antecedent = new DRS(this.ids);
-   antecedent.head.push(...clone(refs));
-   antecedent.head.forEach(ref => ref.closure = true);
-   antecedent.push(m.antecedent.children[1]);
-   
-   let consequent = new DRS(this.ids);
-   consequent.head.push(...clone(antecedent.head));
-   consequent.head.forEach(ref => ref.closure = true);
-   consequent.push(m.consequent.children[3]);
-   
-   let implication = new Implication(antecedent, consequent);
-   
-   return [[], [], [implication], [node]];
+  if (!m) {
+   return [[], [], [], []];
   }
-  
-  return [[], [], [], []];
+
+  let antecedent = new DRS(this.ids);
+  antecedent.head.push(...clone(refs));
+  antecedent.head.forEach(ref => ref.closure = true);
+  antecedent.push(m.antecedent.children[1]);
+   
+  let consequent = new DRS(this.ids);
+  consequent.head.push(...clone(antecedent.head));
+  consequent.head.forEach(ref => ref.closure = true);
+  consequent.push(m.consequent.children[3]);
+   
+  let implication = new Implication(antecedent, consequent);
+   
+  return [[], [], [implication], [node]];
  }
 }
 
@@ -446,27 +446,27 @@ class CREVERY extends Rule {
   let matcher = S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb")));
   let m = match(matcher, node);
   
-  if (m) {
-   let ref = new Referent(this.id(), m.noun.types);
-   let noun = new DRS(this.ids);
-   noun.head.push(...clone(refs));
-   noun.head.forEach(ref => ref.closure = true);
-   noun.head.push(ref);
-   m.noun.ref = ref;
-   noun.push(m.noun);
-   
-   let verb = new DRS(this.ids);
-   verb.head.push(...clone(noun.head));
-   verb.head.forEach(ref => ref.closure = true);
-   node.children[0] = ref;
-   verb.push(node);
-   
-   let implication = new Implication(noun, verb);
-     
-   return [[], [], [implication], [node]];
+  if (!m) {
+   return [[], [], [], []];
   }
-  
-  return [[], [], [], []];
+
+  let ref = new Referent(this.id(), m.noun.types);
+  let noun = new DRS(this.ids);
+  noun.head.push(...clone(refs));
+  noun.head.forEach(ref => ref.closure = true);
+  noun.head.push(ref);
+  m.noun.ref = ref;
+  noun.push(m.noun);
+   
+  let verb = new DRS(this.ids);
+  verb.head.push(...clone(noun.head));
+  verb.head.forEach(ref => ref.closure = true);
+  node.children[0] = ref;
+  verb.push(node);
+   
+  let implication = new Implication(noun, verb);
+     
+  return [[], [], [implication], [node]];
  }
 }
 
@@ -475,14 +475,10 @@ class CRVPEVERY extends Rule {
   let matcher = S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun"))))));
   let m = match(matcher, node);
   
-  // console.log(print(node));
-
   if (!m) {
    return [[], [], [], []];
   }
   
-  // console.log("hi");
-
   let ref = new Referent(this.id(), m.noun.types);
   let noun = new DRS(this.ids);
   noun.head.push(...clone(refs));
