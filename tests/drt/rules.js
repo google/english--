@@ -97,8 +97,9 @@ describe("Rules", function() {
   });
 
   it("CR.PN", function() {
+    let ids = new Ids();
     let node = first(parse("Mel loves Dani."), true);
-    let rule = new CRPN();
+    let rule = new CRPN(ids);
     let [[u], [mel]] = rule.match(node);
 
     // One new discourse referents introduced.
@@ -119,10 +120,11 @@ describe("Rules", function() {
    });
 
   it("CR.PRO", function() {
+    let ids = new Ids();
     let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates him."), true);
 
-    let crpn = new CRPN();
+    let crpn = new CRPN(ids);
     let [[u], [jones]] = crpn.match(sentence);
     let [[v], [ulysses]] = crpn.match(child(sentence, 1, 0));
 
@@ -137,10 +139,12 @@ describe("Rules", function() {
   });
 
   it("CR.PRO", function() {
+    let ids = new Ids();
+
     let sentence = first(parse("Mel loves Dani."), true);
     let node = first(parse("She fascinates him."), true);
     
-    let crpn = new CRPN();
+    let crpn = new CRPN(ids);
     let [[u], [mel]] = crpn.match(sentence);
     let [[v], [dani]] = crpn.match(child(sentence, 1, 0));
 

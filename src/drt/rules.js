@@ -96,38 +96,65 @@ class Rule {
  }
 }
 
-class CRPN extends Rule {
+class CRSPN extends Rule {
  match(node) {
   let matcher1 = S(NP(PN(capture("name"))), VP_());
   
-  let head = [];
-  let body = [];
-  let result = node;
-  
   let m1 = match(matcher1, node);
-  if (m1) {
-   let name = m1.name.children[0];
-   let ref = new Referent(this.id(), m1.name.types);
-   head.push(ref);
-   let pn = m1.name;
-   pn.ref = ref;
-   body.push(pn);
-   node.children[0] = ref;
-  }
-  
-  let matcher2 = VP(V(), NP(PN(capture("name"))));
-  let m2 = match(matcher2, node);
-  if (m2) {
-   let name = m2.name.children[0];
-   let ref = new Referent(this.id(), m2.name.types);
-   head.push(ref);
-   let pn = m2.name;
-   pn.ref = ref;
-   body.push(pn);
-   result.children[1].children[0] = ref;
+  if (!m1) {
+   return [[], [], [], []];
   }
 
-  return [head, body, [], []];
+  let name = m1.name.children[0];
+  let ref = new Referent(this.id(), m1.name.types);
+  let pn = m1.name;
+  pn.ref = ref;
+  node.children[0] = ref;
+ 
+  return [[ref], [pn], [], []];
+ }
+}
+
+class CRVPPN extends Rule {
+ match(node) {
+  let matcher2 = VP(V(), NP(PN(capture("name"))));
+  let m2 = match(matcher2, node);
+
+  if (!m2) {
+   return [[], [], [], []];
+  }
+
+  let name = m2.name.children[0];
+  let ref = new Referent(this.id(), m2.name.types);
+  let pn = m2.name;
+  pn.ref = ref;
+  node.children[1].children[0] = ref;
+
+  return [[ref], [pn], [], []];
+ }
+}
+
+class CompositeRule extends Rule {
+ constructor(rules) {
+  super();
+  this.rules = rules;
+ }
+ match(node) {
+  let result = [[], [], [], []];
+  for (let rule of this.rules) {
+   let [head, body, drs, remove] = rule.match(node);
+   result[0].push(...head);
+   result[1].push(...body);
+   result[2].push(...drs);
+   result[3].push(...remove);
+  }
+  return result;
+ }
+}
+
+class CRPN extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPN(ids), new CRVPPN(ids)]);
  }
 }
 
