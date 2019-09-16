@@ -432,25 +432,45 @@ class CRVPOR extends Rule {
                          VP(capture("b")))));
   let m = match(matcher, node);
 
-  // console.log(print(node));
-
   if (!m) {
    return [[], [], [], []];
   }
 
-  // console.log("hi");
-    
   let a = new DRS(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
-  // console.log(print(S(clone(m.n), VP_(m.a))));
   a.push(S(clone(m.n.children[0]), VP_(m.a)));
 
   let b = new DRS(this.ids);
   b.head.push(...clone(a.head));
   b.head.forEach(ref => ref.closure = true);
-  // console.log(print(S(clone(m.n), VP_(m.b))));
   b.push(S(clone(m.n.children[0]), VP_(m.b)));
+  
+  let disjunction = new Disjunction(a, b);
+  
+  return [[], [], [disjunction], [node]];
+ }
+}
+
+class CRNPOR extends Rule {
+ match(node, refs) {
+  let matcher = S(NP(NP(capture("a")), "or", NP(capture("b"))), 
+                  VP_(capture("vp")));
+  let m = match(matcher, node);
+
+  if (!m) {
+   return [[], [], [], []];
+  }
+
+  let a = new DRS(this.ids);
+  a.head.push(...clone(refs));
+  a.head.forEach(ref => ref.closure = true);
+  a.push(S(m.a, VP_(clone(m.vp))));
+
+  let b = new DRS(this.ids);
+  b.head.push(...clone(a.head));
+  b.head.forEach(ref => ref.closure = true);
+  b.push(S(m.b, VP_(clone(m.vp))));
   
   let disjunction = new Disjunction(a, b);
   
@@ -473,7 +493,8 @@ class DRS {
     new CRCOND(ids),
     new CREVERY(ids),
     new CROR(ids),
-    new CRVPOR(ids)];
+    new CRVPOR(ids),
+    new CRNPOR(ids)];
  }
  
  feed(s) {
@@ -499,13 +520,6 @@ class DRS {
      this.body.splice(i, 1);
     }
     queue.push(...body);
-    //if (!(head.length == 0 &&
-    //      body.length == 0 &&
-    //      drs.length == 0 &&
-    //      remove.length == 0)) {
-    // console.log(print(p));
-    // queue.push(p);
-    //}
    }
    // ... and recurse.
    let next = (p.children || [])
@@ -579,4 +593,5 @@ module.exports = {
  CREVERY: CREVERY,
  CROR: CROR,
  CRVPOR: CRVPOR,
+ CRNPOR: CRNPOR,
 };

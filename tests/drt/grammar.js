@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(52);
+    assertThat(result.length).equalsTo(54);
 
     let i = 0;
     assertThat(print(result[i++]))
@@ -397,6 +397,11 @@ A ->
     // VP Disjunctions
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> VP[num=@1, fin=@2, gap=@3] __ "or" __ VP[num=@1, fin=@2, gap=@3]');
+    // NP Disjunctions
+    assertThat(print(result[i++]))
+     .equalsTo('NP\'[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@1, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@1, case=@2, gap=-]');
+    assertThat(print(result[i++]))
+     .equalsTo('NP\'[num=plur, gen=-hum, case=@2, gap=-] -> NP[num=@3, gen=@5, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@6, case=@2, gap=-]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(result[i++]))

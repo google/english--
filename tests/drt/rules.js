@@ -1,23 +1,24 @@
 const Assert = require("assert");
 
 const {
- match,
- capture,
- print,
- child,
- Ids,
- DRS,
- CRPN,
- CRPRO,
- CRID,
- CRLIN,
- CRNRC,
- CRNEG,
- CRBE,
- CRCOND,
- CREVERY,
- CROR,
- CRVPOR,
+  match,
+  capture,
+  print,
+  child,
+  Ids,
+  DRS,
+  CRPN,
+  CRPRO,
+  CRID,
+  CRLIN,
+  CRNRC,
+  CRNEG,
+  CRBE,
+  CRCOND,
+  CREVERY,
+  CROR,
+  CRVPOR,
+  CRNPOR,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -491,6 +492,26 @@ describe("Rules", function() {
         c likes d
         Mary(c)
         Smith(d)
+      }
+    `));
+  });
+
+  it("CR.NPOR", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones or Smith love Mary."), true);
+
+    let [, , [sub]] = new CRNPOR(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        a love b
+        Jones(a)
+        Mary(b)
+      } or drs(c, d) {
+        c love d
+        Smith(c)
+        Mary(d)
       }
     `));
   });

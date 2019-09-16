@@ -369,11 +369,11 @@ function grammar() {
  
  // PS 12
  result.push(phrase(term("NP'", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
-                     [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
-                      space(),
-                      literal("and"),
-                      space(),
-                      term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
+                    [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
                     "NP"));
  
  result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
@@ -443,6 +443,24 @@ function grammar() {
                       literal("or"),
                       space(),
                       term("VP", {"num": 1, "fin": 2, "gap": 3})]));
+
+ // NP Disjunctions
+ result.push(phrase(term("NP'", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
+                    "NP"));
+ 
+ result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
+                    "NP"));
+
  
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),

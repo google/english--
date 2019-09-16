@@ -405,6 +405,12 @@ describe("Parser", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
+  it("Jones or Smith love her.", function() {
+    assertThat(first(parse("Jones or Smith love her.")))
+     .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
+                 VP_(VP(V("love"), NP(PRO("her"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {
