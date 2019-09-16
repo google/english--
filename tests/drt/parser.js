@@ -89,6 +89,13 @@ describe("Parser", function() {
      //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
    });
 
+  it("debug", function() {
+    parse("Anna loves a man who loves her.");
+    parse("Every book which she loves surprises him.");
+    parse("A stockbroker who does not love her surprises him.");
+    parse("A stockbroker who Mel likes loves him.");
+  });
+
   it("Jones loves.", function() {
     assertThat(first(parse("Jones loves.")))
      .equalsTo(S(NP(PN("Jones")),
@@ -390,12 +397,13 @@ describe("Parser", function() {
                  S(NP(PN("Smith")), VP_(VP(V("loves"), NP(PRO("her")))))));
    });
 
-  it("debug", function() {
-    parse("Anna loves a man who loves her.");
-    parse("Every book which she loves surprises him.");
-    parse("A stockbroker who does not love her surprises him.");
-    parse("A stockbroker who Mel likes loves him.");
-  });
+  it("Mary loves Jones or likes Smith.", function() {
+    assertThat(first(parse("Mary loves Jones or likes Smith.")))
+     .equalsTo(S(NP(PN("Mary")), 
+                 VP_(VP(VP(V("loves"), NP(PN("Jones"))), 
+                        "or", 
+                        VP(V("likes"), NP(PN("Smith")))))));
+   });
 
   function assertThat(x) {
    return {

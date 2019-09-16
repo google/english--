@@ -407,8 +407,7 @@ class CROR extends Rule {
   if (!m) {
    return [[], [], [], []];
   }
-  
-  
+    
   let a = new DRS(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
@@ -418,6 +417,40 @@ class CROR extends Rule {
   b.head.push(...clone(a.head));
   b.head.forEach(ref => ref.closure = true);
   b.push(m.b);
+  
+  let disjunction = new Disjunction(a, b);
+  
+  return [[], [], [disjunction], [node]];
+ }
+}
+
+class CRVPOR extends Rule {
+ match(node, refs) {
+  let matcher = S(capture("n"), 
+                  VP_(VP(VP(capture("a")), 
+                         "or", 
+                         VP(capture("b")))));
+  let m = match(matcher, node);
+
+  // console.log(print(node));
+
+  if (!m) {
+   return [[], [], [], []];
+  }
+
+  // console.log("hi");
+    
+  let a = new DRS(this.ids);
+  a.head.push(...clone(refs));
+  a.head.forEach(ref => ref.closure = true);
+  // console.log(print(S(clone(m.n), VP_(m.a))));
+  a.push(S(clone(m.n.children[0]), VP_(m.a)));
+
+  let b = new DRS(this.ids);
+  b.head.push(...clone(a.head));
+  b.head.forEach(ref => ref.closure = true);
+  // console.log(print(S(clone(m.n), VP_(m.b))));
+  b.push(S(clone(m.n.children[0]), VP_(m.b)));
   
   let disjunction = new Disjunction(a, b);
   
@@ -439,7 +472,8 @@ class DRS {
     new CRBE(ids),
     new CRCOND(ids),
     new CREVERY(ids),
-    new CROR(ids)];
+    new CROR(ids),
+    new CRVPOR(ids)];
  }
  
  feed(s) {
@@ -462,10 +496,16 @@ class DRS {
     this.subs.push(...drs);
     for (let del of remove) {
      let i = this.body.indexOf(del);
-     // console.log(i);
      this.body.splice(i, 1);
     }
     queue.push(...body);
+    //if (!(head.length == 0 &&
+    //      body.length == 0 &&
+    //      drs.length == 0 &&
+    //      remove.length == 0)) {
+    // console.log(print(p));
+    // queue.push(p);
+    //}
    }
    // ... and recurse.
    let next = (p.children || [])
@@ -538,4 +578,5 @@ module.exports = {
  CRCOND: CRCOND,
  CREVERY: CREVERY,
  CROR: CROR,
+ CRVPOR: CRVPOR,
 };

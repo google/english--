@@ -17,6 +17,7 @@ const {
  CRCOND,
  CREVERY,
  CROR,
+ CRVPOR,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -470,6 +471,26 @@ describe("Rules", function() {
         c loves d
         Smith(c)
         Mary(d)
+      }
+    `));
+  });
+
+  it("CR.VPOR", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Mary loves Jones or likes Smith."), true);
+
+    let [, , [sub]] = new CRVPOR(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        a loves b
+        Mary(a)
+        Jones(b)
+      } or drs(c, d) {
+        c likes d
+        Mary(c)
+        Smith(d)
       }
     `));
   });

@@ -558,6 +558,22 @@ describe("DRS", function() {
     `);
   });
 
+  it("Mary loves Jones or likes Smith.", function() {
+    assertThat("Mary loves Jones or likes Smith.", true)
+     .equalsTo(true, `
+       drs(a) {
+         Mary(a)
+         drs(b) {
+           a loves b
+           Jones(b)
+         } or drs(c) {
+           a likes c
+           Smith(c)
+         }
+       }
+    `);
+  });
+
   function trim (str) {
    return str
     .trim()

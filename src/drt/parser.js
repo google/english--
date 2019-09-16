@@ -435,6 +435,14 @@ function grammar() {
                      literal("or"),
                      space(),
                      term("S", {"num": 1})]));
+
+ // VP Disjunctions
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                     [term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                      space(),
+                      literal("or"),
+                      space(),
+                      term("VP", {"num": 1, "fin": 2, "gap": 3})]));
  
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
