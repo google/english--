@@ -99,7 +99,7 @@ describe("DRT Builder", function() {
 
    for (let i = 0; i < a.children.length; i++) {
     if (typeof a.children[i] == "string") {
-     if (a.children[i] != b.children[i]) {
+     if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
       return false;
      }
     } else if (a.children[i]["@type"] == "Match") {
@@ -834,6 +834,49 @@ describe("DRT Builder", function() {
     assertThat(print(be)).equalsTo("happy(b)");
   });
 
+  class CRCOND extends Rule {
+   match(node, refs) {
+    let matcher = S("if", capture("antecedent"), "then", capture("consequent"));
+    let m = match(matcher, node);
+
+    if (m) {
+     let antecedent = new DRS(this.ids);
+     antecedent.head.push(...clone(refs));
+     antecedent.head.forEach(ref => ref.closure = true);
+     antecedent.push(m.antecedent.children[1]);
+
+     let consequent = new DRS(this.ids);
+     consequent.head.push(...clone(antecedent.head));
+     consequent.head.forEach(ref => ref.closure = true);
+     consequent.push(m.consequent.children[3]);
+
+     let implication = new Implication(antecedent, consequent);
+
+     return [[], [], [implication], [node]];
+    }
+
+     return [[], [], [], []];
+   }
+  }
+
+  it("CR.COND", function() {
+    let ids = new Ids();
+
+    let node = first(parse("If Jones owns a book then he likes it."), true);
+
+    let [, , [sub]] = new CRCOND(ids).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        a owns b
+        Jones(a)
+        book(b)
+      } => drs() {
+        a likes b
+      }
+    `));
+  });
+
   class DRS {
    constructor(ids = new Ids()) {
     this.head = [];
@@ -845,7 +888,8 @@ describe("DRT Builder", function() {
       new CRNRC(ids), 
       new CRPRO(ids),
       new CRNEG(ids),
-      new CRBE(ids)];
+      new CRBE(ids),
+      new CRCOND(ids)];
    }
 
    feed(s) {
@@ -904,6 +948,17 @@ describe("DRT Builder", function() {
     result.push("}");
     
     return result.join("\n");
+   }
+  }
+
+  class Implication extends DRS {
+   constructor(antecedent, consequent, ids) {
+    super(ids);
+    this.antecedent = antecedent;
+    this.consequent = consequent;
+   }
+   print() {
+    return this.antecedent.print() + " => " + this.consequent.print()
    }
   }
 
@@ -1291,6 +1346,21 @@ describe("DRT Builder", function() {
          Jones(a)
          porsche(b)
          happy(a)
+       }
+    `);
+  });
+
+  it("If Jones owns a book then he likes it.", function() {
+    assertThat("If Jones owns a book then he likes it.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a, b) {
+           a owns b
+           Jones(a)
+           book(b)
+         } => drs() {
+           a likes b
+         }
        }
     `);
   });
