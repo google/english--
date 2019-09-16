@@ -1384,6 +1384,46 @@ describe("DRT Builder", function() {
     `);
   });
 
+  it("Jones likes Mary. If she likes a book then he likes it.", function() {
+    assertThat("Jones likes Mary. If she likes a book then he likes it.", true)
+     .equalsTo(true, `
+       drs(a, b) {
+         a likes b
+         Jones(a)
+         Mary(b)
+         drs(c) {
+           b likes c
+           book(c)
+         } => drs() {
+           a likes c
+         }
+       }
+    `);
+  });
+
+  it.skip("Jones does not like Mary. If she likes a book then he does not like it.", function() {
+    // TODO(goto): for this to work we need to promote PN to the global DRS.
+    assertThat("Jones does not like Mary. If she likes a book then he does not like it.", true)
+     .equalsTo(true, `
+    `);
+  });
+
+  it("If Mary likes a man then he likes Jones.", function() {
+    assertThat("If Mary likes a man then he likes Jones.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a, b) {
+           a likes b
+           Mary(a)
+           man(b)
+         } => drs(c) {
+           b likes c
+           Jones(c)
+         }
+       }
+    `);
+  });
+
   function trim (str) {
    return str
     .trim()
