@@ -4,6 +4,25 @@ const {Reasoner} = require("../../src/logic/fol.js");
 const {rewrite} = require("../../src/logic/unify.js");
 
 const {
+ match,
+ capture,
+ print,
+ child,
+ Ids,
+ DRS,
+ CRPN,
+ CRPRO,
+ CRID,
+ CRLIN,
+ CRNRC,
+ CRNEG,
+ CRBE,
+ CRCOND,
+ CREVERY,
+ CROR,
+} = require("../../src/drt/rules.js");
+
+const {
   parse, 
   parser, 
   term, 
@@ -13,7 +32,6 @@ const {
   clone, 
   literal, 
   compile, 
-  print, 
   generate, 
   expand, 
   collect, 
@@ -43,8 +61,7 @@ const {
   negation,
   argument} = Logic.Parser;
 
-describe("Builder", function() {
-
+describe("Rules", function() {
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
     let subject = S(NP(capture("mel")), VP_());
@@ -66,58 +83,6 @@ describe("Builder", function() {
      .equalsTo({"case": "-nom", "gap": "-", "gen": "-hum", "num": "sing"});
   });
 
-  function toString(node) {
-   if (typeof node == "string") {
-    return node;
-   } else if (node["@type"] == "Referent") {
-    return node.name;
-   } else if (node["@type"] == "Predicate") {
-    return `${node.name}(${node.arguments.map(x => x.name).join(", ")})`;
-   }
-   let result = [];
-   for (let child of node.children || []) {
-    result.push(toString(child));
-   }
-   return result.join(" ").trim();
-  }
-  
-  it("toString", function() {
-    assertThat(toString(first(parse("Mel loves Dani."))))
-     .equalsTo("Mel loves Dani");
-    assertThat(toString(first(parse("A stockbroker who does not love her surprises him."))))
-     .equalsTo("A stockbroker who does not love her surprises him");
-  });
-
-  let capture = (name) => { return {"@type": "Match", "name": name} };
-  
-  function match(a, b) {
-   if (!b || a["@type"] != b["@type"]) {
-    return false;
-   }
-
-   let result = {};
-
-   for (let i = 0; i < a.children.length; i++) {
-    if (typeof a.children[i] == "string") {
-     if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
-      // console.log(a.children[i]);
-      return false;
-     }
-    } else if (a.children[i]["@type"] == "Match") {
-     result[a.children[i].name] = b;
-     continue;
-    } else {
-     let capture = match(a.children[i], b.children[i]);
-     if (!capture) {
-      return false;
-     }
-
-     result = Object.assign(result, capture);
-    }
-   }
-
-   return result;
-  }
 
   it("match", function() {
     let s = first(parse("Mel loves Dani."));
@@ -128,98 +93,9 @@ describe("Builder", function() {
 
     let m3 = S(NP(), VP_(AUX("does"), "not", VP(capture("vp"))));
     let s3 = first(parse("Jones does not love Smith."));
-    assertThat(transcribe(match(m3, s3).vp))
+    assertThat(print(match(m3, s3).vp))
      .equalsTo("love Smith");
    });
-
-  let arg = (x, free) => argument(Logic.Parser.literal(x), undefined, free);
-
-  class Compiler {
-   compile(node) {
-    // Maps to Logic
-    let matcher = S(REF("", {}, [capture("alpha")]), 
-                    VP_(VP(V(capture("verb")), REF("", {}, [capture("beta")]))));
-    let m = match(matcher, node);
-
-    if (!m) {
-     return false;
-    }
-
-    return predicate(m.verb.children[0], 
-                     [arg(m.alpha.name), arg(m.beta.name)]);
-   }
-  }
-
-  function construct(drs) {
-   let crpn = new CRPN();
-
-   for (let root of drs.body || []) {
-    let [head, body] = crpn.match(root);
-    drs.head = drs.head.concat(head);
-    drs.body = drs.body.concat(body);
-   }
-
-   let compiler = new Compiler();
-
-   for (let i = 0; i < drs.body.length; i++ ) {
-    let result = compiler.compile(drs.body[i]);
-    if (result) {
-     drs.body[i] = result;
-    }
-   }
-  }
-
-
-  class Interpreter {
-   constructor() {
-    this.drs = {head: [], body: []};
-   }
-   feed(s) {
-    this.drs.body.push(first(parse(s), true));
-    construct(this.drs);
-    return this.drs;
-   }
-   ask(s) {
-    return new Reasoner(rewrite(program(this.drs.body)))
-     .go(rewrite(Logic.Rule.of(s)));
-   }
-  }
-
-  it.skip("Interpreter", function() {
-    let interpreter = new Interpreter();
-    let drs = interpreter.feed("Mel loves Dani.");
-
-    let stream = interpreter.ask("exists(p) exists(q) exists (r) (Name(p, Mel) && loves(p, q) && Name(q, r))?");
-
-    assertThat(Forward.toString(Logic.Parser.parse(stream.next().value.toString())))
-     .equalsTo(Forward.toString(Logic.Parser.parse(`
-    Name(u, Mel).
-    exists (p = u) exists (q) exists (r) Name(p, Mel).
-    loves(u, v).
-    exists (p = u) exists (q = v) exists (r) loves(u, q).
-    Name(v, Dani).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(v, r).
-    exists (p = u) exists (q = v) exists (r = Dani) loves(u, q) && Name(q, r).
-    exists (p = u) exists (q = v) exists (r = Dani) Name(p, Mel) && loves(p, q) && Name(q, r).
-    `)));
-  });
-
-  class Ids {
-   constructor() {
-    this.gen = (function*() {
-      let i = 0;
-      while (true) {
-       let char = i % 26;
-       let round = Math.floor(i / 26);
-       yield `${String.fromCharCode(97 + char)}${round > 0 ? round : ""}`;
-       i++;
-      }
-     })();
-   }
-   get() {
-    return this.gen.next().value;
-   }
-  }
 
   it("ids", function() {
     let ids = new Ids();
@@ -235,71 +111,6 @@ describe("Builder", function() {
     assertThat(ids.get()).equalsTo("a1");
     assertThat(ids.get()).equalsTo("b1");
   });
-
-  class Rule {
-   constructor(ids) {
-    this.ids = ids || new Ids();
-   }
-
-   id() {
-    return this.ids.get();
-   }
-  }
-
-  class CRPN extends Rule {
-   match(node) {
-    let matcher1 = S(NP(PN(capture("name"))), VP_());
-
-    let head = [];
-    let body = [];
-    let result = node;
-
-    let m1 = match(matcher1, node);
-    if (m1) {
-     let name = m1.name.children[0];
-     let ref = new Referent(this.id(), m1.name.types);
-     head.push(ref);
-     let pn = m1.name;
-     pn.ref = ref;
-     body.push(pn);
-     node.children[0] = ref;
-    }
-
-    let matcher2 = VP(V(), NP(PN(capture("name"))));
-    let m2 = match(matcher2, node);
-    if (m2) {
-     let name = m2.name.children[0];
-     let ref = new Referent(this.id(), m2.name.types);
-     head.push(ref);
-     let pn = m2.name;
-     pn.ref = ref;
-     body.push(pn);
-     result.children[1].children[0] = ref;
-    }
-
-    return [head, body, [], []];
-   }
-  }
-
-  class Referent {
-   constructor(name, types) {
-    this["@type"] = "Referent";
-    this["types"] = types;
-    this.name = name;
-   }
-  }
-
-  function print(node) {
-   return transcribe(node);
-  }
-
-  function child(node, ...path) {
-   let result = node;
-   for (let i of path) {
-    result = result.children[i];
-   }
-   return result;
-  }
 
   it("CR.PN", function() {
     let node = first(parse("Mel loves Dani."), true);
@@ -322,42 +133,6 @@ describe("Builder", function() {
     // PNs rewritten.
     assertThat(print(node)).equalsTo("a loves b");
    });
-
-  class CRPRO extends Rule {
-   find({gen, num}, refs) {
-    return refs.find((ref) => {
-      return ref.types.gen == gen && ref.types.num == num
-     });
-   }
-   match(node, refs) {
-    let head = [];
-    let body = [];
-    let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
-    let m1 = match(matcher1, node);
-
-    if (m1) {
-     let u = this.find(m1.pronoun.types, refs);
-     if (!u) {
-      throw new Error("Invalid reference: " + m1.pronoun.children[0]);
-     }
-     node.children[0] = u;
-    }
-
-    let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
-    let m2 = match(matcher2, node);
-
-    // The types of head[2] agree with the types of the pronoun,
-    // so bind it to it.
-    if (m2) {
-     let ref = this.find(m2.pronoun.types, refs);
-     if (!ref) {
-      throw new Error("Invalid Reference: " + m2.pronoun.children[0]);
-     }
-     node.children[1].children[0] = ref;
-    }
-    return [head, body, [], []];
-   }
-  }
 
   it("CR.PRO", function() {
     let sentence = first(parse("Jones owns Ulysses."), true);
@@ -409,62 +184,6 @@ describe("Builder", function() {
      assertThat(message).equalsTo("Invalid Reference: her");
     }
   });
-
-  class CRID extends Rule {
-   match(node) {
-    let head = [];
-    let body = [];
-
-    let matcher1 = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
-    let m1 = match(matcher1, node);
-
-    if (m1 && m1.det.children[0] == "a") {
-     let ref = new Referent(this.id(), m1.noun.types);
-     head.push(ref);
-     let n = m1.noun;
-     n.ref = ref;
-     body.push(n);
-     node.children[1] = ref;
-    }
-
-    let matcher2 = S(NP(DET(capture("det")), N(capture("noun"))), VP_());
-    let m2 = match(matcher2, node);
-
-    if (m2 && m2.det.children[0].toLowerCase() == "a") {
-     let ref = new Referent(this.id(), m2.noun.types);
-     head.push(ref);
-     let n = m2.noun;
-     n.ref = ref;
-     body.push(n);
-     node.children[0] = ref;
-    }
-
-    return [head, body, [], []];
-   }
-  }
-
-  class CRLIN extends Rule {
-   match(node) {
-    let matcher = N(capture("noun"));
-    let m = match(matcher, node);
-
-    let head = [];
-    let body = [];
-
-    return [head, body, [], []];
-
-    if (m && 
-        m.noun.ref && 
-        m.noun.children.length == 1 &&
-        typeof m.noun.children[0] == "string") {
-     let name = m.noun.children[0];
-     let u = m.noun.ref.name;
-     node.assign(predicate(name, [arg(u)]));
-    }
-
-    return [head, body, [], []];
-   }
-  }
 
   it("CR.ID", function() {
     let ids = new Ids();
@@ -523,74 +242,16 @@ describe("Builder", function() {
 
     let rule = new CRID(ids);
     
-    let [head1, body1] = rule.match(node);
-    assertThat(head1).equalsTo([new Referent("a", {num: "sing", gen: "male"})]);
+    let [[a], body1] = rule.match(node);
+    assertThat(a.name).equalsTo("a");
+    assertThat(a.types).equalsTo({num: "sing", gen: "male"});
 
-    let [head2, body2] = rule.match(child(node, 1, 0));
-    assertThat(head2).equalsTo([new Referent("b", {num: "sing", gen: "fem"})]);
+    let [[b], body2] = rule.match(child(node, 1, 0));
+    assertThat(b.name).equalsTo("b");
+    assertThat(b.types).equalsTo({num: "sing", gen: "fem"});
 
     assertThat(print(node)).equalsTo("a admires b");
-
    });
-
-  class CRNRC extends Rule {
-   match(node) {
-    let matcher = N(N(), RC(capture("rc")));
-    let m = match(matcher, node);
-
-    let head = [];
-    let body = [];
-    let remove = [];
-
-    if (!m) {
-     return [[], [], [], []];
-    }
-
-    let rc = node.children.pop();
-
-    let s = rc.children[1];
-
-    const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
-    if (match(g1, s)) {
-     child(s, 1, 2, 1).children[0] = node.ref;
-    }
-
-    // Binds gap to the referent.
-    let object = child(s, 1, 0, 1);
-    if (object && object.children[0]["@type"] == "GAP") {
-     object.children[0] = node.ref;
-    }
-    
-    let subject = s.children[0];
-    if (subject.children[0]["@type"] == "GAP") {
-     s.children[0] = node.ref;
-    }
-
-    let noun = node.children.pop();
-    noun.ref = node.ref;
-    body.push(noun);
-    remove.push(node);
-    
-    body.push(s);
-    
-    return [head, body, [], remove];
-   }
-  }
-
-  function transcribe(node) {
-   if (typeof node == "string") {
-    return node;
-   } else if (node["@type"] == "Referent") {
-    return node.name;
-   }
-   let result = [];
-   for (let child of node.children || []) {
-    result.push(transcribe(child));
-   }
-   let suffix = node.ref ? `(${node.ref.name})` : "";
-   let prefix = node.neg ? "~" : "";
-   return prefix + result.join(" ").trim() + suffix;
-  }
 
   it("CR.NRC", function() {
     let ids = new Ids();
@@ -683,39 +344,6 @@ describe("Builder", function() {
     assertThat(print(node)).equalsTo("a owns b");
    });
 
-  class CRNEG extends Rule {
-   match(node, refs) {
-    let matcher = S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp"))));
-    let m = match(matcher, node);
-
-    let head = [];
-    let body = [];
-    let subs = [];
-
-    if (!m) {
-     return [head, body, [], []];
-    }
-    
-    let noun = m.np.children[0];
-
-    let sub = new DRS(this.ids);
-    sub.head = clone(refs);
-    sub.head.forEach(ref => ref.closure = true);
-    sub.neg = true;
-
-    let s = node;
-    s.children[1].children.splice(0, 2);
-
-    // console.log(print(s));
-    sub.push(s);
-
-    // node.assign(noun);
-    // node.remove();
-
-    return [head, body, [sub], [node]];
-   }
-  }
-
   it("CR.NEG", function() {
     let ids = new Ids();
 
@@ -738,31 +366,6 @@ describe("Builder", function() {
       }
     `));
   });
-
-  class CRBE extends Rule {
-   match(node, refs) {
-    let matcher1 = S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj")))));
-    let m1 = match(matcher1, node);
-    if (m1) {
-     let ref = m1.ref.children[0];
-     let adj = m1.adj;
-     adj.ref = ref;
-     return [[], [adj], [], [node]];
-    }
-
-    let matcher2 = S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj")))));
-    let m2 = match(matcher2, node);
-    if (m2) {
-     let ref = m2.ref.children[0];
-     let adj = m2.adj;
-     adj.ref = ref;
-     adj.neg = true;
-     return [[], [adj], [], [node]];
-    }
-
-    return [[], [], [], [], []];
-   }
-  }
 
   it("CR.BE", function() {
     let ids = new Ids();
@@ -835,31 +438,6 @@ describe("Builder", function() {
     assertThat(print(be)).equalsTo("happy(b)");
   });
 
-  class CRCOND extends Rule {
-   match(node, refs) {
-    let matcher = S("if", capture("antecedent"), "then", capture("consequent"));
-    let m = match(matcher, node);
-
-    if (m) {
-     let antecedent = new DRS(this.ids);
-     antecedent.head.push(...clone(refs));
-     antecedent.head.forEach(ref => ref.closure = true);
-     antecedent.push(m.antecedent.children[1]);
-
-     let consequent = new DRS(this.ids);
-     consequent.head.push(...clone(antecedent.head));
-     consequent.head.forEach(ref => ref.closure = true);
-     consequent.push(m.consequent.children[3]);
-
-     let implication = new Implication(antecedent, consequent);
-
-     return [[], [], [implication], [node]];
-    }
-
-     return [[], [], [], []];
-   }
-  }
-
   it("CR.COND", function() {
     let ids = new Ids();
 
@@ -878,35 +456,6 @@ describe("Builder", function() {
     `));
   });
 
-  class CREVERY extends Rule {
-   match(node, refs) {
-    let matcher = S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb")));
-    let m = match(matcher, node);
-
-    if (m) {
-     let ref = new Referent(this.id(), m.noun.types);
-     let noun = new DRS(this.ids);
-     noun.head.push(...clone(refs));
-     noun.head.forEach(ref => ref.closure = true);
-     noun.head.push(ref);
-     m.noun.ref = ref;
-     noun.push(m.noun);
-
-     let verb = new DRS(this.ids);
-     verb.head.push(...clone(noun.head));
-     verb.head.forEach(ref => ref.closure = true);
-     node.children[0] = ref;
-     verb.push(node);
-
-     let implication = new Implication(noun, verb);
-
-     return [[], [], [implication], [node]];
-    }
-
-     return [[], [], [], []];
-   }
-  }
-
   it("CR.EVERY", function() {
     let ids = new Ids();
 
@@ -923,32 +472,6 @@ describe("Builder", function() {
       }
     `));
   });
-
-  class CROR extends Rule {
-   match(node, refs) {
-    let matcher = S(S(capture("a")), "or", S(capture("b")));
-    let m = match(matcher, node);
-
-    if (!m) {
-     return [[], [], [], []];
-    }
-
-
-    let a = new DRS(this.ids);
-    a.head.push(...clone(refs));
-    a.head.forEach(ref => ref.closure = true);
-    a.push(m.a);
-
-    let b = new DRS(this.ids);
-    b.head.push(...clone(a.head));
-    b.head.forEach(ref => ref.closure = true);
-    b.push(m.b);
-    
-    let disjunction = new Disjunction(a, b);
-
-    return [[], [], [disjunction], [node]];
-   }
-  }
 
   it("CR.OR", function() {
     let ids = new Ids();
@@ -969,102 +492,6 @@ describe("Builder", function() {
       }
     `));
   });
-
-  class DRS {
-   constructor(ids = new Ids()) {
-    this.head = [];
-    this.body = [];
-    this.subs = [];
-    this.rules =
-     [new CRPN(ids),
-      new CRID(ids), 
-      new CRNRC(ids), 
-      new CRPRO(ids),
-      new CRNEG(ids),
-      new CRBE(ids),
-      new CRCOND(ids),
-      new CREVERY(ids),
-      new CROR(ids)];
-   }
-
-   feed(s) {
-    this.push(first(parse(s), true));
-   }
-
-   push(node) {
-    let queue = [node];
-
-    this.body.push(node);
-
-    while (queue.length > 0) {
-     let p = queue.shift();
-     // breadth first search: iterate over
-     // this level first ...
-     for (let rule of this.rules) {
-      let [head, body, drs, remove] = rule.match(p, this.head);
-      this.head.push(...head);
-      this.body.push(...body);
-      this.subs.push(...drs);
-      for (let del of remove) {
-       let i = this.body.indexOf(del);
-       // console.log(i);
-       this.body.splice(i, 1);
-      }
-      queue.push(...body);
-     }
-     // ... and recurse.
-     let next = (p.children || [])
-      .filter(c => typeof c != "string");
-     queue.push(...next);
-    }
-
-    return this;
-   }
-
-   print() {
-    let result = [];
-    let refs = [];
-    for (let ref of this.head.filter(ref => !ref.closure)) {
-     refs.push(`${ref.name}`);
-    }
-
-    let args = refs.join(", ");
-    let neg = this.neg ? "~" : "";
-    result.push(`${neg}drs(${args}) \{`);
-
-    for (let cond of this.body) {
-     result.push(transcribe(cond));
-    }
-
-    for (let sub of this.subs) {
-     result.push(sub.print());
-    }
-
-    result.push("}");
-    
-    return result.join("\n");
-   }
-  }
-
-  class Implication {
-   constructor(antecedent, consequent) {
-    this.antecedent = antecedent;
-    this.consequent = consequent;
-   }
-   print() {
-    return this.antecedent.print() + " => " + this.consequent.print()
-   }
-  }
-
-  class Disjunction {
-   constructor(a, b) {
-    this.a = a;
-    this.b = b;
-   }
-   print() {
-    return this.a.print() + " or " + this.b.print()
-   }
-  }
 
   it.skip("DRS", function() {
     class TestRule extends Rule {
