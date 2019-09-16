@@ -139,10 +139,10 @@ class CompositeRule extends Rule {
   super();
   this.rules = rules;
  }
- match(node) {
+ match(node, refs) {
   let result = [[], [], [], []];
   for (let rule of this.rules) {
-   let [head, body, drs, remove] = rule.match(node);
+   let [head, body, drs, remove] = rule.match(node, refs);
    result[0].push(...head);
    result[1].push(...body);
    result[2].push(...drs);
@@ -178,39 +178,60 @@ function child(node, ...path) {
  return result;
 }
 
-class CRPRO extends Rule {
- find({gen, num}, refs) {
-  return refs.find((ref) => {
-    return ref.types.gen == gen && ref.types.num == num
-   });
- }
+function find({gen, num}, refs) {
+ return refs.find((ref) => {
+   return ref.types.gen == gen && ref.types.num == num
+  });
+}
+
+
+class CRSPRO extends Rule {
  match(node, refs) {
-  let head = [];
-  let body = [];
   let matcher1 = S(NP(PRO(capture("pronoun"))), VP_(capture("?")));
   let m1 = match(matcher1, node);
   
-  if (m1) {
-   let u = this.find(m1.pronoun.types, refs);
-   if (!u) {
-    throw new Error("Invalid reference: " + m1.pronoun.children[0]);
-   }
-   node.children[0] = u;
+  if (!m1) {
+   return [[], [], [], []];
   }
 
+  let u = find(m1.pronoun.types, refs);
+
+  if (!u) {
+   throw new Error("Invalid reference: " + m1.pronoun.children[0]);
+  }
+
+  node.children[0] = u;
+
+  return [[], [], [], []];
+ }
+}
+
+class CRVPPRO extends Rule {
+ match(node, refs) {
   let matcher2 = VP(V(), NP(PRO(capture("pronoun"))));
   let m2 = match(matcher2, node);
   
   // The types of head[2] agree with the types of the pronoun,
   // so bind it to it.
-  if (m2) {
-   let ref = this.find(m2.pronoun.types, refs);
-   if (!ref) {
-    throw new Error("Invalid Reference: " + m2.pronoun.children[0]);
-   }
-   node.children[1].children[0] = ref;
+  if (!m2) {
+   return [[], [], [], []];
   }
-  return [head, body, [], []];
+
+  let ref = find(m2.pronoun.types, refs);
+
+  if (!ref) {
+   throw new Error("Invalid Reference: " + m2.pronoun.children[0]);
+  }
+
+  node.children[1].children[0] = ref;
+  
+  return [[], [], [], []];
+ }
+}
+
+class CRPRO extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPRO(ids), new CRVPPRO(ids)]);
  }
 }
 

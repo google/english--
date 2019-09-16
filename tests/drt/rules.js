@@ -131,7 +131,7 @@ describe("Rules", function() {
     assertThat(print(jones)).equalsTo("Jones(a)");
     assertThat(print(ulysses)).equalsTo("Ulysses(b)");
 
-    let rule = new CRPRO();
+    let rule = new CRPRO(ids);
     rule.match(node, [u, v]);
     rule.match(child(node, 1, 0), [u, v]);
 
