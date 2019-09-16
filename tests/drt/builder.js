@@ -1365,6 +1365,25 @@ describe("DRT Builder", function() {
     `);
   });
 
+  it("If Jones owns a book then Smith owns a porsche.", function() {
+    // TODO(goto): to make this result match 2.33 we still need to
+    // promote proper names to the global DRS.
+    assertThat("If Jones owns a book then Smith owns a porsche.", true)
+     .equalsTo(true, `
+       drs() {
+         drs(a, b) {
+           a owns b
+           Jones(a)
+           book(b)
+         } => drs(c, d) {
+           c owns d
+           Smith(c)
+           porsche(d)
+         }
+       }
+    `);
+  });
+
   function trim (str) {
    return str
     .trim()
