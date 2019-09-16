@@ -730,6 +730,34 @@ describe("DRS", function() {
     `);
   });
 
+  it("Mary owns a porsche and she loves it.", function() {
+    assertThat("Mary owns a porsche and she loves it.")
+     .equalsTo(`
+       drs(a) {
+         Mary(a)
+         drs(b) {
+           a owns b
+           porsche(b)
+         } and drs() {
+           a loves b
+         }
+       }
+    `);
+  });
+
+  it("Mary owns a porsche and she loves it.", function() {
+    let drs = new DRS();
+    try {
+     drs.feed("She loves it and Mary owns a porsche.");
+     throw new Error("expected exception");
+    } catch (e) {
+     // She can bind to "Mary" because Mary is a proper name.
+     // "a porsche", on the other hand, isn't processed
+     // globally, so "it" cannot bind to it.
+     Assert.deepEqual(e.message, "Invalid Reference: it");
+    }
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {
