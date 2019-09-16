@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(50);
+    assertThat(result.length).equalsTo(51);
 
     let i = 0;
     assertThat(print(result[i++]))
@@ -391,6 +391,9 @@ A ->
     // Conditionals
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> "if" __ S[num=@1] __ "then" __ S[num=@1]');
+    // Disjunctions
+    assertThat(print(result[i++]))
+     .equalsTo('S[num=@1] -> S[num=@1] __ "or" __ S[num=@1]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(result[i++]))
@@ -815,6 +818,13 @@ A ->
                                                  S(NP(GAP()), VP_(VP(V("owns"), NP(DET("a"), N("book")))))))), 
                  VP_(VP(V("likes"), NP(PRO("it"))))));
   });
+
+  it("Jones loves her or Smith loves her.", function() {
+    assertThat(first(parse("Jones loves her or Smith loves her.")))
+     .equalsTo(S(S(NP(PN("Jones")), VP_(VP(V("loves"), NP(PRO("her"))))), 
+                 "or", 
+                 S(NP(PN("Smith")), VP_(VP(V("loves"), NP(PRO("her")))))));
+   });
 
   it("debug", function() {
     parse("Anna loves a man who loves her.");

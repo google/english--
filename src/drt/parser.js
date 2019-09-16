@@ -428,6 +428,14 @@ function grammar() {
                      space(),
                      term("S", {"num": 1})]));
  
+ // Disjunctions
+ result.push(phrase(term("S", {"num": 1}),
+                    [term("S", {"num": 1}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("S", {"num": 1})]));
+ 
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
                    [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
