@@ -235,36 +235,45 @@ class CRPRO extends CompositeRule {
  }
 }
 
-class CRID extends Rule {
+class CRSID extends Rule {
  match(node) {
-  let head = [];
-  let body = [];
-  
   let matcher1 = VP(V(), NP(DET(capture("det")), N(capture("noun"))));
   let m1 = match(matcher1, node);
   
-  if (m1 && m1.det.children[0] == "a") {
-   let ref = new Referent(this.id(), m1.noun.types);
-   head.push(ref);
-   let n = m1.noun;
-   n.ref = ref;
-   body.push(n);
-   node.children[1] = ref;
+  if (!(m1 && m1.det.children[0] == "a")) {
+   return [[], [], [], []];
   }
+
+  let ref = new Referent(this.id(), m1.noun.types);
+  let n = m1.noun;
+  n.ref = ref;
+  node.children[1] = ref;
   
+  return [[ref], [n], [], []];
+ }
+}
+
+class CRVPID extends Rule {
+ match(node) {
   let matcher2 = S(NP(DET(capture("det")), N(capture("noun"))), VP_());
   let m2 = match(matcher2, node);
 
-  if (m2 && m2.det.children[0].toLowerCase() == "a") {
-   let ref = new Referent(this.id(), m2.noun.types);
-   head.push(ref);
-   let n = m2.noun;
-   n.ref = ref;
-   body.push(n);
-   node.children[0] = ref;
+  if (!(m2 && m2.det.children[0].toLowerCase() == "a")) {
+   return [[], [], [], []];
   }
-  
-  return [head, body, [], []];
+
+  let ref = new Referent(this.id(), m2.noun.types);
+  let n = m2.noun;
+  n.ref = ref;
+  node.children[0] = ref;
+
+  return [[ref], [n], [], []];
+ }
+}
+
+class CRID extends CompositeRule {
+ constructor(ids) {
+  super([new CRSID(ids), new CRVPID(ids)]);
  }
 }
 
