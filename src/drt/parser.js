@@ -445,15 +445,15 @@ function grammar() {
                       term("VP", {"num": 1, "fin": 2, "gap": 3})]));
 
  // NP Disjunctions
- result.push(phrase(term("NP'", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
+ result.push(phrase(term("NP'", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
                     [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
                      space(),
                      literal("or"),
                      space(),
-                     term("NP", {"num": 4, "gen": 1, "case": 2, "gap": "-"})], 
+                     term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"})], 
                     "NP"));
  
- result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
+ result.push(phrase(term("NP'", {"num": 1, "gen": "-hum", "case": 2, "gap": "-"}),
                     [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
                      space(),
                      literal("or"),

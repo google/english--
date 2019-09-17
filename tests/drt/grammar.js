@@ -401,9 +401,9 @@ A ->
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> VP[num=@1, fin=@2, gap=@3] __ "or" __ VP[num=@1, fin=@2, gap=@3]');
     // NP Disjunctions
     assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@1, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@1, case=@2, gap=-]');
+     .equalsTo('NP\'[num=@3, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@1, case=@2, gap=-] __ "or" __ NP[num=@3, gen=@1, case=@2, gap=-]');
     assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=plur, gen=-hum, case=@2, gap=-] -> NP[num=@3, gen=@5, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@6, case=@2, gap=-]');
+     .equalsTo('NP\'[num=@1, gen=-hum, case=@2, gap=-] -> NP[num=@3, gen=@5, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@6, case=@2, gap=-]');
     // Sentential Conjunctions
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> S[num=@1] __ "and" __ S[num=@1]');

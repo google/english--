@@ -845,6 +845,24 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones's wife or Smith's brother love Mary.", function() {
+    assertThat("Jones's wife or Smith's brother loves Mary.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Mary(a)
+         Jones(b)
+         Smith(c)
+         drs(d) {
+           d loves a(d)
+           d wife b
+         } or drs(e) {
+           e loves a(e)
+           e brother c
+         }
+       }
+    `);
+  });
+
 
   function assertThat(x) { 
   return {
