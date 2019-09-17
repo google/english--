@@ -22,6 +22,7 @@ const {
   CRNPOR,
   CRAND,
   CRPP,
+  CRADJ,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -649,6 +650,28 @@ describe("Rules", function() {
 
     assertThat(print(brother)).equalsTo("c brother b");
   });
+
+  it("CR.NPADJ", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones owns an unhappy donkey."), true);
+    
+    let [a, [jones]] = new CRPN(ids).match(node);
+
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(node)).equalsTo("a owns an unhappy donkey");
+
+    let [[b], [donkey]] = new CRID(ids).match(child(node, 1, 0));
+    assertThat(print(node)).equalsTo("a owns b");
+    assertThat(print(donkey)).equalsTo("unhappy donkey(b)");
+
+    let [[], [raw, unhappy], [], [remove]] = new CRADJ(ids).match(donkey);
+    // The noun is removed and two new conditions are introduced.
+    assertThat(remove).equalsTo(donkey);
+    assertThat(print(raw)).equalsTo("donkey(b)");
+    assertThat(print(unhappy)).equalsTo("unhappy(b)");    
+  });
+
 
   function trim (str) {
    return str

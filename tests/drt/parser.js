@@ -430,6 +430,11 @@ describe("Parser", function() {
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
+  it("Jones owns an unhappy donkey.", function() {
+    assertThat(first(parse("Jones owns an unhappy donkey.")))
+     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("an"), N(ADJ("unhappy"), N("donkey")))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

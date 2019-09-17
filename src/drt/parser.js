@@ -418,6 +418,12 @@ function grammar() {
                      space(),
                      term("ADJ")]));
 
+ // Adnominal adjectives (page 271)
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                     [term("ADJ"),
+                      space(),
+                      term("N", {"num": 1, "gen": 2})]));
+
  // Conditionals
  result.push(phrase(term("S", {"num": 1}),
                     [literal("if"),
@@ -494,7 +500,7 @@ function grammar() {
 
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
-                   [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
+                   [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
  
  // LI 2
  result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "+nom"}),
@@ -615,7 +621,7 @@ function grammar() {
 
  // ADJ
  result.push(rule(term("ADJ"),
-                  [[literal("happy")], [literal("unhappy")], [literal("foolish")], [literal("fat")]]));
+                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")]]));
 
  // BE
  result.push(rule(term("BE", {"num": "sing", "fin": 1}),

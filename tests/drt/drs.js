@@ -863,6 +863,59 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones owns an unhappy donkey.", function() {
+    assertThat("Jones owns an unhappy donkey.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         a owns b
+         donkey(b)
+         unhappy(b)
+       }
+    `);
+  });
+
+  it("Jones owns a fast porsche.", function() {
+    assertThat("Jones owns a fast porsche.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         a owns b
+         porsche(b)
+         fast(b)
+       }
+    `);
+  });
+
+  it("Jones owns every fast porsche.", function() {
+    assertThat("Jones owns every fast porsche.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         drs(b) {
+           porsche(b)
+           fast(b)
+         } => drs() {
+           a owns b
+         }
+       }
+    `);
+  });
+
+  it("Every beautiful woman loves Jones.", function() {
+    assertThat("Every beautiful woman loves Jones.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         drs(b) {
+           woman(b)
+           beautiful(b)
+         } => drs() {
+           b loves a
+         }
+       }
+    `);
+  });
 
   function assertThat(x) { 
   return {

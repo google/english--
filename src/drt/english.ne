@@ -616,25 +616,31 @@ NP__num_plur_gen_nhum_case_nnom_gap_plur ->
   NP_num_plur_gen_nhum_case_nnom_gap_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"plur"}, args))(args) %}
 N_num_sing_gen_male -> 
   N_num_sing_gen_male __ RC_num_sing_gen_male {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
+  ADJ __ N_num_sing_gen_male {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "man"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}
 N_num_sing_gen_fem -> 
   N_num_sing_gen_fem __ RC_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
+  ADJ __ N_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "woman"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "widow"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %}
 N_num_sing_gen_nhum -> 
   N_num_sing_gen_nhum __ RC_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
+  ADJ __ N_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "book"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "donkey"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "horse"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   "porsche"i {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %}
 N_num_plur_gen_male -> 
-  N_num_plur_gen_male __ RC_num_plur_gen_male {% (args) => node("N", {"num":"plur","gen":"male"}, args) %}
+  N_num_plur_gen_male __ RC_num_plur_gen_male {% (args) => node("N", {"num":"plur","gen":"male"}, args) %} |
+  ADJ __ N_num_plur_gen_male {% (args) => node("N", {"num":"plur","gen":"male"}, args) %}
 N_num_plur_gen_fem -> 
-  N_num_plur_gen_fem __ RC_num_plur_gen_fem {% (args) => node("N", {"num":"plur","gen":"fem"}, args) %}
+  N_num_plur_gen_fem __ RC_num_plur_gen_fem {% (args) => node("N", {"num":"plur","gen":"fem"}, args) %} |
+  ADJ __ N_num_plur_gen_fem {% (args) => node("N", {"num":"plur","gen":"fem"}, args) %}
 N_num_plur_gen_nhum -> 
-  N_num_plur_gen_nhum __ RC_num_plur_gen_nhum {% (args) => node("N", {"num":"plur","gen":"-hum"}, args) %}
+  N_num_plur_gen_nhum __ RC_num_plur_gen_nhum {% (args) => node("N", {"num":"plur","gen":"-hum"}, args) %} |
+  ADJ __ N_num_plur_gen_nhum {% (args) => node("N", {"num":"plur","gen":"-hum"}, args) %}
 RC_num_sing_gen_male -> 
   RPRO_num_sing_gen_male __ S_num_sing_gap_sing {% (args) => node("RC", {"num":"sing","gen":"male"}, args) %}
 RC_num_sing_gen_fem -> 
@@ -716,6 +722,7 @@ DET_num_sing_rn_p ->
   PN_num_plur_gen_nhum "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %}
 DET_num_sing -> 
   "a"i {% (args) => node("DET", {"num":"sing"}, args) %} |
+  "an"i {% (args) => node("DET", {"num":"sing"}, args) %} |
   "every"i {% (args) => node("DET", {"num":"sing"}, args) %} |
   "the"i {% (args) => node("DET", {"num":"sing"}, args) %} |
   "some"i {% (args) => node("DET", {"num":"sing"}, args) %}
@@ -779,8 +786,10 @@ GAP ->
 ADJ -> 
   "happy"i {% (args) => node("ADJ", {}, args) %} |
   "unhappy"i {% (args) => node("ADJ", {}, args) %} |
-  "foolish"i {% (args) => node("ADJ", {}, args) %} |
-  "fat"i {% (args) => node("ADJ", {}, args) %}
+  "handsome"i {% (args) => node("ADJ", {}, args) %} |
+  "beautiful"i {% (args) => node("ADJ", {}, args) %} |
+  "fast"i {% (args) => node("ADJ", {}, args) %} |
+  "slow"i {% (args) => node("ADJ", {}, args) %}
 BE_num_sing_fin_p -> 
   "is"i {% (args) => node("BE", {"num":"sing","fin":"+"}, args) %}
 BE_num_sing_fin_n -> 

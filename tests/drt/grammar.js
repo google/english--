@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(60);
+    assertThat(result.length).equalsTo(61);
 
     let i = 0;
 
@@ -390,6 +390,8 @@ A ->
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
+    assertThat(print(result[i++]))
+     .equalsTo('N[num=@1, gen=@2] -> ADJ __ N[num=@1, gen=@2]');
     // Conditionals
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> "if" __ S[num=@1] __ "then" __ S[num=@1]');
@@ -418,7 +420,7 @@ A ->
   
     // Insertion Rules
     assertThat(print(result[i++]))
-     .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
+     .equalsTo('DET[num=sing] -> "a" "an" "every" "the" "some"');
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');
     assertThat(print(result[i++]))
@@ -468,7 +470,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
     assertThat(print(result[i++]))
-     .equalsTo('ADJ -> "happy" "unhappy" "foolish" "fat"');
+     .equalsTo('ADJ -> "happy" "unhappy" "handsome" "beautiful" "fast" "slow"');
     assertThat(print(result[i++]))
      .equalsTo('BE[num=sing, fin=@1] -> "is"');
     assertThat(print(result[i++]))

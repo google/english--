@@ -244,24 +244,6 @@ class CRPRO extends CompositeRule {
 
 class CRSID extends Rule {
  constructor(ids) {
-  super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
- }
-
- apply({det, noun}, node) {
-  if (det.children[0] != "a") {
-   return [[], [], [], []];
-  }
-
-  let ref = new Referent(this.id(), noun.types);
-  noun.ref = ref;
-  node.children[1] = ref;
-  
-  return [[ref], [noun], [], []];
- }
-}
-
-class CRVPID extends Rule {
- constructor(ids) {
   super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_()));
  }
 
@@ -274,6 +256,24 @@ class CRVPID extends Rule {
   noun.ref = ref;
   node.children[0] = ref;
 
+  return [[ref], [noun], [], []];
+ }
+}
+
+class CRVPID extends Rule {
+ constructor(ids) {
+  super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
+ }
+
+ apply({det, noun}, node) {
+  if (!(det.children[0] == "a" || det.children[0] == "an")) {
+   return [[], [], [], []];
+  }
+
+  let ref = new Referent(this.id(), noun.types);
+  noun.ref = ref;
+  node.children[1] = ref;
+  
   return [[ref], [noun], [], []];
  }
 }
@@ -627,6 +627,17 @@ class CRPP extends CompositeRule {
  }
 }
 
+class CRADJ extends Rule {
+ constructor(ids) {
+  super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
+ }
+ apply({adj, noun}, node, refs) {
+  adj.ref = node.ref;
+  noun.ref = node.ref;
+  return [[], [noun, adj], [], [node]];
+ }
+}
+
 class DRS {
  constructor(ids = new Ids()) {
   this.head = [];
@@ -647,6 +658,7 @@ class DRS {
     new CRVPOR(ids),
     new CRNPOR(ids),
     new CRAND(ids),
+    new CRADJ(ids),
     ];
  }
  
@@ -778,4 +790,5 @@ module.exports = {
  CRNPOR: CRNPOR,
  CRAND: CRAND,
  CRPP: CRPP,
+ CRADJ: CRADJ
 };
