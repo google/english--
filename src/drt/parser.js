@@ -484,11 +484,6 @@ function grammar() {
                       term("V", {"num": 1, "fin": 2, "trans": 3})]));
  
  // Non-pronomial possessive phrases
- //result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
- //                    [term("DET", {"num": 1}), 
- //                     space(),
- //                     term("N", {"num": 1, "gen": 2})]));
- 
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                      [term("DET", {"num": "sing", "rn": "+"}), 
                       space(),
@@ -497,6 +492,18 @@ function grammar() {
  result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
                     [term("PN", {"num": 1, "gen": 2}), 
                       literal("'s")]));
+
+
+ // Noun Prepositional Phrases
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                    [term("N", {"num": 1, "gen": 2}), 
+                     space(),
+                     term("PP")]));
+
+ result.push(phrase(term("PP"),
+                     [term("PREP"),
+                      space(),
+                      term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"})]));
 
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
@@ -635,6 +642,28 @@ function grammar() {
                   [[literal("husband")], [literal("father")], [literal("brother")] ]));
  result.push(rule(term("RN", {"num": "sing", "gen": "fem"}),
                   [[literal("wife")], [literal("mother")], [literal("sister")] ]));
+
+ // to, of, about, at, before, after, by, behind, during, for,
+ // from, in, over, under and with.
+ // ADJ
+ result.push(rule(term("PREP"),
+                  [[literal("to")], 
+                   [literal("of")], 
+                   [literal("about")], 
+                   [literal("before")], 
+                   [literal("after")], 
+                   [literal("by")],
+                   [literal("behind")],
+                   [literal("during")],
+                   [literal("for")],
+                   [literal("from")],
+                   [literal("in")],
+                   [literal("over")],
+                   [literal("under")],
+                   [literal("with")],
+                   ]));
+
+
  
  return result;
 }
@@ -698,6 +727,8 @@ module.exports = {
   RPRO: (...children) => node("RPRO", ...children),
   GAP: (...children) => node("GAP", ...children),
   ADJ: (...children) => node("ADJ", ...children),
+  PP: (...children) => node("PP", ...children),
+  PREP: (...children) => node("PREP", ...children),
   Discourse: (...children) => node("Discourse", ...children),
   Sentence: (...children) => node("Sentence", ...children),
  }

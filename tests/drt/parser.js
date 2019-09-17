@@ -21,7 +21,7 @@ const {
   nodes} = require("../../src/drt/parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ,
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
  Discourse, Sentence
 } = nodes;
 
@@ -433,6 +433,15 @@ describe("Parser", function() {
   it("Jones owns an unhappy donkey.", function() {
     assertThat(first(parse("Jones owns an unhappy donkey.")))
      .equalsTo(S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("an"), N(ADJ("unhappy"), N("donkey")))))));
+  });
+
+  it("Jones likes a woman with a donkey.", function() {
+    assertThat(first(parse("Jones likes a woman with a donkey.")))
+     .equalsTo(S(NP(PN("Jones")), 
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), N(N("woman"), 
+                                       PP(PREP("with"), NP(DET("a"), N("donkey"))
+                                          )))))));
   });
 
   function assertThat(x) {

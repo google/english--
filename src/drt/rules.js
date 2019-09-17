@@ -586,7 +586,7 @@ class CRAND extends CompositeRule {
 }
 
 // Possessive Phrases
-class CRSPP extends Rule {
+class CRSPOSS extends Rule {
  constructor(ids) {
   super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
@@ -605,7 +605,7 @@ class CRSPP extends Rule {
  }
 }
 
-class CRVPPP extends Rule {
+class CRVPPOSS extends Rule {
  constructor(ids) {
   super(ids, VP(V(capture("verb")), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
@@ -621,9 +621,9 @@ class CRVPPP extends Rule {
  }
 }
 
-class CRPP extends CompositeRule {
+class CRPOSS extends CompositeRule {
  constructor(ids) {
-  super([new CRSPP(ids), new CRVPPP(ids)]);
+  super([new CRSPOSS(ids), new CRVPPOSS(ids)]);
  }
 }
 
@@ -649,7 +649,7 @@ class DRS {
     new CRNRC(ids), 
     new CRPRO(ids),
     new CRNEG(ids),
-    new CRPP(ids),
+    new CRPOSS(ids),
     new CRBE(ids),
     new CRCOND(ids),
     new CREVERY(ids),
@@ -789,6 +789,6 @@ module.exports = {
  CRVPOR: CRVPOR,
  CRNPOR: CRNPOR,
  CRAND: CRAND,
- CRPP: CRPP,
+ CRPOSS: CRPOSS,
  CRADJ: CRADJ
 };

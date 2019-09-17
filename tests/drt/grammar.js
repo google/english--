@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(61);
+    assertThat(result.length).equalsTo(64);
 
     let i = 0;
 
@@ -417,7 +417,13 @@ A ->
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1, gen=@2]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing, rn=+] -> PN[num=@1, gen=@2] "\'s"');
-  
+
+    // Noun propositional phrases
+    assertThat(print(result[i++]))
+     .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ PP');
+    assertThat(print(result[i++]))
+     .equalsTo('PP -> PREP __ NP[num=@1, gen=@2, case=@3, gap=-]');
+    
     // Insertion Rules
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "an" "every" "the" "some"');
@@ -479,6 +485,8 @@ A ->
      .equalsTo('RN[num=sing, gen=male] -> "husband" "father" "brother"');
     assertThat(print(result[i++]))
      .equalsTo('RN[num=sing, gen=fem] -> "wife" "mother" "sister"');
+    assertThat(print(result[i++]))
+     .equalsTo('PREP -> "to" "of" "about" "before" "after" "by" "behind" "during" "for" "from" "in" "over" "under" "with"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

@@ -21,7 +21,7 @@ const {
   CRVPOR,
   CRNPOR,
   CRAND,
-  CRPP,
+  CRPOSS,
   CRADJ,
 } = require("../../src/drt/rules.js");
 
@@ -607,7 +607,7 @@ describe("Rules", function() {
     `));
   });
 
-  it("CR.PP", function() {
+  it("CR.POSS", function() {
     let ids = new Ids();
 
     let node = first(parse("Mary's brother is happy."), true);
@@ -616,7 +616,7 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a 's brother is happy");
 
-    let [[ref], [brother]] = new CRPP(ids).match(node);
+    let [[ref], [brother]] = new CRPOSS(ids).match(node);
 
     assertThat(print(node)).equalsTo("b is happy(b)");
 
@@ -626,7 +626,7 @@ describe("Rules", function() {
     assertThat(print(brother)).equalsTo("b brother a");
   });
 
-  it("CR.PP", function() {
+  it("CR.POSS", function() {
     let ids = new Ids();
 
     let node = first(parse("Jones likes Mary's brother."), true);
@@ -641,7 +641,7 @@ describe("Rules", function() {
     assertThat(print(mary)).equalsTo("Mary(b)");
     assertThat(print(node)).equalsTo("a likes b 's brother");
 
-    let [[ref], [brother]] = new CRPP(ids).match(child(node, 1, 0));
+    let [[ref], [brother]] = new CRPOSS(ids).match(child(node, 1, 0));
 
     assertThat(print(node)).equalsTo("a likes c");
 
