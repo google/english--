@@ -917,6 +917,28 @@ describe("DRS", function() {
     `);
   });
 
+  it("Smith loves a woman who does not like Jones.", function() {
+    assertThat("Smith loves a woman who does not like Jones.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Smith(a)
+         Jones(b)
+         a loves c
+         woman(c)
+         ~drs() {
+           c like b
+         }
+       }
+    `);
+  });
+
+  it.skip("Jones likes a woman who likes Bill.", function() {
+    // TODO(goto): this hangs. investigate why.
+    assertThat("Jones likes a woman who likes Bill.")
+     .equalsTo(`
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {
