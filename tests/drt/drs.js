@@ -792,6 +792,60 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Jones likes him.", function() {
+    // Chapter 3.1 suggests that the "him" here
+    // shouldn't bind to Jones, and more generally
+    // that objects can't bind to subjects.
+    // However, in "If Jones likes Mary then he loves her"
+    // seems like the "he" should bind to "Jones.
+    // TODO(goto): revisit 3.1 and figure out what needs
+    // to be done.
+    assertThat("Jones likes him.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         a likes a
+       }
+    `);
+  });
+
+  it("Jones's wife is happy.", function() {
+    assertThat("Jones's wife is happy.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         b wife a
+         happy(b)
+       }
+    `);
+  });
+
+  it("Jones's wife is happy. She likes Smith.", function() {
+    assertThat("Jones's wife is happy. She likes Smith.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         b wife a
+         happy(b)
+         Smith(c)
+         b likes c
+       }
+    `);
+  });
+
+  it("Smith likes Jones's wife.", function() {
+    assertThat("Smith likes Jones's wife.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Smith(a)
+         Jones(b)
+         a likes c
+         c wife b
+       }
+    `);
+  });
+
+
   function assertThat(x) { 
   return {
     trim (str) {

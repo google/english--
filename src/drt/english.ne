@@ -233,51 +233,63 @@ NP_num_plur_gen_nhum_case_nnom_gap_plur ->
 NP_num_sing_gen_male_case_pnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %} |
   PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_male_case_pnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_male_case_pnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"+nom","gap":"-"}, args) %}
 NP_num_sing_gen_male_case_nnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args) %} |
   PN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_male_case_nnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_male_case_nnom {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_male {% (args) => node("NP", {"num":"sing","gen":"male","case":"-nom","gap":"-"}, args) %}
 NP_num_sing_gen_fem_case_pnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args) %} |
   PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_fem_case_pnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_fem_case_pnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"+nom","gap":"-"}, args) %}
 NP_num_sing_gen_fem_case_nnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args) %} |
   PN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_fem_case_nnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_fem_case_nnom {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_fem {% (args) => node("NP", {"num":"sing","gen":"fem","case":"-nom","gap":"-"}, args) %}
 NP_num_sing_gen_nhum_case_pnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
   PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_nhum_case_pnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_nhum_case_pnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"+nom","gap":"-"}, args) %}
 NP_num_sing_gen_nhum_case_nnom_gap_n -> 
   DET_num_sing __ N_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
   PN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_sing_gen_nhum_case_nnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args) %}
+  PRO_num_sing_gen_nhum_case_nnom {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_sing_gen_nhum {% (args) => node("NP", {"num":"sing","gen":"-hum","case":"-nom","gap":"-"}, args) %}
 NP_num_plur_gen_male_case_pnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args) %} |
   PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_male_case_pnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_male_case_pnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args) %}
 NP_num_plur_gen_male_case_nnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args) %} |
   PN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_male_case_nnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_male_case_nnom {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_male {% (args) => node("NP", {"num":"plur","gen":"male","case":"-nom","gap":"-"}, args) %}
 NP_num_plur_gen_fem_case_pnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args) %} |
   PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_fem_case_pnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_fem_case_pnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"+nom","gap":"-"}, args) %}
 NP_num_plur_gen_fem_case_nnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args) %} |
   PN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_fem_case_nnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_fem_case_nnom {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_fem {% (args) => node("NP", {"num":"plur","gen":"fem","case":"-nom","gap":"-"}, args) %}
 NP_num_plur_gen_nhum_case_pnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
   PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_nhum_case_pnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_nhum_case_pnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"+nom","gap":"-"}, args) %}
 NP_num_plur_gen_nhum_case_nnom_gap_n -> 
   DET_num_plur __ N_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
   PN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
-  PRO_num_plur_gen_nhum_case_nnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %}
+  PRO_num_plur_gen_nhum_case_nnom {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %} |
+  DET_num_sing_rn_p __ RN_num_plur_gen_nhum {% (args) => node("NP", {"num":"plur","gen":"-hum","case":"-nom","gap":"-"}, args) %}
 NP__num_plur_gen_male_case_pnom_gap_n -> 
   NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_sing_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
   NP_num_sing_gen_male_case_pnom_gap_n __ "and"i __ NP_num_plur_gen_male_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args) => node("NP", {"num":"plur","gen":"male","case":"+nom","gap":"-"}, args))(args) %} |
@@ -635,6 +647,13 @@ V_num_plur_fin_n_trans_n ->
   "love"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
   "stink"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %} |
   "adore"i {% (args) => node("V", {"num":"plur","fin":"-","trans":"-"}, args) %}
+DET_num_sing_rn_p -> 
+  PN_num_sing_gen_male "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %} |
+  PN_num_sing_gen_fem "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %} |
+  PN_num_sing_gen_nhum "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %} |
+  PN_num_plur_gen_male "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %} |
+  PN_num_plur_gen_fem "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %} |
+  PN_num_plur_gen_nhum "'s"i {% (args) => node("DET", {"num":"sing","rn":"+"}, args) %}
 DET_num_sing -> 
   "a"i {% (args) => node("DET", {"num":"sing"}, args) %} |
   "every"i {% (args) => node("DET", {"num":"sing"}, args) %} |
@@ -710,6 +729,14 @@ BE_num_plur_fin_p ->
   "are"i {% (args) => node("BE", {"num":"plur","fin":"+"}, args) %}
 BE_num_plur_fin_n -> 
   "are"i {% (args) => node("BE", {"num":"plur","fin":"-"}, args) %}
+RN_num_sing_gen_male -> 
+  "husband"i {% (args) => node("RN", {"num":"sing","gen":"male"}, args) %} |
+  "father"i {% (args) => node("RN", {"num":"sing","gen":"male"}, args) %} |
+  "brother"i {% (args) => node("RN", {"num":"sing","gen":"male"}, args) %}
+RN_num_sing_gen_fem -> 
+  "wife"i {% (args) => node("RN", {"num":"sing","gen":"fem"}, args) %} |
+  "mother"i {% (args) => node("RN", {"num":"sing","gen":"fem"}, args) %} |
+  "sister"i {% (args) => node("RN", {"num":"sing","gen":"fem"}, args) %}
 
 #  whitespaces
 WS_gap_sing -> _ {% () => null %}

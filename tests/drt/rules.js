@@ -21,6 +21,7 @@ const {
   CRVPOR,
   CRNPOR,
   CRAND,
+  CRPP,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -605,34 +606,48 @@ describe("Rules", function() {
     `));
   });
 
-  it.skip("DRS", function() {
-    class TestRule extends Rule {
-     match(node) {
-      return [[], []];
-     }
-    }
+  it("CR.PP", function() {
+    let ids = new Ids();
 
-    let drs = new DRS([new TestRule()]);
+    let node = first(parse("Mary's brother is happy."), true);
+    
+    let [[mary]] = new CRPN(ids).match(child(node, 0, 0));
 
-    drs.feed("Mel loves Dani.");
+    assertThat(print(node)).equalsTo("a 's brother is happy");
 
-    assertThat(drs.head).equalsTo([]);
-    assertThat(drs.body.length).equalsTo(1);
-    assertThat(transcribe(drs.body[0]))
-      .equalsTo("Mel loves Dani");
+    let [[ref], [brother]] = new CRPP(ids).match(node);
+
+    assertThat(print(node)).equalsTo("b is happy(b)");
+
+    // Brother is male and singular
+    assertThat(ref.types).equalsTo({"gen": "male", "num": "sing"});
+
+    assertThat(print(brother)).equalsTo("b brother a");
   });
 
-  it("DRS print()", function() {
-    let drs = new DRS();
-    drs.feed("Mel loves Dani.");
-    assertThat(drs.print())
-     .equalsTo(trim(`
-       drs(a, b) {
-         Mel(a)
-         Dani(b)
-         a loves b
-       }
-     `));
+  it("CR.PP", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones likes Mary's brother."), true);
+    
+    let [a, [jones]] = new CRPN(ids).match(node);
+
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(node)).equalsTo("a likes Mary 's brother");
+
+    let [b, [mary]] = new CRPN(ids).match(child(node, 1, 0, 1, 0));
+
+    assertThat(print(mary)).equalsTo("Mary(b)");
+    assertThat(print(node)).equalsTo("a likes b 's brother");
+
+    let [[ref], [brother]] = new CRPP(ids).match(child(node, 1, 0));
+
+    assertThat(print(node)).equalsTo("a likes c");
+
+    // Brother is male and singular
+    assertThat(ref.types).equalsTo({"gen": "male", "num": "sing"});
+
+    assertThat(print(brother)).equalsTo("c brother b");
   });
 
   function trim (str) {

@@ -18,7 +18,7 @@ const {
   nodes} = require("./parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ,
  Discourse, Sentence
 } = nodes;
 
@@ -180,9 +180,23 @@ class CRVPPN extends Rule {
  }
 }
 
+class CRDETPN extends Rule {
+ constructor(ids) {
+  super(ids, DET(PN(capture("name")), "'s"));
+ }
+ apply({name}, node) {
+  let ref = new Referent(this.id(), name.types);
+  let pn = name;
+  pn.ref = ref;
+  node.children[0] = ref;
+
+  return [[ref], [pn], [], []];
+ }
+}
+
 class CRPN extends CompositeRule {
  constructor(ids) {
-  super([new CRSPN(ids), new CRVPPN(ids)]);
+  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
  }
 }
 
@@ -571,6 +585,48 @@ class CRAND extends CompositeRule {
  }
 }
 
+// Possessive Phrases
+class CRSPP extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+ }
+
+ apply({name, noun, verb}, node) {
+  let u = new Referent(this.id(), noun.types);
+  node.children[0] = u;
+  node.ref = u;
+
+  // console.log(print(node));
+  // console.log(child(node, 1, 0, 1));
+
+  let s = S(u, VP_(VP(V(noun), name.children[0])));
+
+  return [[u], [s], [], []];
+ }
+}
+
+class CRVPPP extends Rule {
+ constructor(ids) {
+  super(ids, VP(V(capture("verb")), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+ }
+
+ apply({name, noun, verb}, node) {
+  let u = new Referent(this.id(), noun.types);
+  node.children[1] = u;
+  // node.ref = u;
+
+  let s = S(u, VP_(VP(V(noun), name.children[0])));
+
+  return [[u], [s], [], []];
+ }
+}
+
+class CRPP extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPP(ids), new CRVPPP(ids)]);
+ }
+}
+
 class DRS {
  constructor(ids = new Ids()) {
   this.head = [];
@@ -582,6 +638,7 @@ class DRS {
     new CRNRC(ids), 
     new CRPRO(ids),
     new CRNEG(ids),
+    new CRPP(ids),
     new CRBE(ids),
     new CRCOND(ids),
     new CREVERY(ids),
@@ -589,7 +646,8 @@ class DRS {
     new CROR(ids),
     new CRVPOR(ids),
     new CRNPOR(ids),
-    new CRAND(ids)];
+    new CRAND(ids),
+    ];
  }
  
  feed(s) {
@@ -719,4 +777,5 @@ module.exports = {
  CRVPOR: CRVPOR,
  CRNPOR: CRNPOR,
  CRAND: CRAND,
+ CRPP: CRPP,
 };

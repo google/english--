@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(56);
+    assertThat(result.length).equalsTo(60);
 
     let i = 0;
 
@@ -370,9 +370,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=@1] -> GAP')
     assertThat(print(result[i++]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] __ N[num=@1, gen=@2]")
+     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] __ N[num=@1, gen=@2]");
     assertThat(print(result[i++]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> PN[num=@1, gen=@2]")
+     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> PN[num=@1, gen=@2]");
     assertThat(print(result[i++]))
      .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> PRO[num=@1, gen=@2, case=@3]');
     assertThat(print(result[i++]))
@@ -410,6 +410,12 @@ A ->
     // VP Conjunctions
     assertThat(print(result[i++]))
      .equalsTo('V[num=@1, fin=@2, trans=@3] -> V[num=@1, fin=@2, trans=@3] __ "and" __ V[num=@1, fin=@2, trans=@3]');
+    // Non-pronomial possessive phrases
+    assertThat(print(result[i++]))
+     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1, gen=@2]');
+    assertThat(print(result[i++]))
+     .equalsTo('DET[num=sing, rn=+] -> PN[num=@1, gen=@2] "\'s"');
+  
     // Insertion Rules
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
@@ -467,6 +473,10 @@ A ->
      .equalsTo('BE[num=sing, fin=@1] -> "is"');
     assertThat(print(result[i++]))
      .equalsTo('BE[num=plur, fin=@1] -> "are"');
+    assertThat(print(result[i++]))
+     .equalsTo('RN[num=sing, gen=male] -> "husband" "father" "brother"');
+    assertThat(print(result[i++]))
+     .equalsTo('RN[num=sing, gen=fem] -> "wife" "mother" "sister"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

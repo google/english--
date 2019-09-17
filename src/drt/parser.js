@@ -477,6 +477,21 @@ function grammar() {
                       space(),
                       term("V", {"num": 1, "fin": 2, "trans": 3})]));
  
+ // Non-pronomial possessive phrases
+ //result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+ //                    [term("DET", {"num": 1}), 
+ //                     space(),
+ //                     term("N", {"num": 1, "gen": 2})]));
+ 
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                     [term("DET", {"num": "sing", "rn": "+"}), 
+                      space(),
+                      term("RN", {"num": 1, "gen": 2})]));
+
+ result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
+                    [term("PN", {"num": 1, "gen": 2}), 
+                      literal("'s")]));
+
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
                    [[literal("a")], [literal("every")], [literal("the")], [literal("some")]]));
@@ -608,6 +623,12 @@ function grammar() {
 
  result.push(rule(term("BE", {"num": "plur", "fin": 1}),
                   [[literal("are")]]));
+
+ // Relative Nouns
+ result.push(rule(term("RN", {"num": "sing", "gen": "male"}),
+                  [[literal("husband")], [literal("father")], [literal("brother")] ]));
+ result.push(rule(term("RN", {"num": "sing", "gen": "fem"}),
+                  [[literal("wife")], [literal("mother")], [literal("sister")] ]));
  
  return result;
 }
@@ -664,6 +685,7 @@ module.exports = {
   BE: (...children) => node("BE", ...children),
   DET: (...children) => node("DET", ...children),
   N: (...children) => node("N", ...children),
+  RN: (...children) => node("RN", ...children),
   PRO: (...children) => node("PRO", ...children),
   AUX: (...children) => node("AUX", ...children),
   RC: (...children) => node("RC", ...children),
