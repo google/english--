@@ -18,7 +18,7 @@ const {
   nodes} = require("./parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ,
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
  Discourse, Sentence
 } = nodes;
 
@@ -273,7 +273,7 @@ class CRVPID extends Rule {
   let ref = new Referent(this.id(), noun.types);
   noun.ref = ref;
   node.children[1] = ref;
-  
+
   return [[ref], [noun], [], []];
  }
 }
@@ -285,25 +285,17 @@ class CRID extends CompositeRule {
 }
 
 class CRLIN extends Rule {
- match(node) {
-  let matcher = N(capture("noun"));
-  let m = match(matcher, node);
-  
-  let head = [];
-  let body = [];
-  
-  return [head, body, [], []];
-  
-  if (m && 
-      m.noun.ref && 
-      m.noun.children.length == 1 &&
-      typeof m.noun.children[0] == "string") {
-   let name = m.noun.children[0];
-   let u = m.noun.ref.name;
-   node.assign(predicate(name, [arg(u)]));
+ constructor(ids) {
+  super(ids, NP(DET("a"), N(capture("noun"))));
+ }
+ apply({noun}, node) {
+  if (!node.ref) {
+   return [[], [], [], []];
   }
-  
-  return [head, body, [], []];
+
+  noun.ref = node.ref;
+
+  return [[], [noun], [], [node]];
  }
 }
 
@@ -613,7 +605,6 @@ class CRVPPOSS extends Rule {
  apply({name, noun, verb}, node) {
   let u = new Referent(this.id(), noun.types);
   node.children[1] = u;
-  // node.ref = u;
 
   let s = S(u, VP_(VP(V(noun), name.children[0])));
 
@@ -638,6 +629,21 @@ class CRADJ extends Rule {
  }
 }
 
+class CRPP extends Rule {
+ constructor(ids) {
+  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np")))));
+ }
+ apply({noun, prep, np}, node, refs) {
+  let u = new Referent(this.id(), noun.types);
+
+  noun.ref = node.ref;
+  np.ref = u;
+  let cond = S(node.ref, VP_(VP(V(prep), u)));
+
+  return [[u], [noun, np, cond], [], [node]];
+ }
+}
+
 class DRS {
  constructor(ids = new Ids()) {
   this.head = [];
@@ -645,7 +651,8 @@ class DRS {
   this.subs = [];
   this.names = new CRPN(ids);
   this.rules =
-   [new CRID(ids), 
+   [new CRID(ids),
+    new CRLIN(ids),
     new CRNRC(ids), 
     new CRPRO(ids),
     new CRNEG(ids),
@@ -659,6 +666,7 @@ class DRS {
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
+    new CRPP(ids),
     ];
  }
  
@@ -790,5 +798,6 @@ module.exports = {
  CRNPOR: CRNPOR,
  CRAND: CRAND,
  CRPOSS: CRPOSS,
- CRADJ: CRADJ
+ CRADJ: CRADJ,
+ CRPP: CRPP,
 };

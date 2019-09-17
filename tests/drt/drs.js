@@ -939,6 +939,35 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones loves a woman with a donkey.", function() {
+    assertThat("Jones loves a woman with a donkey.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         a loves b
+         woman(b)
+         b with c
+         donkey(c)
+       }
+    `);
+  });
+
+  it("Every woman behind a donkey loves Jones.", function() {
+    assertThat("Every woman behind a donkey loves Jones.")
+     .equalsTo(`
+      drs(a) {
+        Jones(a)
+        drs(b, c) {
+          woman(b)
+          b behind c
+          donkey(c)
+        } => drs() {
+          b loves a
+        }
+      }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

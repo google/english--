@@ -647,19 +647,24 @@ function grammar() {
  // from, in, over, under and with.
  // ADJ
  result.push(rule(term("PREP"),
-                  [[literal("to")], 
-                   [literal("of")], 
-                   [literal("about")], 
-                   [literal("before")], 
-                   [literal("after")], 
-                   [literal("by")],
+                  [
+                   // location
                    [literal("behind")],
-                   [literal("during")],
-                   [literal("for")],
-                   [literal("from")],
                    [literal("in")],
                    [literal("over")],
                    [literal("under")],
+                   [literal("near")],
+                   // time
+                   [literal("before")], 
+                   [literal("after")], 
+                   [literal("during")],
+                   // general
+                   [literal("from")],
+                   [literal("to")], 
+                   [literal("of")], 
+                   [literal("about")], 
+                   [literal("by")],
+                   [literal("for")],
                    [literal("with")],
                    ]));
 

@@ -486,7 +486,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('RN[num=sing, gen=fem] -> "wife" "mother" "sister"');
     assertThat(print(result[i++]))
-     .equalsTo('PREP -> "to" "of" "about" "before" "after" "by" "behind" "during" "for" "from" "in" "over" "under" "with"');
+     .equalsTo('PREP -> "behind" "in" "over" "under" "near" "before" "after" "during" "from" "to" "of" "about" "by" "for" "with"');
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

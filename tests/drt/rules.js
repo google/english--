@@ -23,6 +23,7 @@ const {
   CRAND,
   CRPOSS,
   CRADJ,
+  CRPP,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -672,6 +673,31 @@ describe("Rules", function() {
     assertThat(print(unhappy)).equalsTo("unhappy(b)");    
   });
 
+  it("CR.PP", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones loves a woman with a donkey."), true);
+    
+    let [a, [jones]] = new CRPN(ids).match(node);
+
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(node)).equalsTo("a loves a woman with a donkey");
+
+    let [[b], [woman]] = new CRID(ids).match(child(node, 1, 0));
+    assertThat(print(node)).equalsTo("a loves b");
+    assertThat(print(woman)).equalsTo("woman with a donkey(b)");
+
+    let [[], [raw, donkey, prep], [], [remove]] = new CRPP(ids).match(woman);
+    // The noun is removed and two new conditions are introduced.
+    assertThat(remove).equalsTo(woman);
+    assertThat(print(raw)).equalsTo("woman(b)");
+    assertThat(print(donkey)).equalsTo("a donkey(c)");
+    assertThat(print(prep)).equalsTo("b with c");
+
+    let [, [clazz], , [del]] = new CRLIN(ids).match(donkey);
+    assertThat(del).equalsTo(donkey);    
+    assertThat(print(clazz)).equalsTo("donkey(c)");    
+  });
 
   function trim (str) {
    return str

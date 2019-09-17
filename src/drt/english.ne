@@ -826,19 +826,20 @@ RN_num_sing_gen_fem ->
   "mother"i {% (args) => node("RN", {"num":"sing","gen":"fem"}, args) %} |
   "sister"i {% (args) => node("RN", {"num":"sing","gen":"fem"}, args) %}
 PREP -> 
-  "to"i {% (args) => node("PREP", {}, args) %} |
-  "of"i {% (args) => node("PREP", {}, args) %} |
-  "about"i {% (args) => node("PREP", {}, args) %} |
-  "before"i {% (args) => node("PREP", {}, args) %} |
-  "after"i {% (args) => node("PREP", {}, args) %} |
-  "by"i {% (args) => node("PREP", {}, args) %} |
   "behind"i {% (args) => node("PREP", {}, args) %} |
-  "during"i {% (args) => node("PREP", {}, args) %} |
-  "for"i {% (args) => node("PREP", {}, args) %} |
-  "from"i {% (args) => node("PREP", {}, args) %} |
   "in"i {% (args) => node("PREP", {}, args) %} |
   "over"i {% (args) => node("PREP", {}, args) %} |
   "under"i {% (args) => node("PREP", {}, args) %} |
+  "near"i {% (args) => node("PREP", {}, args) %} |
+  "before"i {% (args) => node("PREP", {}, args) %} |
+  "after"i {% (args) => node("PREP", {}, args) %} |
+  "during"i {% (args) => node("PREP", {}, args) %} |
+  "from"i {% (args) => node("PREP", {}, args) %} |
+  "to"i {% (args) => node("PREP", {}, args) %} |
+  "of"i {% (args) => node("PREP", {}, args) %} |
+  "about"i {% (args) => node("PREP", {}, args) %} |
+  "by"i {% (args) => node("PREP", {}, args) %} |
+  "for"i {% (args) => node("PREP", {}, args) %} |
   "with"i {% (args) => node("PREP", {}, args) %}
 
 #  whitespaces
