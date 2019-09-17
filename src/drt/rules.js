@@ -523,7 +523,7 @@ class CRNPOR extends Rule {
  }
 }
 
-class CRAND extends Rule {
+class CRSAND extends Rule {
  constructor(ids) {
   super(ids, S(S(capture("a")), "and", S(capture("b"))));
  }
@@ -541,6 +541,33 @@ class CRAND extends Rule {
   let result = new Conjunction(first, second);
   
   return [[], [], [result], [node]];
+ }
+}
+
+class CRVPAND extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("subject"), VP_(VP(V(V(capture("a")), "and", V(capture("b"))), NP(capture("object"))))));
+ }
+ apply({subject, a, b, object}, node, refs) {
+  let first = new DRS(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(S(clone(subject.children[0]), VP_(VP(a, clone(object)))));
+
+  let second = new DRS(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(S(clone(subject.children[0]), VP_(VP(b, clone(object)))));
+  
+  let conjunction = new Conjunction(first, second);
+  
+  return [[], [], [conjunction], [node]];
+ }
+}
+
+class CRAND extends CompositeRule {
+ constructor(ids) {
+  super([new CRSAND(ids), new CRVPAND(ids)]);
  }
 }
 

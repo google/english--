@@ -758,6 +758,40 @@ describe("DRS", function() {
     }
   });
 
+  it.skip("Mary owns and loves a porsche.", function() {
+    // TODO(goto): find a way to process indefinite nouns
+    // before the CRAND gets constructed.
+    assertThat("Mary owns and loves a porsche.")
+     .equalsTo(`
+       drs(a, d) {
+         Mary(a)
+         porsche(d)
+         drs(b) {
+           a owns b
+           porsche(b)
+         } and drs(c) {
+           a loves c
+           porsche(c)
+         }
+       }
+    `);
+  });
+
+  it("Mary likes and loves Jones.", function() {
+    assertThat("Mary likes and loves Jones.")
+     .equalsTo(`
+       drs(a, b) {
+         Mary(a)
+         Jones(b)
+         drs() {
+           a likes b
+         } and drs() {
+           a loves b
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

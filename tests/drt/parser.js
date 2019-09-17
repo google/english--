@@ -411,6 +411,12 @@ describe("Parser", function() {
                  VP_(VP(V("love"), NP(PRO("her"))))));
   });
 
+  it("Jones owns and loves a porsche.", function() {
+    assertThat(first(parse("Jones owns and loves a porsche.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(V("owns"), "and", V("loves")), NP(DET("a"), N("porsche"))))));
+  });
+
   it("Mary likes Smith and she loves him.", function() {
     assertThat(first(parse("Mary likes Smith and she loves him.")))
      .equalsTo(S(S(NP(PN("Mary")), VP_(VP(V("likes"), NP(PN("Smith"))))), 

@@ -576,7 +576,7 @@ describe("Rules", function() {
     `));
   });
 
-  it("CR.AND", function() {
+  it("CR.SAND", function() {
     // She can't be bound to Mary because Mary hasn't been processed
     // yet.
     let node = first(parse("She loves him and Mary likes Smith."), true);
@@ -585,6 +585,24 @@ describe("Rules", function() {
     } catch (e) {
      Assert.deepEqual(e.message, "Invalid reference: She");
     }
+  });
+
+  it("CR.VPAND", function() {
+    let node = first(parse("Mary owns and loves a porsche."), true);
+
+    let [, , [sub]] = new CRAND(new Ids()).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        Mary(a)
+        a owns b
+        porsche(b)
+      } and drs(c, d) {
+        Mary(c)
+        c loves d
+        porsche(d)
+      }
+    `));
   });
 
   it.skip("DRS", function() {

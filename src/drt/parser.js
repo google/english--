@@ -468,6 +468,14 @@ function grammar() {
                      literal("and"),
                      space(),
                      term("S", {"num": 1})]));
+
+ // V Conjunctions
+ result.push(phrase(term("V", {"num": 1, "fin": 2, "trans": 3}),
+                     [term("V", {"num": 1, "fin": 2, "trans": 3}),
+                      space(),
+                      literal("and"),
+                      space(),
+                      term("V", {"num": 1, "fin": 2, "trans": 3})]));
  
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),

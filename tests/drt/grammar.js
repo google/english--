@@ -342,9 +342,11 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(55);
+    assertThat(result.length).equalsTo(56);
 
     let i = 0;
+
+    // Production Rules
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> S[num=@1] _ "."');
     assertThat(print(result[i++]))
@@ -405,6 +407,10 @@ A ->
     // Sentential Conjunctions
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> S[num=@1] __ "and" __ S[num=@1]');
+    // VP Conjunctions
+    assertThat(print(result[i++]))
+     .equalsTo('V[num=@1, fin=@2, trans=@3] -> V[num=@1, fin=@2, trans=@3] __ "and" __ V[num=@1, fin=@2, trans=@3]');
+    // Insertion Rules
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "every" "the" "some"');
     assertThat(print(result[i++]))
