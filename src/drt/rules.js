@@ -28,6 +28,9 @@ function transcribe(node) {
   return node;
  } else if (node["@type"] == "Referent") {
   return node.name;
+ } else if (node["@type"] == "Predicate") {
+  // console.log(node);
+  return `${node.name}(${node.ref.name})`;
  }
  let result = [];
  for (let child of node.children || []) {
@@ -284,18 +287,50 @@ class CRID extends CompositeRule {
  }
 }
 
-class CRLIN extends Rule {
+class CRNLIN extends Rule {
  constructor(ids) {
-  super(ids, NP(DET("a"), N(capture("noun"))));
+  super(ids, N(capture("noun")));
  }
  apply({noun}, node) {
+  if (!node.ref ||
+      node.children.length != 1) {
+   return [[], [], [], []];
+  }
+
+  // Simple noun
+  let pred = {
+   "@type": "Predicate", 
+   name: child(noun, 0), 
+   ref: node.ref
+  };
+  
+  return [[], [pred], [], [node]];
+ }
+}
+
+class CRPPLIN extends Rule {
+ constructor(ids) {
+  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np")))));
+ }
+ apply({noun, prep, np}, node) {
   if (!node.ref) {
    return [[], [], [], []];
   }
 
-  noun.ref = node.ref;
+  let u = new Referent(this.id(), noun.types);
+  // console.log(print(node));
+  // child(node, 1, 0).children[1] = u;
 
-  return [[], [noun], [], [node]];
+  noun.ref = u;
+  let cond = S(u, VP_(VP(V(prep), np)));
+
+  return [[u], [noun, cond], [], [node]];
+ }
+}
+
+class CRLIN extends CompositeRule {
+ constructor(ids) {
+  super([new CRNLIN(ids), new CRPPLIN(ids)]);
  }
 }
 
@@ -427,7 +462,7 @@ class CREVERY extends Rule {
   n.head.push(ref);
   noun.ref = ref;
   n.push(noun);
-   
+
   let v = new DRS(this.ids);
   v.head.push(...clone(n.head));
   v.head.forEach(ref => ref.closure = true);
@@ -629,18 +664,48 @@ class CRADJ extends Rule {
  }
 }
 
-class CRPP extends Rule {
+class CRSPP extends Rule {
  constructor(ids) {
-  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np")))));
+  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np"))))), 
+               VP_()));
  }
  apply({noun, prep, np}, node, refs) {
   let u = new Referent(this.id(), noun.types);
+  if (child(node, 0, 0)["@type"] == "DET" &&
+      child(node, 0, 0, 0) == "Every") {
+   child(node, 0).children[1] = u;
+  } else {
+   node.children[0] = u;
+  }
 
-  noun.ref = node.ref;
-  np.ref = u;
-  let cond = S(node.ref, VP_(VP(V(prep), u)));
+  noun.ref = u;
+  let cond = S(u, VP_(VP(V(prep), np)));
 
-  return [[u], [noun, np, cond], [], [node]];
+  return [[u], [noun, cond], [], []];
+ }
+}
+
+class CRVPPP extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("subject"), 
+               VP_(VP(V(), NP(DET(), 
+                              N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np"))))
+                              )))));
+ }
+ apply({noun, prep, np}, node, refs) {
+  let u = new Referent(this.id(), noun.types);
+  child(node, 1, 0).children[1] = u;
+
+  noun.ref = u;
+  let cond = S(u, VP_(VP(V(prep), np)));
+
+  return [[u], [noun, cond], [], []];
+ }
+}
+
+class CRPP extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPP(ids), new CRVPPP(ids)]);
  }
 }
 
@@ -651,7 +716,11 @@ class DRS {
   this.subs = [];
   this.names = new CRPN(ids);
   this.rules =
-   [new CRID(ids),
+   [
+    new CREVERY(ids),
+    new CRVPEVERY(ids),
+    new CRPP(ids),
+    new CRID(ids),
     new CRLIN(ids),
     new CRNRC(ids), 
     new CRPRO(ids),
@@ -659,14 +728,11 @@ class DRS {
     new CRPOSS(ids),
     new CRBE(ids),
     new CRCOND(ids),
-    new CREVERY(ids),
-    new CRVPEVERY(ids),
     new CROR(ids),
     new CRVPOR(ids),
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
-    new CRPP(ids),
     ];
  }
  

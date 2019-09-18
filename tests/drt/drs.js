@@ -74,8 +74,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          a admires b
-         woman(b)
          b likes a
+         woman(b)
        }
     `);
   });
@@ -120,8 +120,8 @@ describe("DRS", function() {
          Anna(a)
          Dani(b)
          c fascinates a
-         man(c)
          c loves b
+         man(c)
        }
      `);
   });
@@ -133,8 +133,8 @@ describe("DRS", function() {
          Mel(a)
          Anna(b)
          a loves c
-         book(c)
          c fascinates b
+         book(c)
        }
      `);
   });
@@ -146,8 +146,8 @@ describe("DRS", function() {
          Jones(a)
          Smith(b)
          a owns c
-         book(c)
          b loves c
+         book(c)
        }
      `);
   });
@@ -158,8 +158,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          a owns b
-         book(b)
          b fascinates a
+         book(b)
        }
      `);
   });
@@ -171,10 +171,10 @@ describe("DRS", function() {
          Dani(a)
          Anna(b)
          c loves d
-         man(c)
          c fascinates a
-         book(d)
+         man(c)
          d fascinates b
+         book(d)
        }
      `);
   });
@@ -360,8 +360,8 @@ describe("DRS", function() {
     assertThat("A man is happy.")
      .equalsTo(`
        drs(a) {
-         man(a)
          happy(a)
+         man(a)
        }
     `);
   });
@@ -671,8 +671,8 @@ describe("DRS", function() {
            a loves b
          } or drs(d) {
            a likes d
-           woman(d)
            c loves d
+           woman(d)
          }
        }
     `);
@@ -685,8 +685,8 @@ describe("DRS", function() {
          Jones(a)
          Smith(b)
          drs(c) {
-           woman(c)
            b loves c
+           woman(c)
          } => drs() {
            a likes c
          }
@@ -705,8 +705,8 @@ describe("DRS", function() {
            a loves b
          } or drs() {
            drs(d) {
-             woman(d)
              c loves d
+             woman(d)
            } => drs() {
              a likes d
            }
@@ -869,8 +869,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          a owns b
-         donkey(b)
          unhappy(b)
+         donkey(b)
        }
     `);
   });
@@ -881,8 +881,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          a owns b
-         porsche(b)
          fast(b)
+         porsche(b)
        }
     `);
   });
@@ -893,8 +893,8 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          drs(b) {
-           porsche(b)
            fast(b)
+           porsche(b)
          } => drs() {
            a owns b
          }
@@ -908,8 +908,8 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          drs(b) {
-           woman(b)
            beautiful(b)
+           woman(b)
          } => drs() {
            b loves a
          }
@@ -945,26 +945,64 @@ describe("DRS", function() {
        drs(a, b, c) {
          Jones(a)
          a loves b
-         woman(b)
          b with c
+         woman(b)
          donkey(c)
        }
     `);
   });
 
-  it("Every woman behind a donkey loves Jones.", function() {
-    assertThat("Every woman behind a donkey loves Jones.")
+  it("A woman with a donkey loves Jones.", function() {
+    assertThat("A woman with a donkey loves Jones.")
      .equalsTo(`
-      drs(a) {
-        Jones(a)
-        drs(b, c) {
-          woman(b)
-          b behind c
-          donkey(c)
-        } => drs() {
-          b loves a
-        }
-      }
+       drs(a, b, c) {
+         Jones(a)
+         b loves a
+         b with c
+         woman(b)
+         donkey(c)
+       }
+    `);
+  });
+
+  it.skip("Jones loves the man.", function() {
+    // What handles "the"-like nouns?
+    assertThat("Jones loves the man.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         a loves the man
+       }
+    `);
+  });
+
+  it("Jones likes a woman near Smith's brother.", function() {
+    assertThat("Jones likes a woman near Smith's brother.")
+     .equalsTo(`
+       drs(a, b, c, d) {
+         Jones(a)
+         Smith(b)
+         a likes c
+         c near d
+         woman(c)
+         d brother b
+       }
+    `);
+  });
+
+  it("Every woman with a donkey loves Jones.", function() {
+    assertThat("Every woman with a donkey loves Jones.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         drs(b, c, d) {
+           c with d
+           woman(c)
+           donkey(d)
+         } => drs() {
+           b loves a
+         }
+       }
     `);
   });
 

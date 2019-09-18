@@ -492,8 +492,8 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
          Smith(b)
-         woman(a)
          b loves a
+         woman(a)
        } => drs(c) {
          Jones(c)
          c likes a
@@ -673,7 +673,7 @@ describe("Rules", function() {
     assertThat(print(unhappy)).equalsTo("unhappy(b)");    
   });
 
-  it("CR.PP", function() {
+  it("CR.VPPP", function() {
     let ids = new Ids();
 
     let node = first(parse("Jones loves a woman with a donkey."), true);
@@ -683,20 +683,71 @@ describe("Rules", function() {
     assertThat(print(jones)).equalsTo("Jones(a)");
     assertThat(print(node)).equalsTo("a loves a woman with a donkey");
 
-    let [[b], [woman]] = new CRID(ids).match(child(node, 1, 0));
+    let [[b], [woman, prep], [], []] = new CRPP(ids).match(node);
+
     assertThat(print(node)).equalsTo("a loves b");
-    assertThat(print(woman)).equalsTo("woman with a donkey(b)");
+    assertThat(print(woman)).equalsTo("woman(b)");
+    assertThat(print(prep)).equalsTo("b with a donkey");
 
-    let [[], [raw, donkey, prep], [], [remove]] = new CRPP(ids).match(woman);
-    // The noun is removed and two new conditions are introduced.
-    assertThat(remove).equalsTo(woman);
-    assertThat(print(raw)).equalsTo("woman(b)");
-    assertThat(print(donkey)).equalsTo("a donkey(c)");
+    let [[c], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
     assertThat(print(prep)).equalsTo("b with c");
+    assertThat(print(donkey)).equalsTo("donkey(c)");
+  });
 
-    let [, [clazz], , [del]] = new CRLIN(ids).match(donkey);
-    assertThat(del).equalsTo(donkey);    
-    assertThat(print(clazz)).equalsTo("donkey(c)");    
+  it("CR.SPP", function() {
+    let ids = new Ids();
+
+    let node = first(parse("A woman with a donkey loves Jones."), true);
+    
+    let [a, [jones]] = new CRPN(ids).match(child(node, 1, 0));
+
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(node)).equalsTo("A woman with a donkey loves a");
+
+    let [[b], [woman, prep], [], []] = new CRPP(ids).match(node);
+
+    assertThat(print(node)).equalsTo("b loves a");
+    assertThat(print(woman)).equalsTo("woman(b)");
+    assertThat(print(prep)).equalsTo("b with a donkey");
+
+    let [[c], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
+    assertThat(print(prep)).equalsTo("b with c");
+    assertThat(print(donkey)).equalsTo("donkey(c)");
+  });
+
+  it("CR.SPP every", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Every woman with a donkey loves Jones."), true);
+    
+    let [a, [jones]] = new CRPN(ids).match(child(node, 1, 0));
+
+    assertThat(print(jones)).equalsTo("Jones(a)");
+    assertThat(print(node)).equalsTo("Every woman with a donkey loves a");
+
+    let [[], [], [implication]] = new CREVERY(ids).match(node, []);
+    assertThat(implication.print()).equalsTo(trim(`
+      drs(b, c, d) {
+        c with d
+        woman(c)
+        donkey(d)
+      } => drs() {
+        b loves a
+      }
+    `));
+
+    return;
+
+    let [[b], [woman, prep], [], []] = new CRPP(ids).match(node);
+
+    assertThat(print(node)).equalsTo("Every b loves a");
+    assertThat(print(woman)).equalsTo("woman(b)");
+    assertThat(print(prep)).equalsTo("b with a donkey");
+
+    let [[c], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
+    assertThat(print(prep)).equalsTo("b with c");
+    assertThat(print(donkey)).equalsTo("donkey(c)");
+
   });
 
   function trim (str) {
