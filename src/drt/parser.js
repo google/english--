@@ -279,6 +279,7 @@ function parse(source, start = "Sentence") {
    keepHistory: true
   });
  parser.feed(source);
+ // console.log(parser.results);
  return parser.results;
 }
 
@@ -290,6 +291,14 @@ function grammar() {
                      [term("S", {"num": 1}), 
                       space(true),
                       '"."']));
+
+ // Questions
+ result.push(phrase(term("Sentence"),
+                    [literal("who"),
+                     space(true),
+                     term("S", {"num": 1, "gap": 1}),
+                     space(true),
+                     literal("?")]));
 
  // PS 1
  result.push(phrase(term("S", {"num": 1}),
@@ -347,7 +356,7 @@ function grammar() {
  
  // PS 8
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 1}),
-                     [term("GAP")]));
+                    [term("GAP")]));
  
  // page 36 makes a simplification, which we introduce back manually:
  // The intended meaning is that the left-hand side can have either of 

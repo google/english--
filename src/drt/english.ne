@@ -19,7 +19,9 @@ Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Disco
 
 Sentence -> 
   S_num_sing _ "." {% (args) => node("Sentence", {}, args) %} |
-  S_num_plur _ "." {% (args) => node("Sentence", {}, args) %}
+  S_num_plur _ "." {% (args) => node("Sentence", {}, args) %} |
+  "who"i _ S_num_sing_gap_sing _ "?"i {% (args) => node("Sentence", {}, args) %} |
+  "who"i _ S_num_plur_gap_plur _ "?"i {% (args) => node("Sentence", {}, args) %}
 S_num_sing -> 
   NP__num_sing_gen_male_case_pnom_gap_n __ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |
   NP__num_sing_gen_fem_case_pnom_gap_n __ VP__num_sing_fin_p_gap_n {% (args) => node("S", {"num":"sing"}, args) %} |

@@ -444,6 +444,20 @@ describe("Parser", function() {
                                           )))))));
   });
 
+  it("Who likes Mary?", function() {
+    assertThat(clean(parse("Who likes Mary?")[0]))
+     .equalsTo(Sentence("Who", S(NP(GAP()), 
+                                 VP_(VP(V("likes"), NP(PN("Mary"))))), 
+                        "?"));
+  });
+
+  it("Who is happy?", function() {
+    assertThat(clean(parse("Who is happy?")[0]))
+     .equalsTo(Sentence("Who", S(NP(GAP()), 
+                                 VP_(VP(BE("is"), ADJ("happy")))), 
+                        "?"));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

@@ -342,13 +342,15 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(64);
+    assertThat(result.length).equalsTo(65);
 
     let i = 0;
 
     // Production Rules
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> S[num=@1] _ "."');
+    assertThat(print(result[i++]))
+     .equalsTo('Sentence -> "who" _ S[num=@1, gap=@1] _ "?"');
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> NP\'[num=@1, gen=@2, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(result[i++]))
