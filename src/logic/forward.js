@@ -316,6 +316,7 @@ function stringify(rule) {
  } else if (rule.op == "~") {
   return quantify(rule, `~${stringify(rule.expression)}`);
  } else if (rule["@type"] == "Predicate" || rule["@type"] == "Function") {
+  // console.log(rule);
   return quantify(rule, `${rule.name}(${rule.arguments.map(stringify).join(", ")})`);
  } else if (rule.op) {
   // NOTE(goto): by not parenthesizing we loose some information

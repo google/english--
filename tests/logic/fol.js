@@ -639,8 +639,6 @@ describe("First Order Logic", function() {
 	    return this;
 	  },
 	  equalsTo(y) {
-	    // console.log(result.toString());
-	    // console.log(JSON.stringify(Parser.parse(result.toString()), undefined, 2));
 	    let next = result.next();
 	    end = next.done;
 	    if (next.done) {
@@ -649,7 +647,6 @@ describe("First Order Logic", function() {
 	    }
 	    assertThat(toString(Parser.parse(next.value.toString())))
               .equalsTo(toString(Parser.parse(y)));
-	    // console.log(next);
 	    return this;
 	  }
 	};

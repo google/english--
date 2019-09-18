@@ -1006,6 +1006,22 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Every man from Brazil loves Mary.", function() {
+    // c is introduced here and b is missing.
+    assertThat("Every man from Brazil loves Mary.")
+     .equalsTo(`
+       drs(a) {
+         Mary(a)
+         drs(b, c) {
+           c from Brazil
+           man(c)
+         } => drs() {
+           b loves a
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

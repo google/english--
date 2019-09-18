@@ -813,17 +813,19 @@ class DRS {
 }
 
 class Implication {
- constructor(antecedent, consequent) {
-  this.antecedent = antecedent;
-  this.consequent = consequent;
+ constructor(a, b) {
+  this["@type"] = "Implication";
+  this.a = a;
+  this.b = b;
  }
  print() {
-  return this.antecedent.print() + " => " + this.consequent.print();
+  return this.a.print() + " => " + this.b.print();
  }
 }
 
 class Disjunction {
  constructor(a, b) {
+  this["@type"] = "Disjunction";
   this.a = a;
   this.b = b;
  }
@@ -834,6 +836,7 @@ class Disjunction {
 
 class Conjunction {
  constructor(a, b) {
+  this["@type"] = "Conjunction";
   this.a = a;
   this.b = b;
  }
