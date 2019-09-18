@@ -296,7 +296,20 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("who"),
                      space(true),
-                     term("S", {"num": 1, "gap": 1}),
+                     term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": 1}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "gap": "-"}),
+                     space(true),
+                     literal("?")]));
+
+ result.push(phrase(term("Sentence"),
+                    [literal("who"),
+                     space(),
+                     literal("does"),
+                     space(),
+                     term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP", {"num": 3, "fin": "+", "gap": 1}),
                      space(true),
                      literal("?")]));
 

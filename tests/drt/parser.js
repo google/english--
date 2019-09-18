@@ -446,15 +446,44 @@ describe("Parser", function() {
 
   it("Who likes Mary?", function() {
     assertThat(clean(parse("Who likes Mary?")[0]))
-     .equalsTo(Sentence("Who", S(NP(GAP()), 
-                                 VP_(VP(V("likes"), NP(PN("Mary"))))), 
+     .equalsTo(Sentence("Who", 
+                        NP(GAP()), 
+                        VP_(VP(V("likes"), NP(PN("Mary")))), 
                         "?"));
   });
 
   it("Who is happy?", function() {
     assertThat(clean(parse("Who is happy?")[0]))
-     .equalsTo(Sentence("Who", S(NP(GAP()), 
-                                 VP_(VP(BE("is"), ADJ("happy")))), 
+     .equalsTo(Sentence("Who", 
+                        NP(GAP()), 
+                        VP_(VP(BE("is"), ADJ("happy"))), 
+                        "?"));
+  });
+
+  it("Who does Mary like?", function() {
+    assertThat(clean(parse("Who does Mary like?")[0]))
+     .equalsTo(Sentence("Who", 
+                        "does",
+                        NP(PN("Mary")), 
+                        VP(V("like"), NP(GAP())), 
+                        "?"));
+  });
+
+  it("Who does the man like?", function() {
+    assertThat(clean(parse("Who does the man like?")[0]))
+     .equalsTo(Sentence("Who", 
+                        "does",
+                        NP(DET("the"), N("man")), 
+                        VP(V("like"), NP(GAP())), 
+                        "?"));
+  });
+
+  it("Who does Smith's brother like?", function() {
+    assertThat(clean(parse("Who does Smith's brother like?")[0]))
+     .equalsTo(Sentence("Who", 
+                        "does",
+                        NP(DET(PN("Smith"), "'s"), RN("brother")), 
+                        VP(V("like"), NP(GAP())), 
                         "?"));
   });
 

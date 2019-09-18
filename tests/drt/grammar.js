@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(65);
+    assertThat(result.length).equalsTo(66);
 
     let i = 0;
 
@@ -350,7 +350,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> S[num=@1] _ "."');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" _ S[num=@1, gap=@1] _ "?"');
+     .equalsTo('Sentence -> "who" _ NP[num=@1, gen=@2, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, gap=-] _ "?"');
+    assertThat(print(result[i++]))
+     .equalsTo('Sentence -> "who" __ "does" __ NP[num=@1, gen=@2, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> NP\'[num=@1, gen=@2, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(result[i++]))
