@@ -245,7 +245,7 @@ describe("DRS", function() {
   });
 
   it("Jones does not own a porsche. He likes it.", function() {
-    let drs = new DRS();
+    let drs = DRS.from();
     drs.feed("Jones does not own a porsche.");
     try {
      // "it" in "he likes it" cannot bind to anything
@@ -509,7 +509,7 @@ describe("DRS", function() {
 
   it("Every man is happy. He likes it.", function() {
     try {
-     let drs = new DRS();
+     let drs = DRS.from();
      drs.feed("Every man is happy.");
      drs.feed("He likes it.");
      throw new Error("expected reference 'He' to fail");
@@ -520,7 +520,7 @@ describe("DRS", function() {
 
   it("Every man owns a book. It is happy.", function() {
     try {
-     let drs = new DRS();
+     let drs = DRS.from();
      drs.feed("Every man owns a book.");
      drs.feed("It is happy.");
      throw new Error("expected reference 'It' to fail");
@@ -746,7 +746,7 @@ describe("DRS", function() {
   });
 
   it("Mary owns a porsche and she loves it.", function() {
-    let drs = new DRS();
+    let drs = DRS.from();
     try {
      drs.feed("She loves it and Mary owns a porsche.");
      throw new Error("expected exception");
@@ -1045,7 +1045,7 @@ describe("DRS", function() {
         .join("\n");
     },
     equalsTo(y) {
-     let drs = new DRS();
+     let drs = DRS.from();
 
      for (let s of x.split(".")) {
       if (s == "") {

@@ -411,7 +411,7 @@ class CRNEG extends Rule {
     
   let noun = np.children[0];
   
-  let sub = new DRS(this.ids);
+  let sub = DRS.from(this.ids);
   sub.head = clone(refs);
   sub.head.forEach(ref => ref.closure = true);
   sub.neg = true;
@@ -457,12 +457,12 @@ class CRCOND extends Rule {
   super(ids, S("if", capture("head"), "then", capture("tail")));
  }
  apply({head, tail}, node, refs) {
-  let antecedent = new DRS(this.ids);
+  let antecedent = DRS.from(this.ids);
   antecedent.head.push(...clone(refs));
   antecedent.head.forEach(ref => ref.closure = true);
   antecedent.push(head.children[1]);
    
-  let consequent = new DRS(this.ids);
+  let consequent = DRS.from(this.ids);
   consequent.head.push(...clone(antecedent.head));
   consequent.head.forEach(ref => ref.closure = true);
   consequent.push(tail.children[3]);
@@ -477,14 +477,14 @@ class CREVERY extends Rule {
  }
  apply({noun, verb}, node, refs) {
   let ref = referent(this.id(), noun.types);
-  let n = new DRS(this.ids);
+  let n = DRS.from(this.ids);
   n.head.push(...clone(refs));
   n.head.forEach(ref => ref.closure = true);
   n.head.push(ref);
   noun.ref = ref;
   n.push(noun);
 
-  let v = new DRS(this.ids);
+  let v = DRS.from(this.ids);
   v.head.push(...clone(n.head));
   v.head.forEach(ref => ref.closure = true);
   node.children[0] = ref;
@@ -500,14 +500,14 @@ class CRVPEVERY extends Rule {
  }
  apply({subject, noun}, node, refs) {
   let ref = referent(this.id(), noun.types);
-  let n = new DRS(this.ids);
+  let n = DRS.from(this.ids);
   n.head.push(...clone(refs));
   n.head.forEach(ref => ref.closure = true);
   n.head.push(ref);
   noun.ref = ref;
   n.push(noun);
    
-  let verb = new DRS(this.ids);
+  let verb = DRS.from(this.ids);
   verb.head.push(...clone(n.head));
   verb.head.forEach(ref => ref.closure = true);
   child(node, 1, 0).children[1] = ref;
@@ -522,12 +522,12 @@ class CROR extends Rule {
   super(ids, S(S(capture("a")), "or", S(capture("b"))));
  }
  apply({a, b}, node, refs) {
-  let first = new DRS(this.ids);
+  let first = DRS.from(this.ids);
   first.head.push(...clone(refs));
   first.head.forEach(ref => ref.closure = true);
   first.push(a);
 
-  let second = new DRS(this.ids);
+  let second = DRS.from(this.ids);
   second.head.push(...clone(first.head));
   second.head.forEach(ref => ref.closure = true);
   second.push(b);
@@ -541,12 +541,12 @@ class CRVPOR extends Rule {
   super(ids, S(capture("n"), VP_(VP(VP(capture("a")), "or", VP(capture("b"))))));
  }
  apply({a, b, n}, node, refs) {
-  let first = new DRS(this.ids);
+  let first = DRS.from(this.ids);
   first.head.push(...clone(refs));
   first.head.forEach(ref => ref.closure = true);
   first.push(S(clone(n.children[0]), VP_(a)));
 
-  let second = new DRS(this.ids);
+  let second = DRS.from(this.ids);
   second.head.push(...clone(first.head));
   second.head.forEach(ref => ref.closure = true);
   second.push(S(clone(n.children[0]), VP_(b)));
@@ -561,12 +561,12 @@ class CRNPOR extends Rule {
                   VP_(capture("vp"))));
  }
  apply({first, second, vp}, node, refs) {
-  let a = new DRS(this.ids);
+  let a = DRS.from(this.ids);
   a.head.push(...clone(refs));
   a.head.forEach(ref => ref.closure = true);
   a.push(S(first, VP_(clone(vp))));
 
-  let b = new DRS(this.ids);
+  let b = DRS.from(this.ids);
   b.head.push(...clone(a.head));
   b.head.forEach(ref => ref.closure = true);
   b.push(S(second, VP_(clone(vp))));
@@ -580,12 +580,12 @@ class CRSAND extends Rule {
   super(ids, S(S(capture("a")), "and", S(capture("b"))));
  }
  apply({a, b}, node, refs) {
-  let first = new DRS(this.ids);
+  let first = DRS.from(this.ids);
   first.head.push(...clone(refs));
   first.head.forEach(ref => ref.closure = true);
   first.push(a);
 
-  let second = new DRS(this.ids);
+  let second = DRS.from(this.ids);
   second.head.push(...clone(first.head));
   second.head.forEach(ref => ref.closure = true);
   second.push(b);
@@ -599,12 +599,12 @@ class CRVPAND extends Rule {
   super(ids, S(capture("subject"), VP_(VP(V(V(capture("a")), "and", V(capture("b"))), NP(capture("object"))))));
  }
  apply({subject, a, b, object}, node, refs) {
-  let first = new DRS(this.ids);
+  let first = DRS.from(this.ids);
   first.head.push(...clone(refs));
   first.head.forEach(ref => ref.closure = true);
   first.push(S(clone(subject.children[0]), VP_(VP(a, clone(object)))));
 
-  let second = new DRS(this.ids);
+  let second = DRS.from(this.ids);
   second.head.push(...clone(first.head));
   second.head.forEach(ref => ref.closure = true);
   second.push(S(clone(subject.children[0]), VP_(VP(b, clone(object)))));
@@ -717,14 +717,17 @@ class CRPP extends CompositeRule {
 }
 
 class DRS {
- constructor(ids = new Ids()) {
+ constructor(names, rules) {
   this.head = [];
   this.body = [];
   this.subs = [];
-  this.names = new CRPN(ids);
-  this.rules =
-   [
-    new CREVERY(ids),
+  this.names = names;
+  this.rules = rules;
+ }
+
+ static from(ids = new Ids()) {
+  let rules = 
+   [new CREVERY(ids),
     new CRVPEVERY(ids),
     new CRPP(ids),
     new CRID(ids),
@@ -741,8 +744,9 @@ class DRS {
     new CRAND(ids),
     new CRADJ(ids),
     ];
+  return new DRS(new CRPN(ids), rules);
  }
- 
+
  feed(s) {
   this.push(first(parse(s), true));
  }

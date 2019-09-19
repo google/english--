@@ -27,6 +27,45 @@ const {
 
 describe("Logic", function() {
 
+  it("Who from Brazil loves Mary?", function() {
+    let code = [];
+    code.push("Jones is happy.");
+    code.push("He loves Smith.");
+    code.push("He likes Smith's brother.");
+    code.push("Smith likes a man from Brazil.");
+    code.push("Every man loves Mary.");
+    let kb = program(compile(parse(code.join(" "))));
+    assertThat(trim(toString(kb))).equalsTo(trim(`
+      Jones(a).
+      happy(a).
+      Smith(b).
+      loves(a, b).
+      Smith(c).
+      likes(a, d).
+      brother(d, c).
+      likes(b, e).
+      from(e, Brazil).
+      man(e).
+      Mary(f).
+      forall (g) man(g) => loves(g, f).
+    `));
+
+    let result = new Reasoner(rewrite(kb))
+     .go(rewrite(Rule.of("exists (x) loves(x, f) && from(x, Brazil).")));
+
+    let next = result.next();
+    assertThat(next.done).equalsTo(false);
+    assertThat(toString(Parser.parse(next.value.toString())))
+     .equalsTo(toString(Parser.parse(`
+       man(e).
+       exists (g = e) man(g).
+       forall (g = e) man(g) => loves(g, f).
+       exists (x = e) loves(x, f).
+       from(e, Brazil).
+       exists (x = e) loves(x, f) && from(x, Brazil).
+     `)));
+  });
+
   function transpile(node) {
    if (node["@type"] == "Predicate") {
     return predicate(node.name, [argument(literal(node.ref.name))]);
@@ -80,7 +119,6 @@ describe("Logic", function() {
     return kb;
   }
 
-
   function spread(list) {
    if (list.length == 1) {
     return list[0];
@@ -115,7 +153,7 @@ describe("Logic", function() {
    let np = gap == "vp" ? q[2] : q[1];
    let vp = gap == "vp" ? q[3] : q[2].children[0];
    // console.log(vp);
-   let drs = new DRS();
+   let drs = DRS.from();
    let x = referent("x");
    let body = S(np, VP_(vp));
    if (gap == "vp") {
@@ -131,45 +169,6 @@ describe("Logic", function() {
    }
    return result;
   }
-
-  it("Who from Brazil loves Mary?", function() {
-    let code = [];
-    code.push("Jones is happy.");
-    code.push("He loves Smith.");
-    code.push("He likes Smith's brother.");
-    code.push("Smith likes a man from Brazil.");
-    code.push("Every man loves Mary.");
-    let kb = program(compile(parse(code.join(" "))));
-    assertThat(trim(toString(kb))).equalsTo(trim(`
-      Jones(a).
-      happy(a).
-      Smith(b).
-      loves(a, b).
-      Smith(c).
-      likes(a, d).
-      brother(d, c).
-      likes(b, e).
-      from(e, Brazil).
-      man(e).
-      Mary(f).
-      forall (g) man(g) => loves(g, f).
-    `));
-
-    let result = new Reasoner(rewrite(kb))
-     .go(rewrite(Rule.of("exists (x) loves(x, f) && from(x, Brazil).")));
-
-    let next = result.next();
-    assertThat(next.done).equalsTo(false);
-    assertThat(toString(Parser.parse(next.value.toString())))
-     .equalsTo(toString(Parser.parse(`
-       man(e).
-       exists (g = e) man(g).
-       forall (g = e) man(g) => loves(g, f).
-       exists (x = e) loves(x, f).
-       from(e, Brazil).
-       exists (x = e) loves(x, f) && from(x, Brazil).
-     `)));
-  });
 
   it("Who likes Smith?", function() {
     let code = [];
@@ -199,7 +198,7 @@ describe("Logic", function() {
   });
 
   function parse(code) {
-   let drs = new DRS();
+   let drs = DRS.from();
    
    for (let s of code.split(".")) {
     if (s == "") {
