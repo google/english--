@@ -96,13 +96,13 @@ class Rule {
  }
  
  match(node, refs) {
-  let m = match(this.trigger, node);
+  let result = match(this.trigger, node);
 
-  if (!m) {
+  if (!result) {
    return [[], [], [], []];
   }
 
-  return this.apply(m, node, refs);
+  return this.apply(result, node, refs);
  }
 
  id() {
@@ -140,18 +140,21 @@ function child(node, ...path) {
  return result;
 }
 
-function find({gen, num}, refs) {
+function find({gen, num}, refs, name) {
  return refs.find((ref) => {
-   return ref.types.gen == gen && ref.types.num == num
+   let byName = name ? ref.value == name : true;
+   let types = ref.types || {};
+   return types.gen == gen && types.num == num && byName
   });
 }
 
-class Referent {
- constructor(name, types) {
-  this["@type"] = "Referent";
-  this["types"] = types;
-  this.name = name;
- }
+function referent(name, types, value) {
+  return {
+   "@type": "Referent",
+    types: types,
+    name: name,
+    value: value
+  }
 }
 
 class CRSPN extends Rule {
@@ -159,13 +162,23 @@ class CRSPN extends Rule {
   super(ids, S(NP(PN(capture("name"))), VP_()));
  }
 
- apply({name}, node) {
-  let ref = new Referent(this.id(), name.types);
-  let pn = name;
-  pn.ref = ref;
+ apply({name}, node, refs = []) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, name.children[0]);
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+
   node.children[0] = ref;
 
-  return [[ref], [pn], [], []];
+  return [head, body, [], []];
  }
 }
 
@@ -173,13 +186,29 @@ class CRVPPN extends Rule {
  constructor(ids) {
   super(ids, VP(V(), NP(PN(capture("name")))));
  }
- apply({name}, node) {
-  let ref = new Referent(this.id(), name.types);
-  let pn = name;
-  pn.ref = ref;
+ apply({name}, node, refs = []) {
+  let head = [];
+  let body = [];
+  // console.log(refs);
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, name.children[0]);
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+
   node.children[1].children[0] = ref;
 
-  return [[ref], [pn], [], []];
+  return [head, body, [], []];
+ }
+}
+
+class CRPN extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
  }
 }
 
@@ -188,18 +217,12 @@ class CRDETPN extends Rule {
   super(ids, DET(PN(capture("name")), "'s"));
  }
  apply({name}, node) {
-  let ref = new Referent(this.id(), name.types);
+  let ref = referent(this.id(), name.types);
   let pn = name;
   pn.ref = ref;
   node.children[0] = ref;
 
   return [[ref], [pn], [], []];
- }
-}
-
-class CRPN extends CompositeRule {
- constructor(ids) {
-  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
  }
 }
 
@@ -255,7 +278,7 @@ class CRSID extends Rule {
    return [[], [], [], []];
   }
 
-  let ref = new Referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types);
   noun.ref = ref;
   node.children[0] = ref;
 
@@ -273,7 +296,7 @@ class CRVPID extends Rule {
    return [[], [], [], []];
   }
 
-  let ref = new Referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types);
   noun.ref = ref;
   node.children[1] = ref;
 
@@ -317,7 +340,7 @@ class CRPPLIN extends Rule {
    return [[], [], [], []];
   }
 
-  let u = new Referent(this.id(), noun.types);
+  let u = referent(this.id(), noun.types);
   // console.log(print(node));
   // child(node, 1, 0).children[1] = u;
 
@@ -453,7 +476,7 @@ class CREVERY extends Rule {
   super(ids, S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb"))));
  }
  apply({noun, verb}, node, refs) {
-  let ref = new Referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types);
   let n = new DRS(this.ids);
   n.head.push(...clone(refs));
   n.head.forEach(ref => ref.closure = true);
@@ -476,7 +499,7 @@ class CRVPEVERY extends Rule {
   super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
  }
  apply({subject, noun}, node, refs) {
-  let ref = new Referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types);
   let n = new DRS(this.ids);
   n.head.push(...clone(refs));
   n.head.forEach(ref => ref.closure = true);
@@ -603,7 +626,7 @@ class CRSPOSS extends Rule {
  }
 
  apply({name, noun, verb}, node) {
-  let u = new Referent(this.id(), noun.types);
+  let u = referent(this.id(), noun.types);
   node.children[0] = u;
   node.ref = u;
 
@@ -622,7 +645,7 @@ class CRVPPOSS extends Rule {
  }
 
  apply({name, noun, verb}, node) {
-  let u = new Referent(this.id(), noun.types);
+  let u = referent(this.id(), noun.types);
   node.children[1] = u;
 
   let s = S(u, VP_(VP(V(noun), name.children[0])));
@@ -654,7 +677,7 @@ class CRSPP extends Rule {
                VP_()));
  }
  apply({noun, prep, np}, node, refs) {
-  let u = new Referent(this.id(), noun.types);
+  let u = referent(this.id(), noun.types);
   if (child(node, 0, 0)["@type"] == "DET" &&
       child(node, 0, 0, 0) == "Every") {
    child(node, 0).children[1] = u;
@@ -677,7 +700,7 @@ class CRVPPP extends Rule {
                               )))));
  }
  apply({noun, prep, np}, node, refs) {
-  let u = new Referent(this.id(), noun.types);
+  let u = referent(this.id(), noun.types);
   child(node, 1, 0).children[1] = u;
 
   noun.ref = u;
@@ -728,7 +751,7 @@ class DRS {
   let queue = [node];
   while (queue.length > 0) {
    let p = queue.shift();
-   let [refs, names] = this.names.match(p);
+   let [refs, names] = this.names.match(p, this.head);
    this.head.push(...refs);
    this.body.push(...names);
    // ... and recurse.
@@ -834,7 +857,7 @@ module.exports = {
  capture: capture,
  child: child,
  print: print,
- Referent: Referent,
+ referent: referent,
  Ids: Ids,
  DRS: DRS,
  CRPN: CRPN,

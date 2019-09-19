@@ -1,6 +1,6 @@
 const Assert = require("assert");
 
-const {DRS, Referent} = require("../../src/drt/rules.js");
+const {DRS, referent} = require("../../src/drt/rules.js");
 const DrtParser = require("../../src/drt/parser.js");
 const {S, VP_} = DrtParser.nodes;
 
@@ -116,7 +116,7 @@ describe("Logic", function() {
    let vp = gap == "vp" ? q[3] : q[2].children[0];
    // console.log(vp);
    let drs = new DRS();
-   let x = new Referent("x");
+   let x = referent("x");
    let body = S(np, VP_(vp));
    if (gap == "vp") {
     vp.children[1] = x;
@@ -148,27 +148,26 @@ describe("Logic", function() {
       Smith(c).
       likes(a, d).
       brother(d, c).
-      Smith(e).
-      likes(e, f).
-      from(f, Brazil).
-      man(f).
-      Mary(g).
-      forall (h) man(h) => loves(h, g).
+      likes(b, e).
+      from(e, Brazil).
+      man(e).
+      Mary(f).
+      forall (g) man(g) => loves(g, f).
     `));
 
     let result = new Reasoner(rewrite(kb))
-     .go(rewrite(Rule.of("exists (x) loves(x, g) && from(x, Brazil).")));
+     .go(rewrite(Rule.of("exists (x) loves(x, f) && from(x, Brazil).")));
 
     let next = result.next();
     assertThat(next.done).equalsTo(false);
     assertThat(toString(Parser.parse(next.value.toString())))
      .equalsTo(toString(Parser.parse(`
-       man(f).
-       exists (h = f) man(h).
-       forall (h = f) man(h) => loves(h, g).
-       exists (x = f) loves(x, g).
-       from(f, Brazil).
-       exists (x = f) loves(x, g) && from(x, Brazil).
+       man(e).
+       exists (g = e) man(g).
+       forall (g = e) man(g) => loves(g, f).
+       exists (x = e) loves(x, f).
+       from(e, Brazil).
+       exists (x = e) loves(x, f) && from(x, Brazil).
      `)));
   });
 

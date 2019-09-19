@@ -123,6 +123,23 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a loves b");
    });
 
+  it("CR.PN", function() {
+    let ids = new Ids();
+    let a = first(parse("Mel loves Dani."), true);
+    let rule = new CRPN(ids);
+    let [[u], [mel]] = rule.match(a, []);
+    let [[v], [dani]] = rule.match(child(a, 1, 0), [u]);
+    assertThat(print(a)).equalsTo("a loves b");
+
+    let b = first(parse("Dani loves Mel."), true);
+    let [c] = rule.match(b, [u, v]);
+    assertThat(c.length).equalsTo(0);
+    assertThat(print(b)).equalsTo("b loves Mel");
+    let [d] = rule.match(child(b, 1, 0), [u, v]);
+    assertThat(d.length).equalsTo(0);
+    assertThat(print(b)).equalsTo("b loves a");
+   });
+
   it("CR.PRO", function() {
     let ids = new Ids();
     let sentence = first(parse("Jones owns Ulysses."), true);
@@ -513,10 +530,9 @@ describe("Rules", function() {
         Jones(a)
         Mary(b)
         a loves b
-      } or drs(c, d) {
+      } or drs(c) {
         Smith(c)
-        Mary(d)
-        c loves d
+        c loves b
       }
     `));
   });
@@ -533,10 +549,9 @@ describe("Rules", function() {
         Mary(a)
         Jones(b)
         a loves b
-      } or drs(c, d) {
-        Mary(c)
-        Smith(d)
-        c likes d
+      } or drs(c) {
+        Smith(c)
+        a likes c
       }
     `));
   });
@@ -553,10 +568,9 @@ describe("Rules", function() {
         Jones(a)
         Mary(b)
         a love b
-      } or drs(c, d) {
+      } or drs(c) {
         Smith(c)
-        Mary(d)
-        c love d
+        c love b
       }
     `));
   });
@@ -600,10 +614,9 @@ describe("Rules", function() {
         Mary(a)
         a owns b
         porsche(b)
-      } and drs(c, d) {
-        Mary(c)
-        c loves d
-        porsche(d)
+      } and drs(c) {
+        a loves c
+        porsche(c)
       }
     `));
   });

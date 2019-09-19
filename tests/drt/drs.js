@@ -1022,6 +1022,19 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones loves Mary. Jones likes Smith.", function() {
+    assertThat("Jones loves Mary. Jones likes Smith.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         Mary(b)
+         a loves b
+         Smith(c)
+         a likes c
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {
