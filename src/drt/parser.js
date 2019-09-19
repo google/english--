@@ -279,7 +279,6 @@ function parse(source, start = "Sentence") {
    keepHistory: true
   });
  parser.feed(source);
- // console.log(parser.results);
  return parser.results;
 }
 
@@ -305,7 +304,7 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("who"),
                      space(),
-                     literal("does"),
+                     term("AUX", {"num": "sing", "fin": "+"}),
                      space(),
                      term("NP", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),
                      space(),

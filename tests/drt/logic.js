@@ -1,6 +1,8 @@
 const Assert = require("assert");
 
-const {DRS} = require("../../src/drt/rules.js");
+const {DRS, Referent} = require("../../src/drt/rules.js");
+const DrtParser = require("../../src/drt/parser.js");
+const {S, VP_} = DrtParser.nodes;
 
 const {Parser, Rule} = require("../../src/logic/parser.js");
 const {Forward, normalize, stringify, equals, explain, toString} = require("../../src/logic/forward.js");
@@ -11,6 +13,7 @@ const {
   program, 
   forall, 
   exists, 
+  quantifier,
   implies, 
   predicate, 
   func,
@@ -30,12 +33,18 @@ describe("Logic", function() {
    } else if (node["@type"] == "PN" || node["@type"] == "ADJ") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "S") {
+    // console.log(node);
     let verb = node.children[1].children[0].children[0].children[0];
-    if (verb["@type"] == "RN" ||
+    // console.log(verb);
+    if (verb["@type"] == "V" ||
+        verb["@type"] == "RN" ||
         verb["@type"] == "PREP") {
      verb = verb.children[0];
     }
     let first = node.children[0].name;
+    // console.log(node.children[0]);
+    //console.log(node.children[1].children[0].children[0]);
+    // console.log(node.children[1]);
     let second = node.children[1].children[0].children[1];
     if (second["@type"] == "Referent") {
      second = second.name;
@@ -63,10 +72,8 @@ describe("Logic", function() {
        .filter(ref => !ref.closure)
        .map(ref => ref.name)
        .join("");
-      // console.log();
-      kb.push(forall(x, 
-                     implies(spread(compile(sub.a)),
-                             spread(compile(sub.b)))));
+      kb.push(forall(x, implies(spread(compile(sub.a)),
+                                spread(compile(sub.b)))));
      }
     }
 
@@ -91,6 +98,39 @@ describe("Logic", function() {
                        literal("c"))));
     
   });
+
+  it("Who does Mary like?", function() {
+    assertThat(trim(toString(program([query("Who does Mary like?")]))))
+     .equalsTo("exists (x) exists (a) Mary(a) && like(a, x).");
+  });
+
+  it("Who likes Smith?", function() {
+    assertThat(trim(toString(program([query("Who likes Smith?")]))))
+     .equalsTo("exists (x) exists (a) Smith(a) && likes(x, a).");
+  });
+
+  function query(s) {
+   let q = DrtParser.parse(s)[0].children;
+   let gap = q.length == 5 ? "vp" : "np";
+   let np = gap == "vp" ? q[2] : q[1];
+   let vp = gap == "vp" ? q[3] : q[2].children[0];
+   // console.log(vp);
+   let drs = new DRS();
+   let x = new Referent("x");
+   let body = S(np, VP_(vp));
+   if (gap == "vp") {
+    vp.children[1] = x;
+   } else {
+    body.children[0] = x;
+   }
+   drs.head.push(x);
+   drs.push(body);
+   let result = spread(compile(drs));
+   for (let ref of drs.head) {
+    result.quantifiers.push(quantifier("exists", ref.name));
+   }
+   return result;
+  }
 
   it("Who from Brazil loves Mary?", function() {
     let code = [];
@@ -129,6 +169,33 @@ describe("Logic", function() {
        exists (x = f) loves(x, g).
        from(f, Brazil).
        exists (x = f) loves(x, g) && from(x, Brazil).
+     `)));
+  });
+
+  it("Who likes Smith?", function() {
+    let code = [];
+    code.push("Jones is happy.");
+    code.push("He likes Smith.");
+    let kb = program(compile(parse(code.join(" "))));
+    assertThat(trim(toString(kb))).equalsTo(trim(`
+      Jones(a).
+      happy(a).
+      Smith(b).
+      likes(a, b).
+    `));
+
+    let result = new Reasoner(rewrite(kb))
+     .go(rewrite(query("Who likes Smith?")));
+
+    let next = result.next();
+    assertThat(next.done).equalsTo(false);
+    assertThat(toString(Parser.parse(next.value.toString())))
+     .equalsTo(toString(Parser.parse(`
+       Smith(b).
+       exists (x) exists (a = b) Smith(a).
+       likes(a, b).
+       exists (x = a) exists (a = b) likes(x, b).
+       exists (x = a) exists (a = b) Smith(a) && likes(x, a).
      `)));
   });
 

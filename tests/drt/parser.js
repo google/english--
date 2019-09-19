@@ -463,7 +463,7 @@ describe("Parser", function() {
   it("Who does Mary like?", function() {
     assertThat(clean(parse("Who does Mary like?")[0]))
      .equalsTo(Sentence("Who", 
-                        "does",
+                        AUX("does"),
                         NP(PN("Mary")), 
                         VP(V("like"), NP(GAP())), 
                         "?"));
@@ -472,7 +472,7 @@ describe("Parser", function() {
   it("Who does the man like?", function() {
     assertThat(clean(parse("Who does the man like?")[0]))
      .equalsTo(Sentence("Who", 
-                        "does",
+                        AUX("does"),
                         NP(DET("the"), N("man")), 
                         VP(V("like"), NP(GAP())), 
                         "?"));
@@ -481,7 +481,7 @@ describe("Parser", function() {
   it("Who does Smith's brother like?", function() {
     assertThat(clean(parse("Who does Smith's brother like?")[0]))
      .equalsTo(Sentence("Who", 
-                        "does",
+                        AUX("does"),
                         NP(DET(PN("Smith"), "'s"), RN("brother")), 
                         VP(V("like"), NP(GAP())), 
                         "?"));

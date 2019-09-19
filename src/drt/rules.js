@@ -444,9 +444,7 @@ class CRCOND extends Rule {
   consequent.head.forEach(ref => ref.closure = true);
   consequent.push(tail.children[3]);
    
-  let implication = new Implication(antecedent, consequent);
-   
-  return [[], [], [implication], [node]];
+  return [[], [], [implication(antecedent, consequent)], [node]];
  }
 }
 
@@ -469,9 +467,7 @@ class CREVERY extends Rule {
   node.children[0] = ref;
   v.push(node);
    
-  let implication = new Implication(n, v);
-     
-  return [[], [], [implication], [node]];
+  return [[], [], [implication(n, v)], [node]];
  }
 }
 
@@ -493,10 +489,8 @@ class CRVPEVERY extends Rule {
   verb.head.forEach(ref => ref.closure = true);
   child(node, 1, 0).children[1] = ref;
   verb.push(node);
-   
-  let implication = new Implication(n, verb);
   
-  return [[], [], [implication], [node]];
+  return [[], [], [implication(n, verb)], [node]];
  }
 }
 
@@ -515,9 +509,7 @@ class CROR extends Rule {
   second.head.forEach(ref => ref.closure = true);
   second.push(b);
   
-  let disjunction = new Disjunction(first, second);
-  
-  return [[], [], [disjunction], [node]];
+  return [[], [], [disjunction(first, second)], [node]];
  }
 }
 
@@ -536,9 +528,7 @@ class CRVPOR extends Rule {
   second.head.forEach(ref => ref.closure = true);
   second.push(S(clone(n.children[0]), VP_(b)));
   
-  let disjunction = new Disjunction(first, second);
-  
-  return [[], [], [disjunction], [node]];
+  return [[], [], [disjunction(first, second)], [node]];
  }
 }
 
@@ -558,9 +548,7 @@ class CRNPOR extends Rule {
   b.head.forEach(ref => ref.closure = true);
   b.push(S(second, VP_(clone(vp))));
   
-  let disjunction = new Disjunction(a, b);
-  
-  return [[], [], [disjunction], [node]];
+  return [[], [], [disjunction(a, b)], [node]];
  }
 }
 
@@ -579,9 +567,7 @@ class CRSAND extends Rule {
   second.head.forEach(ref => ref.closure = true);
   second.push(b);
   
-  let result = new Conjunction(first, second);
-  
-  return [[], [], [result], [node]];
+  return [[], [], [conjunction(first, second)], [node]];
  }
 }
 
@@ -600,9 +586,7 @@ class CRVPAND extends Rule {
   second.head.forEach(ref => ref.closure = true);
   second.push(S(clone(subject.children[0]), VP_(VP(b, clone(object)))));
   
-  let conjunction = new Conjunction(first, second);
-  
-  return [[], [], [conjunction], [node]];
+  return [[], [], [conjunction(first, second)], [node]];
  }
 }
 
@@ -744,7 +728,6 @@ class DRS {
   let queue = [node];
   while (queue.length > 0) {
    let p = queue.shift();
-   // console.log(print(p));
    let [refs, names] = this.names.match(p);
    this.head.push(...refs);
    this.body.push(...names);
@@ -812,37 +795,38 @@ class DRS {
  }
 }
 
-class Implication {
- constructor(a, b) {
-  this["@type"] = "Implication";
-  this.a = a;
-  this.b = b;
- }
- print() {
-  return this.a.print() + " => " + this.b.print();
- }
+
+function disjunction(a, b) {
+ return {
+  "@type": "Disjunction",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " or " + this.b.print();
+  }
+ };
 }
 
-class Disjunction {
- constructor(a, b) {
-  this["@type"] = "Disjunction";
-  this.a = a;
-  this.b = b;
- }
- print() {
-  return this.a.print() + " or " + this.b.print();
- }
+function implication(a, b) {
+ return {
+  "@type": "Implication",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " => " + this.b.print();
+  }
+ };
 }
 
-class Conjunction {
- constructor(a, b) {
-  this["@type"] = "Conjunction";
-  this.a = a;
-  this.b = b;
- }
- print() {
-  return this.a.print() + " and " + this.b.print();
- }
+function conjunction(a, b) {
+ return {
+  "@type": "Conjunction",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " and " + this.b.print();
+  }
+ };
 }
 
 module.exports = {
@@ -850,6 +834,7 @@ module.exports = {
  capture: capture,
  child: child,
  print: print,
+ Referent: Referent,
  Ids: Ids,
  DRS: DRS,
  CRPN: CRPN,

@@ -352,7 +352,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> "who" _ NP[num=@1, gen=@2, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, gap=-] _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" __ "does" __ NP[num=@1, gen=@2, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
+     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, gen=@2, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> NP\'[num=@1, gen=@2, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(result[i++]))
