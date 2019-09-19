@@ -267,7 +267,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones owns a book which Smith likes."), true);
 
-    let [h, [jones], subs, [remove]] = new CRPN(ids).match(node);
+    let [h, [jones], , [remove]] = new CRPN(ids).match(node);
 
     assertThat(print(jones))
      .equalsTo("Jones(a)");
@@ -327,7 +327,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones owns a book which he does not like."), true);
 
-    let [refs, [jones], subs, [remove]] = new CRPN(ids).match(node);
+    let [refs, [jones], [remove]] = new CRPN(ids).match(node);
 
     assertThat(print(jones))
      .equalsTo("Jones(a)");
@@ -362,13 +362,13 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a does not own a porsche");
 
-    let [head, body, subs, remove] = new CRNEG(ids).match(node, []);
+    let [head, body, , remove] = new CRNEG(ids).match(node, []);
 
     assertThat(remove.length).equalsTo(1);
     assertThat(remove[0]).equalsTo(node);
 
-    assertThat(subs.length).equalsTo(1);
-    assertThat(subs[0].print()).equalsTo(trim(`
+    assertThat(body.length).equalsTo(1);
+    assertThat(body[0].print()).equalsTo(trim(`
       ~drs(b) {
         a own b
         porsche(b)
@@ -385,10 +385,9 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a is happy");
 
-    let [head, body, subs, remove] = new CRBE(ids).match(node, []);
+    let [head, body, , remove] = new CRBE(ids).match(node, []);
 
     assertThat(head.length).equalsTo(0);
-    assertThat(subs.length).equalsTo(0);
 
     // remove current node
     assertThat(remove.length).equalsTo(1);
@@ -409,10 +408,9 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a is not happy");
 
-    let [head, body, subs, remove] = new CRBE(ids).match(node, []);
+    let [head, body, , remove] = new CRBE(ids).match(node, []);
 
     assertThat(head.length).equalsTo(0);
-    assertThat(subs.length).equalsTo(0);
 
     // remove current node
     assertThat(remove.length).equalsTo(1);
@@ -452,7 +450,7 @@ describe("Rules", function() {
 
     let node = first(parse("If Jones owns a book then he likes it."), true);
 
-    let [, , [sub]] = new CRCOND(ids).match(node, []);
+    let [, [sub]] = new CRCOND(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -470,7 +468,7 @@ describe("Rules", function() {
 
     let node = first(parse("every man loves Jones."), true);
 
-    let [, , [sub]] = new CREVERY(ids).match(node, []);
+    let [, [sub]] = new CREVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a) {
@@ -487,7 +485,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones loves every man."), true);
 
-    let [, , [sub]] = new CRVPEVERY(ids).match(node, []);
+    let [, [sub]] = new CRVPEVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a) {
@@ -504,7 +502,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones likes every woman who Smith loves."), true);
 
-    let [, , [sub]] = new CRVPEVERY(ids).match(node, []);
+    let [, [sub]] = new CRVPEVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -523,7 +521,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones loves Mary or Smith loves Mary."), true);
 
-    let [, , [sub]] = new CROR(ids).match(node, []);
+    let [, [sub]] = new CROR(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -542,7 +540,7 @@ describe("Rules", function() {
 
     let node = first(parse("Mary loves Jones or likes Smith."), true);
 
-    let [, , [sub]] = new CRVPOR(ids).match(node, []);
+    let [, [sub]] = new CRVPOR(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -561,7 +559,7 @@ describe("Rules", function() {
 
     let node = first(parse("Jones or Smith love Mary."), true);
 
-    let [, , [sub]] = new CRNPOR(ids).match(node, []);
+    let [, [sub]] = new CRNPOR(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -580,7 +578,7 @@ describe("Rules", function() {
 
     let node = first(parse("Mary likes Smith and she loves him."), true);
 
-    let [, , [sub]] = new CRAND(ids).match(node, []);
+    let [, [sub]] = new CRAND(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -607,7 +605,7 @@ describe("Rules", function() {
   it("CR.VPAND", function() {
     let node = first(parse("Mary owns and loves a porsche."), true);
 
-    let [, , [sub]] = new CRAND(new Ids()).match(node, []);
+    let [, [sub]] = new CRAND(new Ids()).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
@@ -738,7 +736,7 @@ describe("Rules", function() {
     assertThat(print(jones)).equalsTo("Jones(a)");
     assertThat(print(node)).equalsTo("Every woman with a donkey loves a");
 
-    let [[], [], [implication]] = new CREVERY(ids).match(node, []);
+    let [[], [implication]] = new CREVERY(ids).match(node, []);
     assertThat(implication.print()).equalsTo(trim(`
       drs(b, c, d) {
         c with d

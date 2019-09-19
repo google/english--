@@ -102,17 +102,15 @@ describe("Logic", function() {
     let kb = [];
 
     for (let s of drs.body) {
-     kb.push(transpile(s));
-    }
-
-    for (let sub of drs.subs) {
-     if (sub["@type"] == "Implication") {
-      let x = sub.a.head
+     if (s["@type"] == "Implication") {
+      let x = s.a.head
        .filter(ref => !ref.closure)
        .map(ref => ref.name)
        .join("");
-      kb.push(forall(x, implies(spread(compile(sub.a)),
-                                spread(compile(sub.b)))));
+      kb.push(forall(x, implies(spread(compile(s.a)),
+                                spread(compile(s.b)))));
+     } else {
+      kb.push(transpile(s));
      }
     }
 

@@ -266,10 +266,10 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Ulysses(b)
-         a likes b
          ~drs() {
            a own b
          }
+         a likes b
        }
      `);
   });
@@ -296,10 +296,10 @@ describe("DRS", function() {
     assertThat("A porsche does not stink.")
      .equalsTo(`
        drs(a) {
-         porsche(a)
          ~drs() {
            a stink
          }
+         porsche(a)
        }
      `);
   });
