@@ -23,18 +23,21 @@ const {
 } = nodes;
 
 
-function transcribe(node) {
+function transcribe(node, refs) {
  if (typeof node == "string") {
   return node;
  } else if (node["@type"] == "Referent") {
+  if (refs) {
+   // de-reference referents
+   return refs.find(ref => ref.name == node.name).value;
+  }
   return node.name;
  } else if (node["@type"] == "Predicate") {
-  // console.log(node);
   return `${node.name}(${node.ref.name})`;
  }
  let result = [];
  for (let child of node.children || []) {
-  result.push(transcribe(child));
+  result.push(transcribe(child, refs));
  }
  let suffix = node.ref ? `(${node.ref.name})` : "";
  let prefix = node.neg ? "~" : "";
@@ -128,8 +131,8 @@ class CompositeRule extends Rule {
  }
 }
 
-function print(node) {
- return transcribe(node);
+function print(node, refs) {
+ return transcribe(node, refs);
 }
 
 function child(node, ...path) {
@@ -166,10 +169,10 @@ class CRSPN extends Rule {
   let head = [];
   let body = [];
 
-  let ref = find(name.types, refs, name.children[0]);
+  let ref = find(name.types, refs, print(name.children[0]));
 
   if (!ref) {
-   ref = referent(this.id(), name.types, name.children[0]);
+   ref = referent(this.id(), name.types, print(name, refs));
    head.push(ref);
    let pn = name;
    pn.ref = ref;
@@ -191,6 +194,8 @@ class CRVPPN extends Rule {
   let body = [];
   // console.log(refs);
   let ref = find(name.types, refs, name.children[0]);
+
+  // console.log(refs);
 
   if (!ref) {
    ref = referent(this.id(), name.types, name.children[0]);
@@ -217,7 +222,7 @@ class CRDETPN extends Rule {
   super(ids, DET(PN(capture("name")), "'s"));
  }
  apply({name}, node) {
-  let ref = referent(this.id(), name.types);
+  let ref = referent(this.id(), name.types, print(name));
   let pn = name;
   pn.ref = ref;
   node.children[0] = ref;
@@ -273,12 +278,12 @@ class CRSID extends Rule {
   super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_()));
  }
 
- apply({det, noun}, node) {
+ apply({det, noun}, node, refs) {
   if (det.children[0].toLowerCase() != "a") {
    return [[], [], [], []];
   }
 
-  let ref = referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types, print(noun, refs));
   noun.ref = ref;
   node.children[0] = ref;
 
@@ -291,13 +296,12 @@ class CRVPID extends Rule {
   super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
  }
 
- apply({det, noun}, node) {
-  // console.log("hi");
+ apply({det, noun}, node, refs) {
   if (!(det.children[0] == "a" || det.children[0] == "an")) {
    return [[], [], [], []];
   }
 
-  let ref = referent(this.id(), noun.types);
+  let ref = referent(this.id(), noun.types, print(child(node, 1), refs));
   noun.ref = ref;
   node.children[1] = ref;
 
@@ -626,8 +630,8 @@ class CRSPOSS extends Rule {
   super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
 
- apply({name, noun, verb}, node) {
-  let u = referent(this.id(), noun.types);
+ apply({name, noun, verb}, node, refs) {
+  let u = referent(this.id(), noun.types, print(child(node, 0), refs));
   node.children[0] = u;
   node.ref = u;
 
@@ -642,8 +646,8 @@ class CRVPPOSS extends Rule {
   super(ids, VP(V(capture("verb")), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
 
- apply({name, noun, verb}, node) {
-  let u = referent(this.id(), noun.types);
+ apply({name, noun, verb}, node, refs) {
+  let u = referent(this.id(), noun.types, print(child(node, 1), refs));
   node.children[1] = u;
 
   let s = S(u, VP_(VP(V(noun), name.children[0])));
@@ -764,6 +768,8 @@ class DRS {
     .filter(c => typeof c != "string");
    queue.push(...next);
   }
+
+  // console.log(this.head);
  }
 
  push(node) {

@@ -1035,6 +1035,16 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Mel loves Anna. Mel loves Anna's brother", function() {
+    let ids = new Ids();
+    let drs = DRS.from();
+    drs.bind(first(parse("Mel loves Anna.")));
+    assertThat(drs.head).equalsTo([]);
+    // drs.bind("Mel loves Anna's brother.");
+    // console.log(drs.print());
+
+   });
+
   function assertThat(x) { 
   return {
     trim (str) {
