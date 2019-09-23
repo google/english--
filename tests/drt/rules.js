@@ -218,6 +218,7 @@ describe("Rules", function() {
     // One new discourse referents introduced.
     assertThat(head.length).equalsTo(1);
     assertThat(head[0].name).equalsTo("a");
+    assertThat(head[0].value).equalsTo("a porsche");
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
@@ -241,9 +242,11 @@ describe("Rules", function() {
 
     let rule = new CRID(ids);
     
-    let [head, [id]] = rule.match(node);
+    let [[{name, value}], [id]] = rule.match(node);
 
     assertThat(print(node)).equalsTo("a likes Jones");
+    assertThat(name).equalsTo("a");
+    assertThat(value).equalsTo("A man");
 
     new CRLIN(ids).match(id);
 

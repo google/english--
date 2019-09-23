@@ -229,9 +229,16 @@ describe("Logic", function() {
      .equalsTo("John loves Mary");
   });
 
+  it("A man loves Mary. Who loves Mary?", function() {
+    assertThat(tell("A man loves Mary.").ask("Who loves Mary?"))
+     .equalsTo("A man loves Mary");
+  });
+
   function tell(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
+
+    // console.log(parse(code).print());
 
     return {
      ask(y) {

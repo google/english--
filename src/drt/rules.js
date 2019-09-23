@@ -290,7 +290,8 @@ class CRSID extends Rule {
    return [[], [], [], []];
   }
 
-  let ref = referent(this.id(), noun.types, print(noun, refs));
+  // console.log(child(node, 0));
+  let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
   noun.ref = ref;
   node.children[0] = ref;
 
