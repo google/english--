@@ -259,6 +259,30 @@ describe("Logic", function() {
      .equalsTo("Jones likes Brazil");
   });
 
+  it("Jones's wife is happy. Who is happy??", function() {
+    assertThat(tell("Jones's wife is happy.").ask("Who is happy?"))
+     .equalsTo("Jones 's wife is happy");
+  });
+
+  it("Jones admires a woman who likes him. Who likes Jones?", function() {
+    assertThat(tell("Jones admires a woman who likes him.").ask("Who likes Jones?"))
+     .equalsTo("a woman who likes him likes Jones");
+  });
+
+  it("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
+    assertThat(tell("A man who loves Dani fascinates Anna.").ask("Who fascinates Anna?"))
+     .equalsTo("A man who loves Dani fascinates Anna");
+    assertThat(tell("A man who loves Dani fascinates Anna.").ask("Who loves Dani?"))
+     .equalsTo("A man who loves Dani loves Dani");
+  });
+
+  it.skip("Jones owns a book which Smith loves. Who owns a book?", function() {
+    assertThat(tell("Jones owns a book which Smith loves.").ask("Who owns a book?"))
+     .equalsTo("Jones owns a book");
+    // assertThat(tell("Jones owns a book which Smith loves.").ask("Who does Smith loves?"))
+    // .equalsTo("a book");
+  });
+
   function tell(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
@@ -273,8 +297,8 @@ describe("Logic", function() {
       let ref = next.value.bindings["x@1"];
       // console.log(drs[0]);
       // console.log(parse(code).print());
-      console.log(toString(kb));
-      console.log(toString(program([q])));
+      // console.log(toString(kb));
+      // console.log(toString(program([q])));
       return answer(drs[0][ref.name]);
      }
     }
