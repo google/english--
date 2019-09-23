@@ -164,6 +164,8 @@ describe("Logic", function() {
     } else {
      b.children[1].children[0].children[1] = x;
     }
+    // console.log(gap);
+    // console.log(print(b));
     return print(b);
    };
 
@@ -211,11 +213,36 @@ describe("Logic", function() {
      `)));
 
     let ref = next.value.bindings["x@1"];
-
     assertThat(drs[0][ref.name]).equalsTo("Jones");
-
     assertThat(answer(drs[0][ref.name])).equalsTo("Jones likes Smith");
   });
+
+  it("John loves Mary. Who loves Mary?", function() {
+    assertThat(tell("John loves Mary.").ask("Who loves Mary?"))
+     .equalsTo("John loves Mary");
+  });
+
+  it.skip("John loves Mary. Who does John love?", function() {
+    assertThat(tell("John loves Mary.").ask("Who does John love?"))
+     .equalsTo("Mary");
+  });
+
+  function tell(code) {
+    let drs = compile(parse(code));
+    let kb = program(drs[1]);
+
+    return {
+     ask(y) {
+      let [q, answer] = query(y);
+      let result = new Reasoner(rewrite(kb))
+       .go(rewrite(q));
+      let next = result.next();
+      assertThat(next.done).equalsTo(false);
+      let ref = next.value.bindings["x@1"];
+      return answer(drs[0][ref.name]);
+     }
+    }
+  }
 
   function parse(code) {
    let drs = DRS.from();
