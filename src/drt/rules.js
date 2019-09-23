@@ -192,10 +192,7 @@ class CRVPPN extends Rule {
  apply({name}, node, refs = []) {
   let head = [];
   let body = [];
-  // console.log(refs);
   let ref = find(name.types, refs, name.children[0]);
-
-  // console.log(refs);
 
   if (!ref) {
    ref = referent(this.id(), name.types, name.children[0]);
@@ -211,23 +208,33 @@ class CRVPPN extends Rule {
  }
 }
 
-class CRPN extends CompositeRule {
- constructor(ids) {
-  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
- }
-}
-
 class CRDETPN extends Rule {
  constructor(ids) {
   super(ids, DET(PN(capture("name")), "'s"));
  }
- apply({name}, node) {
-  let ref = referent(this.id(), name.types, print(name));
-  let pn = name;
-  pn.ref = ref;
+ apply({name}, node, refs) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, print(name));
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+  
   node.children[0] = ref;
 
-  return [[ref], [pn], [], []];
+  return [head, body, [], []];
+ }
+}
+
+class CRPN extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
  }
 }
 
@@ -631,6 +638,8 @@ class CRSPOSS extends Rule {
  }
 
  apply({name, noun, verb}, node, refs) {
+  // console.log(child(node, 0, 0));
+
   let u = referent(this.id(), noun.types, print(child(node, 0), refs));
   node.children[0] = u;
   node.ref = u;
@@ -760,16 +769,16 @@ class DRS {
   let queue = [node];
   while (queue.length > 0) {
    let p = queue.shift();
+   // console.log(`${p["@type"]}`);
    let [refs, names] = this.names.match(p, this.head);
    this.head.push(...refs);
    this.body.push(...names);
    // ... and recurse.
+   // console.log(p);
    let next = (p.children || [])
     .filter(c => typeof c != "string");
    queue.push(...next);
   }
-
-  // console.log(this.head);
  }
 
  push(node) {
