@@ -242,6 +242,23 @@ describe("Logic", function() {
      .equalsTo("A man from Brazil loves Mary");
   });
 
+  it("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
+    assertThat(tell("A man loves Mary. He likes Brazil.").ask("Who likes Brazil?"))
+     .equalsTo("A man likes Brazil");
+  });
+
+  it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
+    assertThat(tell("Jones loves Mary. He likes Brazil.").ask("Who likes Brazil?"))
+     .equalsTo("Jones likes Brazil");
+  });
+
+  it.skip("Every man who likes Mary loves Brazil. Jones likes Mary. Who loves Brazil?", function() {
+    // TODO(goto): this fails because Jones isn't predicated on being a man. 
+    // How should we represent that? Jones who is a man likes Mary? Jones is a man?
+    assertThat(tell("Every man who likes Mary loves Brazil. Jones likes Mary.").ask("Who loves Brazil?"))
+     .equalsTo("Jones likes Brazil");
+  });
+
   function tell(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
@@ -255,6 +272,9 @@ describe("Logic", function() {
       assertThat(next.done).equalsTo(false);
       let ref = next.value.bindings["x@1"];
       // console.log(drs[0]);
+      // console.log(parse(code).print());
+      console.log(toString(kb));
+      console.log(toString(program([q])));
       return answer(drs[0][ref.name]);
      }
     }
