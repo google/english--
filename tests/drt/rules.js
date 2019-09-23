@@ -739,6 +739,29 @@ describe("Rules", function() {
     assertThat(print(donkey)).equalsTo("donkey(c)");
   });
 
+  it("A man from Brazil loves Mary", function() {
+    let ids = new Ids();
+
+    let node = first(parse("A man from Brazil loves Mary."), true);
+    
+    let [[a], [jones]] = new CRPN(ids).match(child(node, 1, 0));
+
+    assertThat(print(jones)).equalsTo("Mary(a)");
+    assertThat(print(node)).equalsTo("A man from Brazil loves a");
+
+    let [[b], [brazil]] = new CRPN(ids).match(child(node, 0, 1, 1), []);
+
+    assertThat(print(brazil)).equalsTo("Brazil(b)");
+    assertThat(print(node)).equalsTo("A man from b loves a");
+
+    let [[c], [man, prep], [], []] = new CRPP(ids).match(node, [b]);
+
+    assertThat(print(node)).equalsTo("c loves a");
+    assertThat(print(man)).equalsTo("man(c)");
+    assertThat(print(prep)).equalsTo("c from b");
+    assertThat(c.value).equalsTo("A man from Brazil");
+  });
+
   it("CR.SPP every", function() {
     let ids = new Ids();
 
@@ -759,18 +782,6 @@ describe("Rules", function() {
         b loves a
       }
     `));
-
-    return;
-
-    let [[b], [woman, prep], [], []] = new CRPP(ids).match(node);
-
-    assertThat(print(node)).equalsTo("Every b loves a");
-    assertThat(print(woman)).equalsTo("woman(b)");
-    assertThat(print(prep)).equalsTo("b with a donkey");
-
-    let [[c], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
-    assertThat(print(prep)).equalsTo("b with c");
-    assertThat(print(donkey)).equalsTo("donkey(c)");
 
   });
 

@@ -52,7 +52,7 @@ function match(a, b) {
  }
  
  let result = {};
-   
+ 
  for (let i = 0; i < a.children.length; i++) {
   if (typeof a.children[i] == "string") {
    if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
@@ -232,9 +232,33 @@ class CRDETPN extends Rule {
  }
 }
 
+class CRPPPN extends Rule {
+ constructor(ids) {
+  super(ids, PP(PREP(), NP(PN(capture("name")))));
+ }
+ apply({name}, node, refs) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, print(name));
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+  
+  node.children[1] = ref;
+
+  return [head, body, [], []];
+ }
+}
+
 class CRPN extends CompositeRule {
  constructor(ids) {
-  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids)]);
+  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids), new CRPPPN(ids)]);
  }
 }
 
@@ -685,11 +709,14 @@ class CRADJ extends Rule {
 
 class CRSPP extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np"))))), 
+  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), 
                VP_()));
  }
  apply({noun, prep, np}, node, refs) {
   let u = referent(this.id(), noun.types);
+  // console.log(refs);
+  u.value = print(child(node, 0), refs);
+
   if (child(node, 0, 0)["@type"] == "DET" &&
       child(node, 0, 0, 0) == "Every") {
    child(node, 0).children[1] = u;
@@ -698,7 +725,7 @@ class CRSPP extends Rule {
   }
 
   noun.ref = u;
-  let cond = S(u, VP_(VP(V(prep), np)));
+  let cond = S(u, VP_(VP(V(prep), child(np, 1))));
 
   return [[u], [noun, cond], [], []];
  }

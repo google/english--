@@ -28,7 +28,7 @@ const {
 
 describe("Logic", function() {
 
-  it("Who from Brazil loves Mary?", function() {
+  it.skip("Who from Brazil loves Mary?", function() {
     let code = [];
     code.push("Jones is happy.");
     code.push("He loves Smith.");
@@ -72,6 +72,7 @@ describe("Logic", function() {
     return predicate(node.name, [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "PN" || node["@type"] == "ADJ") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
+   } else if (node["@type"] == "N") {
    } else if (node["@type"] == "S") {
     let verb = node.children[1].children[0].children[0].children[0];
     if (verb["@type"] == "V" ||
@@ -111,6 +112,7 @@ describe("Logic", function() {
      kb.push(forall(x, implies(spread(compile(s.a)[1]),
                                spread(compile(s.b)[1]))));
     } else {
+     // console.log(s);
      kb.push(transpile(s));
     }
    }
@@ -166,6 +168,7 @@ describe("Logic", function() {
     }
     // console.log(gap);
     // console.log(print(b));
+    // console.log(x);
     return print(b);
    };
 
@@ -234,11 +237,14 @@ describe("Logic", function() {
      .equalsTo("A man loves Mary");
   });
 
+  it("A man from Brazil loves Mary. Who loves Mary?", function() {
+    assertThat(tell("A man from Brazil loves Mary.").ask("Who loves Mary?"))
+     .equalsTo("A man from Brazil loves Mary");
+  });
+
   function tell(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
-
-    // console.log(parse(code).print());
 
     return {
      ask(y) {
@@ -248,6 +254,7 @@ describe("Logic", function() {
       let next = result.next();
       assertThat(next.done).equalsTo(false);
       let ref = next.value.bindings["x@1"];
+      // console.log(drs[0]);
       return answer(drs[0][ref.name]);
      }
     }
