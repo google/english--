@@ -824,6 +824,9 @@ class DRS {
  }
 
  push(node) {
+
+  // console.log(node);
+
   // Resolve all proper names first.
   this.bind(node);
 

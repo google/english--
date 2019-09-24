@@ -312,6 +312,15 @@ function grammar() {
                      space(true),
                      literal("?")]));
 
+ result.push(phrase(term("Sentence"),
+                    [literal("is"),
+                     space(),
+                     term("NP", {"num": "sing", "gen": 2, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("ADJ"),
+                     space(true),
+                     literal("?")]));
+
  // PS 1
  result.push(phrase(term("S", {"num": 1}),
                      [term("NP'", {"num": 1, "gen": 2, "case": "+nom", "gap": "-"}),

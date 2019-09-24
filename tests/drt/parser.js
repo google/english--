@@ -493,6 +493,14 @@ describe("Parser", function() {
                         "?"));
   });
 
+  it("Is Mary happy?", function() {
+    assertThat(clean(parse("Is Mary happy?")[0]))
+     .equalsTo(Sentence("Is", 
+                        NP(PN("Mary")), 
+                        ADJ("happy"), 
+                        "?"));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

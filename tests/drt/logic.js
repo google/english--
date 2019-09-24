@@ -2,7 +2,7 @@ const Assert = require("assert");
 
 const {DRS, referent, print} = require("../../src/drt/rules.js");
 const DrtParser = require("../../src/drt/parser.js");
-const {S, VP_} = DrtParser.nodes;
+const {S, VP_, VP, BE} = DrtParser.nodes;
 const {clone} = DrtParser;
 
 const {Parser, Rule} = require("../../src/logic/parser.js");
@@ -148,15 +148,37 @@ describe("Logic", function() {
      .equalsTo("exists (x) exists (a) Smith(a) && likes(x, a).");
   });
 
+  it("Is Mary happy?", function() {
+    assertThat(trim(toString(program([query("Is Mary happy?")[0]]))))
+     .equalsTo("exists (a) Mary(a) && happy(a).");
+  });
+
   function query(s) {
    let q = DrtParser.parse(s)[0].children;
+
+   if (q[0] == "Is") {
+    let drs = DRS.from();
+    let body = S(q[1], VP_(VP(BE("is"), q[2])));
+    let b = clone(body);
+    drs.push(body);
+    let result = spread(compile(drs)[1]);
+    for (let ref of drs.head) {
+     result.quantifiers.push(quantifier("exists", ref.name));
+    }
+
+    let answer = () => {
+     return print(b);
+    };
+
+    return [result, answer];
+   }
+
    let gap = q.length == 5 ? "vp" : "np";
    let np = gap == "vp" ? q[2] : q[1];
    let vp = gap == "vp" ? q[3] : q[2].children[0];
    let drs = DRS.from();
    let x = referent("x");
    let body = S(np, VP_(vp));
-
 
    let b = clone(body);
 
@@ -260,8 +282,27 @@ describe("Logic", function() {
 
   it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
     enter("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
+     .equalsTo(`
+       Brazil(a).
+       Mary(b).
+       forall (c) likes(c, b) && man(c) => loves(c, a).
+       Jones(d).
+       likes(d, b).
+       man(d).
+     `)
      .query("Who loves Brazil?")
-     .equalsTo("Jones loves Brazil");
+     .equalsTo("Jones loves Brazil")
+     .because(`
+       Brazil(a).
+       exists (x) exists (a = a) Brazil(a).
+       likes(d, b).
+       exists (c = d) likes(c, b).
+       man(d).
+       exists (c = d) likes(c, b) && man(c).
+       forall (c = d) likes(c, b) && man(c) => loves(c, a).
+       exists (x = d) exists (a = a) loves(x, a).
+       exists (x = d) exists (a = a) Brazil(a) && loves(x, a).
+     `);
    });
 
   it("Jones's wife is happy. Who is happy??", function() {
@@ -297,13 +338,34 @@ describe("Logic", function() {
      .equalsTo("Jones loves Mary");
   });
 
-  
+  it("Every man is mortal. Socrates is a man. Is Socrates mortal??", function() {
+    enter("Every man is mortal. Socrates is a man.")
+     .equalsTo(`
+        forall (a) man(a) => mortal(a).
+        Socrates(b).
+        man(b).
+     `)
+     .query("Is Socrates mortal?")
+     .equalsTo("Socrates is mortal")
+     .because(`
+        Socrates(b).
+        exists (a = b) Socrates(a).
+        man(b).
+        forall (a = b) man(a) => mortal(a).
+        exists (a = b) mortal(b).
+        exists (a = b) Socrates(a) && mortal(a).
+     `);
+  });
 
   function enter(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
 
     return {
+     equalsTo(a) {
+      assertThat(trim(toString(kb))).equalsTo(trim(a));
+      return this;
+     },
      query(y) {
       let [q, answer] = query(y);
       let result = new Reasoner(rewrite(kb))
@@ -311,14 +373,15 @@ describe("Logic", function() {
       let next = result.next();
       assertThat(next.done).equalsTo(false);
       let ref = next.value.bindings["x@1"];
-      // console.log(drs[0]);
-      // console.log(parse(code).print());
-      // console.log(toString(kb));
-      // console.log(toString(program([q])));
-      // return answer(drs[0][ref.name]);
       return {
+       because(c) {
+        // assertThat();
+        assertThat(trim(next.value.toString())).equalsTo(trim(c));
+        return this;
+       },
        equalsTo(z) {
-        assertThat(answer(drs[0][ref.name])).equalsTo(z);
+        assertThat(answer(ref && drs[0][ref.name])).equalsTo(z);
+        return this;
        }
       }
      }
@@ -341,6 +404,7 @@ describe("Logic", function() {
    return str
     .trim()
     .split("\n")
+    .filter(line => line != "")
     .map(line => line.trim())
     .join("\n");
   }
