@@ -449,7 +449,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith"');
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates"');
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
@@ -483,7 +483,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
     assertThat(print(result[i++]))
-     .equalsTo('ADJ -> "happy" "unhappy" "handsome" "beautiful" "fast" "slow"');
+     .equalsTo('ADJ -> "happy" "unhappy" "handsome" "beautiful" "fast" "slow" "mortal"');
     assertThat(print(result[i++]))
      .equalsTo('BE[num=sing, fin=@1] -> "is"');
     assertThat(print(result[i++]))

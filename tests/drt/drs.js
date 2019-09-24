@@ -1082,6 +1082,21 @@ describe("DRS", function() {
     `);
   });
 
+  it("Every man is mortal.", function() {
+    assertThat("Every man is mortal. Socrates is a man.")
+     .equalsTo(`
+       drs(b) {
+         drs(a) {
+           man(a)
+         } => drs() {
+           mortal(a)
+         }
+         Socrates(b)
+         man(b)
+       }
+    `);
+  });
+
   it.skip("Mel loves Anna. Mel loves Anna's brother", function() {
     let ids = new Ids();
     let drs = DRS.from();

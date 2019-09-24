@@ -221,76 +221,90 @@ describe("Logic", function() {
   });
 
   it("John loves Mary. Who loves Mary?", function() {
-    assertThat(tell("John loves Mary.").ask("Who loves Mary?"))
+    enter("John loves Mary.")
+     .query("Who loves Mary?")
      .equalsTo("John loves Mary");
   });
 
   it("John loves Mary. Who does John love?", function() {
     // NOTE(goto): we need to compile verbs into the infinitive
     // to allow this to work.
-    assertThat(tell("John loves Mary.").ask("Who does John loves?"))
+    enter("John loves Mary.")
+     .query("Who does John loves?")
      .equalsTo("John loves Mary");
   });
 
   it("A man loves Mary. Who loves Mary?", function() {
-    assertThat(tell("A man loves Mary.").ask("Who loves Mary?"))
+    enter("A man loves Mary.")
+     .query("Who loves Mary?")
      .equalsTo("A man loves Mary");
   });
 
   it("A man from Brazil loves Mary. Who loves Mary?", function() {
-    assertThat(tell("A man from Brazil loves Mary.").ask("Who loves Mary?"))
+    enter("A man from Brazil loves Mary.")
+     .query("Who loves Mary?")
      .equalsTo("A man from Brazil loves Mary");
   });
 
   it("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
-    assertThat(tell("A man loves Mary. He likes Brazil.").ask("Who likes Brazil?"))
+    enter("A man loves Mary. He likes Brazil.")
+     .query("Who likes Brazil?")
      .equalsTo("A man likes Brazil");
   });
 
   it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
-    assertThat(tell("Jones loves Mary. He likes Brazil.").ask("Who likes Brazil?"))
+    enter("Jones loves Mary. He likes Brazil.")
+     .query("Who likes Brazil?")
      .equalsTo("Jones likes Brazil");
   });
 
   it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
-    assertThat(tell("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
-               .ask("Who loves Brazil?"))
+    enter("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
+     .query("Who loves Brazil?")
      .equalsTo("Jones loves Brazil");
-  });
+   });
 
   it("Jones's wife is happy. Who is happy??", function() {
-    assertThat(tell("Jones's wife is happy.").ask("Who is happy?"))
+    enter("Jones's wife is happy.")
+     .query("Who is happy?")
      .equalsTo("Jones 's wife is happy");
   });
 
   it("Jones admires a woman who likes him. Who likes Jones?", function() {
-    assertThat(tell("Jones admires a woman who likes him.").ask("Who likes Jones?"))
+    enter("Jones admires a woman who likes him.")
+     .query("Who likes Jones?")
      .equalsTo("a woman who likes him likes Jones");
   });
 
   it("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
-    assertThat(tell("A man who loves Dani fascinates Anna.").ask("Who fascinates Anna?"))
+    enter("A man who loves Dani fascinates Anna.")
+     .query("Who fascinates Anna?")
      .equalsTo("A man who loves Dani fascinates Anna");
-    assertThat(tell("A man who loves Dani fascinates Anna.").ask("Who loves Dani?"))
+    enter("A man who loves Dani fascinates Anna.")
+     .query("Who loves Dani?")
      .equalsTo("A man who loves Dani loves Dani");
   });
 
   it("Jones owns a book which Smith loves. Who owns a book?", function() {
-    assertThat(tell("Jones owns a book which Smith loves.").ask("Who owns a book?"))
+    enter("Jones owns a book which Smith loves.")
+     .query("Who owns a book?")
      .equalsTo("Jones owns a book");
   });
 
   it("Jones is a man who loves Mary. Who loves Mary?", function() {
-    assertThat(tell("Jones is a man who loves Mary.").ask("Who loves Mary?"))
+    enter("Jones is a man who loves Mary.")
+     .query("Who loves Mary?")
      .equalsTo("Jones loves Mary");
   });
 
-  function tell(code) {
+  
+
+  function enter(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
 
     return {
-     ask(y) {
+     query(y) {
       let [q, answer] = query(y);
       let result = new Reasoner(rewrite(kb))
        .go(rewrite(q));
@@ -301,7 +315,12 @@ describe("Logic", function() {
       // console.log(parse(code).print());
       // console.log(toString(kb));
       // console.log(toString(program([q])));
-      return answer(drs[0][ref.name]);
+      // return answer(drs[0][ref.name]);
+      return {
+       equalsTo(z) {
+        assertThat(answer(drs[0][ref.name])).equalsTo(z);
+       }
+      }
      }
     }
   }

@@ -572,7 +572,7 @@ function grammar() {
  
  // LI 9
  result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
-                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")]]));
+                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")]]));
  
  // LI 10
  result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
@@ -657,7 +657,7 @@ function grammar() {
 
  // ADJ
  result.push(rule(term("ADJ"),
-                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")]]));
+                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")], [literal("mortal")]]));
 
  // BE
  result.push(rule(term("BE", {"num": "sing", "fin": 1}),
