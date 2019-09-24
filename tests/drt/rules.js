@@ -458,6 +458,28 @@ describe("Rules", function() {
     assertThat(print(be)).equalsTo("happy(b)");
   });
 
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones is a man."), true);
+
+    new CRPN(ids).match(node);
+
+    assertThat(print(node)).equalsTo("a is a man");
+
+    let [head, body, , remove] = new CRBE(ids).match(node, []);
+
+    // no new referents introduced.
+    assertThat(head.length).equalsTo(0);
+
+    // remove current node.
+    assertThat(remove.length).equalsTo(1);
+    assertThat(remove[0]).equalsTo(node);
+
+    assertThat(body.length).equalsTo(1);
+    assertThat(print(body[0])).equalsTo("man(a)");
+  });
+
   it("CR.COND", function() {
     let ids = new Ids();
 

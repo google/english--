@@ -439,6 +439,14 @@ function grammar() {
                      space(),
                      term("ADJ")]));
 
+ // 3.6 Identity and Predication
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+                    [term("BE", {"num": 1, "fin": 2}),
+                     space(),
+                     term("DET", {"num": 1}), 
+                     space(),
+                     term("N", {"num": 1, "gen": 4})]));
+
  // Adnominal adjectives (page 271)
  result.push(phrase(term("N", {"num": 1, "gen": 2}),
                      [term("ADJ"),

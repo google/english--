@@ -444,6 +444,12 @@ describe("Parser", function() {
                                           )))))));
   });
 
+  it("Jones is a man.", function() {
+    assertThat(first(parse("Jones is a man.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), DET("a"), N("man")))));
+  });
+
   it("Who likes Mary?", function() {
     assertThat(clean(parse("Who likes Mary?")[0]))
      .equalsTo(Sentence("Who", 

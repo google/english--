@@ -314,7 +314,6 @@ class CRSID extends Rule {
    return [[], [], [], []];
   }
 
-  // console.log(child(node, 0));
   let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
   noun.ref = ref;
   node.children[0] = ref;
@@ -356,6 +355,8 @@ class CRNLIN extends Rule {
       node.children.length != 1) {
    return [[], [], [], []];
   }
+
+  // console.log("crnlin: " + print(node));
 
   // Simple noun
   let pred = {
@@ -465,6 +466,7 @@ class CRPOSBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
  }
  apply({ref, adj}, node, refs) {
+  // console.log("crposbe: " + print(np));
   adj.ref = ref.children[0];
   return [[], [adj], [], [node]];
  }
@@ -481,9 +483,21 @@ class CRNEGBE extends Rule {
  }
 }
 
+class CRNBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), DET(capture("det")), N(capture("noun"))))));
+ }
+ apply({ref, det, noun}, node, refs) {
+  let np = clone(noun);
+  np.ref = child(ref, 0);
+  // console.log("crnbe: " + print(np));
+  return [[], [np], [], [node]];
+ }
+}
+
 class CRBE extends CompositeRule {
  constructor(ids) {
-  super([new CRPOSBE(ids), new CRNEGBE(ids)]);
+  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids)]);
  }
 }
 
@@ -701,6 +715,8 @@ class CRADJ extends Rule {
   super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
  }
  apply({adj, noun}, node, refs) {
+  adj = clone(adj);
+  noun = clone(noun);
   adj.ref = node.ref;
   noun.ref = node.ref;
   return [[], [noun, adj], [], [node]];
@@ -714,7 +730,6 @@ class CRSPP extends Rule {
  }
  apply({noun, prep, np}, node, refs) {
   let u = referent(this.id(), noun.types);
-  // console.log(refs);
   u.value = print(child(node, 0), refs);
 
   if (child(node, 0, 0)["@type"] == "DET" &&
@@ -802,7 +817,6 @@ class DRS {
    this.head.push(...refs);
    this.body.push(...names);
    // ... and recurse.
-   // console.log(p);
    let next = (p.children || [])
     .filter(c => typeof c != "string");
    queue.push(...next);
@@ -820,6 +834,8 @@ class DRS {
    let p = queue.shift();
    // breadth first search: iterate over
    // this level first ...
+   // console.log(`${p["@type"]}`);
+   let skip = false;
    for (let rule of this.rules) {
     let [head, body, drs, remove] = rule.match(p, this.head);
     // console.log(body);
@@ -830,6 +846,10 @@ class DRS {
      this.body.splice(i, 1);
     }
     queue.push(...body.filter(c => !(c instanceof DRS)));
+    skip = skip || remove.length > 0;
+   }
+   if (skip) {
+    continue;
    }
    // ... and recurse.
    let next = (p && p.children || [])

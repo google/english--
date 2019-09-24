@@ -366,6 +366,53 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones is a man.", function() {
+    assertThat("Jones is a man.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         man(a)
+       }
+    `);
+  });
+
+  it("Jones is a happy man.", function() {
+    assertThat("Jones is a happy man.")
+     .equalsTo(`
+       drs(a) {
+         Jones(a)
+         happy(a)
+         man(a)
+       }
+    `);
+  });
+
+  it("Jones is a happy man who loves Mary.", function() {
+    assertThat("Jones is a happy man who loves Mary.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         Mary(b)
+         a loves b
+         happy(a)
+         man(a)
+       }
+    `);
+  });
+
+  it("Jones is a man. He is happy. He loves Mary.", function() {
+    assertThat("Jones is a man. He is happy. He loves Mary.")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         man(a)
+         happy(a)
+         Mary(b)
+         a loves b
+       }
+    `);
+  });
+
   it("Jones loves a woman who is happy.", function() {
     assertThat("Jones loves a woman who is happy.")
      .equalsTo(`
