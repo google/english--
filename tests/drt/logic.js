@@ -252,11 +252,10 @@ describe("Logic", function() {
      .equalsTo("Jones likes Brazil");
   });
 
-  it.skip("Every man who likes Mary loves Brazil. Jones likes Mary. Who loves Brazil?", function() {
-    // TODO(goto): this fails because Jones isn't predicated on being a man. 
-    // How should we represent that? Jones who is a man likes Mary? Jones is a man?
-    assertThat(tell("Every man who likes Mary loves Brazil. Jones likes Mary.").ask("Who loves Brazil?"))
-     .equalsTo("Jones likes Brazil");
+  it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
+    assertThat(tell("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
+               .ask("Who loves Brazil?"))
+     .equalsTo("Jones loves Brazil");
   });
 
   it("Jones's wife is happy. Who is happy??", function() {
@@ -276,11 +275,14 @@ describe("Logic", function() {
      .equalsTo("A man who loves Dani loves Dani");
   });
 
-  it.skip("Jones owns a book which Smith loves. Who owns a book?", function() {
+  it("Jones owns a book which Smith loves. Who owns a book?", function() {
     assertThat(tell("Jones owns a book which Smith loves.").ask("Who owns a book?"))
      .equalsTo("Jones owns a book");
-    // assertThat(tell("Jones owns a book which Smith loves.").ask("Who does Smith loves?"))
-    // .equalsTo("a book");
+  });
+
+  it("Jones is a man who loves Mary. Who loves Mary?", function() {
+    assertThat(tell("Jones is a man who loves Mary.").ask("Who loves Mary?"))
+     .equalsTo("Jones loves Mary");
   });
 
   function tell(code) {
