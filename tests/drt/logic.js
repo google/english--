@@ -338,7 +338,7 @@ describe("Logic", function() {
      .equalsTo("Jones loves Mary");
   });
 
-  it("Every man is mortal. Socrates is a man. Is Socrates mortal??", function() {
+  it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
     enter("Every man is mortal. Socrates is a man.")
      .equalsTo(`
         forall (a) man(a) => mortal(a).
@@ -356,6 +356,15 @@ describe("Logic", function() {
         exists (a = b) Socrates(a) && mortal(a).
      `);
   });
+
+  // maybe we need to introduce variables?
+  // how do we express the following?
+  // if "a" is "b"'s child then "b" is "a"'s parent.
+  // if "a" is a child of "b" then "b" is a parent of "a".
+  // if a person is a child of other person then the former is the parent of the latter.
+  // if a person "a" is a child of a person "b" then "b" is parent of "a".
+  // if a person (a) is a child of a person (b) then (b) is parent of (a).
+  
 
   function enter(code) {
     let drs = compile(parse(code));
