@@ -1107,6 +1107,47 @@ describe("DRS", function() {
 
    });
 
+  it("Sam is a brazilian engineer who likes Dani.", function() {
+    assertThat("Sam is a brazilian engineer who loves Dani. He loves Anna. He loves Leo.")
+     .equalsTo(`
+       drs(a, b, c, d) {
+         Sam(a)
+         Dani(b)
+         a loves b
+         brazilian(a)
+         engineer(a)
+         Anna(c)
+         a loves c
+         Leo(d)
+         a loves d
+       }
+    `);
+  });
+
+  it.skip("Sam loves Anna and Leo.", function() {
+    assertThat("Sam loves Anna and Leo.")
+     .equalsTo(`
+       drs(a) {
+         Sam(a)
+         a loves Anna and Leo
+       }
+    `);
+  });
+
+  it("A brazilian engineer who loves Anna's mother is happy.", function() {
+    assertThat("A brazilian engineer who loves Anna's mother is happy.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Anna(a)
+         happy(b)
+         b loves c
+         brazilian(b)
+         engineer(b)
+         c mother a
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

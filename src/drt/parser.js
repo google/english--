@@ -581,7 +581,7 @@ function grammar() {
  
  // LI 9
  result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
-                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")]]));
+                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]]));
  
  // LI 10
  result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
@@ -593,11 +593,11 @@ function grammar() {
  
  // LI 12
  result.push(rule(term("N", {"num": "sing", "gen": "male"}),
-                   [[literal("stockbroker")], [literal("man")]]));
+                   [[literal("stockbroker")], [literal("man")], [literal("engineer")]]));
  
  // LI 13
  result.push(rule(term("N", {"num": "sing", "gen": "fem"}),
-                   [[literal("stockbroker")], [literal("woman")], [literal("widow")]]));
+                   [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")]]));
  
  // LI 14
  result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
@@ -666,7 +666,7 @@ function grammar() {
 
  // ADJ
  result.push(rule(term("ADJ"),
-                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")], [literal("mortal")]]));
+                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")], [literal("mortal")], [literal("brazilian")]]));
 
  // BE
  result.push(rule(term("BE", {"num": "sing", "fin": 1}),

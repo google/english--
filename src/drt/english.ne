@@ -676,14 +676,16 @@ N_num_sing_gen_male ->
   ADJ __ N_num_sing_gen_male {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   N_num_sing_gen_male __ PP {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
-  "man"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}
+  "man"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
+  "engineer"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}
 N_num_sing_gen_fem -> 
   N_num_sing_gen_fem __ RC_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   ADJ __ N_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   N_num_sing_gen_fem __ PP {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "woman"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
-  "widow"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %}
+  "widow"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
+  "engineer"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %}
 N_num_sing_gen_nhum -> 
   N_num_sing_gen_nhum __ RC_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   ADJ __ N_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
@@ -833,7 +835,8 @@ PN_num_sing_gen_male ->
   "Leo"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "Yuji"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
   "Smith"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
-  "Socrates"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
+  "Socrates"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %} |
+  "Sam"i {% (args) => node("PN", {"num":"sing","gen":"male"}, args) %}
 PN_num_sing_gen_fem -> 
   "Mary"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
   "Dani"i {% (args) => node("PN", {"num":"sing","gen":"fem"}, args) %} |
@@ -867,7 +870,8 @@ ADJ ->
   "beautiful"i {% (args) => node("ADJ", {}, args) %} |
   "fast"i {% (args) => node("ADJ", {}, args) %} |
   "slow"i {% (args) => node("ADJ", {}, args) %} |
-  "mortal"i {% (args) => node("ADJ", {}, args) %}
+  "mortal"i {% (args) => node("ADJ", {}, args) %} |
+  "brazilian"i {% (args) => node("ADJ", {}, args) %}
 BE_num_sing_fin_p -> 
   "is"i {% (args) => node("BE", {"num":"sing","fin":"+"}, args) %}
 BE_num_sing_fin_n -> 

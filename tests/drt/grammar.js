@@ -451,15 +451,15 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates"');
+     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man"');
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man" "engineer"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow"');
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow" "engineer"');
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse" "porsche"');
     assertThat(print(result[i++]))
@@ -485,7 +485,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
     assertThat(print(result[i++]))
-     .equalsTo('ADJ -> "happy" "unhappy" "handsome" "beautiful" "fast" "slow" "mortal"');
+     .equalsTo('ADJ -> "happy" "unhappy" "handsome" "beautiful" "fast" "slow" "mortal" "brazilian"');
     assertThat(print(result[i++]))
      .equalsTo('BE[num=sing, fin=@1] -> "is"');
     assertThat(print(result[i++]))
