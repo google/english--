@@ -3,16 +3,16 @@
 (function () {
 function id(x) { return x[0]; }
 
-    function node(type, types, children) {
-     // console.log(type + ": " + JSON.stringify(types) + " => ");
-     return {
-      "@type": type, 
-       "types": types, 
-       "children": children
-       .filter(child => child != null)
-       .filter(child => child != '.')
-       }; 
-    }
+function node(type, types, children) {
+  // console.log(type + ": " + JSON.stringify(types) + " => ");
+  return {
+    "@type": type, 
+    "types": types, 
+    "children": children
+      .filter(child => child != null)
+      .filter(child => child != '.')
+  }; 
+}
 var grammar = {
     Lexer: undefined,
     ParserRules: [
@@ -23,6 +23,11 @@ var grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
+    {"name": "Discourse$ebnf$1$subexpression$1", "symbols": ["_", "Sentence", "_"], "postprocess": (args) => args[1]},
+    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1$subexpression$1"]},
+    {"name": "Discourse$ebnf$1$subexpression$2", "symbols": ["_", "Sentence", "_"], "postprocess": (args) => args[1]},
+    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1", "Discourse$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "Discourse", "symbols": ["Discourse$ebnf$1"], "postprocess": (args) => node("Discourse", {}, ...args)},
     {"name": "FULLNAME$ebnf$1$subexpression$1", "symbols": ["NAME", "_"]},
     {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1$subexpression$1"]},
     {"name": "FULLNAME$ebnf$1$subexpression$2", "symbols": ["NAME", "_"]},
@@ -33,11 +38,6 @@ var grammar = {
     {"name": "NAME$ebnf$2", "symbols": [/[a-z]/]},
     {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b]) => a.join("") + b.join("")},
-    {"name": "Discourse$ebnf$1$subexpression$1", "symbols": ["_", "Sentence", "_"], "postprocess": (args) => args[1]},
-    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1$subexpression$1"]},
-    {"name": "Discourse$ebnf$1$subexpression$2", "symbols": ["_", "Sentence", "_"], "postprocess": (args) => args[1]},
-    {"name": "Discourse$ebnf$1", "symbols": ["Discourse$ebnf$1", "Discourse$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "Discourse", "symbols": ["Discourse$ebnf$1"], "postprocess": (args) => node("Discourse", {}, ...args)},
     {"name": "Sentence", "symbols": ["S_num_sing", "_", {"literal":"."}], "postprocess": (args) => node("Sentence", {}, args)},
     {"name": "Sentence", "symbols": ["S_num_plur", "_", {"literal":"."}], "postprocess": (args) => node("Sentence", {}, args)},
     {"name": "Sentence$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
@@ -1312,7 +1312,7 @@ var grammar = {
     {"name": "WS_gap_plur", "symbols": ["_"], "postprocess": () => null},
     {"name": "WS_gap_n", "symbols": ["__"], "postprocess": () => null}
 ]
-  , ParserStart: "Discourse"
+  , ParserStart: "Sentence"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;

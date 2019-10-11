@@ -1,9 +1,6 @@
 @builtin "whitespace.ne"
 @include "base.ne"
 
-Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Discourse", {}, ...args) %}
-
-
 Sentence -> 
   S_num_sing _ "." {% (args) => node("Sentence", {}, args) %} |
   S_num_plur _ "." {% (args) => node("Sentence", {}, args) %} |

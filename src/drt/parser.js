@@ -201,11 +201,6 @@ function compile(grammar, header = true) {
   result.push(`@builtin "whitespace.ne"`);
   result.push(`@include "base.ne"`);
   result.push(``);
-
-  result.push(`Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Discourse", {}, ...args) %}`);
-  
-  result.push(``);
-  result.push(``);
  }
 
  for (let [key, list] of Object.entries(rules)) {
