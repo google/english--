@@ -523,7 +523,12 @@ describe("Parser", function() {
                         ))));
   });
 
-
+  it("John is from Brazil", function() {
+    assertThat(first(parse("Jones is from Brazil.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+                        ))));
+  });
 
   function assertThat(x) {
    return {

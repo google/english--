@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(68);
+    assertThat(result.length).equalsTo(69);
 
     let i = 0;
 
@@ -399,6 +399,8 @@ A ->
     // 3.6 Identity and Predicates
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, gen=@4, case=@5, gap=@3]');
+    assertThat(print(result[i++]))
+     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ PP');
     assertThat(print(result[i++]))
      .equalsTo('N[num=@1, gen=@2] -> ADJ __ N[num=@1, gen=@2]');
     // Conditionals
