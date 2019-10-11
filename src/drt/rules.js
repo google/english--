@@ -466,9 +466,18 @@ class CRPOSBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
  }
  apply({ref, adj}, node, refs) {
-  // console.log("crposbe: " + print(np));
   adj.ref = ref.children[0];
   return [[], [adj], [], [node]];
+ }
+}
+
+class CRPREPBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE("is"), PP(PREP(capture("prep")), capture("np"))))));
+ }
+ apply({ref, prep, np}, node, refs) {
+  let s = S(child(ref, 0), VP_(VP(V(child(prep, 0)), child(np, 1))));
+  return [[], [s], [], [node]];
  }
 }
 
@@ -490,14 +499,13 @@ class CRNBE extends Rule {
  apply({ref, det, noun}, node, refs) {
   let np = clone(noun);
   np.ref = child(ref, 0);
-  // console.log("crnbe: " + print(np));
   return [[], [np], [], [node]];
  }
 }
 
 class CRBE extends CompositeRule {
  constructor(ids) {
-  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids)]);
+  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids), new CRPREPBE(ids)]);
  }
 }
 
@@ -830,6 +838,8 @@ class DRS {
 
   let queue = [node];
   this.body.push(node);
+
+  // console.log(JSON.stringify(node, undefined, 2));
 
   while (queue.length > 0) {
    let p = queue.shift();

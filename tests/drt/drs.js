@@ -1185,6 +1185,41 @@ describe("DRS", function() {
     `);
   });
 
+  it("Sam is from Brazil", function() {
+    assertThat("Sam is from Brazil.")
+     .equalsTo(`
+       drs(a, b) {
+         Sam(a)
+         Brazil(b)
+         a from b
+       }
+    `);
+  });
+
+  it("Sam is from Brazil", function() {
+    assertThat("Sam is from Brazil.")
+     .equalsTo(`
+       drs(a, b) {
+         Sam(a)
+         Brazil(b)
+         a from b
+       }
+    `);
+  });
+
+  it("Sam's wife is behind Leo's sister", function() {
+    assertThat("Sam's wife is behind Leo's sister.")
+     .equalsTo(`
+       drs(a, b, c, d) {
+         Sam(a)
+         Leo(b)
+         c wife a
+         c behind d
+         d sister b
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

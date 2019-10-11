@@ -497,6 +497,22 @@ describe("Rules", function() {
     assertThat(print(wife)).equalsTo("c wife b");
   });
 
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Sam is from Brazil."), true);
+
+    new CRPN(ids).match(node, []);
+    new CRPN(ids).match(child(node, 1, 0, 1), []);
+
+    assertThat(print(node)).equalsTo("a is from b");
+
+    let [, [from], , [remove]] = new CRBE(ids).match(node, []);
+
+    assertThat(remove).equalsTo(node);
+    assertThat(print(from)).equalsTo("a from b");
+  });
+
   it("CR.COND", function() {
     let ids = new Ids();
 
