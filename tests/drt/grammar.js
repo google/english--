@@ -398,7 +398,7 @@ A ->
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
     // 3.6 Identity and Predicates
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ DET[num=@1] __ N[num=@1, gen=@4]');
+     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, gen=@4, case=@5, gap=@3]');
     assertThat(print(result[i++]))
      .equalsTo('N[num=@1, gen=@2] -> ADJ __ N[num=@1, gen=@2]');
     // Conditionals

@@ -480,6 +480,23 @@ describe("Rules", function() {
     assertThat(print(body[0])).equalsTo("man(a)");
   });
 
+  it("CR.BE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Dani is Sam's wife."), true);
+
+    new CRPN(ids).match(node, []);
+
+    new CRPN(ids).match(child(node, 1, 0, 1, 0), []);
+
+    assertThat(print(node)).equalsTo("a is b 's wife");
+
+    let [[ref], [wife]] = new CRPOSS(ids).match(child(node, 1, 0));
+
+    assertThat(print(node)).equalsTo("a is c");
+    assertThat(print(wife)).equalsTo("c wife b");
+  });
+
   it("CR.COND", function() {
     let ids = new Ids();
 

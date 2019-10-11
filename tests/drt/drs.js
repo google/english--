@@ -1148,6 +1148,43 @@ describe("DRS", function() {
     `);
   });
 
+  it("Sam is Dani's husband.", function() {
+    assertThat("Sam is Dani's husband.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Sam(a)
+         Dani(b)
+         a is c
+         c husband b
+       }
+    `);
+  });
+
+  it("Anna's father is Dani's husband.", function() {
+    assertThat("Anna's father is Dani's husband.")
+     .equalsTo(`
+       drs(a, b, c, d) {
+         Anna(a)
+         Dani(b)
+         c is d(c)
+         c father a
+         d husband b
+       }
+    `);
+  });
+
+  it("Anna's father is a brazilian engineer.", function() {
+    assertThat("Anna's father is a brazilian engineer.")
+     .equalsTo(`
+       drs(a, b) {
+         Anna(a)
+         b father a
+         brazilian(b)
+         engineer(b)
+       }
+    `);
+  });
+
   function assertThat(x) { 
   return {
     trim (str) {

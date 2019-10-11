@@ -447,7 +447,7 @@ describe("Parser", function() {
   it("Jones is a man.", function() {
     assertThat(first(parse("Jones is a man.")))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), DET("a"), N("man")))));
+                 VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
   });
 
   it("Who likes Mary?", function() {
@@ -512,7 +512,7 @@ describe("Parser", function() {
   it("John is a happy man", function() {
     assertThat(first(parse("Jones is a happy man.")))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), DET("a"), N(ADJ("happy"), N("man"))))));
+                 VP_(VP(BE("is"), NP(DET("a"), N(ADJ("happy"), N("man")))))));
   });
 
   it("Sam loves Anna and Leo.", function() {

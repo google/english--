@@ -485,7 +485,7 @@ class CRNEGBE extends Rule {
 
 class CRNBE extends Rule {
  constructor(ids) {
-  super(ids, S(capture("ref"), VP_(VP(BE(), DET(capture("det")), N(capture("noun"))))));
+  super(ids, S(capture("ref"), VP_(VP(BE(), NP(DET(capture("det")), N(capture("noun")))))));
  }
  apply({ref, det, noun}, node, refs) {
   let np = clone(noun);
@@ -677,8 +677,6 @@ class CRSPOSS extends Rule {
  }
 
  apply({name, noun, verb}, node, refs) {
-  // console.log(child(node, 0, 0));
-
   let u = referent(this.id(), noun.types, print(child(node, 0), refs));
   node.children[0] = u;
   node.ref = u;
@@ -691,7 +689,7 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
  constructor(ids) {
-  super(ids, VP(V(capture("verb")), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
