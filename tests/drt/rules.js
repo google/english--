@@ -150,6 +150,14 @@ describe("Rules", function() {
     assertThat(v.value).equalsTo("Mel 's brother");
    });
 
+  it("CR.VPPN", function() {
+    let ids = new Ids();
+    let node = first(parse("Mel's wife is Dani."), true);
+    let [[u], [dani]] = new CRPN(ids).match(child(node, 1, 0), []);
+    assertThat(u.value).equalsTo("Dani");
+    assertThat(print(node)).equalsTo("Mel 's wife is a");
+   });
+
   it("CR.PRO", function() {
     let ids = new Ids();
     let sentence = first(parse("Jones owns Ulysses."), true);

@@ -187,7 +187,7 @@ class CRSPN extends Rule {
 
 class CRVPPN extends Rule {
  constructor(ids) {
-  super(ids, VP(V(), NP(PN(capture("name")))));
+  super(ids, VP(capture("v"), NP(PN(capture("name")))));
  }
  apply({name}, node, refs = []) {
   let head = [];

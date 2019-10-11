@@ -1220,27 +1220,51 @@ describe("DRS", function() {
     `);
   });
 
-  function assertThat(x) { 
-  return {
-    trim (str) {
-      return str
-        .trim()
-        .split("\n")
-        .map(line => line.trim())
-        .join("\n");
-    },
-    equalsTo(y) {
-     let drs = DRS.from();
+  it("Sam's wife is Dani.", function() {
+    assertThat("Sam's wife is Dani.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Sam(a)
+         Dani(b)
+         c is b(c)
+         c wife a
+       }
+    `);
+  });
 
-     for (let s of x.split(".")) {
-      if (s == "") {
-       continue;
+  it("Dani is Sam's wife.", function() {
+    assertThat("Dani is Sam's wife.")
+     .equalsTo(`
+       drs(a, b, c) {
+         Dani(a)
+         Sam(b)
+         a is c
+         c wife b
+       }
+    `);
+  });
+
+  function assertThat(x) { 
+    return {
+      trim (str) {
+        return str
+          .trim()
+          .split("\n")
+          .map(line => line.trim())
+          .join("\n");
+      },
+      equalsTo(y) {
+       let drs = DRS.from();
+
+       for (let s of x.split(".")) {
+        if (s == "") {
+         continue;
+        }
+        drs.feed(s.trim() + ".");
+       }
+       Assert.deepEqual(drs.print(), this.trim(y));
       }
-      drs.feed(s.trim() + ".");
      }
-     Assert.deepEqual(drs.print(), this.trim(y));
     }
-   }
-  }
 
 });
