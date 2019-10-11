@@ -4,6 +4,9 @@ const {Parser, Rule} = require("../../src/logic/parser.js");
 const {Reasoner} = require("../../src/logic/fol.js");
 const {rewrite} = require("../../src/logic/unify.js");
 
+// reasoning with generalized quantifiers.
+// https://eprints.illc.uva.nl/1562/1/MoL-2017-25.text.pdf
+
 const {
   program, 
   forall, 

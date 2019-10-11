@@ -537,6 +537,13 @@ describe("Parser", function() {
                         ))));
   });
 
+  it.skip("If A is B's parent then B is A's child.", function() {
+    assertThat(first(parse("If A is B's parent then B is A's child.")))
+     .equalsTo(S(NP(DET("Every"), N("brazilian")),
+                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+                        ))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

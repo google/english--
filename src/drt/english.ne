@@ -1,5 +1,5 @@
 @builtin "whitespace.ne"
-
+@include "base.ne"
 @{%
     function node(type, types, children) {
      // console.log(type + ": " + JSON.stringify(types) + " => ");
@@ -955,7 +955,7 @@ PREP ->
   "for"i {% (args) => node("PREP", {}, args) %} |
   "with"i {% (args) => node("PREP", {}, args) %}
 
-#  whitespaces
+# whitespaces
 WS_gap_sing -> _ {% () => null %}
 WS_gap_plur -> _ {% () => null %}
 WS_gap_n -> __ {% () => null %}

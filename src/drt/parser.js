@@ -199,7 +199,7 @@ function compile(grammar, header = true) {
 
  if (header) {
   result.push(`@builtin "whitespace.ne"`);
-  result.push(``);
+  result.push(`@include "base.ne"`);
   result.push(`@{%
     function node(type, types, children) {
      // console.log(type + ": " + JSON.stringify(types) + " => ");
@@ -231,18 +231,16 @@ function compile(grammar, header = true) {
  }
  
  if (header) {
-  //result.push("");
   //result.push("# extensible proper names");
   //let names = rule(term("PN", {"num": "sing", "gen": 1}),
   //                 [["FULLNAME"]]);
+
   //for (let exp of generate(names)) {
   // result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
   //}
-  //result.push(`FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}`);
-  //result.push(`NAME -> [A-Z]:+ [a-z]:+ {% ([a, b]) => a.join("") + b.join("") %}`);
   
   result.push("");
-  result.push("#  whitespaces");
+  result.push("# whitespaces");
   
   let whitespaces = rule(term("WS", {"gap": ["sing", "plur", "-"]}));
   for (let whitespace of generate(whitespaces)) {
@@ -392,11 +390,15 @@ function grammar() {
  // PS 10
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                      [term("PN", {"num": 1, "gen": 2})]));
- 
+  
  // PS 11
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                      [term("PRO", {"num": 1, "gen": 2, "case": 3})]));
- 
+
+ // Extensible proper names.
+ //result.push(phrase(term("PN", {"num": "sing", "gen": 1}),
+ //                   [term("FULLNAME")]));
+
  // PS 12
  result.push(phrase(term("NP'", {"num": "plur", "gen": 1, "case": 2, "gap": "-"}),
                     [term("NP", {"num": 3, "gen": 1, "case": 2, "gap": "-"}),
