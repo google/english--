@@ -725,7 +725,8 @@ N_num_sing_gen_male ->
   N_num_sing_gen_male __ PP {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
   "man"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
-  "engineer"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}
+  "engineer"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %} |
+  "brazilian"i {% (args) => node("N", {"num":"sing","gen":"male"}, args) %}
 N_num_sing_gen_fem -> 
   N_num_sing_gen_fem __ RC_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   ADJ __ N_num_sing_gen_fem {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
@@ -733,7 +734,8 @@ N_num_sing_gen_fem ->
   "stockbroker"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "woman"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
   "widow"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
-  "engineer"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %}
+  "engineer"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %} |
+  "brazilian"i {% (args) => node("N", {"num":"sing","gen":"fem"}, args) %}
 N_num_sing_gen_nhum -> 
   N_num_sing_gen_nhum __ RC_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |
   ADJ __ N_num_sing_gen_nhum {% (args) => node("N", {"num":"sing","gen":"-hum"}, args) %} |

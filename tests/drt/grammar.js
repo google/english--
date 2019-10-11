@@ -459,9 +459,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man" "engineer"');
+     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man" "engineer" "brazilian"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow" "engineer"');
+     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow" "engineer" "brazilian"');
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse" "porsche"');
     assertThat(print(result[i++]))

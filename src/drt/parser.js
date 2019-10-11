@@ -596,11 +596,11 @@ function grammar() {
  
  // LI 12
  result.push(rule(term("N", {"num": "sing", "gen": "male"}),
-                   [[literal("stockbroker")], [literal("man")], [literal("engineer")]]));
+                  [[literal("stockbroker")], [literal("man")], [literal("engineer")], [literal("brazilian")]]));
  
  // LI 13
  result.push(rule(term("N", {"num": "sing", "gen": "fem"}),
-                   [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")]]));
+                  [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")], [literal("brazilian")]]));
  
  // LI 14
  result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),

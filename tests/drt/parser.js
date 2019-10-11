@@ -530,6 +530,13 @@ describe("Parser", function() {
                         ))));
   });
 
+  it("Every brazilian is from Brazil", function() {
+    assertThat(first(parse("Every brazilian is from Brazil.")))
+     .equalsTo(S(NP(DET("Every"), N("brazilian")),
+                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+                        ))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

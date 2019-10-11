@@ -357,6 +357,30 @@ describe("Logic", function() {
      `);
   });
 
+  it("Sam is from Brazil. Who is from Brazil?", function() {
+    enter("Sam is from Brazil.")
+     .query("Who is from Brazil?")
+     .equalsTo("Sam is from Brazil");
+  });
+
+  it("Sam is a brazilian engineer. Who is a engineer?", function() {
+    enter("Sam is a brazilian engineer.")
+     .query("Who is a engineer?")
+     .equalsTo("Sam is a engineer");
+  });
+
+  it("Sam's wife is behind Anna. Who is behind Anna?", function() {
+    enter("Sam's wife is behind Anna.")
+     .query("Who is behind Anna?")
+     .equalsTo("Sam 's wife is behind Anna");
+  });
+
+  it("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
+    enter("Sam is a brazilian engineer. Every brazilian is from Brazil.")
+     .query("Who is from Brazil?")
+     .equalsTo("Sam is from Brazil");
+  });
+
   // maybe we need to introduce variables?
   // how do we express the following?
   // if "a" is "b"'s child then "b" is "a"'s parent.
