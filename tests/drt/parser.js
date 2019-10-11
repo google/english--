@@ -405,10 +405,10 @@ describe("Parser", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it("Jones or Smith love her.", function() {
-    assertThat(first(parse("Jones or Smith love her.")))
+  it("Jones or Smith loves her.", function() {
+    assertThat(first(parse("Jones or Smith loves her.")))
      .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
-                 VP_(VP(V("love"), NP(PRO("her"))))));
+                 VP_(VP(V("loves"), NP(PRO("her"))))));
   });
 
   it("Jones owns and loves a porsche.", function() {

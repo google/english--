@@ -185,7 +185,7 @@ describe("Grammar", function() {
      .equalsTo('PRO[num=sing, case=+nom] -> "it"');
   });
 
-  it("gender", function() {
+  it.skip("gender", function() {
     let rule = phrase(term("NP", {"gen": -1}),
                       [term("PRO", {"gen": -1})]);
 
@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(69);
+    assertThat(result.length).equalsTo(67);
 
     let i = 0;
 
@@ -350,47 +350,45 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> S[num=@1] _ "."');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" _ NP[num=@1, gen=@2, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, gap=-] _ "?"');
+     .equalsTo('Sentence -> "who" _ NP[num=@1, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, gap=-] _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, gen=@2, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
+     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "is" __ NP[num=sing, gen=@2, case=+nom, gap=-] __ ADJ _ "?"');
+     .equalsTo('Sentence -> "is" __ NP[num=sing, case=+nom, gap=-] __ ADJ _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('S[num=@1] -> NP\'[num=@1, gen=@2, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
+     .equalsTo('S[num=@1] -> NP\'[num=@1, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@3, gen=@2, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@3, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, gen=@2, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
+     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
     assertThat(print(result[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, gap=@2]");
     assertThat(print(result[i++]))
      .equalsTo("VP'[num=@1, fin=+, gap=@2] -> VP[num=@1, fin=+, gap=@2]");
     assertThat(print(result[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] WS[gap=@3] NP\'[num=@3, gen=@4, case=-nom, gap=@3]");
+     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] WS[gap=@3] NP\'[num=@3, case=-nom, gap=@3]");
     assertThat(print(result[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] __ NP\'[num=@3, gen=@4, case=-nom, gap=-]");
+     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] __ NP\'[num=@3, case=-nom, gap=-]");
     assertThat(print(result[i++]))
      .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=-]");
     assertThat(print(result[i++]))
-     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=@1] -> GAP')
+     .equalsTo('NP[num=@1, case=@3, gap=@1] -> GAP')
     assertThat(print(result[i++]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=@1] __ N[num=@1, gen=@2]");
+     .equalsTo("NP[num=@1, case=@3, gap=-] -> DET[num=@1] __ N[num=@1]");
     assertThat(print(result[i++]))
-     .equalsTo("NP[num=@1, gen=@2, case=@3, gap=-] -> PN[num=@1, gen=@2]");
+     .equalsTo("NP[num=@1, case=@3, gap=-] -> PN[num=@1]");
     assertThat(print(result[i++]))
-     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> PRO[num=@1, gen=@2, case=@3]');
+     .equalsTo('NP[num=@1, case=@3, gap=-] -> PRO[num=@1, case=@3]');
     assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=plur, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@1, case=@2, gap=-] __ "and" __ NP[num=@4, gen=@1, case=@2, gap=-]');
+     .equalsTo('NP\'[num=plur, case=@2, gap=-] -> NP[num=@3, case=@2, gap=-] __ "and" __ NP[num=@4, case=@2, gap=-]');
     assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=plur, gen=-hum, case=@2, gap=-] -> NP[num=@3, gen=@5, case=@2, gap=-] __ "and" __ NP[num=@4, gen=@6, case=@2, gap=-]');
+     .equalsTo("NP'[num=@1, case=@3, gap=@4] -> NP[num=@1, case=@3, gap=@4]");
     assertThat(print(result[i++]))
-     .equalsTo("NP'[num=@1, gen=@2, case=@3, gap=@4] -> NP[num=@1, gen=@2, case=@3, gap=@4]");
+     .equalsTo('N[num=@1] -> N[num=@1] __ RC[num=@1]');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ RC[num=@1, gen=@2]');
-    assertThat(print(result[i++]))
-     .equalsTo('RC[num=@1, gen=@2] -> RPRO[num=@1, gen=@2] __ S[num=@1, gap=@1]');
+     .equalsTo('RC[num=@1] -> RPRO[num=@1] __ S[num=@1, gap=@1]');
     // Adjectives
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
@@ -398,11 +396,11 @@ A ->
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
     // 3.6 Identity and Predicates
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, gen=@4, case=@5, gap=@3]');
+     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, case=@5, gap=@3]');
     assertThat(print(result[i++]))
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ PP');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=@1, gen=@2] -> ADJ __ N[num=@1, gen=@2]');
+     .equalsTo('N[num=@1] -> ADJ __ N[num=@1]');
     // Conditionals
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> "if" __ S[num=@1] __ "then" __ S[num=@1]');
@@ -414,9 +412,7 @@ A ->
      .equalsTo('VP[num=@1, fin=@2, gap=@3] -> VP[num=@1, fin=@2, gap=@3] __ "or" __ VP[num=@1, fin=@2, gap=@3]');
     // NP Disjunctions
     assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=@3, gen=@1, case=@2, gap=-] -> NP[num=@3, gen=@1, case=@2, gap=-] __ "or" __ NP[num=@3, gen=@1, case=@2, gap=-]');
-    assertThat(print(result[i++]))
-     .equalsTo('NP\'[num=@1, gen=-hum, case=@2, gap=-] -> NP[num=@3, gen=@5, case=@2, gap=-] __ "or" __ NP[num=@4, gen=@6, case=@2, gap=-]');
+     .equalsTo('NP\'[num=@3, case=@2, gap=-] -> NP[num=@3, case=@2, gap=-] __ "or" __ NP[num=@3, case=@2, gap=-]');
     // Sentential Conjunctions
     assertThat(print(result[i++]))
      .equalsTo('S[num=@1] -> S[num=@1] __ "and" __ S[num=@1]');
@@ -425,45 +421,45 @@ A ->
      .equalsTo('V[num=@1, fin=@2, trans=@3] -> V[num=@1, fin=@2, trans=@3] __ "and" __ V[num=@1, fin=@2, trans=@3]');
     // Non-pronomial possessive phrases
     assertThat(print(result[i++]))
-     .equalsTo('NP[num=@1, gen=@2, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1, gen=@2]');
+     .equalsTo('NP[num=@1, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1]');
     assertThat(print(result[i++]))
-     .equalsTo('DET[num=sing, rn=+] -> PN[num=@1, gen=@2] "\'s"');
+     .equalsTo('DET[num=sing, rn=+] -> PN[num=@1] "\'s"');
 
     // Noun propositional phrases
     assertThat(print(result[i++]))
-     .equalsTo('N[num=@1, gen=@2] -> N[num=@1, gen=@2] __ PP');
+     .equalsTo('N[num=@1] -> N[num=@1] __ PP');
     assertThat(print(result[i++]))
-     .equalsTo('PP -> PREP __ NP[num=@1, gen=@2, case=@3, gap=-]');
+     .equalsTo('PP -> PREP __ NP[num=@1, case=@3, gap=-]');
     
     // Insertion Rules
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "an" "every" "the" "some"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, gen=male, case=+nom] -> "he"');
+     .equalsTo('PRO[num=sing, case=+nom] -> "he"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, gen=male, case=-nom] -> "him"');
+     .equalsTo('PRO[num=sing, case=-nom] -> "him"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, gen=fem, case=+nom] -> "she"');
+     .equalsTo('PRO[num=sing, case=+nom] -> "she"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, gen=fem, case=-nom] -> "her"');
+     .equalsTo('PRO[num=sing, case=-nom] -> "her"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, gen=-hum, case=-nom/+nom] -> "it"');
+     .equalsTo('PRO[num=sing, case=-nom/+nom] -> "it"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=+nom] -> "they"');
+     .equalsTo('PRO[num=plur, case=+nom] -> "they"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=plur, gen=male/fem/-hum, case=-nom] -> "them"');
+     .equalsTo('PRO[num=plur, case=-nom] -> "them"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=male] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
+     .equalsTo('PN[num=sing] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=fem] -> "Mary" "Dani" "Anna"');
+     .equalsTo('PN[num=sing] -> "Mary" "Dani" "Anna"');
     assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing, gen=-hum] -> "Brazil" "Italy" "Ulysses"');
+     .equalsTo('PN[num=sing] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=male] -> "stockbroker" "man" "engineer" "brazilian"');
+     .equalsTo('N[num=sing] -> "stockbroker" "man" "engineer" "brazilian"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=fem] -> "stockbroker" "woman" "widow" "engineer" "brazilian"');
+     .equalsTo('N[num=sing] -> "stockbroker" "woman" "widow" "engineer" "brazilian"');
     assertThat(print(result[i++]))
-     .equalsTo('N[num=sing, gen=-hum] -> "book" "donkey" "horse" "porsche"');
+     .equalsTo('N[num=sing] -> "book" "donkey" "horse" "porsche"');
     assertThat(print(result[i++]))
      .equalsTo('AUX[num=sing, fin=+] -> "does"');
     assertThat(print(result[i++]))
@@ -481,9 +477,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink" "adore"');
     assertThat(print(result[i++]))
-     .equalsTo('RPRO[num=sing/plur, gen=male/fem] -> "who"');
+     .equalsTo('RPRO[num=sing/plur] -> "who"');
     assertThat(print(result[i++]))
-     .equalsTo('RPRO[num=sing/plur, gen=-hum] -> "which"');
+     .equalsTo('RPRO[num=sing/plur] -> "which"');
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
     assertThat(print(result[i++]))
@@ -493,9 +489,9 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('BE[num=plur, fin=@1] -> "are"');
     assertThat(print(result[i++]))
-     .equalsTo('RN[num=sing, gen=male] -> "husband" "father" "brother"');
+     .equalsTo('RN[num=sing] -> "husband" "father" "brother"');
     assertThat(print(result[i++]))
-     .equalsTo('RN[num=sing, gen=fem] -> "wife" "mother" "sister"');
+     .equalsTo('RN[num=sing] -> "wife" "mother" "sister"');
     assertThat(print(result[i++]))
      .equalsTo('PREP -> "behind" "in" "over" "under" "near" "before" "after" "during" "from" "to" "of" "about" "by" "for" "with"');
     

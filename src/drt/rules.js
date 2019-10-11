@@ -144,9 +144,14 @@ function child(node, ...path) {
 }
 
 function find({gen, num}, refs, name) {
+ // console.log(`Trying to find a ${gen} ${num} `);
  return refs.find((ref) => {
+   // console.log(`I have a ${ref.gen} ${ref.num} `);
    let byName = name ? ref.value == name : true;
    let types = ref.types || {};
+   if (gen == undefined || types.gen == undefined) {
+    return false;
+   }
    return types.gen == gen && types.num == num && byName
   });
 }
@@ -332,9 +337,16 @@ class CRVPID extends Rule {
    return [[], [], [], []];
   }
 
-  let ref = referent(this.id(), noun.types, print(child(node, 1), refs));
+  // console.log(noun);
+  let types = clone(noun.types);
+  Object.assign(types, child(noun, 0).types);
+  // console.log(types);
+
+  let ref = referent(this.id(), types, print(child(node, 1), refs));
   noun.ref = ref;
   node.children[1] = ref;
+
+  // console.log(ref);
 
   return [[ref], [noun], [], []];
  }

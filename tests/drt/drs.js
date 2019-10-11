@@ -637,38 +637,38 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones or Smith love Mary.", function() {
+  it("Jones or Smith loves Mary.", function() {
     // TODO(goto): this isn't correct because
     // Mary is bound to different referents.
-    assertThat("Jones or Smith love Mary.")
+    assertThat("Jones or Smith loves Mary.")
      .equalsTo(`
        drs(a) {
          Mary(a)
          drs(b) {
            Jones(b)
-           b love a
+           b loves a
          } or drs(c) {
            Smith(c)
-           c love a
+           c loves a
          }
        }
     `);
   });
 
-  it("Mary is happy. Jones or Smith love her.", function() {
+  it("Mary is happy. Jones or Smith loves her.", function() {
     // TODO(goto): this isn't correct because
     // Mary is bound to different referents.
-    assertThat("Mary is happy. Jones or Smith love her.")
+    assertThat("Mary is happy. Jones or Smith loves her.")
      .equalsTo(`
        drs(a) {
          Mary(a)
          happy(a)
          drs(b) {
            Jones(b)
-           b love a
+           b loves a
          } or drs(c) {
            Smith(c)
-           c love a
+           c loves a
          }
        }
     `);
