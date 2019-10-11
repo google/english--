@@ -200,19 +200,6 @@ function compile(grammar, header = true) {
  if (header) {
   result.push(`@builtin "whitespace.ne"`);
   result.push(`@include "base.ne"`);
-  result.push(`@{%
-    function node(type, types, children) {
-     // console.log(type + ": " + JSON.stringify(types) + " => ");
-     return {
-      "@type": type, 
-       "types": types, 
-       "children": children
-       .filter(child => child != null)
-       .filter(child => child != '.')
-       }; 
-    }
-    %}`);
-  result.push(``);
   result.push(``);
 
   result.push(`Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Discourse", {}, ...args) %}`);

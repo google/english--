@@ -1,18 +1,5 @@
 @builtin "whitespace.ne"
 @include "base.ne"
-@{%
-    function node(type, types, children) {
-     // console.log(type + ": " + JSON.stringify(types) + " => ");
-     return {
-      "@type": type, 
-       "types": types, 
-       "children": children
-       .filter(child => child != null)
-       .filter(child => child != '.')
-       }; 
-    }
-    %}
-
 
 Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Discourse", {}, ...args) %}
 

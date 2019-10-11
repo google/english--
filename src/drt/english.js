@@ -13,7 +13,7 @@ function id(x) { return x[0]; }
        .filter(child => child != '.')
        }; 
     }
-    var grammar = {
+var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
