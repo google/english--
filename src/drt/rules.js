@@ -400,19 +400,17 @@ class CRNLIN extends Rule {
 
 class CRPPLIN extends Rule {
  constructor(ids) {
-  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np")))));
+  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), capture("np"))));
  }
  apply({noun, prep, np}, node) {
   if (!node.ref) {
    return [[], [], [], []];
   }
 
-  let u = referent(this.id(), noun.types);
+  noun.ref = node.ref;
+  let cond = S(node.ref, VP_(VP(V(prep), child(np, 1))));
 
-  noun.ref = u;
-  let cond = S(u, VP_(VP(V(prep), np)));
-
-  return [[u], [noun, cond], [], [node]];
+  return [[], [noun, cond], [], [node]];
  }
 }
 

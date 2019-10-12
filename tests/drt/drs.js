@@ -203,7 +203,7 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Mel owns a book. It fascinates him. Dani loves him.", function() {
+  it("Mel owns a book. It fascinates him. Dani loves him.", function() {
     assertThat("Mel owns a book. It fascinates him. Dani loves him.")
      .equalsTo(`
        drs(a, b, c) {
@@ -653,9 +653,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Mary is happy. Jones or Smith loves her.", function() {
-    // TODO(goto): this isn't correct because
-    // Mary is bound to different referents.
+  it("Mary is happy. Jones or Smith loves her.", function() {
     assertThat("Mary is happy. Jones or Smith loves her.")
      .equalsTo(`
        drs(a) {
@@ -808,9 +806,8 @@ describe("DRS", function() {
     // before the CRAND gets constructed.
     assertThat("Mary owns and loves a porsche.")
      .equalsTo(`
-       drs(a, d) {
+       drs(a) {
          Mary(a)
-         porsche(d)
          drs(b) {
            a owns b
            porsche(b)
@@ -979,10 +976,16 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones likes a woman who likes Bill.", function() {
-    // TODO(goto): this hangs. investigate why.
+  it("Jones likes a woman who likes Bill.", function() {
     assertThat("Jones likes a woman who likes Bill.")
      .equalsTo(`
+       drs(a, b, c) {
+         Jones(a)
+         Bill(b)
+         a likes c
+         c likes b
+         woman(c)
+       }
     `);
   });
 
@@ -1042,10 +1045,10 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          Jones(a)
-         drs(b, c, d) {
-           c with d
-           woman(c)
-           donkey(d)
+         drs(b, c) {
+           b with c
+           woman(b)
+           donkey(c)
          } => drs() {
            b loves a
          }
@@ -1053,17 +1056,17 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Every man from Brazil loves Mary.", function() {
-    // c is introduced here and b is missing.
+  it("Every man from Brazil loves Mary.", function() {
     assertThat("Every man from Brazil loves Mary.")
      .equalsTo(`
-       drs(a) {
+       drs(a, b) {
          Mary(a)
-         drs(b, c) {
-           c from Brazil
+         Brazil(b)
+         drs(c) {
+           c from b
            man(c)
          } => drs() {
-           b loves a
+           c loves a
          }
        }
     `);

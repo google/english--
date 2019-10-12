@@ -860,10 +860,10 @@ describe("Rules", function() {
 
     let [[], [implication]] = new CREVERY(ids).match(node, []);
     assertThat(implication.print()).equalsTo(trim(`
-      drs(b, c, d) {
-        c with d
-        woman(c)
-        donkey(d)
+      drs(b, c) {
+        b with c
+        woman(b)
+        donkey(c)
       } => drs() {
         b loves a
       }
