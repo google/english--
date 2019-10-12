@@ -550,6 +550,12 @@ describe("Parser", function() {
                  VP_(VP(V("loves"), NP(PRO("It"))))));
   });
 
+  it("John loves himself.", function() {
+    assertThat(first(parse("John loves himself.")))
+     .equalsTo(S(NP(PN("John")),
+                 VP_(VP(V("loves"), NP(PRO("himself"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

@@ -311,8 +311,9 @@ class CRVPPRO extends Rule {
  }
 
  apply({sub, pro}, node, refs) {
-  // console.log(child(sub, 0));
-  let ref = find(pro.types, refs, undefined, undefined, [child(sub, 0)]);
+  // Exclude the subject if the pronoun is non-reflexive.
+  let exclude = pro.types.refl == "-" ? [child(sub, 0)] : [];
+  let ref = find(pro.types, refs, undefined, undefined, exclude);
 
   if (!ref) {
    throw new Error("Invalid Reference: " + pro.children[0]);

@@ -1100,15 +1100,6 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Mel loves Anna. Mel loves Anna's brother", function() {
-    let ids = new Ids();
-    let drs = DRS.from();
-    drs.bind(first(parse("Mel loves Anna.")));
-    assertThat(drs.head).equalsTo([]);
-    // drs.bind("Mel loves Anna's brother.");
-    // console.log(drs.print());
-
-   });
 
   it("Sam is a brazilian engineer who likes Dani. He loves Anna. He loves Leo.", function() {
     assertThat("Sam is a brazilian engineer who loves Dani. He loves Anna. He loves Leo.")
@@ -1253,7 +1244,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Fabio is Denise's brother. He likes Japan", function() {
+  it("Fabio is Denise's brother. He likes Japan.", function() {
     assertThat("Fabio is Denise's brother. He likes Japan.")
      .equalsTo(`
        drs(a, b, c, d) {
@@ -1263,6 +1254,16 @@ describe("DRS", function() {
          c brother b
          Japan(d)
          c likes d
+       }
+    `);
+  });
+
+  it("John loves himself.", function() {
+    assertThat("John loves himself.")
+     .equalsTo(`
+       drs(a) {
+         John(a)
+         a loves a
        }
     `);
   });

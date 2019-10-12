@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(65);
+    assertThat(result.length).equalsTo(68);
 
     let i = 0;
 
@@ -380,7 +380,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo("NP[num=@1, case=@3, gap=-] -> PN[num=@1]");
     assertThat(print(result[i++]))
-     .equalsTo('NP[num=@1, case=@3, gap=-] -> PRO[num=@1, case=@3]');
+     .equalsTo('NP[num=@1, case=@3, gap=-] -> PRO[num=@1, case=@3, refl=@4]');
     assertThat(print(result[i++]))
      .equalsTo('NP\'[num=plur, case=@2, gap=-] -> NP[num=@3, case=@2, gap=-] __ "and" __ NP[num=@4, case=@2, gap=-]');
     assertThat(print(result[i++]))
@@ -435,19 +435,19 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing] -> "a" "an" "every" "the" "some"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, case=+nom] -> "he"');
+     .equalsTo('PRO[num=sing, case=+nom, refl=-] -> "he"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, case=-nom] -> "him"');
+     .equalsTo('PRO[num=sing, case=-nom, refl=-] -> "him"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, case=+nom] -> "she"');
+     .equalsTo('PRO[num=sing, case=+nom, refl=-] -> "she"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, case=-nom] -> "her"');
+     .equalsTo('PRO[num=sing, case=-nom, refl=-] -> "her"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=sing, case=-nom/+nom] -> "it"');
+     .equalsTo('PRO[num=sing, case=-nom/+nom, refl=-] -> "it"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=plur, case=+nom] -> "they"');
+     .equalsTo('PRO[num=plur, case=+nom, refl=-] -> "they"');
     assertThat(print(result[i++]))
-     .equalsTo('PRO[num=plur, case=-nom] -> "them"');
+     .equalsTo('PRO[num=plur, case=-nom, refl=-] -> "them"');
     // assertThat(print(result[i++]))
     //  .equalsTo('PN[num=sing] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
     // assertThat(print(result[i++]))
@@ -480,6 +480,12 @@ A ->
      .equalsTo('RPRO[num=sing/plur] -> "who"');
     assertThat(print(result[i++]))
      .equalsTo('RPRO[num=sing/plur] -> "which"');
+    assertThat(print(result[i++]))
+     .equalsTo('PRO[num=sing, case=-nom, refl=+] -> "himself"');
+    assertThat(print(result[i++]))
+     .equalsTo('PRO[num=sing, case=-nom, refl=+] -> "herself"');
+    assertThat(print(result[i++]))
+     .equalsTo('PRO[num=sing, case=-nom, refl=+] -> "itself"');
     assertThat(print(result[i++]))
      .equalsTo('GAP -> null');
     assertThat(print(result[i++]))

@@ -176,22 +176,26 @@ NP_num_plur_case_nnom_gap_plur ->
 NP_num_sing_case_pnom_gap_n -> 
   DET_num_sing __ N_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
   PN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
-  PRO_num_sing_case_pnom {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
+  PRO_num_sing_case_pnom_refl_p {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
+  PRO_num_sing_case_pnom_refl_n {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
   DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %}
 NP_num_sing_case_nnom_gap_n -> 
   DET_num_sing __ N_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
   PN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
-  PRO_num_sing_case_nnom {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
+  PRO_num_sing_case_nnom_refl_p {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
+  PRO_num_sing_case_nnom_refl_n {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
   DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %}
 NP_num_plur_case_pnom_gap_n -> 
   DET_num_plur __ N_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
   PN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
-  PRO_num_plur_case_pnom {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
+  PRO_num_plur_case_pnom_refl_p {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
+  PRO_num_plur_case_pnom_refl_n {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
   DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %}
 NP_num_plur_case_nnom_gap_n -> 
   DET_num_plur __ N_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
   PN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
-  PRO_num_plur_case_nnom {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
+  PRO_num_plur_case_nnom_refl_p {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
+  PRO_num_plur_case_nnom_refl_n {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
   DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %}
 NP__num_plur_case_pnom_gap_n -> 
   NP_num_sing_case_pnom_gap_n __ "and"i __ NP_num_sing_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc))(args) %} |
@@ -328,18 +332,18 @@ DET_num_sing ->
   "every"i {% (args, loc) => node("DET", {"num":"sing"}, args, loc) %} |
   "the"i {% (args, loc) => node("DET", {"num":"sing"}, args, loc) %} |
   "some"i {% (args, loc) => node("DET", {"num":"sing"}, args, loc) %}
-PRO_num_sing_case_pnom -> 
-  "he"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","gen":"male"}, args, loc) %} |
-  "she"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","gen":"fem"}, args, loc) %} |
-  "it"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","gen":"-hum"}, args, loc) %}
-PRO_num_sing_case_nnom -> 
-  "him"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","gen":"male"}, args, loc) %} |
-  "her"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","gen":"fem"}, args, loc) %} |
-  "it"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","gen":"-hum"}, args, loc) %}
-PRO_num_plur_case_pnom -> 
-  "they"i {% (args, loc) => node("PRO", {"num":"plur","case":"+nom","gen":["male","fem","-hum"]}, args, loc) %}
-PRO_num_plur_case_nnom -> 
-  "them"i {% (args, loc) => node("PRO", {"num":"plur","case":"-nom","gen":["male","fem","-hum"]}, args, loc) %}
+PRO_num_sing_case_pnom_refl_n -> 
+  "he"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","refl":"-","gen":"male"}, args, loc) %} |
+  "she"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","refl":"-","gen":"fem"}, args, loc) %} |
+  "it"i {% (args, loc) => node("PRO", {"num":"sing","case":"+nom","refl":"-","gen":"-hum"}, args, loc) %}
+PRO_num_sing_case_nnom_refl_n -> 
+  "him"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"-","gen":"male"}, args, loc) %} |
+  "her"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"-","gen":"fem"}, args, loc) %} |
+  "it"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"-","gen":"-hum"}, args, loc) %}
+PRO_num_plur_case_pnom_refl_n -> 
+  "they"i {% (args, loc) => node("PRO", {"num":"plur","case":"+nom","refl":"-","gen":["male","fem","-hum"]}, args, loc) %}
+PRO_num_plur_case_nnom_refl_n -> 
+  "them"i {% (args, loc) => node("PRO", {"num":"plur","case":"-nom","refl":"-","gen":["male","fem","-hum"]}, args, loc) %}
 AUX_num_sing_fin_p -> 
   "does"i {% (args, loc) => node("AUX", {"num":"sing","fin":"+"}, args, loc) %}
 AUX_num_plur_fin_p -> 
@@ -350,6 +354,10 @@ RPRO_num_sing ->
 RPRO_num_plur -> 
   "who"i {% (args, loc) => node("RPRO", {"num":"plur"}, args, loc) %} |
   "which"i {% (args, loc) => node("RPRO", {"num":"plur"}, args, loc) %}
+PRO_num_sing_case_nnom_refl_p -> 
+  "himself"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"+","gen":"male"}, args, loc) %} |
+  "herself"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"+","gen":"fem"}, args, loc) %} |
+  "itself"i {% (args, loc) => node("PRO", {"num":"sing","case":"-nom","refl":"+","gen":"-hum"}, args, loc) %}
 GAP -> 
   null {% (args, loc) => node("GAP", {}, args, loc) %}
 ADJ -> 

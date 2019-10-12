@@ -108,6 +108,7 @@ const FEATURES = {
  "case": ["+nom", "-nom"],    
  "trans": ["+", "-"],
  "fin": ["+", "-"],
+ "refl": ["+", "-"],
 };
 
 function collect(rule) {
@@ -377,7 +378,7 @@ function grammar() {
   
  // PS 11
  result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
-                     [term("PRO", {"num": 1, "case": 3})]));
+                     [term("PRO", {"num": 1, "case": 3, "refl": 4})]));
 
  // PS 12
  result.push(phrase(term("NP'", {"num": "plur", "case": 2, "gap": "-"}),
@@ -517,43 +518,43 @@ function grammar() {
                    [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
  
  // LI 2
- result.push(rule(term("PRO", {"num": "sing", "case": "+nom"}),
+ result.push(rule(term("PRO", {"num": "sing", "case": "+nom", "refl": "-"}),
                   [[literal("he")]],
                   undefined,
                   {"gen": "male"}));
  
  // LI 3
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom"}),
+ result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "-"}),
                   [[literal("him")]],
                   undefined,
                   {"gen": "male"}));
  
  // LI 4
- result.push(rule(term("PRO", {"num": "sing", "case": "+nom"}),
+ result.push(rule(term("PRO", {"num": "sing", "case": "+nom", "refl": "-"}),
                   [[literal("she")]],
                   undefined,
                   {"gen": "fem"}));
  
  // LI 5
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom"}),
+ result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "-"}),
                   [[literal("her")]],
                   undefined,
                   {"gen": "fem"}));
  
  // LI 6
- result.push(rule(term("PRO", {"num": "sing", "case": ["-nom", "+nom"]}),
+ result.push(rule(term("PRO", {"num": "sing", "case": ["-nom", "+nom"], "refl": "-"}),
                   [[literal("it")]],
                   undefined,
                   {"gen": "-hum"}));
   
  // LI 7
- result.push(rule(term("PRO", {"num": "plur", "case": "+nom"}),
+ result.push(rule(term("PRO", {"num": "plur", "case": "+nom", "refl": "-"}),
                   [[literal("they")]],
                   undefined,
                   {"gen": ["male", "fem", "-hum"]}));
  
  // LI 8
- result.push(rule(term("PRO", {"num": "plur", "case": "-nom"}),
+ result.push(rule(term("PRO", {"num": "plur", "case": "-nom", "refl": "-"}),
                   [[literal("them")]],
                   undefined,
                   {"gen": ["male", "fem", "-hum"]}));
@@ -655,6 +656,24 @@ function grammar() {
  result.push(rule(term("RPRO", {"num": ["sing", "plur"]}),
                    [[literal("which")]]));
  
+ // LI 23
+ result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
+                  [[literal("himself")]],
+                  undefined,
+                  {"gen": "male"}));
+
+ // LI 24
+ result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
+                  [[literal("herself")]],
+                  undefined,
+                  {"gen": "fem"}));
+
+ // LI 25
+ result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
+                  [[literal("itself")]],
+                  undefined,
+                  {"gen": "-hum"}));
+
  // GAP
  result.push(rule(term("GAP"),
                    [["null"]]));
