@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(68);
+    assertThat(result.length).equalsTo(69);
 
     let i = 0;
 
@@ -498,6 +498,8 @@ A ->
      .equalsTo('RN[num=sing] -> "husband" "father" "brother"');
     assertThat(print(result[i++]))
      .equalsTo('RN[num=sing] -> "wife" "mother" "sister"');
+    assertThat(print(result[i++]))
+     .equalsTo('RN[num=sing] -> "parent" "child" "sibling"');
     assertThat(print(result[i++]))
      .equalsTo('PREP -> "behind" "in" "over" "under" "near" "before" "after" "during" "from" "to" "of" "about" "by" "for" "with"');
     assertThat(print(result[i++]))

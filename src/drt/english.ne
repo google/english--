@@ -383,7 +383,10 @@ RN_num_sing ->
   "brother"i {% (args, loc) => node("RN", {"num":"sing","gen":"male"}, args, loc) %} |
   "wife"i {% (args, loc) => node("RN", {"num":"sing","gen":"fem"}, args, loc) %} |
   "mother"i {% (args, loc) => node("RN", {"num":"sing","gen":"fem"}, args, loc) %} |
-  "sister"i {% (args, loc) => node("RN", {"num":"sing","gen":"fem"}, args, loc) %}
+  "sister"i {% (args, loc) => node("RN", {"num":"sing","gen":"fem"}, args, loc) %} |
+  "parent"i {% (args, loc) => node("RN", {"num":"sing","gen":["male","fem"]}, args, loc) %} |
+  "child"i {% (args, loc) => node("RN", {"num":"sing","gen":["male","fem"]}, args, loc) %} |
+  "sibling"i {% (args, loc) => node("RN", {"num":"sing","gen":["male","fem"]}, args, loc) %}
 PREP -> 
   "behind"i {% (args, loc) => node("PREP", {}, args, loc) %} |
   "in"i {% (args, loc) => node("PREP", {}, args, loc) %} |

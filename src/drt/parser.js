@@ -691,14 +691,27 @@ function grammar() {
 
  // Relative Nouns
  result.push(rule(term("RN", {"num": "sing"}),
-                  [[literal("husband")], [literal("father")], [literal("brother")]],
+                  [[literal("husband")], 
+                   [literal("father")], 
+                   [literal("brother")],
+                   ],
                   undefined,
                   {"gen": "male"}));
 
  result.push(rule(term("RN", {"num": "sing"}),
-                  [[literal("wife")], [literal("mother")], [literal("sister")]],
+                  [[literal("wife")], 
+                   [literal("mother")], 
+                   [literal("sister")]
+                   ],
                   undefined,
                   {"gen": "fem"}));
+
+ result.push(rule(term("RN", {"num": "sing"}),
+                  [[literal("parent")], 
+                   [literal("child")], 
+                   [literal("sibling")]],
+                  undefined,
+                  {"gen": ["male", "fem"]}));
 
  // to, of, about, at, before, after, by, behind, during, for,
  // from, in, over, under and with.

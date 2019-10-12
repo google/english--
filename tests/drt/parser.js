@@ -538,10 +538,12 @@ describe("Parser", function() {
   });
 
   it.skip("If A is B's parent then B is A's child.", function() {
-    assertThat(first(parse("If A is B's parent then B is A's child.")))
-     .equalsTo(S(NP(DET("Every"), N("brazilian")),
-                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
-                        ))));
+    assertThat(first(parse("If Aa is Bb's parent then Bb is Aa's child.")))
+     .equalsTo(S("If", 
+                 S(NP(PN("Aa")), VP_(VP(BE("is"), NP(DET(PN("Bb"), "'s"), RN("parent"))))), 
+                 "then", 
+                 S(NP(PN("Bb")), VP_(VP(BE("is"), NP(DET(PN("Aa"), "'s"), RN("child"))))), 
+                 ));
   });
 
   it("He loves it.", function() {
@@ -552,6 +554,13 @@ describe("Parser", function() {
 
   it("John loves himself.", function() {
     assertThat(first(parse("John loves himself.")))
+     .equalsTo(S(NP(PN("John")),
+                 VP_(VP(V("loves"), NP(PRO("himself"))))));
+  });
+
+  it.skip("John is happy with Mary.", function() {
+    // TODO(goto): this probably involves second order logic?
+    assertThat(first(parse("John is happy with Mary.")))
      .equalsTo(S(NP(PN("John")),
                  VP_(VP(V("loves"), NP(PRO("himself"))))));
   });
