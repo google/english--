@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(69);
+    assertThat(result.length).equalsTo(71);
 
     let i = 0;
 
@@ -424,6 +424,8 @@ A ->
      .equalsTo('NP[num=@1, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing, rn=+] -> PN[num=@1] "\'s"');
+    assertThat(print(result[i++]))
+     .equalsTo('DET[num=sing, rn=+] -> VAR "\'s"');
 
     // Noun propositional phrases
     assertThat(print(result[i++]))
@@ -448,12 +450,6 @@ A ->
      .equalsTo('PRO[num=plur, case=+nom, refl=-] -> "they"');
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, case=-nom, refl=-] -> "them"');
-    // assertThat(print(result[i++]))
-    //  .equalsTo('PN[num=sing] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
-    // assertThat(print(result[i++]))
-    //  .equalsTo('PN[num=sing] -> "Mary" "Dani" "Anna"');
-    // assertThat(print(result[i++]))
-    //  .equalsTo('PN[num=sing] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing] -> "stockbroker" "man" "engineer" "brazilian"');
     assertThat(print(result[i++]))
@@ -504,6 +500,8 @@ A ->
      .equalsTo('PREP -> "behind" "in" "over" "under" "near" "before" "after" "during" "from" "to" "of" "about" "by" "for" "with"');
     assertThat(print(result[i++]))
      .equalsTo("PN[num=sing] -> FULLNAME");
+    assertThat(print(result[i++]))
+     .equalsTo("NP[num=@1, case=@2, gap=@3] -> VAR");
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

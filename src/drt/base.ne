@@ -32,3 +32,5 @@ Discourse -> ( _ Sentence _ {% (args) => args[1] %} ):+ {% (args) => node("Disco
 
 FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}
 NAME -> [A-Z]:+ [a-z]:+ {% ([a, b], location, reject) => name(a, b, reject) %}
+
+VAR -> [A-Z] {% (name) => node("VAR", {}, name) %}

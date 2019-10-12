@@ -502,6 +502,10 @@ function grammar() {
                     [term("PN", {"num": 1}), 
                       literal("'s")]));
 
+ result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
+                    [term("VAR"), 
+                      literal("'s")]));
+
  // Noun Prepositional Phrases
  result.push(phrase(term("N", {"num": 1}),
                     [term("N", {"num": 1}), 
@@ -744,6 +748,10 @@ function grammar() {
                     undefined,
                     {"gen": "?"}));
  
+ // Variables
+ result.push(phrase(term("NP", {"num": 1, "case": 2, "gap": 3}),
+                     [term("VAR")]));
+
  return result;
 }
 
@@ -809,6 +817,7 @@ module.exports = {
   ADJ: (...children) => node("ADJ", ...children),
   PP: (...children) => node("PP", ...children),
   PREP: (...children) => node("PREP", ...children),
+  VAR: (...children) => node("VAR", ...children),
   Discourse: (...children) => node("Discourse", ...children),
   Sentence: (...children) => node("Sentence", ...children),
  }
