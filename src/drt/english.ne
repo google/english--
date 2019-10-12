@@ -166,45 +166,37 @@ VP_num_plur_fin_n_gap_n ->
   BE_num_plur_fin_n __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args, loc) %} |
   VP_num_plur_fin_n_gap_n __ "or"i __ VP_num_plur_fin_n_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"-","gap":"-"}, args, loc) %}
 NP_num_sing_case_pnom_gap_sing -> 
-  GAP {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"sing"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"sing"}, args, loc) %}
+  GAP {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"sing"}, args, loc) %}
 NP_num_sing_case_nnom_gap_sing -> 
-  GAP {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"sing"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"sing"}, args, loc) %}
+  GAP {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"sing"}, args, loc) %}
 NP_num_plur_case_pnom_gap_plur -> 
-  GAP {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"plur"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"plur"}, args, loc) %}
+  GAP {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"plur"}, args, loc) %}
 NP_num_plur_case_nnom_gap_plur -> 
-  GAP {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"plur"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"plur"}, args, loc) %}
+  GAP {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"plur"}, args, loc) %}
 NP_num_sing_case_pnom_gap_n -> 
   DET_num_sing __ N_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
   PN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
   PRO_num_sing_case_pnom_refl_p {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
   PRO_num_sing_case_pnom_refl_n {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
-  DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %}
+  DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"-"}, args, loc) %}
 NP_num_sing_case_nnom_gap_n -> 
   DET_num_sing __ N_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
   PN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
   PRO_num_sing_case_nnom_refl_p {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
   PRO_num_sing_case_nnom_refl_n {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
-  DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %}
+  DET_num_sing_rn_p __ RN_num_sing {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"-"}, args, loc) %}
 NP_num_plur_case_pnom_gap_n -> 
   DET_num_plur __ N_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
   PN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
   PRO_num_plur_case_pnom_refl_p {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
   PRO_num_plur_case_pnom_refl_n {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
-  DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %}
+  DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc) %}
 NP_num_plur_case_nnom_gap_n -> 
   DET_num_plur __ N_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
   PN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
   PRO_num_plur_case_nnom_refl_p {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
   PRO_num_plur_case_nnom_refl_n {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
-  DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %} |
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %}
+  DET_num_sing_rn_p __ RN_num_plur {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"-"}, args, loc) %}
 NP__num_plur_case_pnom_gap_n -> 
   NP_num_sing_case_pnom_gap_n __ "and"i __ NP_num_sing_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc))(args) %} |
   NP_num_sing_case_pnom_gap_n __ "and"i __ NP_num_plur_case_pnom_gap_n {% (args) => args.length == 1 ? args[0] : ((args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"-"}, args, loc))(args) %} |
@@ -328,8 +320,7 @@ V_num_plur_fin_n_trans_n ->
   "adore"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"-"}, args, loc) %}
 DET_num_sing_rn_p -> 
   PN_num_sing "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %} |
-  PN_num_plur "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %} |
-  VAR "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %}
+  PN_num_plur "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %}
 PP -> 
   PREP __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("PP", {}, args, loc) %} |
   PREP __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("PP", {}, args, loc) %} |
@@ -413,15 +404,8 @@ PREP ->
   "for"i {% (args, loc) => node("PREP", {}, args, loc) %} |
   "with"i {% (args, loc) => node("PREP", {}, args, loc) %}
 PN_num_sing -> 
-  FULLNAME {% (args, loc) => node("PN", {"num":"sing","gen":"?"}, args, loc) %}
-NP_num_sing_case_pnom_gap_plur -> 
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"plur"}, args, loc) %}
-NP_num_sing_case_nnom_gap_plur -> 
-  VAR {% (args, loc) => node("NP", {"num":"sing","case":"-nom","gap":"plur"}, args, loc) %}
-NP_num_plur_case_pnom_gap_sing -> 
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"+nom","gap":"sing"}, args, loc) %}
-NP_num_plur_case_nnom_gap_sing -> 
-  VAR {% (args, loc) => node("NP", {"num":"plur","case":"-nom","gap":"sing"}, args, loc) %}
+  FULLNAME {% (args, loc) => node("PN", {"num":"sing","gen":"?"}, args, loc) %} |
+  VAR {% (args, loc) => node("PN", {"num":"sing","gen":"?","var":true}, args, loc) %}
 
 # whitespaces
 WS_gap_sing -> _ {% () => null %}

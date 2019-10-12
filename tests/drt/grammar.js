@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(71);
+    assertThat(result.length).equalsTo(70);
 
     let i = 0;
 
@@ -424,8 +424,6 @@ A ->
      .equalsTo('NP[num=@1, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1]');
     assertThat(print(result[i++]))
      .equalsTo('DET[num=sing, rn=+] -> PN[num=@1] "\'s"');
-    assertThat(print(result[i++]))
-     .equalsTo('DET[num=sing, rn=+] -> VAR "\'s"');
 
     // Noun propositional phrases
     assertThat(print(result[i++]))
@@ -501,7 +499,7 @@ A ->
     assertThat(print(result[i++]))
      .equalsTo("PN[num=sing] -> FULLNAME");
     assertThat(print(result[i++]))
-     .equalsTo("NP[num=@1, case=@2, gap=@3] -> VAR");
+     .equalsTo("PN[num=sing] -> VAR");
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

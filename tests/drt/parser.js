@@ -21,7 +21,7 @@ const {
   nodes} = require("../../src/drt/parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, VAR,
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
  Discourse, Sentence
 } = nodes;
 
@@ -540,9 +540,9 @@ describe("Parser", function() {
   it("If A is B's parent then B is A's child.", function() {
     assertThat(first(parse("If A is B's parent then B is A's child.")))
      .equalsTo(S("If", 
-                 S(NP(VAR("A")), VP_(VP(BE("is"), NP(DET(VAR("B"), "'s"), RN("parent"))))), 
+                 S(NP(PN("A")), VP_(VP(BE("is"), NP(DET(PN("B"), "'s"), RN("parent"))))), 
                  "then", 
-                 S(NP(VAR("B")), VP_(VP(BE("is"), NP(DET(VAR("A"), "'s"), RN("child"))))), 
+                 S(NP(PN("B")), VP_(VP(BE("is"), NP(DET(PN("A"), "'s"), RN("child"))))), 
                  ));
   });
 
