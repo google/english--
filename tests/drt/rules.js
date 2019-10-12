@@ -673,17 +673,17 @@ describe("Rules", function() {
   it("CR.AND", function() {
     let ids = new Ids();
 
-    let node = first(parse("Mary likes Smith and she loves him."), true);
+    let node = first(parse("Smith likes Mary and she loves him."), true);
 
     let [, [sub]] = new CRAND(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
-        Mary(a)
-        Smith(b)
+        Smith(a)
+        Mary(b)
         a likes b
       } and drs() {
-        a loves b
+        b loves a
       }
     `));
   });

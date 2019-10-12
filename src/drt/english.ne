@@ -340,22 +340,6 @@ PRO_num_plur_case_pnom ->
   "they"i {% (args, loc) => node("PRO", {"num":"plur","case":"+nom","gen":["male","fem","-hum"]}, args, loc) %}
 PRO_num_plur_case_nnom -> 
   "them"i {% (args, loc) => node("PRO", {"num":"plur","case":"-nom","gen":["male","fem","-hum"]}, args, loc) %}
-PN_num_sing -> 
-  "Jones"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "John"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Mel"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Leo"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Yuji"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Smith"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Socrates"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Sam"i {% (args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc) %} |
-  "Mary"i {% (args, loc) => node("PN", {"num":"sing","gen":"fem"}, args, loc) %} |
-  "Dani"i {% (args, loc) => node("PN", {"num":"sing","gen":"fem"}, args, loc) %} |
-  "Anna"i {% (args, loc) => node("PN", {"num":"sing","gen":"fem"}, args, loc) %} |
-  "Brazil"i {% (args, loc) => node("PN", {"num":"sing","gen":"-hum"}, args, loc) %} |
-  "Italy"i {% (args, loc) => node("PN", {"num":"sing","gen":"-hum"}, args, loc) %} |
-  "Ulysses"i {% (args, loc) => node("PN", {"num":"sing","gen":"-hum"}, args, loc) %} |
-  FULLNAME {% (args, loc) => node("PN", {"num":"sing","gen":"?"}, args, loc) %}
 AUX_num_sing_fin_p -> 
   "does"i {% (args, loc) => node("AUX", {"num":"sing","fin":"+"}, args, loc) %}
 AUX_num_plur_fin_p -> 
@@ -408,6 +392,8 @@ PREP ->
   "by"i {% (args, loc) => node("PREP", {}, args, loc) %} |
   "for"i {% (args, loc) => node("PREP", {}, args, loc) %} |
   "with"i {% (args, loc) => node("PREP", {}, args, loc) %}
+PN_num_sing -> 
+  FULLNAME {% (args, loc) => node("PN", {"num":"sing","gen":"?"}, args, loc) %}
 
 # whitespaces
 WS_gap_sing -> _ {% () => null %}

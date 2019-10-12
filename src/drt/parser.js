@@ -559,22 +559,22 @@ function grammar() {
                   {"gen": ["male", "fem", "-hum"]}));
  
  // LI 9
- result.push(rule(term("PN", {"num": "sing"}),
-                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]],
-                  undefined,
-                  {"gen": "male"}));
+ //result.push(rule(term("PN", {"num": "sing"}),
+ //[[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]],
+ //undefined,
+ //{"gen": "male"}));
  
  // LI 10
- result.push(rule(term("PN", {"num": "sing"}),
-                  [[literal("Mary")], [literal("Dani")], [literal("Anna")]],
-                  undefined,
-                  {"gen": "fem"}));
+ // result.push(rule(term("PN", {"num": "sing"}),
+ //                  [[literal("Mary")], [literal("Dani")], [literal("Anna")]],
+ //                  undefined,
+ //                  {"gen": "fem"}));
  
  // LI 11
- result.push(rule(term("PN", {"num": "sing"}),
-                  [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]],
-                  undefined, 
-                  {"gen": "-hum"}));
+ //result.push(rule(term("PN", {"num": "sing"}),
+ //                 [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]],
+ //                 undefined, 
+ //                 {"gen": "-hum"}));
  
  // LI 12
  result.push(rule(term("N", {"num": "sing"}),

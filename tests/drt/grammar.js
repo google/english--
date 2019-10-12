@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(68);
+    assertThat(result.length).equalsTo(65);
 
     let i = 0;
 
@@ -448,12 +448,12 @@ A ->
      .equalsTo('PRO[num=plur, case=+nom] -> "they"');
     assertThat(print(result[i++]))
      .equalsTo('PRO[num=plur, case=-nom] -> "them"');
-    assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
-    assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing] -> "Mary" "Dani" "Anna"');
-    assertThat(print(result[i++]))
-     .equalsTo('PN[num=sing] -> "Brazil" "Italy" "Ulysses"');
+    // assertThat(print(result[i++]))
+    //  .equalsTo('PN[num=sing] -> "Jones" "John" "Mel" "Leo" "Yuji" "Smith" "Socrates" "Sam"');
+    // assertThat(print(result[i++]))
+    //  .equalsTo('PN[num=sing] -> "Mary" "Dani" "Anna"');
+    // assertThat(print(result[i++]))
+    //  .equalsTo('PN[num=sing] -> "Brazil" "Italy" "Ulysses"');
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing] -> "stockbroker" "man" "engineer" "brazilian"');
     assertThat(print(result[i++]))
