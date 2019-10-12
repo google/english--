@@ -143,12 +143,14 @@ function child(node, ...path) {
  return result;
 }
 
-function find({gen, num}, refs, name, loc) {
+function find({gen, num}, refs, name, loc, exclude = []) {
  let match = (ref) => {
   let byName = name ? ref.value == name : true;
   let types = ref.types || {};
-  //console.log(`I have a ${types.num} ${types.gen} by name? ${byName} @${ref.loc}`);
+  // console.log(`I have a name=${ref.name} num=${types.num} gen=${types.gen} @${ref.loc}`);
   if (!byName || types.num != num || ref.loc > loc) {
+   return false;
+  } else if (exclude.map(x => x.name).includes(ref.name)) {
    return false;
   } else if (types.gen == "?") {
    types.gen = gen;
@@ -157,7 +159,7 @@ function find({gen, num}, refs, name, loc) {
   return types.gen == gen;
  };
 
- //console.log(`Trying to find a ${num} ${gen} @${loc}`);
+ // console.log(`Trying to find a num=${num} gen=${gen} loc=${loc} excluding=${exclude.map(x => x.name).join(", ")}`);
 
  for (let i = refs.length - 1; i >= 0; i--) {
   if (match(refs[i])) {
@@ -303,17 +305,20 @@ class CRSPRO extends Rule {
 
 class CRVPPRO extends Rule {
  constructor(ids) {
-  super(ids, VP(V(), NP(PRO(capture("pronoun")))));
+  super(ids, S(capture("sub"),
+               VP_(VP(V(), NP(PRO(capture("pro")))))
+               ));
  }
 
- apply({pronoun}, node, refs) {
-  let ref = find(pronoun.types, refs);
+ apply({sub, pro}, node, refs) {
+  // console.log(child(sub, 0));
+  let ref = find(pro.types, refs, undefined, undefined, [child(sub, 0)]);
 
   if (!ref) {
-   throw new Error("Invalid Reference: " + pronoun.children[0]);
+   throw new Error("Invalid Reference: " + pro.children[0]);
   }
 
-  node.children[1].children[0] = ref;
+  child(node, 1, 0).children[1] = ref;
   
   return [[], [], [], []];
  }

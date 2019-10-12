@@ -206,11 +206,13 @@ describe("Rules", function() {
   });
 
   it("CR.PRO", function() {
+    let ids = new Ids();
+
     let sentence = first(parse("Jones owns Ulysses."), true);
     let node = first(parse("It fascinates him."), true);
 
-    let [[u], [jones]] = new CRPN().match(sentence);
-    let [[v], [ulysses]] = new CRPN().match(child(sentence, 1, 0));
+    let [[u], [jones]] = new CRPN(ids).match(sentence);
+    let [[v], [ulysses]] = new CRPN(ids).match(child(sentence, 1, 0));
 
     u.loc = 0;
     v.loc = 0;
@@ -219,12 +221,12 @@ describe("Rules", function() {
     assertThat(ulysses.types.gen).equalsTo("?");
     
     new CRPRO().match(node, [u, v]);
-    assertThat(jones.types.gen).equalsTo("?");
+    assertThat(jones.types.gen).equalsTo("male");
     assertThat(ulysses.types.gen).equalsTo("-hum");
 
     new CRPRO().match(child(node, 1, 0), [u, v]);
 
-    assertThat(print(node)).equalsTo("a fascinates a");
+    assertThat(print(node)).equalsTo("b fascinates a");
 
     assertThat(jones.types.gen).equalsTo("male");
     assertThat(ulysses.types.gen).equalsTo("-hum");

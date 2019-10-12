@@ -837,19 +837,21 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones likes him.", function() {
+  it("John likes Peter. He admires him.", function() {
     // Chapter 3.1 suggests that the "him" here
-    // shouldn't bind to Jones, and more generally
+    // shouldn't bind to "he", and more generally
     // that objects can't bind to subjects.
     // However, in "If Jones likes Mary then he loves her"
     // seems like the "he" should bind to "Jones.
     // TODO(goto): revisit 3.1 and figure out what needs
     // to be done.
-    assertThat("Jones likes him.")
+    assertThat("John likes Peter. He admires him.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         a likes a
+       drs(a, b) {
+         John(a)
+         Peter(b)
+         a likes b
+         b admires a
        }
     `);
   });
