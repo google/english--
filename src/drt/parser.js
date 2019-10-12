@@ -15,7 +15,7 @@ let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};
 let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
 let literal = (value) => { return {"@type": "Literal", name: value} };
-let phrase = (head, tail, skip) => { return rule(head, [tail], skip); };
+let phrase = (head, tail, skip, types) => { return rule(head, [tail], skip, types); };
 
 function name(term, pretty) {
  if (typeof term == "string") {
@@ -221,14 +221,6 @@ function compile(grammar, header = true) {
  }
  
  if (header) {
-  //result.push("# extensible proper names");
-  //let names = rule(term("PN", {"num": "sing", "gen": 1}),
-  //                 [["FULLNAME"]]);
-
-  //for (let exp of generate(names)) {
-  // result.push(`${print(exp, true)} {% ${processor(exp)} %}`);
-  //}
-  
   result.push("");
   result.push("# whitespaces");
   
@@ -245,7 +237,7 @@ function compile(grammar, header = true) {
 
 function processor(rule, name, extra) {
  let result = [];
- result.push("(args)");
+ result.push("(args, loc)");
  // let args = [];
  // for (let line of rules[0].tail) {
  // for (let term of line) {
@@ -259,7 +251,7 @@ function processor(rule, name, extra) {
  let types = {};
  Object.assign(types, rule.head.types);
  Object.assign(types, extra);
- result.push(`"${name ? name : rule.head.name}", ${JSON.stringify(types)}, args`);
+ result.push(`"${name ? name : rule.head.name}", ${JSON.stringify(types)}, args, loc`);
  result.push(")");
  return result.join("");
 }
@@ -387,10 +379,6 @@ function grammar() {
  result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
                      [term("PRO", {"num": 1, "case": 3})]));
 
- // Extensible proper names.
- //result.push(phrase(term("PN", {"num": "sing", "gen": 1}),
- //                   [term("FULLNAME")]));
-
  // PS 12
  result.push(phrase(term("NP'", {"num": "plur", "case": 2, "gap": "-"}),
                     [term("NP", {"num": 3, "case": 2, "gap": "-"}),
@@ -399,14 +387,6 @@ function grammar() {
                      space(),
                      term("NP", {"num": 4, "case": 2, "gap": "-"})], 
                     "NP"));
- 
- //result.push(phrase(term("NP'", {"num": "plur", "gen": "-hum", "case": 2, "gap": "-"}),
- //                   [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
- //                    space(),
- //                    literal("and"),
- //                    space(),
- //                    term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
- //                   "NP"));
  
  // PS 12.5
  result.push(phrase(term("NP'", {"num": 1, "case": 3, "gap": 4}),
@@ -495,14 +475,6 @@ function grammar() {
                      term("NP", {"num": 3, "case": 2, "gap": "-"})], 
                     "NP"));
  
- //result.push(phrase(term("NP'", {"num": 1, "gen": "-hum", "case": 2, "gap": "-"}),
- //                   [term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"}),
- //                    space(),
- //                    literal("or"),
- //                    space(),
- //                    term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
- //                   "NP"));
-
  // Sentential Conjunctions
  result.push(phrase(term("S", {"num": 1}),
                     [term("S", {"num": 1}),
@@ -734,7 +706,11 @@ function grammar() {
                    [literal("with")],
                    ]));
 
-
+ // Extensible proper names.
+ result.push(phrase(term("PN", {"num": "sing"}),
+                    [term("FULLNAME")],
+                    undefined,
+                    {"gen": "?"}));
  
  return result;
 }
@@ -752,6 +728,7 @@ function clean(node) {
   }
  } else if (typeof node == "object") {
   delete node.types;
+  delete node.loc;
   clean(node.children);
  }
  return node;

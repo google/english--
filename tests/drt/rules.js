@@ -56,7 +56,7 @@ describe("Rules", function() {
     let subject = S(NP(PN(capture("mel"))), VP_());
     assertThat(match(subject, s).mel.types)
      .equalsTo({
-       "gen": "male", "num": "sing"});
+       "gen": "?", "num": "sing"});
     let object = S(NP(), VP_(VP(V(), NP(capture("object")))));
     assertThat(match(object, s).object["@type"]).equalsTo("NP");
     assertThat(match(object, s).object.types)
@@ -133,6 +133,9 @@ describe("Rules", function() {
     let [[v], [dani]] = rule.match(child(a, 1, 0), [u]);
     assertThat(print(a)).equalsTo("a loves b");
 
+    u.loc = 0;
+    v.loc = 0;
+
     let b = first(parse("Dani loves Mel."), true);
     let [c] = rule.match(b, [u, v]);
     assertThat(c.length).equalsTo(0);
@@ -169,6 +172,9 @@ describe("Rules", function() {
     let [[u], [jones]] = crpn.match(sentence);
     let [[v], [ulysses]] = crpn.match(child(sentence, 1, 0));
 
+    u.loc = 0;
+    v.loc = 0;
+
     assertThat(print(jones)).equalsTo("Jones(a)");
     assertThat(print(ulysses)).equalsTo("Ulysses(b)");
 
@@ -189,6 +195,9 @@ describe("Rules", function() {
     let [[u], [mel]] = crpn.match(sentence);
     let [[v], [dani]] = crpn.match(child(sentence, 1, 0));
 
+    u.loc = 0;
+    v.loc = 0;
+
     let rule = new CRPRO();
     rule.match(node, [u, v]);
     rule.match(child(node, 1, 0), [u, v]);
@@ -198,20 +207,27 @@ describe("Rules", function() {
 
   it("CR.PRO", function() {
     let sentence = first(parse("Jones owns Ulysses."), true);
-    let node = first(parse("It fascinates her."), true);
+    let node = first(parse("It fascinates him."), true);
 
     let [[u], [jones]] = new CRPN().match(sentence);
     let [[v], [ulysses]] = new CRPN().match(child(sentence, 1, 0));
+
+    u.loc = 0;
+    v.loc = 0;
+
+    assertThat(jones.types.gen).equalsTo("?");
+    assertThat(ulysses.types.gen).equalsTo("?");
     
-    let rule = new CRPRO();
-    try {
-     // Ulysses is a -hum and Jones is male, so
-     // the pronoun "her" should fail.
-     rule.match(child(node, 1, 0), [u, v]);
-     throw new Error();
-    } catch ({message}) {
-     assertThat(message).equalsTo("Invalid Reference: her");
-    }
+    new CRPRO().match(node, [u, v]);
+    assertThat(jones.types.gen).equalsTo("?");
+    assertThat(ulysses.types.gen).equalsTo("-hum");
+
+    new CRPRO().match(child(node, 1, 0), [u, v]);
+
+    assertThat(print(node)).equalsTo("a fascinates a");
+
+    assertThat(jones.types.gen).equalsTo("male");
+    assertThat(ulysses.types.gen).equalsTo("-hum");
   });
 
   it("CR.ID", function() {
@@ -352,12 +368,13 @@ describe("Rules", function() {
 
     let node = first(parse("Jones owns a book which he does not like."), true);
 
-    let [refs, [jones], [remove]] = new CRPN(ids).match(node);
+    let [[u], [jones], [remove]] = new CRPN(ids).match(node);
 
     assertThat(print(jones))
      .equalsTo("Jones(a)");
     assertThat(print(node))
      .equalsTo("a owns a book which he does not like");
+    assertThat(u.types).equalsTo({"gen": "?", "num": "sing"});
 
     let [ref, [id]] = new CRID(ids).match(child(node, 1, 0));
     assertThat(print(node)).equalsTo("a owns b");
@@ -369,7 +386,7 @@ describe("Rules", function() {
     assertThat(print(book)).equalsTo("book(b)");
     assertThat(print(rc)).equalsTo("he does not like b");
 
-    new CRPRO(ids).match(rc, refs);
+    new CRPRO(ids).match(rc, [u]);
 
     assertThat(print(rc)).equalsTo("a does not like b");
 

@@ -275,9 +275,9 @@ describe("Logic", function() {
   });
 
   it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
-    enter("Jones loves Mary. He likes Brazil.")
+    enter("Jones loves Mary. She likes Brazil.")
      .query("Who likes Brazil?")
-     .equalsTo("Jones likes Brazil");
+     .equalsTo("Mary likes Brazil");
   });
 
   it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {

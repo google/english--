@@ -259,8 +259,6 @@ describe("DRS", function() {
   });
 
   it("Jones does not own Ulysses. He likes it.", function() {
-    // TODO(goto): promote PN referents from sub drs to the
-    // global drs.
     assertThat("Jones does not own Ulysses. He likes it.")
      .equalsTo(`
        drs(a, b) {
@@ -269,7 +267,7 @@ describe("DRS", function() {
          ~drs() {
            a own b
          }
-         a likes b
+         b likes a
        }
      `);
   });
@@ -393,8 +391,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         a loves b
          happy(a)
+         a loves b
          man(a)
        }
     `);
@@ -792,15 +790,15 @@ describe("DRS", function() {
     `);
   });
 
-  it("Mary owns a porsche and she loves it.", function() {
+  it("She loves it and Mary owns a porsche.", function() {
     let drs = DRS.from();
     try {
      drs.feed("She loves it and Mary owns a porsche.");
-     throw new Error("expected exception");
+     throw new Error("Expected exception");
     } catch (e) {
-     // She can bind to "Mary" because Mary is a proper name.
-     // "a porsche", on the other hand, isn't processed
-     // globally, so "it" cannot bind to it.
+     // She can't bind to "Mary" because Mary is introduced
+     // lexically after She, regardless of "Mary" being a
+     // proper noun and being visible globally.
      Assert.deepEqual(e.message, "Invalid Reference: it");
     }
   });
@@ -1107,19 +1105,25 @@ describe("DRS", function() {
 
    });
 
-  it("Sam is a brazilian engineer who likes Dani.", function() {
+  it("Sam is a brazilian engineer who likes Dani. He loves Anna. He loves Leo.", function() {
     assertThat("Sam is a brazilian engineer who loves Dani. He loves Anna. He loves Leo.")
+     // This is awkward but is working as intended:
+     // Sam loves Dani, Dani loves Anna and Anna loves Leo.
+     // Pronouns are bound to the last introduced referent
+     // that agrees in gender and number, and Sam, Dani, Anna 
+     // and Leo have gender values that can be bound to
+     // anything.
      .equalsTo(`
        drs(a, b, c, d) {
          Sam(a)
          Dani(b)
-         a loves b
          brazilian(a)
+         a loves b
          engineer(a)
          Anna(c)
-         a loves c
+         b loves c
          Leo(d)
-         a loves d
+         c loves d
        }
     `);
   });

@@ -75,14 +75,14 @@ describe("Parser", function() {
   });
 
   it("ambiguities", function() {
-     assertThat(parse("Mel loves Dani.").length).equalsTo(1);
+     assertThat(parse("Foo loves Bar.").length).equalsTo(1);
      // TODO(goto): investigate why there are 6 possible interpretations.
      // This is possibly related to the expansions of gender / number.
-     assertThat(parse("Anna loves a man.", "Sentence").length).equalsTo(1);
-     assertThat(parse("A man loves Dani.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Mel loves a book.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Mel loves a book and Dani.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Mel and Dani love Anna and Leo.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Foo loves a man.", "Sentence").length).equalsTo(1);
+     assertThat(parse("A man loves Bar.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Foo loves a book.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Foo loves a book and Bar.", "Sentence").length).equalsTo(1);
+     assertThat(parse("Foo and Bar love Hello and World.", "Sentence").length).equalsTo(1);
      // console.log(JSON.stringify(parse("Mel and Dani like Brazil.", "Sentence")[1], undefined, 2));
      //assertThat(parse("Mel and Dani like Brazil.", "Sentence").length).equalsTo(1);
      //assertThat(parse("Yuji and Mel like Dani.", "Sentence").length).equalsTo(1);
@@ -542,6 +542,12 @@ describe("Parser", function() {
      .equalsTo(S(NP(DET("Every"), N("brazilian")),
                  VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
                         ))));
+  });
+
+  it("He loves it.", function() {
+    assertThat(first(parse("He loves It.")))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V("loves"), NP(PRO("It"))))));
   });
 
   function assertThat(x) {

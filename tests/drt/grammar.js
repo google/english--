@@ -286,7 +286,7 @@ describe("Grammar", function() {
 
     let rules = generate(rule);
 
-    assertThat(processor(rules[0])).equalsTo(`(args) => node("S", {}, args)`);
+    assertThat(processor(rules[0])).equalsTo(`(args, loc) => node("S", {}, args, loc)`);
    });
 
   it("processor", function() {
@@ -296,7 +296,7 @@ describe("Grammar", function() {
     let rules = generate(rule);
 
     assertThat(processor(rules[0]))
-     .equalsTo(`(args) => node("PN", {"num":"sing","gen":"male"}, args)`);
+     .equalsTo(`(args, loc) => node("PN", {"num":"sing","gen":"male"}, args, loc)`);
    });
 
   it("processor", function() {
@@ -306,8 +306,8 @@ describe("Grammar", function() {
     assertThat(compile([rule], false))
      .equalsTo(`
 S -> 
-  S_num_sing {% (args) => node("S", {}, args) %} |
-  S_num_plur {% (args) => node("S", {}, args) %}
+  S_num_sing {% (args, loc) => node("S", {}, args, loc) %} |
+  S_num_plur {% (args, loc) => node("S", {}, args, loc) %}
                `.trim());
   });
 
@@ -318,8 +318,8 @@ S ->
     assertThat(compile([rule], false))
      .equalsTo(`
 A -> 
-  A_num_sing {% (args) => args.length == 1 ? args[0] : ((args) => node("B", {}, args))(args) %} |
-  A_num_plur {% (args) => args.length == 1 ? args[0] : ((args) => node("B", {}, args))(args) %}
+  A_num_sing {% (args) => args.length == 1 ? args[0] : ((args, loc) => node("B", {}, args, loc))(args) %} |
+  A_num_plur {% (args) => args.length == 1 ? args[0] : ((args, loc) => node("B", {}, args, loc))(args) %}
                `.trim());
   });
 
@@ -327,8 +327,8 @@ A ->
     let grammar = [rule(term("A"), [[literal("b")], [literal("c")]])];
     assertThat(compile(grammar, false)).equalsTo(`
 A -> 
-  "b"i {% (args) => node("A", {}, args) %} |
-  "c"i {% (args) => node("A", {}, args) %}
+  "b"i {% (args, loc) => node("A", {}, args, loc) %} |
+  "c"i {% (args, loc) => node("A", {}, args, loc) %}
      `.trim());
   });
 
@@ -342,7 +342,7 @@ A ->
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(67);
+    assertThat(result.length).equalsTo(68);
 
     let i = 0;
 
@@ -494,6 +494,8 @@ A ->
      .equalsTo('RN[num=sing] -> "wife" "mother" "sister"');
     assertThat(print(result[i++]))
      .equalsTo('PREP -> "behind" "in" "over" "under" "near" "before" "after" "during" "from" "to" "of" "about" "by" "for" "with"');
+    assertThat(print(result[i++]))
+     .equalsTo("PN[num=sing] -> FULLNAME");
     
     // "case" makes the distinction between "nominative case"
     // and "non-nominative case", respectively, he/she and

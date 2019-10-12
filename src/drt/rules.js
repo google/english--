@@ -143,25 +143,38 @@ function child(node, ...path) {
  return result;
 }
 
-function find({gen, num}, refs, name) {
- // console.log(`Trying to find a ${gen} ${num} `);
- return refs.find((ref) => {
-   // console.log(`I have a ${ref.gen} ${ref.num} `);
-   let byName = name ? ref.value == name : true;
-   let types = ref.types || {};
-   if (gen == undefined || types.gen == undefined) {
-    return false;
-   }
-   return types.gen == gen && types.num == num && byName
-  });
+function find({gen, num}, refs, name, loc) {
+ let match = (ref) => {
+  let byName = name ? ref.value == name : true;
+  let types = ref.types || {};
+  //console.log(`I have a ${types.num} ${types.gen} by name? ${byName} @${ref.loc}`);
+  if (!byName || types.num != num || ref.loc > loc) {
+   return false;
+  } else if (types.gen == "?") {
+   types.gen = gen;
+   return true;
+  }
+  return types.gen == gen;
+ };
+
+ //console.log(`Trying to find a ${num} ${gen} @${loc}`);
+
+ for (let i = refs.length - 1; i >= 0; i--) {
+  if (match(refs[i])) {
+   return refs[i];
+  }
+ }
+
+ return undefined;
 }
 
-function referent(name, types, value) {
+function referent(name, types, value, loc) {
   return {
    "@type": "Referent",
     types: types,
     name: name,
-    value: value
+    value: value,
+    loc: loc
   }
 }
 
@@ -174,10 +187,10 @@ class CRSPN extends Rule {
   let head = [];
   let body = [];
 
-  let ref = find(name.types, refs, print(name.children[0]));
+  let ref = find(name.types, refs, print(name.children[0]), name.loc);
 
   if (!ref) {
-   ref = referent(this.id(), name.types, print(name, refs));
+   ref = referent(this.id(), name.types, print(name, refs), name.loc);
    head.push(ref);
    let pn = name;
    pn.ref = ref;
@@ -195,12 +208,15 @@ class CRVPPN extends Rule {
   super(ids, VP(capture("v"), NP(PN(capture("name")))));
  }
  apply({name}, node, refs = []) {
+  // console.log(name);
+
   let head = [];
   let body = [];
-  let ref = find(name.types, refs, name.children[0]);
+  let ref = find(name.types, refs, name.children[0], name.loc);
 
   if (!ref) {
-   ref = referent(this.id(), name.types, name.children[0]);
+   ref = referent(this.id(), name.types, name.children[0], name.loc);
+   // console.log(ref);
    head.push(ref);
    let pn = name;
    pn.ref = ref;
@@ -273,7 +289,7 @@ class CRSPRO extends Rule {
  }
 
  apply({pronoun}, node, refs) {
-  let u = find(pronoun.types, refs);
+  let u = find(pronoun.types, refs, undefined, pronoun.loc);
 
   if (!u) {
    throw new Error("Invalid reference: " + pronoun.children[0]);
@@ -337,16 +353,12 @@ class CRVPID extends Rule {
    return [[], [], [], []];
   }
 
-  // console.log(noun);
   let types = clone(noun.types);
   Object.assign(types, child(noun, 0).types);
-  // console.log(types);
 
   let ref = referent(this.id(), types, print(child(node, 1), refs));
   noun.ref = ref;
   node.children[1] = ref;
-
-  // console.log(ref);
 
   return [[ref], [noun], [], []];
  }
@@ -842,8 +854,11 @@ class DRS {
  }
 
  push(node) {
-
-  // console.log(node);
+  for (let ref of this.head) {
+   // Reset all of the locations of previous
+   // referents before new phrases are processed.
+   ref.loc = 0;
+  }
 
   // Resolve all proper names first.
   this.bind(node);
