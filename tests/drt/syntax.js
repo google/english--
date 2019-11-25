@@ -163,10 +163,11 @@ describe("Syntax", function() {
      .equalsTo('V[num=sing, fin=+, trans=+] -> V[num=sing, fin=-, trans=+] "s"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing, fin=+, trans=-] -> V[num=sing, fin=-, trans=-] "s"');
+    
     assertThat(print(result[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
+     .equalsTo('V[num=plur, fin=+, trans=+] -> V[num=sing, fin=-, trans=+]');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=-] -> "love" "stink" "adore"');
+     .equalsTo('V[num=plur, fin=+, trans=-] -> V[num=sing, fin=-, trans=-]');
     assertThat(print(result[i++]))
      .equalsTo('RPRO[num=sing/plur] -> "who"');
     assertThat(print(result[i++]))

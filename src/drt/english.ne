@@ -281,19 +281,10 @@ V_num_sing_fin_n_trans_n ->
   "adore"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"-"}, args, loc) %}
 V_num_plur_fin_p_trans_p -> 
   V_num_plur_fin_p_trans_p __ "and"i __ V_num_plur_fin_p_trans_p {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "like"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "admire"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "know"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "own"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "fascinate"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "rotate"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
-  "surprise"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %}
+  V_num_sing_fin_n_trans_p {% ([child], loc) => child %}
 V_num_plur_fin_p_trans_n -> 
   V_num_plur_fin_p_trans_n __ "and"i __ V_num_plur_fin_p_trans_n {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"-"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"-"}, args, loc) %} |
-  "stink"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"-"}, args, loc) %} |
-  "adore"i {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"-"}, args, loc) %}
+  V_num_sing_fin_n_trans_n {% ([child], loc) => child %}
 V_num_plur_fin_n_trans_p -> 
   V_num_plur_fin_n_trans_p __ "and"i __ V_num_plur_fin_n_trans_p {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
   "like"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |

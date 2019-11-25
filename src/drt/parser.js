@@ -622,12 +622,12 @@ function grammar() {
  
  // LI 17
  result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),
-                   transitive.map((verb) => [literal(verb)])));
+                  transitive.map((verb) => [literal(verb)])));
  
  // LI 18
  // Manually expanding into the transitivity.
  result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
-                   intransitive.map((verb) => [literal(verb)])));
+                  intransitive.map((verb) => [literal(verb)])));
  
  // LI 19
  // Manually expanding into the present / third person.
@@ -636,9 +636,6 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
- //result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
- //                  transitive.map((verb) => [literal(verb + "s")])
- //                  ));
  result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
                   [[term("V", {"num": "sing", "fin": "-", "trans": "+"}), literal("s")]],
                   undefined, 
@@ -657,19 +654,29 @@ function grammar() {
                   }
                   ));
  
- //result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
- //                  intransitive.map((verb) => [literal(verb + "s")])
- //                  ));
- 
  // LI 20
  // Manually expanding into the present / plural.
  // > Except for the verb be, plural verb forms we want here - i.e. the third person plural of the
  // > present tense - are identical with the infinitival forms, which we already have (They were needed
  // > for negation). 
+ 
  result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "+"}),
-                   transitive.map((verb) => [literal(verb)])));
+                  [[term("V", {"num": "sing", "fin": "-", "trans": "+"})]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return `([child], loc) => child`;
+                  }
+                  ));
+ 
  result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "-"}),
-                   intransitive.map((verb) => [literal(verb)])));
+                  [[term("V", {"num": "sing", "fin": "-", "trans": "-"})]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return `([child], loc) => child`;
+                  }
+                  ));
  
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by
