@@ -621,6 +621,26 @@ function grammar() {
                    [literal("stink")],
                    [literal("adore")]]));
 
+ // Non-stative berbs in their inifinitive form.
+ 
+ result.push(rule(term("V", {"trans": "+", "stat": "-"}),
+                  [[literal("leave")],
+                   [literal("reach")],
+                   [literal("kiss")],
+                   [literal("hit")],
+                   [literal("scold")],
+                   [literal("beat")],
+                   ]));
+
+ result.push(rule(term("V", {"trans": "-", "stat": "-"}),
+                  [[literal("leave")],
+                   [literal("arrive")],
+                   [literal("walk")],
+                   [literal("sleep")],
+                   [literal("come")],
+                   [literal("shine")],
+                   ]));
+
  // LI 17
  // LI 18
  result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2}),

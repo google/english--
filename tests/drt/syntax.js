@@ -37,7 +37,7 @@ describe("Syntax", function() {
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(69);
+    assertThat(result.length).equalsTo(71);
 
     let i = 0;
 
@@ -158,6 +158,11 @@ describe("Syntax", function() {
      .equalsTo('V[trans=+, stat=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
      .equalsTo('V[trans=-, stat=+] -> "love" "stink" "adore"');
+
+    assertThat(print(result[i++]))
+     .equalsTo('V[trans=+, stat=-] -> "leave" "reach" "kiss" "hit" "scold" "beat"');
+    assertThat(print(result[i++]))
+     .equalsTo('V[trans=-, stat=-] -> "leave" "arrive" "walk" "sleep" "come" "shine"');
 
     assertThat(print(result[i++]))
      .equalsTo('V[num=@1, fin=-, stat=@3, trans=@2] -> V[trans=@2, stat=@3]');

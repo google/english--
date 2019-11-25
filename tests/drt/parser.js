@@ -565,6 +565,22 @@ describe("Parser", function() {
                  VP_(VP(V("loves"), NP(PRO("himself"))))));
   });
 
+  it("Jones walks.", function() {
+    // non-stative verbs
+    assertThat(first(parse("Jones walks.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("walks")))));
+  });
+
+  it("Jones hits a porsche.", function() {
+    // non-stative verbs
+    assertThat(first(parse("Jones hits a porsche.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("hits"),
+                        NP(DET("a"), N("porsche"))
+                        ))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

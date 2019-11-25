@@ -513,6 +513,20 @@ V_trans_n_stat_p ->
   "love"i {% (args, loc) => node("V", {"trans":"-","stat":"+"}, args, loc) %} |
   "stink"i {% (args, loc) => node("V", {"trans":"-","stat":"+"}, args, loc) %} |
   "adore"i {% (args, loc) => node("V", {"trans":"-","stat":"+"}, args, loc) %}
+V_trans_p_stat_n -> 
+  "leave"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %} |
+  "reach"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %} |
+  "kiss"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %} |
+  "hit"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %} |
+  "scold"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %} |
+  "beat"i {% (args, loc) => node("V", {"trans":"+","stat":"-"}, args, loc) %}
+V_trans_n_stat_n -> 
+  "leave"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %} |
+  "arrive"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %} |
+  "walk"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %} |
+  "sleep"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %} |
+  "come"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %} |
+  "shine"i {% (args, loc) => node("V", {"trans":"-","stat":"-"}, args, loc) %}
 RPRO_num_sing -> 
   "who"i {% (args, loc) => node("RPRO", {"num":"sing"}, args, loc) %} |
   "which"i {% (args, loc) => node("RPRO", {"num":"sing"}, args, loc) %}
