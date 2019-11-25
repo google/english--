@@ -2,9 +2,6 @@ const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./english.js");
 
 let rule = (head = {}, tail = [], skip = false, types = {}, prod) => { 
- //if (prod) {
- // console.log(typeof prod);
- //}
  return {
   "@type": "Rule", 
   "head": head, 
@@ -200,10 +197,7 @@ function compile(grammar, header = true) {
     }
     
     let prod = processor(expansion, undefined, rule.types);
-    if (rule.prod != undefined) {
-     // console.log(rule.prod);
-     // console.log(typeof (() => {}) == "function");
-     // console.log(expansion);
+    if (rule.prod) {
      prod = rule.prod(expansion.head.name, expansion.head.types);
     } else if (rule.skip) {
      prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion, rule.skip, rule.types)})(args)`;
@@ -248,14 +242,6 @@ function compile(grammar, header = true) {
 function processor(rule, name, extra) {
  let result = [];
  result.push("(args, loc)");
- // let args = [];
- // for (let line of rules[0].tail) {
- // for (let term of line) {
- //  args.push(name(term));
- //  }
- // }
- // processor.push(args.join(", "));
- // processor.push(")");
  result.push(" => ");
  result.push("node(");
  let types = {};
@@ -635,6 +621,7 @@ function grammar() {
                    [literal("adore")]]));
 
  // LI 17
+ // LI 18
  result.push(rule(term("V", {"num": 1, "fin": "-", "trans": 2}),
                   [[term("V", {"trans": 2})]],
                   undefined, 
@@ -643,11 +630,6 @@ function grammar() {
                    return `([child], loc) => child`;
                   }
                   ));
- 
- // LI 18
- // Manually expanding into the transitivity.
- //result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
- //                 intransitive.map((verb) => [literal(verb)])));
  
  // LI 19
  // Manually expanding into the present / third person.
