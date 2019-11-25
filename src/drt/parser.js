@@ -109,6 +109,7 @@ const FEATURES = {
  "case": ["+nom", "-nom"],    
  "trans": ["+", "-"],
  "fin": ["+", "-"],
+ "stat": ["+", "-"],
  "refl": ["+", "-"],
 };
 
@@ -265,9 +266,9 @@ function grammar() {
 
  // Root
  result.push(phrase(term("Sentence"),
-                     [term("S", {"num": 1}), 
-                      space(true),
-                      '"."']));
+                    [term("S", {"num": 1, "stat": 2}), 
+                     space(true),
+                     '"."']));
 
  // Questions
  result.push(phrase(term("Sentence"),
@@ -275,7 +276,7 @@ function grammar() {
                      space(true),
                      term("NP", {"num": 1, "case": "+nom", "gap": 1}),
                      space(),
-                     term("VP'", {"num": 1, "fin": "+", "gap": "-"}),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-"}),
                      space(true),
                      literal("?")]));
 
@@ -286,7 +287,7 @@ function grammar() {
                      space(),
                      term("NP", {"num": 1, "case": "+nom", "gap": "-"}),
                      space(),
-                     term("VP", {"num": 3, "fin": "+", "gap": 1}),
+                     term("VP", {"num": 3, "fin": "+", "stat": 2, "gap": 1}),
                      space(true),
                      literal("?")]));
 
@@ -300,58 +301,58 @@ function grammar() {
                      literal("?")]));
 
  // PS 1
- result.push(phrase(term("S", {"num": 1}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2}),
                      [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
                       space(),
-                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-"})]));
  
  // PS 2
- result.push(phrase(term("S", {"num": 1, "gap": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3}),
                      [term("NP'", {"num": 1, "case": "+nom", "gap": 3}),
                       term("WS", {"gap": 3}),
-                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-"})]));
  
  // PS 2.5
- result.push(phrase(term("S", {"num": 1, "gap": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3}),
                      [term("NP'", {"num": 3, "case": "+nom", "gap": 3}),
                       term("WS", {"gap": 3}),
-                      term("VP'", {"num": 1, "fin": "+", "gap": "-"})]));
+                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-"})]));
 
  // PS 3
- result.push(phrase(term("S", {"num": 1, "gap": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3}),
                      [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
                       space(),
-                      term("VP'", {"num": 1, "fin": "+", "gap": 3})]));
+                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": 3})]));
  
  // PS 4
  // NOTE(goto): this is slightly different in that the "num" variable
  // is tied to the same variable rather than a different one. This
  // may be a typo in the paper.
- result.push(phrase(term("VP'", {"num": 1, "fin": "+", "gap": 2}),
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2}),
                      [term("AUX", {"num": 1, "fin": "+"}),
                       space(),
                       literal("not"),
                       space(),
-                      term("VP", {"num": 1, "fin": "-", "gap": 2})]));
+                      term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2})]));
  
  // PS 5
- result.push(phrase(term("VP'", {"num": 1, "fin": "+", "gap": 2}),
-                     [term("VP", {"num": 1, "fin": "+", "gap": 2})]));
-
- // PS 6
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
-                     [term("V", {"num": 1, "fin": 2, "trans": "+"}),
-                      term("WS", {"gap": 3}),
-                      term("NP'", {"num": 3, "case": "-nom", "gap": 3})]));
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2}),
+                    [term("VP", {"num": 1, "fin": "+", "stat": 3, "gap": 2})]));
  
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
-                     [term("V", {"num": 1, "fin": 2, "trans": "+"}),
-                      space(),
-                      term("NP'", {"num": 3, "case": "-nom", "gap": "-"})]));
+ // PS 6
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+"}),
+                     term("WS", {"gap": 3}),
+                     term("NP'", {"num": 3, "case": "-nom", "gap": 3})]));
+ 
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "-"}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+"}),
+                     space(),
+                     term("NP'", {"num": 3, "case": "-nom", "gap": "-"})]));
  
  // PS 7
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": "-"}),
-                     [term("V", {"num": 1, "fin": 2, "trans": "-"})]));
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 3, "gap": "-"}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 3, "trans": "-"})]));
  
  // PS 8
  result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": 1}),
@@ -403,15 +404,15 @@ function grammar() {
  result.push(phrase(term("RC", {"num": 1}),
                      [term("RPRO", {"num": 1}),
                       space(),
-                      term("S", {"num": 1, "gap": 1})]));
+                      term("S", {"num": 1, "stat": 2, "gap": 1})]));
 
  // PS Adjectives (page 57)
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
                     [term("BE", {"num": 1, "fin": 2}),
                      space(),
                      term("ADJ")]));
 
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
                     [term("BE", {"num": 1, "fin": 2}),
                      space(),
                      literal("not"),
@@ -420,12 +421,12 @@ function grammar() {
  
 
  // 3.6 Identity and Predication
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
                     [term("BE", {"num": 1, "fin": 2}),
                      space(),
                      term("NP", {"num": 1, "case": 5, "gap": 3})]));
 
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
                     [term("BE", {"num": 1, "fin": 2}),
                      space(),
                      term("PP")]));
@@ -437,30 +438,30 @@ function grammar() {
                       term("N", {"num": 1})]));
 
  // Conditionals
- result.push(phrase(term("S", {"num": 1}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2}),
                     [literal("if"),
                      space(),
-                     term("S", {"num": 1}),
+                     term("S", {"num": 1, "stat": 2}),
                      space(),
                      literal("then"),
                      space(),
-                     term("S", {"num": 1})]));
+                     term("S", {"num": 1, "stat": 2})]));
  
  // Sentential Disjunctions
- result.push(phrase(term("S", {"num": 1}),
-                    [term("S", {"num": 1}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2}),
+                    [term("S", {"num": 1, "stat": 2}),
                      space(),
                      literal("or"),
                      space(),
-                     term("S", {"num": 1})]));
+                     term("S", {"num": 1, "stat": 2})]));
 
  // VP Disjunctions
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "gap": 3}),
-                     [term("VP", {"num": 1, "fin": 2, "gap": 3}),
-                      space(),
-                      literal("or"),
-                      space(),
-                      term("VP", {"num": 1, "fin": 2, "gap": 3})]));
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
+                    [term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3})]));
 
  // NP Disjunctions
  result.push(phrase(term("NP'", {"num": 3, "case": 2, "gap": "-"}),
@@ -472,30 +473,30 @@ function grammar() {
                     "NP"));
  
  // Sentential Conjunctions
- result.push(phrase(term("S", {"num": 1}),
-                    [term("S", {"num": 1}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2}),
+                    [term("S", {"num": 1, "stat": 2}),
                      space(),
                      literal("and"),
                      space(),
-                     term("S", {"num": 1})]));
+                     term("S", {"num": 1, "stat": 2})]));
 
  // V Conjunctions
- result.push(phrase(term("V", {"num": 1, "fin": 2, "trans": 3}),
-                     [term("V", {"num": 1, "fin": 2, "trans": 3}),
-                      space(),
-                      literal("and"),
-                      space(),
-                      term("V", {"num": 1, "fin": 2, "trans": 3})]));
+ result.push(phrase(term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3})]));
  
  // Non-pronomial possessive phrases
  result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
-                     [term("DET", {"num": "sing", "rn": "+"}), 
-                      space(),
-                      term("RN", {"num": 1})]));
+                    [term("DET", {"num": "sing", "rn": "+"}), 
+                     space(),
+                     term("RN", {"num": 1})]));
 
  result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
                     [term("PN", {"num": 1}), 
-                      literal("'s")]));
+                     literal("'s")]));
 
  // Noun Prepositional Phrases
  result.push(phrase(term("N", {"num": 1}),
@@ -504,13 +505,13 @@ function grammar() {
                      term("PP")]));
 
  result.push(phrase(term("PP"),
-                     [term("PREP"),
-                      space(),
-                      term("NP", {"num": 1, "case": 3, "gap": "-"})]));
-
+                    [term("PREP"),
+                     space(),
+                     term("NP", {"num": 1, "case": 3, "gap": "-"})]));
+ 
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
-                   [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
+                  [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
  
  // LI 2
  result.push(rule(term("PRO", {"num": "sing", "case": "+nom", "refl": "-"}),
@@ -602,9 +603,9 @@ function grammar() {
  result.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
                    [[literal("do")]]));
  
- // Verbs in their inifinitive form.
+ // Stative berbs in their inifinitive form.
  
- result.push(rule(term("V", {"trans": "+"}),
+ result.push(rule(term("V", {"trans": "+", "stat": "+"}),
                   [[literal("like")],
                    [literal("love")],
                    [literal("admire")],
@@ -615,15 +616,15 @@ function grammar() {
                    [literal("surprise")],
                    ]));
 
- result.push(rule(term("V", {"trans": "-"}),
+ result.push(rule(term("V", {"trans": "-", "stat": "+"}),
                   [[literal("love")],
                    [literal("stink")],
                    [literal("adore")]]));
 
  // LI 17
  // LI 18
- result.push(rule(term("V", {"num": 1, "fin": "-", "trans": 2}),
-                  [[term("V", {"trans": 2})]],
+ result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2}),
+                  [[term("V", {"trans": 2, "stat": 3})]],
                   undefined, 
                   undefined,
                   (name, types) => { 
@@ -638,8 +639,8 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
- result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": 1}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": 1}), literal("s")]],
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1}), literal("s")]],
                   undefined, 
                   undefined,
                   (name, types) => { 
@@ -653,8 +654,8 @@ function grammar() {
  // > present tense - are identical with the infinitival forms, which we already have (They were needed
  // > for negation). 
  
- result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": 1}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": 1})]],
+ result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1})]],
                   undefined, 
                   undefined,
                   (name, types) => { 

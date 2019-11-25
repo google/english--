@@ -43,31 +43,31 @@ describe("Syntax", function() {
 
     // Production Rules
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> S[num=@1] _ "."');
+     .equalsTo('Sentence -> S[num=@1, stat=@2] _ "."');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" _ NP[num=@1, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, gap=-] _ "?"');
+     .equalsTo('Sentence -> "who" _ NP[num=@1, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, stat=@2, gap=-] _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, case=+nom, gap=-] __ VP[num=@3, fin=+, gap=@1] _ "?"');
+     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, case=+nom, gap=-] __ VP[num=@3, fin=+, stat=@2, gap=@1] _ "?"');
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> "is" __ NP[num=sing, case=+nom, gap=-] __ ADJ _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('S[num=@1] -> NP\'[num=@1, case=+nom, gap=-] __ VP\'[num=@1, fin=+, gap=-]');
+     .equalsTo('S[num=@1, stat=@2] -> NP\'[num=@1, case=+nom, gap=-] __ VP\'[num=@1, fin=+, stat=@2, gap=-]');
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, stat=@2, gap=@3] -> NP\'[num=@1, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, stat=@2, gap=-]");
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@3, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, gap=-]");
+     .equalsTo("S[num=@1, stat=@2, gap=@3] -> NP\'[num=@3, case=+nom, gap=@3] WS[gap=@3] VP'[num=@1, fin=+, stat=@2, gap=-]");
     assertThat(print(result[i++]))
-     .equalsTo("S[num=@1, gap=@3] -> NP\'[num=@1, case=+nom, gap=-] __ VP'[num=@1, fin=+, gap=@3]");
+     .equalsTo("S[num=@1, stat=@2, gap=@3] -> NP\'[num=@1, case=+nom, gap=-] __ VP'[num=@1, fin=+, stat=@2, gap=@3]");
     assertThat(print(result[i++]))
-     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, gap=@2]");
+     .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, stat=@3, gap=@2]");
     assertThat(print(result[i++]))
-     .equalsTo("VP'[num=@1, fin=+, gap=@2] -> VP[num=@1, fin=+, gap=@2]");
+     .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2] -> VP[num=@1, fin=+, stat=@3, gap=@2]");
     assertThat(print(result[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=@3] -> V[num=@1, fin=@2, trans=+] WS[gap=@3] NP\'[num=@3, case=-nom, gap=@3]");
+     .equalsTo("VP[num=@1, fin=@2, stat=@4, gap=@3] -> V[num=@1, fin=@2, stat=@4, trans=+] WS[gap=@3] NP\'[num=@3, case=-nom, gap=@3]");
     assertThat(print(result[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=+] __ NP\'[num=@3, case=-nom, gap=-]");
+     .equalsTo("VP[num=@1, fin=@2, stat=@4, gap=-] -> V[num=@1, fin=@2, stat=@4, trans=+] __ NP\'[num=@3, case=-nom, gap=-]");
     assertThat(print(result[i++]))
-     .equalsTo("VP[num=@1, fin=@2, gap=-] -> V[num=@1, fin=@2, trans=-]");
+     .equalsTo("VP[num=@1, fin=@2, stat=@3, gap=-] -> V[num=@1, fin=@2, stat=@3, trans=-]");
     assertThat(print(result[i++]))
      .equalsTo('NP[num=@1, case=@3, gap=@1] -> GAP')
     assertThat(print(result[i++]))
@@ -83,37 +83,37 @@ describe("Syntax", function() {
     assertThat(print(result[i++]))
      .equalsTo('N[num=@1] -> N[num=@1] __ RC[num=@1]');
     assertThat(print(result[i++]))
-     .equalsTo('RC[num=@1] -> RPRO[num=@1] __ S[num=@1, gap=@1]');
+     .equalsTo('RC[num=@1] -> RPRO[num=@1] __ S[num=@1, stat=@2, gap=@1]');
     // Adjectives
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
+     .equalsTo('VP[num=@1, fin=@2, stat=@4, gap=@3] -> BE[num=@1, fin=@2] __ ADJ');
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
+     .equalsTo('VP[num=@1, fin=@2, stat=@4, gap=@3] -> BE[num=@1, fin=@2] __ "not" __ ADJ');
     // 3.6 Identity and Predicates
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, case=@5, gap=@3]');
+     .equalsTo('VP[num=@1, fin=@2, stat=@4, gap=@3] -> BE[num=@1, fin=@2] __ NP[num=@1, case=@5, gap=@3]');
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> BE[num=@1, fin=@2] __ PP');
+     .equalsTo('VP[num=@1, fin=@2, stat=@4, gap=@3] -> BE[num=@1, fin=@2] __ PP');
     assertThat(print(result[i++]))
      .equalsTo('N[num=@1] -> ADJ __ N[num=@1]');
     // Conditionals
     assertThat(print(result[i++]))
-     .equalsTo('S[num=@1] -> "if" __ S[num=@1] __ "then" __ S[num=@1]');
+     .equalsTo('S[num=@1, stat=@2] -> "if" __ S[num=@1, stat=@2] __ "then" __ S[num=@1, stat=@2]');
     // Sentential Disjunctions
     assertThat(print(result[i++]))
-     .equalsTo('S[num=@1] -> S[num=@1] __ "or" __ S[num=@1]');
+     .equalsTo('S[num=@1, stat=@2] -> S[num=@1, stat=@2] __ "or" __ S[num=@1, stat=@2]');
     // VP Disjunctions
     assertThat(print(result[i++]))
-     .equalsTo('VP[num=@1, fin=@2, gap=@3] -> VP[num=@1, fin=@2, gap=@3] __ "or" __ VP[num=@1, fin=@2, gap=@3]');
+     .equalsTo('VP[num=@1, fin=@2, stat=@4, gap=@3] -> VP[num=@1, fin=@2, stat=@4, gap=@3] __ "or" __ VP[num=@1, fin=@2, stat=@4, gap=@3]');
     // NP Disjunctions
     assertThat(print(result[i++]))
      .equalsTo('NP\'[num=@3, case=@2, gap=-] -> NP[num=@3, case=@2, gap=-] __ "or" __ NP[num=@3, case=@2, gap=-]');
     // Sentential Conjunctions
     assertThat(print(result[i++]))
-     .equalsTo('S[num=@1] -> S[num=@1] __ "and" __ S[num=@1]');
+     .equalsTo('S[num=@1, stat=@2] -> S[num=@1, stat=@2] __ "and" __ S[num=@1, stat=@2]');
     // VP Conjunctions
     assertThat(print(result[i++]))
-     .equalsTo('V[num=@1, fin=@2, trans=@3] -> V[num=@1, fin=@2, trans=@3] __ "and" __ V[num=@1, fin=@2, trans=@3]');
+     .equalsTo('V[num=@1, fin=@2, stat=@4, trans=@3] -> V[num=@1, fin=@2, stat=@4, trans=@3] __ "and" __ V[num=@1, fin=@2, stat=@4, trans=@3]');
     // Non-pronomial possessive phrases
     assertThat(print(result[i++]))
      .equalsTo('NP[num=@1, case=@3, gap=-] -> DET[num=sing, rn=+] __ RN[num=@1]');
@@ -155,18 +155,18 @@ describe("Syntax", function() {
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
     
     assertThat(print(result[i++]))
-     .equalsTo('V[trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
+     .equalsTo('V[trans=+, stat=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
-     .equalsTo('V[trans=-] -> "love" "stink" "adore"');
+     .equalsTo('V[trans=-, stat=+] -> "love" "stink" "adore"');
 
     assertThat(print(result[i++]))
-     .equalsTo('V[num=@1, fin=-, trans=@2] -> V[trans=@2]');
+     .equalsTo('V[num=@1, fin=-, stat=@3, trans=@2] -> V[trans=@2, stat=@3]');
 
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=@1] -> V[num=sing, fin=-, trans=@1] "s"');
+     .equalsTo('V[num=sing, fin=+, stat=@2, trans=@1] -> V[num=sing, fin=-, stat=@2, trans=@1] "s"');
     
     assertThat(print(result[i++]))
-     .equalsTo('V[num=plur, fin=+, trans=@1] -> V[num=sing, fin=-, trans=@1]');
+     .equalsTo('V[num=plur, fin=+, stat=@2, trans=@1] -> V[num=sing, fin=-, stat=@2, trans=@1]');
 
     assertThat(print(result[i++]))
      .equalsTo('RPRO[num=sing/plur] -> "who"');
