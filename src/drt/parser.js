@@ -653,17 +653,8 @@ function grammar() {
  // > present tense - are identical with the infinitival forms, which we already have (They were needed
  // > for negation). 
  
- result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "+"}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": "+"})]],
-                  undefined, 
-                  undefined,
-                  (name, types) => { 
-                   return `([child], loc) => child`;
-                  }
-                  ));
- 
- result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": "-"}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": "-"})]],
+ result.push(rule(term("V", {"num": "plur", "fin": "+", "trans": 1}),
+                  [[term("V", {"num": "sing", "fin": "-", "trans": 1})]],
                   undefined, 
                   undefined,
                   (name, types) => { 
