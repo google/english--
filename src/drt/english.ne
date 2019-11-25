@@ -266,19 +266,10 @@ V_num_sing_fin_p_trans_n ->
   V_num_sing_fin_n_trans_n "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
 V_num_sing_fin_n_trans_p -> 
   V_num_sing_fin_n_trans_p __ "and"i __ V_num_sing_fin_n_trans_p {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "like"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "admire"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "know"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "own"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "fascinate"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "rotate"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
-  "surprise"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %}
+  V_trans_p {% ([child], loc) => child %}
 V_num_sing_fin_n_trans_n -> 
   V_num_sing_fin_n_trans_n __ "and"i __ V_num_sing_fin_n_trans_n {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"-"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"-"}, args, loc) %} |
-  "stink"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"-"}, args, loc) %} |
-  "adore"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"-"}, args, loc) %}
+  V_trans_n {% ([child], loc) => child %}
 V_num_plur_fin_p_trans_p -> 
   V_num_plur_fin_p_trans_p __ "and"i __ V_num_plur_fin_p_trans_p {% (args, loc) => node("V", {"num":"plur","fin":"+","trans":"+"}, args, loc) %} |
   V_num_sing_fin_n_trans_p {% ([child], loc) => child %}
@@ -287,19 +278,10 @@ V_num_plur_fin_p_trans_n ->
   V_num_sing_fin_n_trans_n {% ([child], loc) => child %}
 V_num_plur_fin_n_trans_p -> 
   V_num_plur_fin_n_trans_p __ "and"i __ V_num_plur_fin_n_trans_p {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "like"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "admire"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "know"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "own"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "fascinate"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "rotate"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %} |
-  "surprise"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"+"}, args, loc) %}
+  V_trans_p {% ([child], loc) => child %}
 V_num_plur_fin_n_trans_n -> 
   V_num_plur_fin_n_trans_n __ "and"i __ V_num_plur_fin_n_trans_n {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"-"}, args, loc) %} |
-  "love"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"-"}, args, loc) %} |
-  "stink"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"-"}, args, loc) %} |
-  "adore"i {% (args, loc) => node("V", {"num":"plur","fin":"-","trans":"-"}, args, loc) %}
+  V_trans_n {% ([child], loc) => child %}
 DET_num_sing_rn_p -> 
   PN_num_sing "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %} |
   PN_num_plur "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %}
@@ -330,6 +312,19 @@ AUX_num_sing_fin_p ->
   "does"i {% (args, loc) => node("AUX", {"num":"sing","fin":"+"}, args, loc) %}
 AUX_num_plur_fin_p -> 
   "do"i {% (args, loc) => node("AUX", {"num":"plur","fin":"+"}, args, loc) %}
+V_trans_p -> 
+  "like"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "love"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "admire"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "know"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "own"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "fascinate"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "rotate"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %} |
+  "surprise"i {% (args, loc) => node("V", {"trans":"+"}, args, loc) %}
+V_trans_n -> 
+  "love"i {% (args, loc) => node("V", {"trans":"-"}, args, loc) %} |
+  "stink"i {% (args, loc) => node("V", {"trans":"-"}, args, loc) %} |
+  "adore"i {% (args, loc) => node("V", {"trans":"-"}, args, loc) %}
 RPRO_num_sing -> 
   "who"i {% (args, loc) => node("RPRO", {"num":"sing"}, args, loc) %} |
   "which"i {% (args, loc) => node("RPRO", {"num":"sing"}, args, loc) %}

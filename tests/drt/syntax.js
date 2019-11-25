@@ -37,7 +37,7 @@ describe("Syntax", function() {
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(70);
+    assertThat(result.length).equalsTo(71);
 
     let i = 0;
 
@@ -155,9 +155,12 @@ describe("Syntax", function() {
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
     
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
+     .equalsTo('V[trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink" "adore"');
+     .equalsTo('V[trans=-] -> "love" "stink" "adore"');
+
+    assertThat(print(result[i++]))
+     .equalsTo('V[num=@1, fin=-, trans=@2] -> V[trans=@2]');
 
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing, fin=+, trans=+] -> V[num=sing, fin=-, trans=+] "s"');

@@ -617,17 +617,37 @@ function grammar() {
                    [[literal("do")]]));
  
  // Verbs in their inifinitive form.
- const transitive = ["like", "love", "admire", "know", "own", "fascinate", "rotate", "surprise"];
- const intransitive = ["love", "stink", "adore"];
  
+ result.push(rule(term("V", {"trans": "+"}),
+                  [[literal("like")],
+                   [literal("love")],
+                   [literal("admire")],
+                   [literal("know")],
+                   [literal("own")],
+                   [literal("fascinate")],
+                   [literal("rotate")],
+                   [literal("surprise")],
+                   ]));
+
+ result.push(rule(term("V", {"trans": "-"}),
+                  [[literal("love")],
+                   [literal("stink")],
+                   [literal("adore")]]));
+
  // LI 17
- result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "+"}),
-                  transitive.map((verb) => [literal(verb)])));
+ result.push(rule(term("V", {"num": 1, "fin": "-", "trans": 2}),
+                  [[term("V", {"trans": 2})]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return `([child], loc) => child`;
+                  }
+                  ));
  
  // LI 18
  // Manually expanding into the transitivity.
- result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
-                  intransitive.map((verb) => [literal(verb)])));
+ //result.push(rule(term("V", {"num": ["sing", "plur"], "fin": "-", "trans": "-"}),
+ //                 intransitive.map((verb) => [literal(verb)])));
  
  // LI 19
  // Manually expanding into the present / third person.
