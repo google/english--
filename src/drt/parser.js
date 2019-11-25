@@ -638,17 +638,8 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
- result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": "+"}), literal("s")]],
-                  undefined, 
-                  undefined,
-                  (name, types) => { 
-                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
-                  }
-                  ));
- 
- result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
-                  [[term("V", {"num": "sing", "fin": "-", "trans": "-"}), literal("s")]],
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": 1}),
+                  [[term("V", {"num": "sing", "fin": "-", "trans": 1}), literal("s")]],
                   undefined, 
                   undefined,
                   (name, types) => { 

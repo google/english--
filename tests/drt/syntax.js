@@ -37,7 +37,7 @@ describe("Syntax", function() {
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(71);
+    assertThat(result.length).equalsTo(70);
 
     let i = 0;
 
@@ -163,9 +163,7 @@ describe("Syntax", function() {
      .equalsTo('V[num=@1, fin=-, trans=@2] -> V[trans=@2]');
 
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=+] -> V[num=sing, fin=-, trans=+] "s"');
-    assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=-] -> V[num=sing, fin=-, trans=-] "s"');
+     .equalsTo('V[num=sing, fin=+, trans=@1] -> V[num=sing, fin=-, trans=@1] "s"');
     
     assertThat(print(result[i++]))
      .equalsTo('V[num=plur, fin=+, trans=+] -> V[num=sing, fin=-, trans=+]');
