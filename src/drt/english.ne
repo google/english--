@@ -263,9 +263,7 @@ V_num_sing_fin_p_trans_p ->
   V_num_sing_fin_n_trans_p "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
 V_num_sing_fin_p_trans_n -> 
   V_num_sing_fin_p_trans_n __ "and"i __ V_num_sing_fin_p_trans_n {% (args, loc) => node("V", {"num":"sing","fin":"+","trans":"-"}, args, loc) %} |
-  "loves"i {% (args, loc) => node("V", {"num":"sing","fin":"+","trans":"-"}, args, loc) %} |
-  "stinks"i {% (args, loc) => node("V", {"num":"sing","fin":"+","trans":"-"}, args, loc) %} |
-  "adores"i {% (args, loc) => node("V", {"num":"sing","fin":"+","trans":"-"}, args, loc) %}
+  V_num_sing_fin_n_trans_n "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
 V_num_sing_fin_n_trans_p -> 
   V_num_sing_fin_n_trans_p __ "and"i __ V_num_sing_fin_n_trans_p {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |
   "like"i {% (args, loc) => node("V", {"num":"sing","fin":"-","trans":"+"}, args, loc) %} |

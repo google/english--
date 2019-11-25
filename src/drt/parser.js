@@ -649,8 +649,17 @@ function grammar() {
                   ));
  
  result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
-                   intransitive.map((verb) => [literal(verb + "s")])
-                   ));
+                  [[term("V", {"num": "sing", "fin": "-", "trans": "-"}), literal("s")]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                  }
+                  ));
+ 
+ //result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
+ //                  intransitive.map((verb) => [literal(verb + "s")])
+ //                  ));
  
  // LI 20
  // Manually expanding into the present / plural.
