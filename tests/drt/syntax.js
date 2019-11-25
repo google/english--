@@ -25,16 +25,16 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe.only("Syntax", function() {
+describe("Syntax", function() {
   
   it("generate", function() {
     let result = grammar();
 
     const fs = require("fs");
-    fs.writeFileSync("./src/drt/english.ne", compile(clone(result)));
+    fs.writeFileSync("./src/drt/english.ne", compile(result));
   });
 
-  it.only("grammar", function() {
+  it("grammar", function() {
     let result = grammar();
 
     assertThat(result.length).equalsTo(70);
@@ -153,12 +153,14 @@ describe.only("Syntax", function() {
      .equalsTo('AUX[num=sing, fin=+] -> "does"');
     assertThat(print(result[i++]))
      .equalsTo('AUX[num=plur, fin=+] -> "do"');
+    
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing/plur, fin=-, trans=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing/plur, fin=-, trans=-] -> "love" "stink" "adore"');
+
     assertThat(print(result[i++]))
-     .equalsTo('V[num=sing, fin=+, trans=+] -> "likes" "loves" "admires" "knows" "owns" "fascinates" "rotates" "surprises"');
+     .equalsTo('V[num=sing, fin=+, trans=+] -> V[num=sing, fin=-, trans=+] "s"');
     assertThat(print(result[i++]))
      .equalsTo('V[num=sing, fin=+, trans=-] -> "loves" "stinks" "adores"');
     assertThat(print(result[i++]))

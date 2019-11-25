@@ -1,13 +1,17 @@
 const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./english.js");
 
-let rule = (head = {}, tail = [], skip = false, types = {}) => { 
+let rule = (head = {}, tail = [], skip = false, types = {}, prod) => { 
+ //if (prod) {
+ // console.log(typeof prod);
+ //}
  return {
   "@type": "Rule", 
   "head": head, 
   "tail": tail, 
   "skip": skip, 
-  "types": types
+  "types": types,
+  "prod": prod
  }
 };
 
@@ -181,7 +185,7 @@ function generate(rule) {
 
 function compile(grammar, header = true) {
  let rules = {};
- 
+
  let flatten = (expansion) => {
  };
 
@@ -196,7 +200,12 @@ function compile(grammar, header = true) {
     }
     
     let prod = processor(expansion, undefined, rule.types);
-    if (rule.skip) {
+    if (rule.prod != undefined) {
+     // console.log(rule.prod);
+     // console.log(typeof (() => {}) == "function");
+     // console.log(expansion);
+     prod = rule.prod(expansion.head.name, expansion.head.types);
+    } else if (rule.skip) {
      prod = `(args) => args.length == 1 ? args[0] : (${processor(expansion, rule.skip, rule.types)})(args)`;
     }
     rules[head].push([list.join(" "), prod]);
@@ -627,9 +636,17 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+ //result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
+ //                  transitive.map((verb) => [literal(verb + "s")])
+ //                  ));
  result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "+"}),
-                   transitive.map((verb) => [literal(verb + "s")])
-                   ));
+                  [[term("V", {"num": "sing", "fin": "-", "trans": "+"}), literal("s")]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                  }
+                  ));
  
  result.push(rule(term("V", {"num": "sing", "fin": "+", "trans": "-"}),
                    intransitive.map((verb) => [literal(verb + "s")])

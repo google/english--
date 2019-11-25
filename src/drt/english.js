@@ -1,4 +1,4 @@
-// Generated automatically by nearley, version 2.13.0
+// Generated automatically by nearley, version 2.18.0
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
@@ -339,22 +339,8 @@ var grammar = {
     {"name": "RC_num_plur", "symbols": ["RPRO_num_plur", "__", "S_num_plur_gap_plur"], "postprocess": (args, loc) => node("RC", {"num":"plur"}, args, loc)},
     {"name": "V_num_sing_fin_p_trans_p$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p", "__", "V_num_sing_fin_p_trans_p$subexpression$1", "__", "V_num_sing_fin_p_trans_p"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$2", "symbols": [/[lL]/, /[iI]/, /[kK]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$2"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$3", "symbols": [/[lL]/, /[oO]/, /[vV]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$3"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$4", "symbols": [/[aA]/, /[dD]/, /[mM]/, /[iI]/, /[rR]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$4"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$5", "symbols": [/[kK]/, /[nN]/, /[oO]/, /[wW]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$5"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$6", "symbols": [/[oO]/, /[wW]/, /[nN]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$6"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$7", "symbols": [/[fF]/, /[aA]/, /[sS]/, /[cC]/, /[iI]/, /[nN]/, /[aA]/, /[tT]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$7"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$8", "symbols": [/[rR]/, /[oO]/, /[tT]/, /[aA]/, /[tT]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$8"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
-    {"name": "V_num_sing_fin_p_trans_p$subexpression$9", "symbols": [/[sS]/, /[uU]/, /[rR]/, /[pP]/, /[rR]/, /[iI]/, /[sS]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_p_trans_p$subexpression$9"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"+"}, args, loc)},
+    {"name": "V_num_sing_fin_p_trans_p$subexpression$2", "symbols": [/[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V_num_sing_fin_p_trans_p", "symbols": ["V_num_sing_fin_n_trans_p", "V_num_sing_fin_p_trans_p$subexpression$2"], "postprocess": ([inf, s], loc) => { inf.children[0] += s; return inf; }},
     {"name": "V_num_sing_fin_p_trans_n$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "V_num_sing_fin_p_trans_n", "symbols": ["V_num_sing_fin_p_trans_n", "__", "V_num_sing_fin_p_trans_n$subexpression$1", "__", "V_num_sing_fin_p_trans_n"], "postprocess": (args, loc) => node("V", {"num":"sing","fin":"+","trans":"-"}, args, loc)},
     {"name": "V_num_sing_fin_p_trans_n$subexpression$2", "symbols": [/[lL]/, /[oO]/, /[vV]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
