@@ -34,7 +34,7 @@ describe("Syntax", function() {
     fs.writeFileSync("./src/drt/english.ne", compile(result));
   });
 
-  it("grammar", function() {
+  it.skip("grammar", function() {
     let result = grammar();
 
     assertThat(result.length).equalsTo(74);
