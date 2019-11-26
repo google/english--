@@ -25,7 +25,7 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe.only("Parser", function() {
+describe("Parser", function() {
 
   it("errors", function() {
     assertThat("foo").failsAt(0, "f");
