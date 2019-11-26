@@ -618,6 +618,18 @@ describe.only("Parser", function() {
                  VP_(AUX("did"), "not", VP(V("walk")))));
   });
 
+  it("Jones was happy.", function() {
+    assertThat(first(parse("Jones was happy.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("was"), ADJ("happy")))));
+  });
+
+  it("They were happy.", function() {
+    assertThat(first(parse("They were happy.")))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(BE("were"), ADJ("happy")))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

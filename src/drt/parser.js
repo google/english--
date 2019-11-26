@@ -784,6 +784,12 @@ function grammar() {
  result.push(rule(term("BE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
                   [[literal("are")]]));
 
+ result.push(rule(term("BE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "past"}),
+                  [[literal("was")]]));
+
+ result.push(rule(term("BE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "past"}),
+                  [[literal("were")]]));
+
  // Relative Nouns
  result.push(rule(term("RN", {"num": "sing"}),
                   [[literal("husband")], 

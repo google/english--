@@ -2376,6 +2376,10 @@ BE_num_sing_fin_p_tp_npast_tense_pres ->
   "is"i {% (args, loc) => node("BE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, args, loc) %}
 BE_num_plur_fin_p_tp_npast_tense_pres -> 
   "are"i {% (args, loc) => node("BE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, args, loc) %}
+BE_num_sing_fin_p_tp_npast_tense_past -> 
+  "was"i {% (args, loc) => node("BE", {"num":"sing","fin":"+","tp":"-past","tense":"past"}, args, loc) %}
+BE_num_plur_fin_p_tp_npast_tense_past -> 
+  "were"i {% (args, loc) => node("BE", {"num":"plur","fin":"+","tp":"-past","tense":"past"}, args, loc) %}
 RN_num_sing -> 
   "husband"i {% (args, loc) => node("RN", {"num":"sing","gen":"male"}, args, loc) %} |
   "father"i {% (args, loc) => node("RN", {"num":"sing","gen":"male"}, args, loc) %} |
