@@ -37,7 +37,7 @@ describe("Syntax", function() {
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(72);
+    assertThat(result.length).equalsTo(74);
 
     let i = 0;
 
@@ -47,7 +47,7 @@ describe("Syntax", function() {
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> "who" _ NP[num=@1, case=+nom, gap=@1] __ VP\'[num=@1, fin=+, stat=@2, gap=-, tense=@3] _ "?"');
     assertThat(print(result[i++]))
-     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+] __ NP[num=@1, case=+nom, gap=-] __ VP[num=@3, fin=+, stat=@2, gap=@1, tense=@4] _ "?"');
+     .equalsTo('Sentence -> "who" __ AUX[num=sing, fin=+, tense=@4] __ NP[num=@1, case=+nom, gap=-] __ VP[num=@3, fin=+, stat=@2, gap=@1, tense=@4] _ "?"');
     assertThat(print(result[i++]))
      .equalsTo('Sentence -> "is" __ NP[num=sing, case=+nom, gap=-] __ ADJ _ "?"');
     assertThat(print(result[i++]))
@@ -59,7 +59,9 @@ describe("Syntax", function() {
     assertThat(print(result[i++]))
      .equalsTo("S[num=@1, stat=@2, gap=@3, tense=@4] -> NP\'[num=@1, case=+nom, gap=-] __ VP'[num=@1, fin=+, stat=@2, gap=@3, tense=@4]");
     assertThat(print(result[i++]))
-     .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2, tense=@4] -> AUX[num=@1, fin=+] __ \"not\" __ VP[num=@1, fin=-, stat=@3, gap=@2, tense=@4]");
+     .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2, tense=fut] -> AUX[num=@1, fin=+, tense=fut] __ VP[num=@1, fin=-, stat=@3, gap=@2, tense=pres]");
+    assertThat(print(result[i++]))
+     .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2, tense=@4] -> AUX[num=@1, fin=+, tense=@4] __ \"not\" __ VP[num=@1, fin=-, stat=@3, gap=@2, tense=@4]");
     assertThat(print(result[i++]))
      .equalsTo("VP'[num=@1, fin=+, stat=@3, gap=@2, tense=@4] -> VP[num=@1, fin=+, stat=@3, gap=@2, tense=@4]");
     assertThat(print(result[i++]))
@@ -150,9 +152,9 @@ describe("Syntax", function() {
     assertThat(print(result[i++]))
      .equalsTo('N[num=sing] -> "book" "donkey" "horse" "porsche"');
     assertThat(print(result[i++]))
-     .equalsTo('AUX[num=sing, fin=+] -> "does"');
+     .equalsTo('AUX[num=sing, fin=+, tense=pres] -> "does"');
     assertThat(print(result[i++]))
-     .equalsTo('AUX[num=plur, fin=+] -> "do"');
+     .equalsTo('AUX[num=plur, fin=+, tense=pres] -> "do"');
     
     assertThat(print(result[i++]))
      .equalsTo('V[trans=+, stat=+] -> "like" "love" "admire" "know" "own" "fascinate" "rotate" "surprise"');

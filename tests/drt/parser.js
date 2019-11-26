@@ -596,6 +596,21 @@ describe("Parser", function() {
                         NP(PN("Anna"))))));
   });
 
+  it("Jones will walk.", function() {
+    // future tense
+    assertThat(first(parse("Jones will walk.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("will"), VP(V("walk")))));
+  });
+
+  it("Jones will kiss Anna.", function() {
+    // future tense
+    assertThat(first(parse("Jones will kiss Anna.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("will"), VP(V("kiss"),
+                                     NP(PN("Anna"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

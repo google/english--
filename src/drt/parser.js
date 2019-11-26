@@ -111,7 +111,7 @@ const FEATURES = {
  "fin": ["+", "-"],
  "stat": ["+", "-"],
  "refl": ["+", "-"],
- "tense": ["pres", "past"]
+ "tense": ["pres", "past", "fut"]
 };
 
 function collect(rule) {
@@ -284,7 +284,7 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("who"),
                      space(),
-                     term("AUX", {"num": "sing", "fin": "+"}),
+                     term("AUX", {"num": "sing", "fin": "+", "tense": 4}),
                      space(),
                      term("NP", {"num": 1, "case": "+nom", "gap": "-"}),
                      space(),
@@ -325,16 +325,22 @@ function grammar() {
                       space(),
                       term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": 3, "tense": 4})]));
  
- // PS 4
+ // PS 4a
  // NOTE(goto): this is slightly different in that the "num" variable
  // is tied to the same variable rather than a different one. This
  // may be a typo in the paper.
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tense": "fut"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tense": "fut"}),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tense": "pres"})]));
+ 
+ // PS 4b
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tense": 4}),
-                     [term("AUX", {"num": 1, "fin": "+"}),
-                      space(),
-                      literal("not"),
-                      space(),
-                      term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tense": 4})]));
+                    [term("AUX", {"num": 1, "fin": "+", "tense": 4}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tense": 4})]));
  
  // PS 5
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tense": 4}),
@@ -597,11 +603,11 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  
  // LI 15
- result.push(rule(term("AUX", {"num": "sing", "fin": "+"}),
+ result.push(rule(term("AUX", {"num": "sing", "fin": "+", "tense": "pres"}),
                    [[literal("does")]]));
  
  // LI 16
- result.push(rule(term("AUX", {"num": "plur", "fin": "+"}),
+ result.push(rule(term("AUX", {"num": "plur", "fin": "+", "tense": "pres"}),
                    [[literal("do")]]));
  
  // Stative berbs in their inifinitive form.
@@ -801,6 +807,11 @@ function grammar() {
                     [term("VAR")],
                     undefined,
                     {"gen": "?", "var": true}));
+
+ // LI 33
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tense": "fut"}),
+                   [[literal("will")]]));
+
  
  return result;
 }
