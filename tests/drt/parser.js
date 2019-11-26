@@ -649,22 +649,22 @@ describe("Parser", function() {
                  VP_(VP(HAVE("have"), VP(V("walked"))))));
   });
 
-  it.skip("She had walked.", function() {
+  it("She had walked.", function() {
     assertThat(first(parse("She had walked.")))
      .equalsTo(S(NP(PRO("She")),
                  VP_(VP(HAVE("had"), VP(V("walked"))))));
   });
 
-  it.skip("They had walked.", function() {
+  it("They had walked.", function() {
     assertThat(first(parse("They had walked.")))
      .equalsTo(S(NP(PRO("They")),
                  VP_(VP(HAVE("had"), VP(V("walked"))))));
   });
 
-  it.skip("She had walked.", function() {
+  it("She had kissed him.", function() {
     assertThat(first(parse("She had kissed him.")))
      .equalsTo(S(NP(PRO("She")),
-                 VP_(VP(HAVE("had"), VP(V("walked"))))));
+                 VP_(VP(HAVE("had"), VP(V("kissed"), NP(PRO("him")))))));
   });
 
 

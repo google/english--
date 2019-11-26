@@ -2834,10 +2834,10 @@ V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_pres ->
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_npast_tense_pres "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_npast_tense_pres "s"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %}
 V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_fut -> 
@@ -2848,10 +2848,10 @@ V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres ->
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"+","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_npast_tense_pres "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_npast_tense_pres "s"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_p_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %}
 V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_fut -> 
@@ -2862,10 +2862,10 @@ V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_pres ->
   V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"-","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_npast_tense_pres "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_npast_tense_pres "s"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_p_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %}
 V_num_sing_fin_p_stat_p_trans_n_tp_ppast_tense_fut -> 
@@ -2876,10 +2876,10 @@ V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_pres ->
   V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"-","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_pres "s"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_pres "s"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_p_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"+","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %}
 V_num_sing_fin_p_stat_n_trans_n_tp_ppast_tense_fut -> 
@@ -2944,76 +2944,76 @@ V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut ->
   V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"-","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut -> 
   V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut -> 
   V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut -> 
   V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut -> 
   V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres -> 
@@ -3021,7 +3021,7 @@ V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres ->
   V_num_sing_fin_n_stat_p_trans_p_tp_npast_tense_pres {% ([child], loc) => child %}
 V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %}
 V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_fut -> 
@@ -3035,7 +3035,7 @@ V_num_plur_fin_p_stat_n_trans_p_tp_npast_tense_pres ->
   V_num_sing_fin_n_stat_n_trans_p_tp_npast_tense_pres {% ([child], loc) => child %}
 V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_p_stat_n_trans_p_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_p_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %}
 V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_fut -> 
@@ -3049,7 +3049,7 @@ V_num_plur_fin_p_stat_p_trans_n_tp_npast_tense_pres ->
   V_num_sing_fin_n_stat_p_trans_n_tp_npast_tense_pres {% ([child], loc) => child %}
 V_num_plur_fin_p_stat_p_trans_n_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_p_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_p_stat_p_trans_n_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_p_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %}
 V_num_plur_fin_p_stat_p_trans_n_tp_ppast_tense_fut -> 
@@ -3063,7 +3063,7 @@ V_num_plur_fin_p_stat_n_trans_n_tp_npast_tense_pres ->
   V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_pres {% ([child], loc) => child %}
 V_num_plur_fin_p_stat_n_trans_n_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_p_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_p_stat_n_trans_n_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_p_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %}
 V_num_plur_fin_p_stat_n_trans_n_tp_ppast_tense_fut -> 
@@ -3128,76 +3128,76 @@ V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut ->
   V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"-","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut -> 
   V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut -> 
   V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut -> 
   V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut -> 
   V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc) %}
 DET_num_sing_rn_p -> 
   PN_num_sing "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %} |
   PN_num_plur "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %}

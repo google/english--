@@ -713,7 +713,7 @@ function grammar() {
                   undefined, 
                   undefined,
                   (name, types) => { 
-                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                   return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }
                   ));
  
@@ -749,21 +749,17 @@ function grammar() {
                   undefined, 
                   undefined,
                   (name, types) => { 
-                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                   return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }
                   ));
 
  // LI 54
- //result.push(rule(term("V", {"num": "sing", "fin": "part", "stat": "-", "trans": "-", "tp": "+past", "tense": "pres"}),
- //                 [[literal("walked")]],
- //                 ));
-
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   undefined, 
                   undefined,
                   (name, types) => { 
-                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                   return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }
                   ));
 
