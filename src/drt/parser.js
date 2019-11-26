@@ -435,12 +435,12 @@ function grammar() {
 
  // PS Adjectives (page 57)
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
-                    [term("BE", {"num": 1, "fin": 2}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
                      space(),
                      term("ADJ")]));
 
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
-                    [term("BE", {"num": 1, "fin": 2}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
                      space(),
                      literal("not"),
                      space(),
@@ -448,12 +448,12 @@ function grammar() {
  
  // 3.6 Identity and Predication
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
-                    [term("BE", {"num": 1, "fin": 2}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
                      space(),
                      term("NP", {"num": 1, "case": 5, "gap": 3})]));
 
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
-                    [term("BE", {"num": 1, "fin": 2}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
                      space(),
                      term("PP")]));
 
@@ -778,10 +778,10 @@ function grammar() {
                   [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")], [literal("mortal")], [literal("brazilian")]]));
 
  // BE
- result.push(rule(term("BE", {"num": "sing", "fin": 1}),
+ result.push(rule(term("BE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "pres"}),
                   [[literal("is")]]));
 
- result.push(rule(term("BE", {"num": "plur", "fin": 1}),
+ result.push(rule(term("BE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
                   [[literal("are")]]));
 
  // Relative Nouns
