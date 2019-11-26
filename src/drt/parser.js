@@ -541,6 +541,14 @@ function grammar() {
                      space(),
                      term("VP", {"num": 1, "fin": "part", "stat": 6, "gap": 3, "tp": 4, "tense": 5})]));
 
+ // 17b
+ result.push(phrase(term("VP", {"num": 1, "fin": "+", "stat": "+", "gap": 3, "tp": 4, "tense": 5}),
+                    [term("HAVE", {"num": 1, "fin": "+", "tp": 4, "tense": 5}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "part", "stat": 6, "gap": 3, "tp": 4, "tense": 5})]));
+
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
                   [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
@@ -875,9 +883,20 @@ function grammar() {
  result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "fut"}),
                    [[literal("will")]]));
 
- // LI 43
- result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "-past", "tense": "pres"}),
+ // LI 44
+ result.push(rule(term("HAVE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "pres"}),
                    [[literal("has")]]));
+ 
+ // LI 45
+ result.push(rule(term("HAVE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("have")]]));
+ // LI 46
+ result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                   [[literal("had")]]));
+
+ // LI 47
+ result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "+past", "tense": ["pres", "past"]}),
+                   [[literal("had")]]));
  
  return result;
 }
