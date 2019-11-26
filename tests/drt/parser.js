@@ -25,7 +25,7 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe("Parser", function() {
+describe.only("Parser", function() {
 
   it("errors", function() {
     assertThat("foo").failsAt(0, "f");
@@ -609,6 +609,13 @@ describe("Parser", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("will"), VP(V("kiss"),
                                      NP(PN("Anna"))))));
+  });
+
+  it("Jones did not walk.", function() {
+    // past tense
+    assertThat(first(parse("Jones did not walk.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("did"), "not", VP(V("walk")))));
   });
 
   function assertThat(x) {

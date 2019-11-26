@@ -338,12 +338,27 @@ function grammar() {
                      term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 4, "tense": "pres"})]));
  
  // PS 4b
- result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": 4}),
-                    [term("AUX", {"num": 1, "fin": "+", "tp": 5, "tense": 4}),
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": "fut"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": 5, "tense": "fut"}),
                      space(),
                      literal("not"),
                      space(),
-                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 5, "tense": 4})]));
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 5, "tense": "pres"})]));
+ 
+ // PS 4c
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "pres"}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"})]));
+ 
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": "-past", "tense": "past"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"})]));
  
  // PS 5
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": 4}),
@@ -613,6 +628,14 @@ function grammar() {
  // LI 16
  result.push(rule(term("AUX", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
                    [[literal("do")]]));
+
+ // LI 30
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                   [[literal("did")]]));
+
+ // LI 31
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "+past", "tense": "past"}),
+                   [[literal("did")]]));
  
  // Stative berbs in their inifinitive form.
  
@@ -696,6 +719,16 @@ function grammar() {
                   }
                   ));
  // Past tense
+ // LI 51
+ //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "-past", "tense": "pres"}),
+ //                 [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+ //                 undefined, 
+ //                 undefined,
+ //                 (name, types) => { 
+ //                  return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+ //                 }
+ //                 ));
+
  // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
