@@ -581,6 +581,21 @@ describe("Parser", function() {
                         ))));
   });
 
+  it("Jones walked.", function() {
+    // past tense
+    assertThat(first(parse("Jones walked.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("walked")))));
+  });
+
+  it("Jones kissed Anna.", function() {
+    // past tense
+    assertThat(first(parse("Jones kissed Anna.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("kissed"),
+                        NP(PN("Anna"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

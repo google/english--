@@ -111,7 +111,7 @@ const FEATURES = {
  "fin": ["+", "-"],
  "stat": ["+", "-"],
  "refl": ["+", "-"],
- "tense": ["pres"]
+ "tense": ["pres", "past"]
 };
 
 function collect(rule) {
@@ -683,6 +683,17 @@ function grammar() {
                    return `([child], loc) => child`;
                   }
                   ));
+ // Past tense
+ // LI 51
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tense": "pres"}), literal("ed")]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                  }
+                  ));
+
  
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by

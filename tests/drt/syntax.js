@@ -37,7 +37,7 @@ describe("Syntax", function() {
   it("grammar", function() {
     let result = grammar();
 
-    assertThat(result.length).equalsTo(71);
+    assertThat(result.length).equalsTo(72);
 
     let i = 0;
 
@@ -172,6 +172,9 @@ describe("Syntax", function() {
     
     assertThat(print(result[i++]))
      .equalsTo('V[num=plur, fin=+, stat=@2, trans=@1, tense=pres] -> V[num=sing, fin=-, stat=@2, trans=@1, tense=pres]');
+
+    assertThat(print(result[i++]))
+     .equalsTo('V[num=@1, fin=+, stat=@2, trans=@3, tense=past] -> V[num=@1, fin=-, stat=@2, trans=@3, tense=pres] "ed"');
 
     assertThat(print(result[i++]))
      .equalsTo('RPRO[num=sing/plur] -> "who"');
