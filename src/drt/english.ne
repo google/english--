@@ -706,7 +706,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_pres ->
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -714,7 +716,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres ->
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
@@ -722,7 +726,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past ->
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
@@ -730,7 +736,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past ->
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -738,7 +746,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut ->
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -746,7 +756,9 @@ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut ->
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_n_gap_sing_tp_ppast_tense_pres -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -802,7 +814,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_pres ->
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -810,7 +824,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres ->
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
@@ -818,7 +834,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past ->
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
@@ -826,7 +844,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past ->
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -834,7 +854,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut ->
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -842,7 +864,9 @@ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut ->
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_n_gap_plur_tp_ppast_tense_pres -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1083,6 +1107,198 @@ VP_num_sing_fin_n_stat_n_gap_plur_tp_npast_tense_fut ->
   BE_num_sing_fin_n_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_n_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   VP_num_sing_fin_n_stat_n_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_n_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1090,7 +1306,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres ->
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -1098,7 +1316,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres ->
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
@@ -1106,7 +1326,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past ->
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
@@ -1114,7 +1336,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past ->
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -1122,7 +1346,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut ->
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -1130,7 +1356,9 @@ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut ->
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_n_gap_sing_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1186,7 +1414,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_pres ->
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -1194,7 +1424,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres ->
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
@@ -1202,7 +1434,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past ->
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
@@ -1210,7 +1444,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past ->
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -1218,7 +1454,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut ->
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -1226,7 +1464,9 @@ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut ->
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_n_gap_plur_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1467,6 +1707,198 @@ VP_num_plur_fin_n_stat_n_gap_plur_tp_npast_tense_fut ->
   BE_num_plur_fin_n_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_n_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
   VP_num_plur_fin_n_stat_n_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_n_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut WS_gap_sing NP__num_sing_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_sing {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_sing_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"sing","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut WS_gap_plur NP__num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_plur {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_plur_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"plur","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1476,7 +1908,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres ->
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -1486,7 +1920,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres ->
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_pres __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
@@ -1496,7 +1932,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past ->
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_past __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
@@ -1506,7 +1944,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past ->
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_past __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -1516,7 +1956,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut ->
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_ppast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut -> 
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   V_num_sing_fin_p_stat_p_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -1526,7 +1968,9 @@ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut ->
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_p_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_sing_fin_p_tp_npast_tense_fut __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_sing_fin_p_stat_n_gap_n_tp_ppast_tense_pres -> 
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   V_num_sing_fin_p_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"+","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1707,6 +2151,126 @@ VP_num_sing_fin_n_stat_n_gap_n_tp_npast_tense_fut ->
   BE_num_sing_fin_n_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_sing_fin_n_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   VP_num_sing_fin_n_stat_n_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_n_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_past __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ NP_num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_sing_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_sing_fin_part_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"sing","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1716,7 +2280,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres ->
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
@@ -1726,7 +2292,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres ->
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_pres __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
@@ -1736,7 +2304,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past ->
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_past __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
@@ -1746,7 +2316,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past ->
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_past __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
@@ -1756,7 +2328,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut ->
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_ppast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
@@ -1766,7 +2340,9 @@ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut ->
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_p_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
-  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+  VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_p_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  HAVE_num_plur_fin_p_tp_npast_tense_fut __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
 VP_num_plur_fin_p_stat_n_gap_n_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
   V_num_plur_fin_p_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"+","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
@@ -1947,6 +2523,126 @@ VP_num_plur_fin_n_stat_n_gap_n_tp_npast_tense_fut ->
   BE_num_plur_fin_n_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   BE_num_plur_fin_n_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
   VP_num_plur_fin_n_stat_n_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_n_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"-","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_p_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"+","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_pres __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_pres __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_pres {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"pres"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_past __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_past __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_past {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"past"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_ppast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_ppast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"+past","tense":"fut"}, args, loc) %}
+VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut __ NP__num_sing_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut __ NP__num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ "not"i __ ADJ {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_pnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ NP_num_plur_case_nnom_gap_n {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  BE_num_plur_fin_part_tp_npast_tense_fut __ PP {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_fut __ "or"i __ VP_num_plur_fin_part_stat_n_gap_n_tp_npast_tense_fut {% (args, loc) => node("VP", {"num":"plur","fin":"part","stat":"-","gap":"-","tp":"-past","tense":"fut"}, args, loc) %}
 NP_num_sing_case_pnom_gap_sing -> 
   GAP {% (args, loc) => node("NP", {"num":"sing","case":"+nom","gap":"sing"}, args, loc) %}
 NP_num_sing_case_nnom_gap_sing -> 
@@ -2174,6 +2870,78 @@ V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_fut ->
   V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"-","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %}
 V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut -> 
   V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_n_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"-","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %}
+V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut -> 
+  V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_sing_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"sing","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_sing_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
 V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres -> 
   V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_p_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"+","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %}
 V_num_plur_fin_p_stat_p_trans_p_tp_npast_tense_pres -> 
@@ -2286,6 +3054,78 @@ V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_fut ->
   V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"-","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %}
 V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut -> 
   V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_n_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"-","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %}
+V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_p_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"+","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_p_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_p_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"+","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_p_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_pres {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"pres"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_past {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"past"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_ppast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"+past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
+V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut -> 
+  V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut __ "and"i __ V_num_plur_fin_part_stat_n_trans_n_tp_npast_tense_fut {% (args, loc) => node("V", {"num":"plur","fin":"part","stat":"-","trans":"-","tp":"-past","tense":"fut"}, args, loc) %} |
+  V_num_plur_fin_n_stat_n_trans_n_tp_ppast_tense_pres "ed"i {% ([inf, s], loc) => { inf.children[0] += s; return inf; } %}
 DET_num_sing_rn_p -> 
   PN_num_sing "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %} |
   PN_num_plur "'s"i {% (args, loc) => node("DET", {"num":"sing","rn":"+"}, args, loc) %}
@@ -2413,6 +3253,10 @@ AUX_num_sing_fin_p_tp_npast_tense_fut ->
   "will"i {% (args, loc) => node("AUX", {"num":"sing","fin":"+","tp":"-past","tense":"fut"}, args, loc) %}
 AUX_num_plur_fin_p_tp_npast_tense_fut -> 
   "will"i {% (args, loc) => node("AUX", {"num":"plur","fin":"+","tp":"-past","tense":"fut"}, args, loc) %}
+HAVE_num_sing_fin_p_tp_npast_tense_pres -> 
+  "has"i {% (args, loc) => node("HAVE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, args, loc) %}
+HAVE_num_plur_fin_p_tp_npast_tense_pres -> 
+  "has"i {% (args, loc) => node("HAVE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, args, loc) %}
 
 # whitespaces
 WS_gap_sing -> _ {% () => null %}

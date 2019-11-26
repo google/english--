@@ -21,7 +21,7 @@ const {
   nodes} = require("../../src/drt/parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
+ S, NP, NP_, PN, VP_, VP, V, BE, HAVE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
  Discourse, Sentence
 } = nodes;
 
@@ -628,6 +628,12 @@ describe("Parser", function() {
     assertThat(first(parse("They were happy.")))
      .equalsTo(S(NP(PRO("They")),
                  VP_(VP(BE("were"), ADJ("happy")))));
+  });
+
+  it("She has walked.", function() {
+    assertThat(first(parse("She has walked.")))
+     .equalsTo(S(NP(PRO("She")),
+                 VP_(VP(HAVE("has"), VP(V("walked"))))));
   });
 
   function assertThat(x) {

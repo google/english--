@@ -109,7 +109,7 @@ const FEATURES = {
  "num": ["sing", "plur"],
  "case": ["+nom", "-nom"],    
  "trans": ["+", "-"],
- "fin": ["+", "-"],
+ "fin": ["+", "-", "part"],
  "stat": ["+", "-"],
  "refl": ["+", "-"],
  "tense": ["pres", "past", "fut"],
@@ -534,7 +534,13 @@ function grammar() {
                     [term("PREP"),
                      space(),
                      term("NP", {"num": 1, "case": 3, "gap": "-"})]));
- 
+
+ // 17a
+ result.push(phrase(term("VP", {"num": 1, "fin": "+", "stat": "+", "gap": 3, "tp": 4, "tense": 5}),
+                    [term("HAVE", {"num": 1, "fin": "+", "tp": 4, "tense": 5}),
+                     space(),
+                     term("VP", {"num": 1, "fin": "part", "stat": 6, "gap": 3, "tp": 4, "tense": 5})]));
+
  // LI 1
  result.push(rule(term("DET", {"num": ["sing"]}),
                   [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
@@ -739,6 +745,20 @@ function grammar() {
                   }
                   ));
 
+ // LI 54
+ //result.push(rule(term("V", {"num": "sing", "fin": "part", "stat": "-", "trans": "-", "tp": "+past", "tense": "pres"}),
+ //                 [[literal("walked")]],
+ //                 ));
+
+ result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  undefined, 
+                  undefined,
+                  (name, types) => { 
+                   return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+                  }
+                  ));
+
  
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by
@@ -855,6 +875,9 @@ function grammar() {
  result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "fut"}),
                    [[literal("will")]]));
 
+ // LI 43
+ result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("has")]]));
  
  return result;
 }
@@ -910,6 +933,7 @@ module.exports = {
   VP: (...children) => node("VP", ...children),
   V: (...children) => node("V", ...children),
   BE: (...children) => node("BE", ...children),
+  HAVE: (...children) => node("HAVE", ...children),
   DET: (...children) => node("DET", ...children),
   N: (...children) => node("N", ...children),
   RN: (...children) => node("RN", ...children),
