@@ -660,6 +660,7 @@ function grammar() {
  // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+ // LI 49
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tense": "pres"}), literal("s")]],
                   undefined, 
@@ -675,6 +676,7 @@ function grammar() {
  // > present tense - are identical with the infinitival forms, which we already have (They were needed
  // > for negation). 
  
+ // LI 50
  result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1, "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tense": "pres"})]],
                   undefined, 
@@ -684,7 +686,7 @@ function grammar() {
                   }
                   ));
  // Past tense
- // LI 51
+ // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tense": "pres"}), literal("ed")]],
                   undefined, 
