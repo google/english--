@@ -28,11 +28,13 @@ describe.only("Runtime", function() {
       let terms = line.map(name).join(" ");
       let types = line.map(term => JSON.stringify(term.types || {}));
 
-      //if (prod) {
-      // console.log(prod);
-      //}
+      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
 
-      result.push(`${name(head)} -> ${terms} {% (d, l, r) => process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r) %}`);
+      if (typeof prod == "string") {
+       body = `(${prod})(${body})`;
+      }
+
+      result.push(`${name(head)} -> ${terms} {% (d, l, r) => ${body} %}`);
 
      }
     }
@@ -55,29 +57,23 @@ describe.only("Runtime", function() {
      return parser.feed(src).results[0];
     }
 
+    assertThat(parse("V", "walks")).equalsTo({
+      "@type": "V",
+      "children": ["walks"],
+      "loc": 0,
+      "types": {
+        "fin": "+",
+        "num": "sing",
+        "stat": 2,
+        "tense": "pres",
+        "tp": "-past",
+        "trans": 1,
+      }
+    });
+
     assertThat(parse("V", "walked")).equalsTo({
       "@type": "V",
-      "children": [{
-        "@type": "V",
-        "children": [{
-          "@type": "V",
-          "children": ["walk"],
-          "types": {
-            "stat": "-", 
-            "trans": "-",
-          },
-          "loc": "0",
-        }],
-        "types": {
-          "fin": "-",
-          "num": 1,
-          "stat": 3,
-          "tense": "pres",
-          "tp": 4,
-          "trans": 2,
-        },
-        "loc": "0",
-      }, "ed", ],
+      "children": ["walked"],
       "types": {
         "fin": "part",
         "num": 1,
@@ -97,6 +93,7 @@ describe.only("Runtime", function() {
        "children": ["happy"],
        "loc": "0",
     });
+
     assertThat(parse("V", "shine")).equalsTo({
        "@type": "V", 
        "types": {

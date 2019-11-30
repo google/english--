@@ -695,6 +695,7 @@ function grammar() {
                   [[term("V", {"trans": 2, "stat": 3})]],
                   undefined, 
                   undefined,
+                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0]], root.loc); }",
                   (name, types) => { 
                    return `([child], loc) => child`;
                   }
@@ -712,6 +713,7 @@ function grammar() {
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
                   undefined, 
                   undefined,
+                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }
@@ -748,6 +750,7 @@ function grammar() {
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   undefined, 
                   undefined,
+                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }
@@ -758,6 +761,7 @@ function grammar() {
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   undefined, 
                   undefined,
+                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
                   }

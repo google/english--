@@ -54,11 +54,6 @@ function process(head, types, children, features, location, reject) {
  }
  // console.log(`Valid match ${JSON.stringify(types)}: ${JSON.stringify(children)}`);
  return node(head, types, children, location);
- // return {
- //  "@type": head,
- //  "types": types,
- //  "children": tail
- // }
 }
 
 %}
