@@ -27,7 +27,7 @@ const {
 
 describe("Syntax", function() {
   
-  it("generate", function() {
+  it.skip("generate", function() {
     let result = grammar();
 
     const fs = require("fs");

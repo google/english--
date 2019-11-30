@@ -8,7 +8,7 @@ const {
 const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./test.js");
 
-describe.only("Runtime", function() {
+describe("Runtime", function() {
   it("compile", function() {
     let result = [];
 
