@@ -20,8 +20,8 @@ function match(a, b) {
   return true;
  }
 
- let first = Object.entries(a);
- let second = Object.entries(b);
+ let first = Object.entries(a || {});
+ let second = Object.entries(b || {});
 
  if (first.length != second.length) {
   return false;
@@ -48,16 +48,26 @@ function process(head, types, children, features, location, reject) {
  // console.log(`process ${head}`);
  // console.log(`${tail.length} ${features.length}`);
  if (children.length != features.length) {
-  console.log("Invalid number of args?");
+  // console.log("Invalid number of args?");
   return reject;
  }
  for (let i = 0; i < children.length; i++) {
-  if (!match(children[i].types, features[i])) {
+  if (!match((children[i] || {}).types, features[i])) {
    return reject;
   }
  }
  // console.log(`Valid match ${JSON.stringify(types)}: ${JSON.stringify(children)}`);
  return node(head, types, children, location);
+}
+
+const reserved = ["he", "she", "it", "they", "him", "her", "them", "his", "hers", "theirs"];
+
+function name(head, tail, reject) {
+  let result = head.join("") + tail.join("");
+  if (reserved.includes(result.toLowerCase())) {
+    return reject;
+  }
+  return result;
 }
 
 var grammar = {
@@ -70,6 +80,17 @@ var grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
+    {"name": "FULLNAME$ebnf$1$subexpression$1", "symbols": ["NAME", "_"]},
+    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1$subexpression$1"]},
+    {"name": "FULLNAME$ebnf$1$subexpression$2", "symbols": ["NAME", "_"]},
+    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1", "FULLNAME$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "FULLNAME", "symbols": ["FULLNAME$ebnf$1"], "postprocess": ([args]) => args.map(name => name[0]).join(" ")},
+    {"name": "NAME$ebnf$1", "symbols": [/[A-Z]/]},
+    {"name": "NAME$ebnf$1", "symbols": ["NAME$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME$ebnf$2", "symbols": [/[a-z]/]},
+    {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b], location, reject) => name(a, b, reject)},
+    {"name": "VAR", "symbols": [/[A-Z]/], "postprocess": ([name]) => name},
     {"name": "Sentence", "symbols": ["S", "_", {"literal":"."}], "postprocess": (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{}], l, r)},
     {"name": "Sentence$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "Sentence$subexpression$2", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
@@ -100,8 +121,8 @@ var grammar = {
     {"name": "NP", "symbols": ["PN"], "postprocess": (d, l, r) => process("NP", {"num":1,"case":3,"gap":"-"}, d, [{"num":1}], l, r)},
     {"name": "NP", "symbols": ["PRO"], "postprocess": (d, l, r) => process("NP", {"num":1,"case":3,"gap":"-"}, d, [{"num":1,"case":3,"refl":4}], l, r)},
     {"name": "NP_$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$1", "__", "NP"], "postprocess": (d, l, r) => process("NP'", {"num":"plur","case":2,"gap":"-"}, d, [{"num":3,"case":2,"gap":"-"},{},{},{},{"num":4,"case":2,"gap":"-"}], l, r)},
-    {"name": "NP_", "symbols": ["NP"], "postprocess": (d, l, r) => process("NP'", {"num":1,"case":3,"gap":4}, d, [{"num":1,"case":3,"gap":4}], l, r)},
+    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$1", "__", "NP"], "postprocess": (d, l, r) => ((root) => node("NP", root.types, root.children[0].children, root.loc))(process("NP'", {"num":"plur","case":2,"gap":"-"}, d, [{"num":3,"case":2,"gap":"-"},{},{},{},{"num":4,"case":2,"gap":"-"}], l, r))},
+    {"name": "NP_", "symbols": ["NP"], "postprocess": (d, l, r) => ((root) => node("NP", root.types, root.children[0].children, root.loc))(process("NP'", {"num":1,"case":3,"gap":4}, d, [{"num":1,"case":3,"gap":4}], l, r))},
     {"name": "N", "symbols": ["N", "__", "RC"], "postprocess": (d, l, r) => process("N", {"num":1}, d, [{"num":1},{},{"num":1}], l, r)},
     {"name": "RC", "symbols": ["RPRO", "__", "S"], "postprocess": (d, l, r) => process("RC", {"num":1}, d, [{"num":1},{},{"num":1,"stat":2,"gap":1,"tp":4,"tense":3}], l, r)},
     {"name": "VP", "symbols": ["BE", "__", "ADJ"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r)},
@@ -118,7 +139,7 @@ var grammar = {
     {"name": "VP$subexpression$2", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "VP", "symbols": ["VP", "__", "VP$subexpression$2", "__", "VP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}], l, r)},
     {"name": "NP_$subexpression$2", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$2", "__", "NP"], "postprocess": (d, l, r) => process("NP'", {"num":3,"case":2,"gap":"-"}, d, [{"num":3,"case":2,"gap":"-"},{},{},{},{"num":3,"case":2,"gap":"-"}], l, r)},
+    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$2", "__", "NP"], "postprocess": (d, l, r) => ((root) => node("NP", root.types, root.children[0].children, root.loc))(process("NP'", {"num":3,"case":2,"gap":"-"}, d, [{"num":3,"case":2,"gap":"-"},{},{},{},{"num":3,"case":2,"gap":"-"}], l, r))},
     {"name": "S$subexpression$4", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "S", "symbols": ["S", "__", "S$subexpression$4", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"tp":4,"tense":3}], l, r)},
     {"name": "V$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},

@@ -1,5 +1,12 @@
 const {deepEqual} = require("assert");
-const {grammar} = require("../../src/drt/parser.js");
+const {grammar, nodes, clean} = require("../../src/drt/parser.js");
+const {
+ S, NP, NP_, PN, VP_, VP, V, BE, HAVE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
+ Discourse, Sentence
+} = nodes;
+
+const {Parser} = require("nearley");
+const {ParserRules, ParserStart} = require("./test.js");
 
 describe.only("Runtime", function() {
   it("compile", function() {
@@ -23,14 +30,16 @@ describe.only("Runtime", function() {
      }
     };
 
-    for (let {head, tail, prod} of rules) {
+    for (let {head, tail, skip, prod} of rules) {
      for (let line of tail) {
       let terms = line.map(name).join(" ");
       let types = line.map(term => JSON.stringify(term.types || {}));
 
       let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
 
-      if (typeof prod == "string") {
+      if (skip) {
+       body = `((root) => node("${skip}", root.types, root.children[0].children, root.loc))(${body})`;
+      } else if (typeof prod == "string") {
        body = `(${prod})(${body})`;
       }
 
@@ -45,19 +54,19 @@ describe.only("Runtime", function() {
     fs.writeFileSync("./tests/drt/test.ne", result.join("\n"));
   });
 
-  
-  it("parse", function() {
-    const {Parser} = require("nearley");
-    const {ParserRules, ParserStart} = require("./test.js");
 
-    let parse = (rule, src) => {
-     const parser = new Parser(ParserRules, rule, {
-       keepHistory: true
-      });
-     return parser.feed(src).results[0];
-    }
+  function parse(src, rule = ParserStart) {
+   const parser = new Parser(ParserRules, rule, {
+     keepHistory: true
+    });
+   return clean(parser.feed(src).results[0]).children[0];
+  }
 
-    assertThat(parse("V", "walks")).equalsTo({
+  it.skip("parse", function() {
+
+    console.log(JSON.stringify(parse("walks", "V"), undefined, 2));
+
+    assertThat(parse("walks", "V")).equalsTo({
       "@type": "V",
       "children": ["walks"],
       "loc": 0,
@@ -71,7 +80,7 @@ describe.only("Runtime", function() {
       }
     });
 
-    assertThat(parse("V", "walked")).equalsTo({
+    assertThat(parse("walked", "V")).equalsTo({
       "@type": "V",
       "children": ["walked"],
       "types": {
@@ -86,15 +95,15 @@ describe.only("Runtime", function() {
     }
     );
 
-    assertThat(parse("WS", " ")).equalsTo([null]);
-    assertThat(parse("ADJ", "happy")).equalsTo({
+    assertThat(parse(" ", "WS")).equalsTo([null]);
+    assertThat(parse("happy", "ADJ")).equalsTo({
        "@type": "ADJ", 
        "types": {}, 
        "children": ["happy"],
        "loc": "0",
     });
 
-    assertThat(parse("V", "shine")).equalsTo({
+    assertThat(parse("shine", "V")).equalsTo({
        "@type": "V", 
        "types": {
         "stat": "-",
@@ -104,6 +113,68 @@ describe.only("Runtime", function() {
        "loc": "0",
     });
 
+    assertThat(parse("she", "NP")).equalsTo({
+      "@type": "NP",
+      "children": [{
+        "@type": "PRO",
+        "children": ["she"],
+        "loc": 0,
+        "types": {
+          "case": "+nom",
+          "num": "sing",
+          "refl": "-",
+        }
+      }],
+      "loc": 0,
+      "types": {
+        "case": 3,
+        "gap": "-",
+        "num": 1,
+      }
+    });
+  });
+
+  it("He likes her", function() {
+    assertThat(parse("He likes her."))
+     .equalsTo(S(NP(PRO("He")), 
+                 VP_(VP(V("likes"), 
+                        NP(PRO("her"))))));
+  });
+
+  it("Jones loves.", function() {
+    assertThat(parse("Jones loves."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("Mary loves", function() {
+    assertThat(parse("Mary loves."))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("Anna loves.", function() {
+    assertThat(parse("Anna loves."))
+     .equalsTo(S(NP(PN("Anna")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("John stinks", function() {
+    assertThat(parse("John stinks."))
+     .equalsTo(S(NP(PN("John")),
+                 VP_(VP(V("stinks")))));
+  });
+
+  it("a man loves", function() {
+    assertThat(parse("a man loves."))
+     .equalsTo(S(NP(DET("a"), N("man")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("every donkey stinks", function() {
+    assertThat(parse("every donkey stinks."))
+     .equalsTo(S(NP(DET("every"), N("donkey")),
+                 VP_(VP(V("stinks")))));
   });
 
   function assertThat(x) {

@@ -16,8 +16,8 @@ function match(a, b) {
   return true;
  }
 
- let first = Object.entries(a);
- let second = Object.entries(b);
+ let first = Object.entries(a || {});
+ let second = Object.entries(b || {});
 
  if (first.length != second.length) {
   return false;
@@ -44,11 +44,11 @@ function process(head, types, children, features, location, reject) {
  // console.log(`process ${head}`);
  // console.log(`${tail.length} ${features.length}`);
  if (children.length != features.length) {
-  console.log("Invalid number of args?");
+  // console.log("Invalid number of args?");
   return reject;
  }
  for (let i = 0; i < children.length; i++) {
-  if (!match(children[i].types, features[i])) {
+  if (!match((children[i] || {}).types, features[i])) {
    return reject;
   }
  }
@@ -56,4 +56,18 @@ function process(head, types, children, features, location, reject) {
  return node(head, types, children, location);
 }
 
+const reserved = ["he", "she", "it", "they", "him", "her", "them", "his", "hers", "theirs"];
+
+function name(head, tail, reject) {
+  let result = head.join("") + tail.join("");
+  if (reserved.includes(result.toLowerCase())) {
+    return reject;
+  }
+  return result;
+}
+
 %}
+
+FULLNAME -> (NAME _):+ {% ([args]) => args.map(name => name[0]).join(" ") %}
+NAME -> [A-Z]:+ [a-z]:+ {% ([a, b], location, reject) => name(a, b, reject) %}
+VAR -> [A-Z] {% ([name]) => name %}
