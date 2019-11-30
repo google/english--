@@ -1,7 +1,7 @@
 const {deepEqual} = require("assert");
 const {grammar} = require("../../src/drt/parser.js");
 
-describe("Runtime", function() {
+describe.only("Runtime", function() {
   it("compile", function() {
     let result = [];
 
@@ -23,11 +23,17 @@ describe("Runtime", function() {
      }
     };
 
-    for (let {head, tail} of rules) {
+    for (let {head, tail, prod} of rules) {
      for (let line of tail) {
       let terms = line.map(name).join(" ");
       let types = line.map(term => JSON.stringify(term.types || {}));
+
+      //if (prod) {
+      // console.log(prod);
+      //}
+
       result.push(`${name(head)} -> ${terms} {% (d, l, r) => process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r) %}`);
+
      }
     }
 
@@ -49,11 +55,6 @@ describe("Runtime", function() {
      return parser.feed(src).results[0];
     }
 
-    // assertThat(parse("Sentence", "He likes her.")).equalsTo({
-    // });
-
-    // return;
-
     assertThat(parse("V", "walked")).equalsTo({
       "@type": "V",
       "children": [{
@@ -63,8 +64,9 @@ describe("Runtime", function() {
           "children": ["walk"],
           "types": {
             "stat": "-", 
-            "trans": "-"
+            "trans": "-",
           },
+          "loc": "0",
         }],
         "types": {
           "fin": "-",
@@ -74,6 +76,7 @@ describe("Runtime", function() {
           "tp": 4,
           "trans": 2,
         },
+        "loc": "0",
       }, "ed", ],
       "types": {
         "fin": "part",
@@ -82,7 +85,8 @@ describe("Runtime", function() {
         "tense": 5,
         "tp": 4,
         "trans": 3,
-      }
+      },
+      "loc": "0",
     }
     );
 
@@ -90,7 +94,8 @@ describe("Runtime", function() {
     assertThat(parse("ADJ", "happy")).equalsTo({
        "@type": "ADJ", 
        "types": {}, 
-       "children": ["happy"]
+       "children": ["happy"],
+       "loc": "0",
     });
     assertThat(parse("V", "shine")).equalsTo({
        "@type": "V", 
@@ -98,7 +103,8 @@ describe("Runtime", function() {
         "stat": "-",
         "trans": "-"
        }, 
-       "children": ["shine"]
+       "children": ["shine"],
+       "loc": "0",
     });
 
   });
