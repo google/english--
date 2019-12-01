@@ -8,7 +8,7 @@ const {
 const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./test.js");
 
-describe("Runtime", function() {
+describe.only("Runtime", function() {
   it("compile", function() {
     let result = [];
 
@@ -59,13 +59,26 @@ describe("Runtime", function() {
    const parser = new Parser(ParserRules, rule, {
      keepHistory: true
     });
-   return clean(parser.feed(src).results[0]).children[0];
+   return parser.feed(src).results[0];
   }
 
-  it.skip("parse", function() {
+  function first(node) {
+   return clean(node.children[0]);
+  }
 
-    console.log(JSON.stringify(parse("walks", "V"), undefined, 2));
+  it("stink", function() {
+    assertThat(parse("stink", "V")).equalsTo({
+      "@type": "V",
+      "children": ["stink"],
+      "loc": 0,
+      "types": {
+        "stat": "+",
+        "trans": "-"
+      }
+    });
+  });
 
+  it("walks", function() {
     assertThat(parse("walks", "V")).equalsTo({
       "@type": "V",
       "children": ["walks"],
@@ -79,7 +92,9 @@ describe("Runtime", function() {
         "trans": 1,
       }
     });
+  });
 
+  it("walked", function() {
     assertThat(parse("walked", "V")).equalsTo({
       "@type": "V",
       "children": ["walked"],
@@ -92,17 +107,23 @@ describe("Runtime", function() {
         "trans": 3,
       },
       "loc": "0",
-    }
-    );
+    });
+  });
 
+  it("whitespace", function() {
     assertThat(parse(" ", "WS")).equalsTo([null]);
+  });
+
+  it("happy", function() {
     assertThat(parse("happy", "ADJ")).equalsTo({
        "@type": "ADJ", 
        "types": {}, 
        "children": ["happy"],
        "loc": "0",
     });
+  });
 
+  it("shine", function() {
     assertThat(parse("shine", "V")).equalsTo({
        "@type": "V", 
        "types": {
@@ -112,7 +133,9 @@ describe("Runtime", function() {
        "children": ["shine"],
        "loc": "0",
     });
+  });
 
+  it("she", function() {
     assertThat(parse("she", "NP")).equalsTo({
       "@type": "NP",
       "children": [{
@@ -135,46 +158,126 @@ describe("Runtime", function() {
   });
 
   it("He likes her", function() {
-    assertThat(parse("He likes her."))
+    assertThat(first(parse("He likes her.")))
      .equalsTo(S(NP(PRO("He")), 
                  VP_(VP(V("likes"), 
                         NP(PRO("her"))))));
   });
 
   it("Jones loves.", function() {
-    assertThat(parse("Jones loves."))
+    assertThat(first(parse("Jones loves.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("loves")))));
   });
 
   it("Mary loves", function() {
-    assertThat(parse("Mary loves."))
+    assertThat(first(parse("Mary loves.")))
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(V("loves")))));
   });
 
   it("Anna loves.", function() {
-    assertThat(parse("Anna loves."))
+    assertThat(first(parse("Anna loves.")))
      .equalsTo(S(NP(PN("Anna")),
                  VP_(VP(V("loves")))));
   });
 
   it("John stinks", function() {
-    assertThat(parse("John stinks."))
+    assertThat(first(parse("John stinks.")))
      .equalsTo(S(NP(PN("John")),
                  VP_(VP(V("stinks")))));
   });
 
   it("a man loves", function() {
-    assertThat(parse("a man loves."))
+    assertThat(first(parse("a man loves.")))
      .equalsTo(S(NP(DET("a"), N("man")),
                  VP_(VP(V("loves")))));
   });
 
   it("every donkey stinks", function() {
-    assertThat(parse("every donkey stinks."))
+    assertThat(first(parse("every donkey stinks.")))
      .equalsTo(S(NP(DET("every"), N("donkey")),
                  VP_(VP(V("stinks")))));
+  });
+
+  it("the woman loves.", function() {
+    assertThat(first(parse("the woman loves.")))
+     .equalsTo(S(NP(DET("the"), N("woman")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("he loves", function() {
+    assertThat(first(parse("he loves.")))
+     .equalsTo(S(NP(PRO("he")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("she loves", function() {
+    assertThat(first(parse("she loves.")))
+     .equalsTo(S(NP(PRO("she")),
+                 VP_(VP(V("loves")))));
+  });
+
+  it("it stinks.", function() {
+    assertThat(first(parse("it stinks.")))
+     .equalsTo(S(NP(PRO("it")),
+                 VP_(VP(V("stinks")))));
+  });
+
+  it("it does not stink.", function() {
+    assertThat(first(parse("it does not stink.")))
+     .equalsTo(S(NP(PRO("it")),
+                 VP_(AUX("does"), "not", VP(V("stink")))));
+  });
+
+  it("the book does not stink.", function() {
+    assertThat(first(parse("the book does not stink.")))
+     .equalsTo(S(NP(DET("the"), N("book")),
+                 VP_(AUX("does"), "not", VP(V("stink")))));
+  });
+
+  it("he loves her.", function() {
+    assertThat(first(parse("he loves her.")))
+     .equalsTo(S(NP(PRO("he")),
+                 VP_(VP(V("loves"), NP(PRO("her"))))));
+  });
+
+  it("she loves the book", function() {
+    assertThat(first(parse("she loves the book.")))
+     .equalsTo(S(NP(PRO("she")),
+                 VP_(VP(V("loves"), NP(DET("the"), N("book"))))));
+  });
+
+  it("every man loves her.", function() {
+    assertThat(first(parse("every man loves her.")))
+     .equalsTo(S(NP(DET("every"), N("man")),
+                 VP_(VP(V("loves"), NP(PRO("her"))))));
+  });
+
+  it("every man loves John.", function() {
+    assertThat(first(parse("every man loves John.")))
+     .equalsTo(S(NP(DET("every"), N("man")),
+                 VP_(VP(V("loves"), NP(PN("John"))))));
+  });
+
+  it("shes does not love.", function() {
+    assertThat(first(parse("she does not love.")))
+     .equalsTo(S(NP(PRO("she")),
+                 VP_(AUX("does"), "not", VP(V("love")))));
+  });
+
+  it("she does not love him.", function() {
+    assertThat(first(parse("she does not love him.")))
+     .equalsTo(S(NP(PRO("she")),
+                  VP_(AUX("does"), "not", 
+                      VP(V("love"), NP(PRO("him"))))));
+  });
+
+  it("John does not like the book.", function() {
+    assertThat(first(parse("John does not like the book.")))
+     .equalsTo(S(NP(PN("John")),
+                 VP_(AUX("does"), "not", 
+                     VP(V("like"), NP(DET("the"), N("book"))))));
   });
 
   function assertThat(x) {

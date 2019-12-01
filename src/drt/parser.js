@@ -730,6 +730,7 @@ function grammar() {
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"})]],
                   undefined, 
                   undefined,
+                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, root.children[0].children, root.loc); }",
                   (name, types) => { 
                    return `([child], loc) => child`;
                   }
