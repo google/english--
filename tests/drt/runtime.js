@@ -30,7 +30,8 @@ describe.only("Runtime", function() {
      }
     };
 
-    for (let {head, tail, skip, prod} of rules) {
+    for (let rule of rules) {
+     let {head, tail, skip, prod} = rule;
      for (let line of tail) {
       let terms = line.map(name).join(" ");
       let types = line.map(term => JSON.stringify(term.types || {}));
@@ -38,7 +39,7 @@ describe.only("Runtime", function() {
       let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
 
       if (skip) {
-       body = `((root) => node("${skip}", root.types, root.children[0].children, root.loc))(${body})`;
+       body = `((root) => node("${skip}", Object.assign(root.types, ${JSON.stringify(rule.types)}), root.children[0].children, root.loc))(${body})`;
       } else if (typeof prod == "string") {
        body = `(${prod})(${body})`;
       }
@@ -138,6 +139,12 @@ describe.only("Runtime", function() {
   it("she", function() {
     assertThat(parse("she", "NP")).equalsTo({
       "@type": "NP",
+      "loc": 0,
+      "types": {
+        "case": 3,
+        "gap": "-",
+        "num": 1,
+      },
       "children": [{
         "@type": "PRO",
         "children": ["she"],
@@ -148,13 +155,14 @@ describe.only("Runtime", function() {
           "refl": "-",
         }
       }],
-      "loc": 0,
-      "types": {
-        "case": 3,
-        "gap": "-",
-        "num": 1,
-      }
     });
+  });
+
+  it("He and she", function() {
+    // console.log(JSON.stringify(clean(parse("he and she", "NP_")), undefined, 2));
+    // return;
+    assertThat(clean(parse("he and she", "NP_")))
+     .equalsTo(NP(NP(PRO("he")), "and", NP(PRO("she"))));
   });
 
   it("He likes her", function() {
@@ -306,7 +314,7 @@ describe.only("Runtime", function() {
                  ));
   });
 
-  it.skip("he and she love her.", function() {
+  it("he and she love her.", function() {
     // This has three possible interpretations, because "he and she"
     // has 3 gender values: male, fem and -hum.
     // TODO(goto): when both sides agree, we should probably make
@@ -317,7 +325,7 @@ describe.only("Runtime", function() {
                  VP_(VP(V("love"), NP(PRO("her"))))));
   });
 
-  it.skip("they love him and her.", function() {
+  it("they love him and her.", function() {
     assertThat(first(parse("they love him and her.")))
      .equalsTo(S(NP(PRO("they")),
                  VP_(VP(V("love"), 
@@ -325,7 +333,7 @@ describe.only("Runtime", function() {
                         ))));
   });
 
-  it.skip("every man loves a book and a woman.", function() {
+  it("every man loves a book and a woman.", function() {
     assertThat(first(parse("every man loves a book and a woman.")))
      .equalsTo(S(NP(DET("every"), N("man")),
                  VP_(VP(V("loves"), 
@@ -345,7 +353,7 @@ describe.only("Runtime", function() {
                  VP_(VP(V("loves"), NP(PN("Italy"))))));
   });
 
-  it.skip("every man loves Italy and Brazil", function() {
+  it("every man loves Italy and Brazil", function() {
     assertThat(first(parse("every man loves Italy and Brazil.")))
      .equalsTo(S(NP(DET("every"), N("man")),
                     VP_(VP(V("loves"), 
@@ -473,7 +481,7 @@ describe.only("Runtime", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it.skip("Jones or Smith loves her.", function() {
+  it("Jones or Smith loves her.", function() {
     assertThat(first(parse("Jones or Smith loves her.")))
      .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
                  VP_(VP(V("loves"), NP(PRO("her"))))));
@@ -583,7 +591,7 @@ describe.only("Runtime", function() {
                  VP_(VP(BE("is"), NP(DET("a"), N(ADJ("happy"), N("man")))))));
   });
 
-  it.skip("Sam loves Anna and Leo.", function() {
+  it("Sam loves Anna and Leo.", function() {
     assertThat(first(parse("Sam loves Anna and Leo.")))
      .equalsTo(S(NP(PN("Sam")),
                  VP_(VP(V("loves"), 

@@ -16,7 +16,7 @@ let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};
 let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
 let literal = (value) => { return {"@type": "Literal", name: value} };
-let phrase = (head, tail, skip, types) => { return rule(head, [tail], skip, types); };
+let phrase = (head, tail, skip, types, prod) => { return rule(head, [tail], skip, types, prod); };
 
 function name(term, pretty) {
  if (typeof term == "string") {
@@ -409,12 +409,17 @@ function grammar() {
                      literal("and"),
                      space(),
                      term("NP", {"num": 4, "case": 2, "gap": "-"})], 
-                    "NP"));
+                    undefined,
+                    undefined,
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // PS 12.5
  result.push(phrase(term("NP'", {"num": 1, "case": 3, "gap": 4}),
                     [term("NP", {"num": 1, "case": 3, "gap": 4})], 
-                    "NP"));
+                    undefined,
+                    undefined,
+                    "(root) => { return root.children[0]; }",
+                    ));
  
 
  // PS 13
@@ -496,7 +501,9 @@ function grammar() {
                      literal("or"),
                      space(),
                      term("NP", {"num": 3, "case": 2, "gap": "-"})], 
-                    "NP"));
+                    undefined,
+                    undefined,
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // Sentential Conjunctions
  result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
