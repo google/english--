@@ -77,6 +77,10 @@ describe.only("Runtime", function() {
     assertThat(capture({"c": "d"}, {"e": "f"})).equalsTo(false);
     // e = f is met with a variable
     assertThat(capture({"e": 1}, {"e": "f"})).equalsTo({"@1": "f"});
+    // captured enumeration
+    assertThat(capture({"a": ["b", "c"]}, {"a": 1})).equalsTo({"1": ["b", "c"]});
+    // captured enumeration
+    assertThat(capture({"a": ["b", "c"]}, {"a": "b"})).equalsTo({});
   });
 
   it("match", function() {
@@ -96,6 +100,8 @@ describe.only("Runtime", function() {
     assertThat(match([{"a": 1}, {"a": 2}], [{"a": "b"}, {"a": "c"}])).equalsTo({"@1": "b", "@2": "c"});
     assertThat(match([{}], [""])).equalsTo({});
     assertThat(match([""], [{}])).equalsTo({});
+    assertThat(match([{"a": ["b", "c"]}], [{"a": 1}])).equalsTo({"1": ["b", "c"]});
+    assertThat(match([{"a": ["b", "c"]}], [{"a": "b"}])).equalsTo({});
 
     // uneven number of features
     assertThat(match([{num: 'sing', stat: '+', gap: '-', tp: '-past', tense: 'pres' }, {}, {}], 
@@ -132,7 +138,8 @@ describe.only("Runtime", function() {
     // there are still open features
     assertThat(merge({"a": 1, "b": 2}, {"2": "c"})).equalsTo({"a": 1, "b": "c"});
 
-    // assertThat(merge({"a": 1}, {"a": "b"})).equalsTo({"a": "b"});
+    // merging enumerations
+    assertThat(merge({"a": 1, "b": 2}, {"2": ["c", "d"]})).equalsTo({"a": 1, "b": ["c", "d"]});
   });
 
   it("resolve", function() {
@@ -150,6 +157,7 @@ describe.only("Runtime", function() {
      .equalsTo({"a": 1, "b": "d"});
     assertThat(resolve({"a": 1}, [], [])).equalsTo({"a": 1});
     assertThat(resolve({"a": 1}, [{"a": "b"}], [{"a": 1}])).equalsTo({"a": "b"});
+    assertThat(resolve({"a": 1}, [{"c": ["d", "e"]}], [{"c": 1}])).equalsTo({"a": ["d", "e"]});
   });
 
   it("process", function() {
@@ -298,6 +306,28 @@ describe.only("Runtime", function() {
     });
   });
 
+  it("it", function() {
+    assertThat(parse("it", "NP")).equalsTo({
+      "@type": "NP",
+      "loc": 0,
+      "types": {
+        "case": ["-nom", "+nom"],
+        "gap": "-",
+        "num": "sing",
+      },
+      "children": [{
+        "@type": "PRO",
+        "children": ["it"],
+        "loc": 0,
+        "types": {
+          "case": ["-nom", "+nom"],
+          "num": "sing",
+          "refl": "-",
+        }
+      }],
+    });
+  });
+
   it("Jones", function() {
     assertThat(parse("Jones", "PN"))
      .equalsTo({"@type": "PN", "types": {"num": "sing"}, "loc": 0, "children": ["Jones"]});
@@ -415,19 +445,19 @@ describe.only("Runtime", function() {
                  VP_(VP(V("loves")))));
   });
 
-  it.skip("it stinks.", function() {
+  it("it stinks.", function() {
     assertThat(first(parse("it stinks.")))
      .equalsTo(S(NP(PRO("it")),
                  VP_(VP(V("stinks")))));
   });
 
-  it.skip("it does not stink.", function() {
+  it("it does not stink.", function() {
     assertThat(first(parse("it does not stink.")))
      .equalsTo(S(NP(PRO("it")),
                  VP_(AUX("does"), "not", VP(V("stink")))));
   });
 
-  it.skip("the book does not stink.", function() {
+  it("the book does not stink.", function() {
     assertThat(first(parse("the book does not stink.")))
      .equalsTo(S(NP(DET("the"), N("book")),
                  VP_(AUX("does"), "not", VP(V("stink")))));
@@ -457,27 +487,27 @@ describe.only("Runtime", function() {
                  VP_(VP(V("loves"), NP(PN("John"))))));
   });
 
-  it.skip("shes does not love.", function() {
+  it("shes does not love.", function() {
     assertThat(first(parse("she does not love.")))
      .equalsTo(S(NP(PRO("she")),
                  VP_(AUX("does"), "not", VP(V("love")))));
   });
 
-  it.skip("she does not love him.", function() {
+  it("she does not love him.", function() {
     assertThat(first(parse("she does not love him.")))
      .equalsTo(S(NP(PRO("she")),
                   VP_(AUX("does"), "not", 
                       VP(V("love"), NP(PRO("him"))))));
   });
 
-  it.skip("John does not like the book.", function() {
+  it("John does not like the book.", function() {
     assertThat(first(parse("John does not like the book.")))
      .equalsTo(S(NP(PN("John")),
                  VP_(AUX("does"), "not", 
                      VP(V("like"), NP(DET("the"), N("book"))))));
   });
 
-  it.skip("they love him", function() {
+  it("they love him", function() {
     // There are three interpretations to this phrase because
     // "they" can have three genders: male, female or non-human.
     // assertThat(parse("they love him.").length).equalsTo(3);
@@ -488,14 +518,14 @@ describe.only("Runtime", function() {
                  VP_(VP(V("love"), NP(PRO("him"))))));
   });
 
-  it.skip("they do not love him", function() {
+  it("they do not love him", function() {
     assertThat(first(parse("they do not love him.")))
      .equalsTo(S(NP(PRO("they")),
                  VP_(AUX("do"), "not", VP(V("love"), NP(PRO("him"))))
                  ));
   });
 
-  it.skip("they do not love the book", function() {
+  it("they do not love the book", function() {
     assertThat(first(parse("they do not love the book.")))
      .equalsTo(S(NP(PRO("they")),
                  VP_(AUX("do"), "not", 
@@ -620,7 +650,7 @@ describe.only("Runtime", function() {
                  VP_(VP(BE("is"), "not", ADJ("happy")))));
    });
 
-  it.skip("A porsche does not stink", function() {
+  it("A porsche does not stink", function() {
     assertThat(first(parse("A porsche does not stink.")))
      .equalsTo(S(NP(DET("A"), N("porsche")),
                  VP_(AUX("does"), "not", 
@@ -811,7 +841,7 @@ describe.only("Runtime", function() {
                  ));
   });
 
-  it.skip("He loves it.", function() {
+  it("He loves it.", function() {
     assertThat(first(parse("He loves It.")))
      .equalsTo(S(NP(PRO("He")),
                  VP_(VP(V("loves"), NP(PRO("It"))))));
@@ -861,14 +891,14 @@ describe.only("Runtime", function() {
                         NP(PN("Anna"))))));
   });
 
-  it.skip("Jones will walk.", function() {
+  it("Jones will walk.", function() {
     // future tense
     assertThat(first(parse("Jones will walk.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("will"), VP(V("walk")))));
   });
 
-  it.skip("Jones will kiss Anna.", function() {
+  it("Jones will kiss Anna.", function() {
     // future tense
     assertThat(first(parse("Jones will kiss Anna.")))
      .equalsTo(S(NP(PN("Jones")),

@@ -18,6 +18,10 @@ function capture(a, b) {
     // uses a different namespace for
     // the variables from children.
     result["@" + a[key]] = value;
+   } else if (Array.isArray(a[key])) {
+    if (!a[key].includes(value)) {
+     return false;
+    }
    } else if (a[key] != value) {
     return false;
    }
