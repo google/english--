@@ -270,7 +270,7 @@ function grammar() {
 
  // Root
  result.push(phrase(term("Sentence"),
-                    [term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}), 
+                    [term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3, "gap": "-"}), 
                      space(true),
                      '"."']));
 
@@ -878,6 +878,7 @@ function grammar() {
  // Extensible proper names.
  result.push(phrase(term("PN", {"num": "sing"}),
                     [term("FULLNAME")],
+                    undefined,
                     undefined,
                     {"gen": "?"}));
 

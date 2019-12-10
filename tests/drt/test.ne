@@ -1,7 +1,8 @@
 @builtin "whitespace.ne"
 @include "base.ne"
+@{% const {capture, match, merge, resolve, process, node} = require("./processor.js"); %}
 
-Sentence -> S _ "." {% (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{}], l, r) %}
+Sentence -> S _ "." {% (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3,"gap":"-"},{},{}], l, r) %}
 Sentence -> "who"i _ NP __ VP_ _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":1,"case":"+nom","gap":1},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3},{},{}], l, r) %}
 Sentence -> "who"i __ AUX __ NP __ VP _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","fin":"+","tp":5,"tense":4},{},{"num":1,"case":"+nom","gap":"-"},{},{"num":3,"fin":"+","stat":2,"gap":1,"tp":5,"tense":4},{},{}], l, r) %}
 Sentence -> "is"i __ NP __ ADJ _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","case":"+nom","gap":"-"},{},{},{},{}], l, r) %}
@@ -148,4 +149,3 @@ HAVE -> "has"i {% (d, l, r) => process("HAVE", {"num":"sing","fin":"+","tp":"-pa
 HAVE -> "have"i {% (d, l, r) => process("HAVE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r) %}
 HAVE -> "had"i {% (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r) %}
 HAVE -> "had"i {% (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"+past","tense":["pres","past"]}, d, [{}], l, r) %}
-WS -> _

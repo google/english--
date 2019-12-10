@@ -4,62 +4,6 @@
 function id(x) { return x[0]; }
 
 
-function node(type, types, children, loc) {
-  return {
-    "@type": type,
-    "types": types,
-    "children": children
-      .filter(child => child != null)
-      .filter(child => child != '.'),
-    "loc": loc
-  };
-}
-
-function match(a, b) {
- if (JSON.stringify(b) == "{}") {
-  return true;
- }
-
- let first = Object.entries(a || {});
- let second = Object.entries(b || {});
-
- if (first.length != second.length) {
-  return false;
- }
-
- for (let i = 0; i < first.length; i++) {
-  let [key, value] = second[i];
-  if (typeof first[i][1] == "number" ||
-      typeof second[i][1] == "number") {
-   continue;
-  }
-  if (first[i][1] != second[i][1]) {
-   // console.log(`${JSON.stringify(a)} doesnt match ${JSON.stringify(b)}?`);
-   return false;
-  }
- }
-
- // console.log(`${JSON.stringify(a)} matches ${JSON.stringify(b)}?`);
-
- return true;
-}
-
-function process(head, types, children, features, location, reject) {
- // console.log(`process ${head}`);
- // console.log(`${tail.length} ${features.length}`);
- if (children.length != features.length) {
-  // console.log("Invalid number of args?");
-  return reject;
- }
- for (let i = 0; i < children.length; i++) {
-  if (!match((children[i] || {}).types, features[i])) {
-   return reject;
-  }
- }
- // console.log(`Valid match ${JSON.stringify(types)}: ${JSON.stringify(children)}`);
- return node(head, types, children, location);
-}
-
 const reserved = ["he", "she", "it", "they", "him", "her", "them", "his", "hers", "theirs"];
 
 function name(head, tail, reject) {
@@ -70,7 +14,8 @@ function name(head, tail, reject) {
   return result;
 }
 
-var grammar = {
+
+ const {capture, match, merge, resolve, process, node} = require("./processor.js"); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -91,7 +36,10 @@ var grammar = {
     {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b], location, reject) => name(a, b, reject)},
     {"name": "VAR", "symbols": [/[A-Z]/], "postprocess": ([name]) => name},
-    {"name": "Sentence", "symbols": ["S", "_", {"literal":"."}], "postprocess": (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{}], l, r)},
+    {"name": "WS", "symbols": ["_"], "postprocess": (data, loc, reject) => process("WS", {"gap": "-"}, [], [], loc)},
+    {"name": "WS", "symbols": ["__"], "postprocess": (data, loc, reject) => process("WS", {"gap": "sing"}, [], [], loc)},
+    {"name": "WS", "symbols": ["__"], "postprocess": (data, loc, reject) => process("WS", {"gap": "plur"}, [], [], loc)},
+    {"name": "Sentence", "symbols": ["S", "_", {"literal":"."}], "postprocess": (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3,"gap":"-"},{},{}], l, r)},
     {"name": "Sentence$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "Sentence$subexpression$2", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
     {"name": "Sentence", "symbols": ["Sentence$subexpression$1", "_", "NP", "__", "VP_", "_", "Sentence$subexpression$2"], "postprocess": (d, l, r) => process("Sentence", {}, d, [{},{},{"num":1,"case":"+nom","gap":1},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3},{},{}], l, r)},
@@ -358,8 +306,7 @@ var grammar = {
     {"name": "HAVE$subexpression$3", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "HAVE", "symbols": ["HAVE$subexpression$3"], "postprocess": (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r)},
     {"name": "HAVE$subexpression$4", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$4"], "postprocess": (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"+past","tense":["pres","past"]}, d, [{}], l, r)},
-    {"name": "WS", "symbols": ["_"]}
+    {"name": "HAVE", "symbols": ["HAVE$subexpression$4"], "postprocess": (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"+past","tense":["pres","past"]}, d, [{}], l, r)}
 ]
   , ParserStart: "Sentence"
 }
