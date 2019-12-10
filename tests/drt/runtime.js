@@ -37,7 +37,7 @@ describe.only("Runtime", function() {
      let {head, tail, skip, prod} = rule;
      for (let line of tail) {
       let terms = line.map(name).join(" ");
-      let types = line.map(term => JSON.stringify(term.types || {}));
+      let types = line.filter(term => term != "null").map(term => JSON.stringify(term.types || {}));
 
       let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
 
@@ -76,7 +76,7 @@ describe.only("Runtime", function() {
     // e = f is not met
     assertThat(capture({"c": "d"}, {"e": "f"})).equalsTo(false);
     // e = f is met with a variable
-    assertThat(capture({"e": 1}, {"e": "f"})).equalsTo({"1": "f"});
+    assertThat(capture({"e": 1}, {"e": "f"})).equalsTo({"@1": "f"});
   });
 
   it("match", function() {
@@ -90,10 +90,10 @@ describe.only("Runtime", function() {
     assertThat(match([{"a": "b"}, {"a": "c"}], [{"a": 1}, {"a": 1}])).equalsTo(false);
     assertThat(match([{"a": "b", "c": "d"}], [{"a": 1, "c": 2}])).equalsTo({"1": "b", "2": "d"});
     assertThat(match([{"a": "b"}, {"c": "d"}], [{"a": 1}, {"c": 2}])).equalsTo({"1": "b", "2": "d"});
-    assertThat(match([{"a": 1}], [{"a": "b"}])).equalsTo({"1": "b"});
+    assertThat(match([{"a": 1}], [{"a": "b"}])).equalsTo({"@1": "b"});
     assertThat(match([{"c": "d"}], [{"e": "f"}])).equalsTo(false);
-    assertThat(match([{"a": 1}, {"a": "b"}], [{"a": "c"}, {"a": "b"}])).equalsTo({"1": "c"});
-    assertThat(match([{"a": 1}, {"a": 2}], [{"a": "b"}, {"a": "c"}])).equalsTo({"1": "b", "2": "c"});
+    assertThat(match([{"a": 1}, {"a": "b"}], [{"a": "c"}, {"a": "b"}])).equalsTo({"@1": "c"});
+    assertThat(match([{"a": 1}, {"a": 2}], [{"a": "b"}, {"a": "c"}])).equalsTo({"@1": "b", "@2": "c"});
     assertThat(match([{}], [""])).equalsTo({});
     assertThat(match([""], [{}])).equalsTo({});
 
@@ -101,6 +101,24 @@ describe.only("Runtime", function() {
     assertThat(match([{num: 'sing', stat: '+', gap: '-', tp: '-past', tense: 'pres' }, {}, {}], 
                      [{num: 1, stat: 2, tp: 4, tense: 3}, {}, {}]))
      .equalsTo(false); 
+  });
+
+  it("match - two variables binds to a value", function() {
+    // two variables binds to a value
+    assertThat(match([{"gap": "-"}, {"gap": 1}], [{"gap": 3}, {"gap": 3}])).equalsTo({"1": "-", "3": "-"});
+  });
+
+  it("match", function() {
+    assertThat(match([{"a": 3}, {"c": "d"}], [{"a": "b"}, {"c": 3}])).equalsTo({"@3": "b", "3": "d"});
+    // return;
+    // case: 3 = "+nom" and tense: 3 = "pres" collides (totally different types of features).
+    //assertThat(match([{"num": "sing", "case": 3, "gap": "-"},
+    //                  {},
+    //                  { "num": 'sing', "fin": '+', "stat": '+', "gap": '-', "tp": '-past', "tense": 'pres'}], 
+    //                 [{"num": 1, "case": '+nom', "gap": '-' },
+    //                  {},
+    //                  {"num": 1, "fin": '+', "stat": 2, "gap": '-', "tp": 4, "tense": 3}]))
+    // .equalsTo(false);
 
   });
 
@@ -113,9 +131,15 @@ describe.only("Runtime", function() {
 
     // there are still open features
     assertThat(merge({"a": 1, "b": 2}, {"2": "c"})).equalsTo({"a": 1, "b": "c"});
+
+    // assertThat(merge({"a": 1}, {"a": "b"})).equalsTo({"a": "b"});
   });
 
   it("resolve", function() {
+    assertThat(resolve({"a": 1}, [{"a": 1}], [{"a": "b"}])).equalsTo({"a": "b"});
+    // return;
+    assertThat(resolve({"c": 1}, [{"a": 3}, {"c": "d"}], [{"a": "b"}, {"c": 1}])).equalsTo({"c": "d"});
+    
     assertThat(resolve({}, [], [])).equalsTo({});
     assertThat(resolve({"a": "b"}, [], [])).equalsTo({"a": "b"});
     assertThat(resolve({"a": "b"}, [{"c": "d"}], [{"c": "d"}])).equalsTo({"a": "b"});
@@ -123,8 +147,9 @@ describe.only("Runtime", function() {
     assertThat(resolve({"a": 1}, [{"c": "d"}], [{"c": 1}])).equalsTo({"a": "d"});
     assertThat(resolve({"a": 1}, [{"a": 1}, {"a": "b"}], [{"a": 1}, {"a": "b"}])).equalsTo({"a": 1});
     assertThat(resolve({"a": 1, "b": 2}, [{"a": 1}, {"a": "b"}, {"b": 2}], [{"a": 1}, {"a": "b"}, {"b": "d"}]))
-     .equalsTo({"a": 1, "b":"d"});
+     .equalsTo({"a": 1, "b": "d"});
     assertThat(resolve({"a": 1}, [], [])).equalsTo({"a": 1});
+    assertThat(resolve({"a": 1}, [{"a": "b"}], [{"a": 1}])).equalsTo({"a": "b"});
   });
 
   it("process", function() {
@@ -204,7 +229,7 @@ describe.only("Runtime", function() {
     });
   });
 
-  it("whitespace", function() {
+  it("WS", function() {
     assertThat(parse(" ", "WS")).equalsTo({
       "@type": "WS", 
       "types": { 
@@ -213,6 +238,21 @@ describe.only("Runtime", function() {
       "children": [], 
       "loc": 0 
     });
+  });
+
+  it("GAP", function() {
+    assertThat(clean(parse("", "GAP")))
+     .equalsTo(GAP());
+  });
+
+  it("GAP - NP", function() {
+    assertThat(parse("", "NP_"))
+     .equalsTo({
+      "@type": "NP", 
+      "types": {"gap": "+", "num": 1, "case": 3}, 
+      "children": [{"@type": "GAP", "children": [], "loc": 0, "types": {}}], 
+      "loc": 0 
+     });
   });
 
   it("happy", function() {
@@ -280,6 +320,11 @@ describe.only("Runtime", function() {
       });
   });
 
+  it("loves", function() {
+    assertThat(clean(parse("loves", "S")))
+     .equalsTo(S(NP(GAP()), VP_(VP(V("loves")))));
+  });
+
   it("He and she", function() {
     assertThat(clean(parse("he and she", "NP_")))
      .equalsTo(NP(NP(PRO("he")), "and", NP(PRO("she"))));
@@ -290,9 +335,9 @@ describe.only("Runtime", function() {
      .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
   });
 
-  it("Jones loves.", function() {
-    assertThat(first(parse("Jones loves.")))
-     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
+  it("likes her", function() {
+    assertThat(clean(parse("likes her", "S")))
+      .equalsTo(S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))));
   });
 
   it.skip("a man who likes her", function() {
@@ -304,9 +349,9 @@ describe.only("Runtime", function() {
                        ))));
   });
 
-  it.skip("likes her", function() {
-    assertThat(clean(parse("likes her", "S")))
-     .equalsTo(S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))));
+  it("Jones loves.", function() {
+    assertThat(first(parse("Jones loves.")))
+     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
   });
 
   it("He likes her", function() {
@@ -644,7 +689,7 @@ describe.only("Runtime", function() {
                  S(NP(PRO("she")), VP_(VP(V("loves"), NP(PRO("him")))))));
   });
 
-  it("Jones's wife is happy.", function() {
+  it.skip("Jones's wife is happy.", function() {
     assertThat(first(parse("Jones's wife is happy.")))
      .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
                  VP_(VP(BE("is"), ADJ("happy")))));
@@ -743,14 +788,14 @@ describe.only("Runtime", function() {
                         ))));
   });
 
-  it("John is from Brazil", function() {
+  it.skip("John is from Brazil", function() {
     assertThat(first(parse("Jones is from Brazil.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
                         ))));
   });
 
-  it("Every brazilian is from Brazil", function() {
+  it.skip("Every brazilian is from Brazil", function() {
     assertThat(first(parse("Every brazilian is from Brazil.")))
      .equalsTo(S(NP(DET("Every"), N("brazilian")),
                  VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
@@ -838,7 +883,7 @@ describe.only("Runtime", function() {
                  VP_(AUX("did"), "not", VP(V("walk")))));
   });
 
-  it("Jones was happy.", function() {
+  it.skip("Jones was happy.", function() {
     assertThat(first(parse("Jones was happy.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("was"), ADJ("happy")))));

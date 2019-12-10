@@ -15,7 +15,9 @@ function capture(a, b) {
    if (a[key] == undefined) {
     return false;
    } else if (typeof a[key] == "number") {
-    result[a[key]] = value;
+    // uses a different namespace for
+    // the variables from children.
+    result["@" + a[key]] = value;
    } else if (a[key] != value) {
     return false;
    }
@@ -34,16 +36,22 @@ function match(a, b) {
  for (let i = 0; i < a.length; i++) {
   let binding = capture(a[i], b[i]);
   if (!binding) {
-   // console.log("hi");
-   // console.log(a[i]);
-   // console.log(b[i]);
    return false;
   }
+  // console.log(binding);
   for (let [key, value] of Object.entries(binding)) {
-   if (result[key] && result[key] != value) {
+   if (result[key] == undefined) {
+    result[key] = value;
+    // console.log(value);
+   } else if (typeof value == "number") {
+    result[value] = result[key];
+   } else if (typeof result[key] == "string" &&
+              result[key] != value) {
+    // console.log(key);
+    // console.log(result[key]);
+    // console.log("hi");
     return false;
    }
-   result[key] = value;
   }
  }
 
@@ -52,12 +60,18 @@ function match(a, b) {
 
 function merge(rule, bindings) {
  let result = JSON.parse(JSON.stringify(rule));
+
+ //console.log(rule);
+ //console.log(bindings);
+
  for (let [key, value] of Object.entries(rule)) {
   if (typeof value == "number") {
-   if (bindings[value] != undefined) {
+   // console.log(bindings);
+   if (bindings[value] != undefined ||
+       bindings["@" +value] != undefined) {
     // console.log(rule);
     // console.log(bindings);
-    result[key] = bindings[value];
+    result[key] = bindings[value] || bindings["@" + value];
    }
   }
  }
@@ -88,7 +102,7 @@ function node(type, types = {}, children = [], loc = 0) {
 
 function process(type, types, data, conditions, location, reject) {
  // console.log(type);
- // console.log(data);
+ // console.log(JSON.stringify(data));
  let children = data.map(c => c || {}).map(c => c.types || {});
  //console.log(data);
  // console.log(data.map(c => c || {}).map(c => c["@type"] || {}));
@@ -100,8 +114,12 @@ function process(type, types, data, conditions, location, reject) {
   // console.log("Rejecting");
   return reject;
  }
- // console.log(result);
- // console.log("yay!");
+ //console.log("yay!");
+ //console.log("children: " + JSON.stringify(children));
+ //console.log("conditions: " + JSON.stringify(conditions));
+ //console.log("types" + JSON.stringify(types));
+ //console.log("result: " + JSON.stringify(result));
+ // console.log(JSON.stringify(data, 2, undefined));
  let n = node(type, result, data, location);
  // console.log(n);
  return n;

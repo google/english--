@@ -305,28 +305,28 @@ function grammar() {
                      literal("?")]));
 
  // PS 1
- result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
                      [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
                       space(),
                       term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
  
  // PS 2
- result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3, "tp": 5, "tense": 4}),
-                     [term("NP'", {"num": 1, "case": "+nom", "gap": 3}),
-                      term("WS", {"gap": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                     [term("NP'", {"num": 1, "case": "+nom", "gap": "+"}),
+                      term("WS", {"gap": "-"}),
                       term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
  
  // PS 2.5
- result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3, "tp": 5, "tense": 4}),
-                     [term("NP'", {"num": 3, "case": "+nom", "gap": 3}),
-                      term("WS", {"gap": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                     [term("NP'", {"num": 3, "case": "+nom", "gap": "+"}),
+                      term("WS", {"gap": "-"}),
                       term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
 
  // PS 3
- result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 3, "tp": 5, "tense": 4}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
                      [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
                       space(),
-                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": 3, "tp": 5, "tense": 4})]));
+                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4})]));
  
  // PS 4a
  // NOTE(goto): this is slightly different in that the "num" variable
@@ -381,7 +381,7 @@ function grammar() {
                     [term("V", {"num": 1, "fin": 2, "stat": 3, "trans": "-", "tp": 5, "tense": 4})]));
  
  // PS 8
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": 1}),
+ result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "+"}),
                     [term("GAP")]));
  
  // page 36 makes a simplification, which we introduce back manually:
@@ -807,7 +807,9 @@ function grammar() {
 
  // GAP
  result.push(rule(term("GAP"),
-                   [["null"]]));
+                  [["null"]],
+                  undefined,
+                  undefined));
 
  // ADJ
  result.push(rule(term("ADJ"),
