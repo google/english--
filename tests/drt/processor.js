@@ -49,12 +49,19 @@ function match(a, b) {
     // console.log(value);
    } else if (typeof value == "number") {
     result[value] = result[key];
-   } else if (typeof result[key] == "string" &&
-              result[key] != value) {
-    // console.log(key);
+   } else if (typeof result[key] == "string") {
     // console.log(result[key]);
-    // console.log("hi");
-    return false;
+    // console.log(value);
+    if (Array.isArray(value)) {
+     // console.log(key);
+     // console.log("hi");
+     if (!value.includes(result[key])) {
+      return false;
+     }
+    } else if (result[key] != value) {
+     return false;
+    }
+    // return false;
    }
   }
  }

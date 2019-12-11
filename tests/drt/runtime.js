@@ -102,7 +102,7 @@ describe.only("Runtime", function() {
     assertThat(match([""], [{}])).equalsTo({});
     assertThat(match([{"a": ["b", "c"]}], [{"a": 1}])).equalsTo({"1": ["b", "c"]});
     assertThat(match([{"a": ["b", "c"]}], [{"a": "b"}])).equalsTo({});
-
+     
     // uneven number of features
     assertThat(match([{num: 'sing', stat: '+', gap: '-', tp: '-past', tense: 'pres' }, {}, {}], 
                      [{num: 1, stat: 2, tp: 4, tense: 3}, {}, {}]))
@@ -114,6 +114,12 @@ describe.only("Runtime", function() {
     assertThat(match([{"gap": "-"}, {"gap": 1}], [{"gap": 3}, {"gap": 3}])).equalsTo({"1": "-", "3": "-"});
   });
 
+
+  it("match - same variable, one enumeration", function() {
+    assertThat(match([{"num": "sing"}, {}, {"num": ["sing", "plur"]}], [{"num": 1}, {}, {"num": 1}]))
+     .equalsTo({"1": "sing"});
+  });
+  
   it("match", function() {
     assertThat(match([{"a": 3}, {"c": "d"}], [{"a": "b"}, {"c": 3}])).equalsTo({"@3": "b", "3": "d"});
     // return;
@@ -370,13 +376,16 @@ describe.only("Runtime", function() {
       .equalsTo(S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))));
   });
 
-  it.skip("a man who likes her", function() {
+  it("who likes her", function() {
+    assertThat(clean(parse("who likes her", "RC")))
+     .equalsTo(RC(RPRO("who"), 
+                  S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))));
+  });
+
+  it("a man who likes her", function() {
     assertThat(clean(parse("a man who likes her", "NP_")))
-     .equalsTo(NP(DET("a"), 
-                  N(N("man"), 
-                    RC(RPRO("who"), 
-                       S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))
-                       ))));
+     .equalsTo(NP(DET("a"), N(N("man"), RC(RPRO("who"), 
+                                           S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))))));
   });
 
   it("Jones loves.", function() {
@@ -580,7 +589,7 @@ describe.only("Runtime", function() {
                            ))));
   });
 
-  it.skip("Anna loves a man who loves her.", function() {
+  it("Anna loves a man who loves her.", function() {
     assertThat(first(parse("Anna loves a man who loves her.")))
      .equalsTo(S(NP(PN("Anna")),
                  VP_(VP(V("loves"),
@@ -591,7 +600,7 @@ describe.only("Runtime", function() {
                                 )))))));
   });
 
-  it.skip("Anna loves a book which surprises her", function() {
+  it("Anna loves a book which surprises her", function() {
     // assertThat(first(parse("Anna loves a book which surprises her.")).length).equalsTo(12);
     assertThat(first(parse("Anna loves a book which surprises her.")))
      .equalsTo(S(NP(PN("Anna")),
@@ -615,7 +624,7 @@ describe.only("Runtime", function() {
 
   });
 
-  it.skip("Every man who knows her loves her.", function() {
+  it("Every man who knows her loves her.", function() {
     assertThat(first(parse("Every man who knows her loves her.")))
      .equalsTo(S(NP(DET("Every"), 
                     N(N("man"), RC(RPRO("who"), 
@@ -626,7 +635,7 @@ describe.only("Runtime", function() {
                  ));
   });
 
-  it.skip("A stockbroker who does not love her surprises him.", function() {
+  it("A stockbroker who does not love her surprises him.", function() {
     assertThat(first(parse("A stockbroker who does not love her surprises him.")))
      .equalsTo(S(NP(DET("A"),
                     N(N("stockbroker"), RC(RPRO("who"), 
@@ -657,7 +666,7 @@ describe.only("Runtime", function() {
                      VP(V("stink")))));
   });
 
-  it.skip("Jones loves a woman who does not admire him.", function() {
+  it("Jones loves a woman who does not admire him.", function() {
     assertThat(first(parse("Jones loves a woman who does not love him.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("loves"),
@@ -678,7 +687,7 @@ describe.only("Runtime", function() {
                  S(NP(PRO("he")), VP_(VP(V("likes"), NP(PRO("it")))))));
   });
 
-  it.skip("every man who owns a book likes it.", function() {
+  it("every man who owns a book likes it.", function() {
     assertThat(first(parse("every man who owns a book likes it.")))
      .equalsTo(S(NP(DET("every"), N(N("man"), RC(RPRO("who"), 
                                                  S(NP(GAP()), VP_(VP(V("owns"), NP(DET("a"), N("book")))))))), 
