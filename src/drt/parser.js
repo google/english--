@@ -479,12 +479,12 @@ function grammar() {
                      term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
  
  // Sentential Disjunctions
- result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
-                    [term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
+                    [term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
                      space(),
                      literal("or"),
                      space(),
-                     term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3})]));
+                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
 
  // VP Disjunctions
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),

@@ -711,14 +711,14 @@ describe.only("Runtime", function() {
                  VP_(VP(V("likes"), NP(PRO("it"))))));
   });
 
-  it.skip("Jones loves her or Smith loves her.", function() {
+  it("Jones loves her or Smith loves her.", function() {
     assertThat(first(parse("Jones loves her or Smith loves her.")))
      .equalsTo(S(S(NP(PN("Jones")), VP_(VP(V("loves"), NP(PRO("her"))))), 
                  "or", 
                  S(NP(PN("Smith")), VP_(VP(V("loves"), NP(PRO("her")))))));
    });
 
-  it.skip("Mary loves Jones or likes Smith.", function() {
+  it("Mary loves Jones or likes Smith.", function() {
     assertThat(first(parse("Mary loves Jones or likes Smith.")))
      .equalsTo(S(NP(PN("Mary")), 
                  VP_(VP(VP(V("loves"), NP(PN("Jones"))), 
@@ -726,7 +726,7 @@ describe.only("Runtime", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it.skip("Jones or Smith loves her.", function() {
+  it("Jones or Smith loves her.", function() {
     assertThat(first(parse("Jones or Smith loves her.")))
      .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
                  VP_(VP(V("loves"), NP(PRO("her"))))));
