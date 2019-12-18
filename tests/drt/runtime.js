@@ -398,6 +398,13 @@ describe.only("Runtime", function() {
                   S(NP(PRO("she")), VP_(VP(V("loves"), NP(GAP()))))));
   });
 
+  it("he likes it", function() {
+    assertThat(clean(parse("he likes it", "S")))
+     .equalsTo(S(NP(PRO("he")),
+                 VP_(VP(V("likes"), NP(PRO("it"))))));
+  });
+
+
   it("Jones loves.", function() {
     assertThat(first(parse("Jones loves.")))
      .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
@@ -689,7 +696,7 @@ describe.only("Runtime", function() {
                  ));
   });
 
-  it.skip("If Jones owns a book then he likes it.", function() {
+  it("If Jones owns a book then he likes it.", function() {
     assertThat(first(parse("If Jones owns a book then he likes it.")))
      .equalsTo(S("If", 
                  S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("a"), N("book"))))), 
@@ -851,7 +858,7 @@ describe.only("Runtime", function() {
                         ))));
   });
 
-  it.skip("If A is B's parent then B is A's child.", function() {
+  it("If A is B's parent then B is A's child.", function() {
     assertThat(first(parse("If A is B's parent then B is A's child.")))
      .equalsTo(S("If", 
                  S(NP(PN("A")), VP_(VP(BE("is"), NP(DET(PN("B"), "'s"), RN("parent"))))), 

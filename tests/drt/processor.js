@@ -127,12 +127,12 @@ function process(type, types, data, conditions, location, reject) {
   // console.log("Rejecting");
   return reject;
  }
- //console.log("yay!");
+ // console.log("yay!");
  //console.log("types" + JSON.stringify(types));
  //console.log("result: " + JSON.stringify(result));
  // console.log(JSON.stringify(data, 2, undefined));
  let n = node(type, result, data, location);
- // console.log(n);
+ // console.log(JSON.stringify(n));
  return n;
 }
 

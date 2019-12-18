@@ -469,14 +469,14 @@ function grammar() {
                       term("N", {"num": 1})]));
 
  // Conditionals
- result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
                     [literal("if"),
                      space(),
-                     term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
+                     term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
                      space(),
                      literal("then"),
                      space(),
-                     term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3})]));
+                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
  
  // Sentential Disjunctions
  result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),

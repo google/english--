@@ -81,7 +81,7 @@ function name(head, tail, reject) {
     {"name": "N", "symbols": ["ADJ", "__", "N"], "postprocess": (d, l, r) => process("N", {"num":1}, d, [{},{},{"num":1}], l, r)},
     {"name": "S$subexpression$1", "symbols": [/[iI]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "S$subexpression$2", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "S", "symbols": ["S$subexpression$1", "__", "S", "__", "S$subexpression$2", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"tp":4,"tense":3}, d, [{},{},{"num":1,"stat":2,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"tp":4,"tense":3}], l, r)},
+    {"name": "S", "symbols": ["S$subexpression$1", "__", "S", "__", "S$subexpression$2", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{},{},{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r)},
     {"name": "S$subexpression$3", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "S", "symbols": ["S", "__", "S$subexpression$3", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"tp":4,"tense":3}], l, r)},
     {"name": "VP$subexpression$2", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
