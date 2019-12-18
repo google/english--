@@ -506,12 +506,12 @@ function grammar() {
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // Sentential Conjunctions
- result.push(phrase(term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
-                    [term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3}),
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
+                    [term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
                      space(),
                      literal("and"),
                      space(),
-                     term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3})]));
+                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
 
  // V Conjunctions
  result.push(phrase(term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5}),

@@ -35,7 +35,7 @@ S -> "if"i __ S __ "then"i __ S {% (d, l, r) => process("S", {"num":1,"stat":2,"
 S -> S __ "or"i __ S {% (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r) %}
 VP -> VP __ "or"i __ VP {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}], l, r) %}
 NP_ -> NP __ "or"i __ NP {% (d, l, r) => ((root) => { return node('NP', root.types, root.children, root.loc); })(process("NP'", {"num":3,"case":2,"gap":"-"}, d, [{"num":3,"case":2,"gap":"-"},{},{},{},{"num":3,"case":2,"gap":"-"}], l, r)) %}
-S -> S __ "and"i __ S {% (d, l, r) => process("S", {"num":1,"stat":2,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"tp":4,"tense":3}], l, r) %}
+S -> S __ "and"i __ S {% (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r) %}
 V -> V __ "and"i __ V {% (d, l, r) => process("V", {"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}], l, r) %}
 NP -> DET __ RN {% (d, l, r) => process("NP", {"num":1,"case":3,"gap":"-"}, d, [{"num":"sing","rn":"+"},{},{"num":1}], l, r) %}
 DET -> PN "'s"i {% (d, l, r) => process("DET", {"num":"sing","rn":"+"}, d, [{"num":1},{}], l, r) %}
