@@ -186,13 +186,13 @@ describe.only("Runtime", function() {
      }], 0, -1)).equalsTo(-1);
   });
 
-  function parse(src, rule = ParserStart) {
+  function parse(src, rule = ParserStart, i = 0) {
    const parser = new Parser(ParserRules, rule, {
      keepHistory: true
     });
    // console.log(ParserStart);
    // console.log(parser.feed(src));
-   return parser.feed(src).results[0];
+   return parser.feed(src).results[i];
   }
 
   function first(node) {
@@ -386,6 +386,16 @@ describe.only("Runtime", function() {
     assertThat(clean(parse("a man who likes her", "NP_")))
      .equalsTo(NP(DET("a"), N(N("man"), RC(RPRO("who"), 
                                            S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))))));
+  });
+
+  it("she loves", function() {
+    assertThat(clean(parse("she loves", "S"))).equalsTo(S(NP(PRO("she")), VP_(VP(V("loves")))));
+  });
+
+  it("who she loves", function() {
+    assertThat(clean(parse("who she loves", "RC")))
+     .equalsTo(RC(RPRO("who"), 
+                  S(NP(PRO("she")), VP_(VP(V("loves"), NP(GAP()))))));
   });
 
   it("Jones loves.", function() {
@@ -612,7 +622,7 @@ describe.only("Runtime", function() {
                                 )))))));
   });
 
-  it.skip("Every book which she loves surprises him.", function() {
+  it("Every book which she loves surprises him.", function() {
     assertThat(first(parse("Every book which she loves surprises him.")))
      .equalsTo(S(NP(DET("Every"), 
                     N(N("book"), RC(RPRO("which"), 

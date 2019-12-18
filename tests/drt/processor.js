@@ -120,14 +120,14 @@ function process(type, types, data, conditions, location, reject) {
  // console.log(children);
  // console.log(JSON.stringify(data, 2, undefined));
  // console.log(conditions);
+ // console.log("child: " + JSON.stringify(children));
+ // console.log("conds: " + JSON.stringify(conditions));
  let result = resolve(types, children, conditions);
  if (!result) {
   // console.log("Rejecting");
   return reject;
  }
  //console.log("yay!");
- //console.log("children: " + JSON.stringify(children));
- //console.log("conditions: " + JSON.stringify(conditions));
  //console.log("types" + JSON.stringify(types));
  //console.log("result: " + JSON.stringify(result));
  // console.log(JSON.stringify(data, 2, undefined));

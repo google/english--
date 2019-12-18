@@ -366,10 +366,10 @@ function grammar() {
  
  // PS 6
  // TODO(goto): should we limit tense to ["past", "pres"] per page 684?
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "+", "tp": 6, "tense": 5}),
                     [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
-                     term("WS", {"gap": 3}),
-                     term("NP'", {"num": 3, "case": "-nom", "gap": 3})]));
+                     term("WS", {"gap": "-"}),
+                     term("NP'", {"num": 3, "case": "-nom", "gap": "+"})]));
  
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "-", "tp": 6, "tense": 5}),
                     [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
@@ -436,7 +436,7 @@ function grammar() {
  result.push(phrase(term("RC", {"num": 1}),
                      [term("RPRO", {"num": 1}),
                       space(),
-                      term("S", {"num": 1, "stat": 2, "gap": 1, "tp": 4, "tense": 3})]));
+                      term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 4, "tense": 3})]));
 
  // PS Adjectives (page 57)
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
