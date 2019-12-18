@@ -515,11 +515,11 @@ function grammar() {
 
  // V Conjunctions
  result.push(phrase(term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5}),
-                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 7, "trans": 3, "tp": 6, "tense": 5}),
                      space(),
                      literal("and"),
                      space(),
-                     term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5})]));
+                     term("V", {"num": 1, "fin": 2, "stat": 8, "trans": 3, "tp": 6, "tense": 5})]));
  
  // Non-pronomial possessive phrases
  result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),

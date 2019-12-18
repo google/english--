@@ -732,7 +732,7 @@ describe.only("Runtime", function() {
                  VP_(VP(V("loves"), NP(PRO("her"))))));
   });
 
-  it.skip("Jones owns and loves a porsche.", function() {
+  it("Jones owns and loves a porsche.", function() {
     assertThat(first(parse("Jones owns and loves a porsche.")))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(V("owns"), "and", V("loves")), NP(DET("a"), N("porsche"))))));
