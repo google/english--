@@ -1,6 +1,8 @@
 const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./english.js");
 
+let namespace = 0;
+
 let rule = (head = {}, tail = [], skip = false, types = {}, prod) => { 
  return {
   "@type": "Rule", 

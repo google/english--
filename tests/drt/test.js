@@ -91,7 +91,7 @@ function name(head, tail, reject) {
     {"name": "S$subexpression$4", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "S", "symbols": ["S", "__", "S$subexpression$4", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r)},
     {"name": "V$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["V", "__", "V$subexpression$1", "__", "V"], "postprocess": (d, l, r) => process("V", {"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}], l, r)},
+    {"name": "V", "symbols": ["V", "__", "V$subexpression$1", "__", "V"], "postprocess": (d, l, r) => process("V", {"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":7,"trans":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":8,"trans":3,"tp":6,"tense":5}], l, r)},
     {"name": "NP", "symbols": ["DET", "__", "RN"], "postprocess": (d, l, r) => process("NP", {"num":1,"case":3,"gap":"-"}, d, [{"num":"sing","rn":"+"},{},{"num":1}], l, r)},
     {"name": "DET$subexpression$1", "symbols": [{"literal":"'"}, /[sS]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "DET", "symbols": ["PN", "DET$subexpression$1"], "postprocess": (d, l, r) => process("DET", {"num":"sing","rn":"+"}, d, [{"num":1},{}], l, r)},

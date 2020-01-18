@@ -130,7 +130,14 @@ function process(type, types, data, conditions, location, reject) {
  // console.log("yay!");
  //console.log("types" + JSON.stringify(types));
  //console.log("result: " + JSON.stringify(result));
- // console.log(JSON.stringify(data, 2, undefined));
+ // console.log(JSON.stringify(result, 2, undefined));
+ let namespace = Math.floor((Math.random() * 1000));
+ for (let [key, value] of Object.entries(result)) {
+  if (typeof value == "number") {
+   // console.log("hi");
+   result[key] = namespace + value;
+  }
+ }
  let n = node(type, result, data, location);
  // console.log(JSON.stringify(n));
  return n;
