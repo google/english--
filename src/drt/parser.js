@@ -280,7 +280,7 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("who"),
                      space(true),
-                     term("NP", {"num": 1, "case": "+nom", "gap": 1}),
+                     term("NP", {"num": 1, "case": "+nom", "gap": "+"}),
                      space(),
                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
                      space(true),
@@ -293,7 +293,7 @@ function grammar() {
                      space(),
                      term("NP", {"num": 1, "case": "+nom", "gap": "-"}),
                      space(),
-                     term("VP", {"num": 3, "fin": "+", "stat": 2, "gap": 1, "tp": 5, "tense": 4}),
+                     term("VP", {"num": 3, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
                      space(true),
                      literal("?")]));
 

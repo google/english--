@@ -3,8 +3,8 @@
 @{% const {capture, match, merge, resolve, process, node} = require("./processor.js"); %}
 
 Sentence -> S _ "." {% (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3,"gap":"-"},{},{}], l, r) %}
-Sentence -> "who"i _ NP __ VP_ _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":1,"case":"+nom","gap":1},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3},{},{}], l, r) %}
-Sentence -> "who"i __ AUX __ NP __ VP _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","fin":"+","tp":5,"tense":4},{},{"num":1,"case":"+nom","gap":"-"},{},{"num":3,"fin":"+","stat":2,"gap":1,"tp":5,"tense":4},{},{}], l, r) %}
+Sentence -> "who"i _ NP __ VP_ _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":1,"case":"+nom","gap":"+"},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3},{},{}], l, r) %}
+Sentence -> "who"i __ AUX __ NP __ VP _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","fin":"+","tp":5,"tense":4},{},{"num":1,"case":"+nom","gap":"-"},{},{"num":3,"fin":"+","stat":2,"gap":"+","tp":5,"tense":4},{},{}], l, r) %}
 Sentence -> "is"i __ NP __ ADJ _ "?"i {% (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","case":"+nom","gap":"-"},{},{},{},{}], l, r) %}
 S -> NP_ __ VP_ {% (d, l, r) => process("S", {"num":1,"stat":2,"gap":"-","tp":4,"tense":3}, d, [{"num":1,"case":"+nom","gap":"-"},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3}], l, r) %}
 S -> NP_ WS VP_ {% (d, l, r) => process("S", {"num":1,"stat":2,"gap":"+","tp":5,"tense":4}, d, [{"num":1,"case":"+nom","gap":"+"},{"gap":"-"},{"num":1,"fin":"+","stat":2,"gap":"-","tp":5,"tense":4}], l, r) %}

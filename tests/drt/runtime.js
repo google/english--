@@ -784,24 +784,24 @@ describe.only("Runtime", function() {
                  VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
   });
 
-  it.skip("Who likes Mary?", function() {
-    assertThat(clean(parse("Who likes Mary?")[0]))
+  it("Who likes Mary?", function() {
+    assertThat(clean(parse("Who likes Mary?")))
      .equalsTo(Sentence("Who", 
                         NP(GAP()), 
                         VP_(VP(V("likes"), NP(PN("Mary")))), 
                         "?"));
   });
 
-  it.skip("Who is happy?", function() {
-    assertThat(clean(parse("Who is happy?")[0]))
+  it("Who is happy?", function() {
+    assertThat(clean(parse("Who is happy?")))
      .equalsTo(Sentence("Who", 
                         NP(GAP()), 
                         VP_(VP(BE("is"), ADJ("happy"))), 
                         "?"));
   });
 
-  it.skip("Who does Mary like?", function() {
-    assertThat(clean(parse("Who does Mary like?")[0]))
+  it("Who does Mary like?", function() {
+    assertThat(clean(parse("Who does Mary like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(PN("Mary")), 
@@ -809,8 +809,8 @@ describe.only("Runtime", function() {
                         "?"));
   });
 
-  it.skip("Who does the man like?", function() {
-    assertThat(clean(parse("Who does the man like?")[0]))
+  it("Who does the man like?", function() {
+    assertThat(clean(parse("Who does the man like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(DET("the"), N("man")), 
@@ -818,8 +818,8 @@ describe.only("Runtime", function() {
                         "?"));
   });
 
-  it.skip("Who does Smith's brother like?", function() {
-    assertThat(clean(parse("Who does Smith's brother like?")[0]))
+  it("Who does Smith's brother like?", function() {
+    assertThat(clean(parse("Who does Smith's brother like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(DET(PN("Smith"), "'s"), RN("brother")), 
@@ -827,8 +827,8 @@ describe.only("Runtime", function() {
                         "?"));
   });
 
-  it.skip("Is Mary happy?", function() {
-    assertThat(clean(parse("Is Mary happy?")[0]))
+  it("Is Mary happy?", function() {
+    assertThat(clean(parse("Is Mary happy?")))
      .equalsTo(Sentence("Is", 
                         NP(PN("Mary")), 
                         ADJ("happy"), 
