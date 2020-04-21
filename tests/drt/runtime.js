@@ -6,9 +6,9 @@ const {
 } = nodes;
 
 const {Parser} = require("nearley");
-const {ParserRules, ParserStart} = require("./test.js");
+const {ParserRules, ParserStart} = require("./../../src/drt/english.js");
 
-const {capture, match, merge, resolve, process, node} = require("./processor.js");
+const {capture, match, merge, resolve, process, node} = require("./../../src/drt/processor.js");
 
 describe.only("Runtime", function() {
   it("compile", function() {
@@ -55,7 +55,7 @@ describe.only("Runtime", function() {
     // result.push("WS -> _");
 
     const fs = require("fs");
-    fs.writeFileSync("./tests/drt/test.ne", result.join("\n"));
+    fs.writeFileSync("./src/drt/english.ne", result.join("\n"));
   });
 
   it("capture", function() {
