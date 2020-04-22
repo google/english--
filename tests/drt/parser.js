@@ -1,99 +1,441 @@
-const Assert = require("assert");
-
-const {
-  parse, 
-  parser, 
-  term, 
-  rule, 
-  phrase, 
-  space, 
-  clone, 
-  literal, 
-  compile, 
-  print, 
-  generate, 
-  expand, 
-  collect, 
-  processor, 
-  grammar,
-  first,
-  clean,
-  nodes} = require("../../src/drt/parser.js");
-
+const {deepEqual} = require("assert");
+const {grammar, nodes, clean} = require("../../src/drt/parser.js");
 const {
  S, NP, NP_, PN, VP_, VP, V, BE, HAVE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
  Discourse, Sentence
 } = nodes;
 
-describe("Parser", function() {
+const {Parser} = require("nearley");
+const {ParserRules, ParserStart} = require("./../../src/drt/english.js");
 
-  it("errors", function() {
-    assertThat("foo").failsAt(0, "f");
-    assertThat("A stockbroker who do not love her surprises him.").failsAt(20, " ");
+const {capture, match, merge, resolve, process, node} = require("./../../src/drt/processor.js");
+
+describe.only("Runtime", function() {
+  it("compile", function() {
+    let result = [];
+
+    result.push(`@builtin "whitespace.ne"`);
+    result.push(`@include "base.ne"`);
+    result.push(`@{% const {capture, match, merge, resolve, process, node} = require("./processor.js"); %}`);
+    result.push(``);
+
+    let rules = grammar();
+
+    let name = (term) => {
+     if (typeof term == "string") {
+      return term;
+     } else if (term["@type"] == "Literal") {
+      return `"${term.name}"i`;
+     } else {
+      let result = term.name;
+      result = result.replace("'", '_');
+      return result;
+     }
+    };
+
+    for (let rule of rules) {
+     let {head, tail, skip, prod} = rule;
+     for (let line of tail) {
+      let terms = line.map(name).join(" ");
+      let types = line.filter(term => term != "null").map(term => JSON.stringify(term.types || {}));
+
+      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
+
+      if (skip) {
+       body = `((root) => node("${skip}", Object.assign(root.types, ${JSON.stringify(rule.types)}), root.children[0].children, root.loc))(${body})`;
+      } else if (typeof prod == "string") {
+       body = `(${prod})(${body})`;
+      }
+
+      result.push(`${name(head)} -> ${terms} {% (d, l, r) => ${body} %}`);
+
+     }
+    }
+
+    // result.push("WS -> _");
+
+    const fs = require("fs");
+    fs.writeFileSync("./src/drt/english.ne", result.join("\n"));
   });
 
-  it("discourse", function() {
-    assertThat(clean(parse("Anna loves John. John loves Anna. A man loves her.", "Discourse")[0]))
-     .equalsTo(Discourse(Sentence(S(NP(PN("Anna")),
-                                    VP_(VP(V("loves"), NP(PN("John")))))
-                                  ),
-                         Sentence(S(NP(PN("John")),
-                                    VP_(VP(V("loves"), NP(PN("Anna")))))
-                                  ),
-                         Sentence(S(NP(DET("A"), N("man")),
-                                    VP_(VP(V("loves"), NP(PRO("her")))))
-                                  )
-                         ));
-   });
-
-  it.skip("extensible proper names", function() {
-    assertThat(first(parse("Sam loves her.")))
-     .equalsTo(S(NP_(NP(PN("Sam"))),
-                 VP_(VP(V("loves"), NP_(NP(PRO("her")))))));
-    assertThat(first(parse("Sam loves Dani.")))
-     .equalsTo(S(NP_(NP(PN("Sam"))),
-                 VP_(VP(V("loves"), NP_(NP(PN("Dani")))))));
-    assertThat(first(parse("Sam and Dani love Anna and Leo.")))
-     .equalsTo(S(NP_(NP(PN("Sam")), "and", NP(PN("Dani"))),
-                 VP_(VP(V("love"), 
-                        NP_(NP(PN("Anna")), "and", NP(PN("Leo")))
-                        ))));
-    assertThat(first(parse("Sam Goto loves Dani Fonsechi.")))
-     .equalsTo(S(NP_(NP(PN("Sam Goto"))),
-                 VP_(VP(V("loves"), NP_(NP(PN("Dani Fonsechi")))))));
+  it("capture", function() {
+    // base case
+    assertThat(capture({}, {})).equalsTo({});
+    // empty child, non-empty conditions
+    assertThat(capture({}, {"a": "b"})).equalsTo(false);
+    // non-empty child, empty conditions
+    assertThat(capture({"a": "b"}, {})).equalsTo(false);
+    // matching child and condition
+    assertThat(capture({"a": "b"}, {"a": "b"})).equalsTo({});
+    // non-matching child and condition
+    assertThat(capture({"a": "b"}, {"a": "c"})).equalsTo(false);
+    // captured feature
+    assertThat(capture({"a": "b"}, {"a": 1})).equalsTo({"1": "b"});
+    // two variables
+    assertThat(capture({"a": "b", "c": "d"}, {"a": "b", "c": 1})).equalsTo({"1": "d"});
+    // e = f is not met
+    assertThat(capture({"c": "d"}, {"e": "f"})).equalsTo(false);
+    // e = f is met with a variable
+    assertThat(capture({"e": 1}, {"e": "f"})).equalsTo({"@1": "f"});
+    // captured enumeration
+    assertThat(capture({"a": ["b", "c"]}, {"a": 1})).equalsTo({"1": ["b", "c"]});
+    // captured enumeration
+    assertThat(capture({"a": ["b", "c"]}, {"a": "b"})).equalsTo({});
   });
 
-  it("autocomplete", function() {
-   //const parser = new Parser(ParserRules, ParserStart, {
-   //  keepHistory: true
-   // });
-   //parser.feed("");
-   // console.log(parser.table[0].states);
-   // for (let row of parser.table) {
-   //  console.log(row.wants);
-   // }
+  it("match", function() {
+    assertThat(match([], [])).equalsTo({});
+    assertThat(match([1], [])).equalsTo(false);
+    assertThat(match([], [1])).equalsTo(false);
+    assertThat(match([{}], [{}])).equalsTo({});
+    assertThat(match([{"a": "b"}], [{"a": "c"}])).equalsTo(false);
+    assertThat(match([{"a": "b"}], [{"a": "b"}])).equalsTo({});
+    assertThat(match([{"a": "b"}], [{"a": 1}])).equalsTo({"1": "b"});
+    assertThat(match([{"a": "b"}, {"a": "c"}], [{"a": 1}, {"a": 1}])).equalsTo(false);
+    assertThat(match([{"a": "b", "c": "d"}], [{"a": 1, "c": 2}])).equalsTo({"1": "b", "2": "d"});
+    assertThat(match([{"a": "b"}, {"c": "d"}], [{"a": 1}, {"c": 2}])).equalsTo({"1": "b", "2": "d"});
+    assertThat(match([{"a": 1}], [{"a": "b"}])).equalsTo({"@1": "b"});
+    assertThat(match([{"c": "d"}], [{"e": "f"}])).equalsTo(false);
+    assertThat(match([{"a": 1}, {"a": "b"}], [{"a": "c"}, {"a": "b"}])).equalsTo({"@1": "c"});
+    assertThat(match([{"a": 1}, {"a": 2}], [{"a": "b"}, {"a": "c"}])).equalsTo({"@1": "b", "@2": "c"});
+    assertThat(match([{}], [""])).equalsTo({});
+    assertThat(match([""], [{}])).equalsTo({});
+    assertThat(match([{"a": ["b", "c"]}], [{"a": 1}])).equalsTo({"1": ["b", "c"]});
+    assertThat(match([{"a": ["b", "c"]}], [{"a": "b"}])).equalsTo({});
+     
+    // uneven number of features
+    assertThat(match([{num: 'sing', stat: '+', gap: '-', tp: '-past', tense: 'pres' }, {}, {}], 
+                     [{num: 1, stat: 2, tp: 4, tense: 3}, {}, {}]))
+     .equalsTo(false); 
   });
 
-  it("ambiguities", function() {
-     assertThat(parse("Foo loves Bar.").length).equalsTo(1);
-     // TODO(goto): investigate why there are 6 possible interpretations.
-     // This is possibly related to the expansions of gender / number.
-     assertThat(parse("Foo loves a man.", "Sentence").length).equalsTo(1);
-     assertThat(parse("A man loves Bar.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Foo loves a book.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Foo loves a book and Bar.", "Sentence").length).equalsTo(1);
-     assertThat(parse("Foo and Bar love Hello and World.", "Sentence").length).equalsTo(1);
-     // console.log(JSON.stringify(parse("Mel and Dani like Brazil.", "Sentence")[1], undefined, 2));
-     //assertThat(parse("Mel and Dani like Brazil.", "Sentence").length).equalsTo(1);
-     //assertThat(parse("Yuji and Mel like Dani.", "Sentence").length).equalsTo(1);
-     //assertThat(parse("Anna loves a man who loves her.", "Sentence").length).equalsTo(6);
-   });
+  it("match - two variables binds to a value", function() {
+    // two variables binds to a value
+    assertThat(match([{"gap": "-"}, {"gap": 1}], [{"gap": 3}, {"gap": 3}])).equalsTo({"1": "-", "3": "-"});
+  });
 
-  it("debug", function() {
-    parse("Anna loves a man who loves her.");
-    parse("Every book which she loves surprises him.");
-    parse("A stockbroker who does not love her surprises him.");
-    parse("A stockbroker who Mel likes loves him.");
+
+  it("match - same variable, one enumeration", function() {
+    assertThat(match([{"num": "sing"}, {}, {"num": ["sing", "plur"]}], [{"num": 1}, {}, {"num": 1}]))
+     .equalsTo({"1": "sing"});
+  });
+  
+  it("match", function() {
+    assertThat(match([{"a": 3}, {"c": "d"}], [{"a": "b"}, {"c": 3}])).equalsTo({"@3": "b", "3": "d"});
+    // return;
+    // case: 3 = "+nom" and tense: 3 = "pres" collides (totally different types of features).
+    //assertThat(match([{"num": "sing", "case": 3, "gap": "-"},
+    //                  {},
+    //                  { "num": 'sing', "fin": '+', "stat": '+', "gap": '-', "tp": '-past', "tense": 'pres'}], 
+    //                 [{"num": 1, "case": '+nom', "gap": '-' },
+    //                  {},
+    //                  {"num": 1, "fin": '+', "stat": 2, "gap": '-', "tp": 4, "tense": 3}]))
+    // .equalsTo(false);
+
+  });
+
+  it("merge", function() {
+    assertThat(merge({}, {})).equalsTo({});
+    assertThat(merge({"a": "b"}, {})).equalsTo({"a": "b"});
+    assertThat(merge({"a": 1}, {"1": "b"})).equalsTo({"a": "b"});
+    assertThat(merge({"a": 1}, {"1": "b"})).equalsTo({"a": "b"});
+    assertThat(merge({"a": 1, "b": 2, "c": "d"}, {"1": "foo", "2": "bar"})).equalsTo({"a": "foo", "b": "bar", "c": "d"});
+
+    // there are still open features
+    assertThat(merge({"a": 1, "b": 2}, {"2": "c"})).equalsTo({"a": 1, "b": "c"});
+
+    // merging enumerations
+    assertThat(merge({"a": 1, "b": 2}, {"2": ["c", "d"]})).equalsTo({"a": 1, "b": ["c", "d"]});
+  });
+
+  it("resolve", function() {
+    assertThat(resolve({"a": 1}, [{"a": 1}], [{"a": "b"}])).equalsTo({"a": "b"});
+    // return;
+    assertThat(resolve({"c": 1}, [{"a": 3}, {"c": "d"}], [{"a": "b"}, {"c": 1}])).equalsTo({"c": "d"});
+    
+    assertThat(resolve({}, [], [])).equalsTo({});
+    assertThat(resolve({"a": "b"}, [], [])).equalsTo({"a": "b"});
+    assertThat(resolve({"a": "b"}, [{"c": "d"}], [{"c": "d"}])).equalsTo({"a": "b"});
+    assertThat(resolve({"a": "b"}, [{"c": "d"}], [{"e": "f"}])).equalsTo(false);
+    assertThat(resolve({"a": 1}, [{"c": "d"}], [{"c": 1}])).equalsTo({"a": "d"});
+    assertThat(resolve({"a": 1}, [{"a": 1}, {"a": "b"}], [{"a": 1}, {"a": "b"}])).equalsTo({"a": 1});
+    assertThat(resolve({"a": 1, "b": 2}, [{"a": 1}, {"a": "b"}, {"b": 2}], [{"a": 1}, {"a": "b"}, {"b": "d"}]))
+     .equalsTo({"a": 1, "b": "d"});
+    assertThat(resolve({"a": 1}, [], [])).equalsTo({"a": 1});
+    assertThat(resolve({"a": 1}, [{"a": "b"}], [{"a": 1}])).equalsTo({"a": "b"});
+    assertThat(resolve({"a": 1}, [{"c": ["d", "e"]}], [{"c": 1}])).equalsTo({"a": ["d", "e"]});
+  });
+
+  it("process", function() {
+    assertThat(process("V", {}, [], [])).equalsTo(node("V"));
+    assertThat(process("V", {"a": "b"}, [], [])).equalsTo(node("V", {"a": "b"}));
+    assertThat(process("V", {"a": "b"}, [node("E", {"c": "d"})], [{"c": "d"}]))
+     .equalsTo(node("V", {"a": "b"}, [node("E", {"c": "d"})]));
+    assertThat(process("V", {}, ["stink"], [{}])).equalsTo(node("V", {}, ["stink"]));
+    assertThat(process("V", {"a": 1}, [node("E", {"a": "b"})], [{"a": 1}])).equalsTo(node("V", {"a": "b"}, [node("E", {"a": "b"})]));
+  });
+
+  it("process: missing data", function() {
+    assertThat(process("V", {}, [node("V", {trans: '-', stat: '+' })], [{
+       "num": "sing",
+       "fin": '-',
+       "stat": 2,
+       "trans": 1,
+       "tp": "-past",
+       "tense": "pres"
+     }], 0, -1)).equalsTo(-1);
+  });
+
+  function parse(src, rule = ParserStart, i = 0) {
+   const parser = new Parser(ParserRules, rule, {
+     keepHistory: true
+    });
+   // console.log(ParserStart);
+   // console.log(parser.feed(src));
+   return parser.feed(src).results[i];
+  }
+
+  function first(node) {
+   return clean(node.children[0]);
+  }
+
+  it("book", function() {
+    assertThat(parse("book", "N")).equalsTo({
+      "@type": "N",
+      "children": ["book"],
+      "loc": 0,
+      "types": {
+        "num": "sing",
+         "gen": "-hum"
+      }
+    });
+  });
+
+  it("stink", function() {
+    assertThat(parse("stink", "V")).equalsTo({
+      "@type": "V",
+      "children": ["stink"],
+      "loc": 0,
+      "types": {
+        "stat": "+",
+        "trans": "-"
+      }
+    });
+  });
+
+  it("walks", function() {
+    assertThat(parse("walks", "V")).equalsTo({
+      "@type": "V",
+      "children": ["walks"],
+      "loc": 0,
+      "types": {
+        "fin": "+",
+        "num": "sing",
+        "stat": "-",
+        "tense": "pres",
+        "tp": "-past",
+        "trans": "-",
+      }
+    });
+  });
+
+  it("walked", function() {
+    assertThat(parse("walked", "V")).equalsTo({
+      "@type": "V",
+      "children": ["walked"],
+      "types": {
+        "fin": "part",
+        "num": -1303940481,
+        "stat": "-",
+        "tense": -590000754,
+        "tp": -590000755,
+        "trans": "-",
+      },
+      "loc": 0,
+    });
+  });
+
+  it("WS", function() {
+    assertThat(parse(" ", "WS")).equalsTo({
+      "@type": "WS", 
+      "types": { 
+        "gap": "-"
+      }, 
+      "children": [], 
+      "loc": 0 
+    });
+  });
+
+  it("GAP", function() {
+    assertThat(clean(parse("", "GAP")))
+     .equalsTo(GAP());
+  });
+
+  it.skip("GAP - NP", function() {
+    assertThat(parse("", "NP_"))
+     .equalsTo({
+      "@type": "NP", 
+      "types": {"gap": "+", "num": 1291680057, "case": -1182885959}, 
+      "children": [{"@type": "GAP", "children": [], "loc": 0, "types": {}}],
+      "loc": 0 
+     });
+  });
+
+  it("happy", function() {
+    assertThat(parse("happy", "ADJ")).equalsTo({
+       "@type": "ADJ", 
+       "types": {}, 
+       "children": ["happy"],
+       "loc": "0",
+    });
+  });
+
+  it("shine", function() {
+    assertThat(parse("shine", "V")).equalsTo({
+       "@type": "V", 
+       "types": {
+        "stat": "-",
+        "trans": "-"
+       }, 
+       "children": ["shine"],
+       "loc": "0",
+    });
+  });
+
+  it("she", function() {
+    assertThat(parse("she", "NP")).equalsTo({
+      "@type": "NP",
+      "loc": 0,
+      "types": {
+        "case": "+nom",
+        "gen": "fem",
+        "gap": "-",
+        "num": "sing",
+      },
+      "children": [{
+        "@type": "PRO",
+        "children": ["she"],
+        "loc": 0,
+        "types": {
+          "case": "+nom",
+          "gen": "fem",
+          "num": "sing",
+          "refl": "-",
+        }
+      }],
+    });
+  });
+
+  it("it", function() {
+    assertThat(parse("it", "NP")).equalsTo({
+      "@type": "NP",
+      "loc": 0,
+      "types": {
+        "case": ["-nom", "+nom"],
+        "gap": "-",
+        "num": "sing",
+        "gen": "-hum",
+      },
+      "children": [{
+        "@type": "PRO",
+        "children": ["it"],
+        "loc": 0,
+        "types": {
+          "case": ["-nom", "+nom"],
+          "num": "sing",
+          "gen": "-hum",
+          "refl": "-",
+        }
+      }],
+    });
+  });
+
+  it("Jones", function() {
+    assertThat(parse("Jones", "PN"))
+     .equalsTo({"@type": "PN", "types": {"num": "sing"}, "loc": 0, "children": ["Jones"]});
+  });
+
+  it("Jones's", function() {
+    assertThat(clean(parse("Jones's wife", "NP_")))
+     .equalsTo(NP(DET(PN("Jones"), "'s"), RN("wife")));
+  });
+
+  it("loves", function() {
+    assertThat(parse("loves", "V"))
+     .equalsTo({
+       "@type": "V",
+       "children": ["loves"],
+       "loc": 0,
+       "types": {
+          "fin": "+",
+          "num": "sing",
+          "stat": "+",
+          "tense": "pres",
+          "tp": "-past",
+          "trans": "-",
+         }
+      });
+  });
+
+  it("loves", function() {
+    assertThat(clean(parse("loves", "S")))
+     .equalsTo(S(NP(GAP()), VP_(VP(V("loves")))));
+  });
+
+  it("He and she", function() {
+    assertThat(clean(parse("he and she", "NP_")))
+     .equalsTo(NP(NP(PRO("he")), "and", NP(PRO("she"))));
+  });
+
+  it("Jones loves", function() {
+    assertThat(clean(parse("Jones loves", "S")))
+     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
+  });
+
+  it("likes her", function() {
+    assertThat(clean(parse("likes her", "S")))
+      .equalsTo(S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))));
+  });
+
+  it("who likes her", function() {
+    assertThat(clean(parse("who likes her", "RC")))
+     .equalsTo(RC(RPRO("who"), 
+                  S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))));
+  });
+
+  it("a man who likes her", function() {
+    assertThat(clean(parse("a man who likes her", "NP_")))
+     .equalsTo(NP(DET("a"), N(N("man"), RC(RPRO("who"), 
+                                           S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))))));
+  });
+
+  it("she loves", function() {
+    assertThat(clean(parse("she loves", "S"))).equalsTo(S(NP(PRO("she")), VP_(VP(V("loves")))));
+  });
+
+  it("who she loves", function() {
+    assertThat(clean(parse("who she loves", "RC")))
+     .equalsTo(RC(RPRO("who"), 
+                  S(NP(PRO("she")), VP_(VP(V("loves"), NP(GAP()))))));
+  });
+
+  it("he likes it", function() {
+    assertThat(clean(parse("he likes it", "S")))
+     .equalsTo(S(NP(PRO("he")),
+                 VP_(VP(V("likes"), NP(PRO("it"))))));
+  });
+
+
+  it("Jones loves.", function() {
+    assertThat(first(parse("Jones loves.")))
+     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("loves")))));
+  });
+
+  it("He likes her", function() {
+    assertThat(first(parse("He likes her.")))
+     .equalsTo(S(NP(PRO("He")), 
+                 VP_(VP(V("likes"), 
+                        NP(PRO("her"))))));
   });
 
   it("Jones loves.", function() {
@@ -424,6 +766,12 @@ describe("Parser", function() {
                  S(NP(PRO("she")), VP_(VP(V("loves"), NP(PRO("him")))))));
   });
 
+  it("Jones is happy.", function() {
+    assertThat(first(parse("Jones is happy.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), ADJ("happy")))));
+  });
+
   it("Jones's wife is happy.", function() {
     assertThat(first(parse("Jones's wife is happy.")))
      .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
@@ -451,7 +799,7 @@ describe("Parser", function() {
   });
 
   it("Who likes Mary?", function() {
-    assertThat(clean(parse("Who likes Mary?")[0]))
+    assertThat(clean(parse("Who likes Mary?")))
      .equalsTo(Sentence("Who", 
                         NP(GAP()), 
                         VP_(VP(V("likes"), NP(PN("Mary")))), 
@@ -459,7 +807,7 @@ describe("Parser", function() {
   });
 
   it("Who is happy?", function() {
-    assertThat(clean(parse("Who is happy?")[0]))
+    assertThat(clean(parse("Who is happy?")))
      .equalsTo(Sentence("Who", 
                         NP(GAP()), 
                         VP_(VP(BE("is"), ADJ("happy"))), 
@@ -467,7 +815,7 @@ describe("Parser", function() {
   });
 
   it("Who does Mary like?", function() {
-    assertThat(clean(parse("Who does Mary like?")[0]))
+    assertThat(clean(parse("Who does Mary like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(PN("Mary")), 
@@ -476,7 +824,7 @@ describe("Parser", function() {
   });
 
   it("Who does the man like?", function() {
-    assertThat(clean(parse("Who does the man like?")[0]))
+    assertThat(clean(parse("Who does the man like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(DET("the"), N("man")), 
@@ -485,7 +833,7 @@ describe("Parser", function() {
   });
 
   it("Who does Smith's brother like?", function() {
-    assertThat(clean(parse("Who does Smith's brother like?")[0]))
+    assertThat(clean(parse("Who does Smith's brother like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
                         NP(DET(PN("Smith"), "'s"), RN("brother")), 
@@ -494,7 +842,7 @@ describe("Parser", function() {
   });
 
   it("Is Mary happy?", function() {
-    assertThat(clean(parse("Is Mary happy?")[0]))
+    assertThat(clean(parse("Is Mary happy?")))
      .equalsTo(Sentence("Is", 
                         NP(PN("Mary")), 
                         ADJ("happy"), 
@@ -667,24 +1015,12 @@ describe("Parser", function() {
                  VP_(VP(HAVE("had"), VP(V("kissed"), NP(PRO("him")))))));
   });
 
-
   function assertThat(x) {
    return {
     equalsTo(y) {
-     Assert.deepEqual(x, y);
-    },
-    failsAt(offset, token) {
-     try {
-      parse(x);
-      throw Error("expected failure");
-     } catch (e) {
-      // console.log(e);
-      assertThat(e.offset).equalsTo(offset);
-      assertThat(e.token.value).equalsTo(token);
-     }
+      deepEqual(x, y);
     }
-   }
+   };
   }
 
 });
-

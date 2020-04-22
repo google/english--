@@ -131,15 +131,22 @@ function process(type, types, data, conditions, location, reject) {
  //console.log("types" + JSON.stringify(types));
  //console.log("result: " + JSON.stringify(result));
  // console.log(JSON.stringify(result, 2, undefined));
- let namespace = Math.floor((Math.random() * 1000));
  for (let [key, value] of Object.entries(result)) {
   if (typeof value == "number") {
-   // console.log("hi");
+   let rule = [];
+   rule.push(`${type}${JSON.stringify(types)}`);
+   rule.push("=>");
+   for (let i = 0; i < conditions.length; i++) {
+    rule.push(`${(data[i] || {})["@type"] || "*"}${JSON.stringify(conditions[i])}`);
+   }
+
+   let hash = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+   let namespace = hash(rule.join(" "));
+
    result[key] = namespace + value;
   }
  }
  let n = node(type, result, data, location);
- // console.log(JSON.stringify(n));
  return n;
 }
 

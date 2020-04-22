@@ -280,7 +280,7 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("who"),
                      space(true),
-                     term("NP", {"num": 1, "case": "+nom", "gap": "+"}),
+                     term("NP", {"num": 1, "gen": 5, "case": "+nom", "gap": "+"}),
                      space(),
                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
                      space(true),
@@ -291,7 +291,7 @@ function grammar() {
                      space(),
                      term("AUX", {"num": "sing", "fin": "+", "tp": 5, "tense": 4}),
                      space(),
-                     term("NP", {"num": 1, "case": "+nom", "gap": "-"}),
+                     term("NP", {"num": 1, "gen": 6, "case": "+nom", "gap": "-"}),
                      space(),
                      term("VP", {"num": 3, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
                      space(true),
@@ -300,7 +300,7 @@ function grammar() {
  result.push(phrase(term("Sentence"),
                     [literal("is"),
                      space(),
-                     term("NP", {"num": "sing", "case": "+nom", "gap": "-"}),
+                     term("NP", {"num": "sing", "gen": 1, "case": "+nom", "gap": "-"}),
                      space(),
                      term("ADJ"),
                      space(true),
@@ -308,27 +308,27 @@ function grammar() {
 
  // PS 1
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
-                     [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
-                      space(),
-                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
+                    [term("NP'", {"num": 1, "gen": 5, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
  
  // PS 2
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
-                     [term("NP'", {"num": 1, "case": "+nom", "gap": "+"}),
-                      term("WS", {"gap": "-"}),
-                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
+                    [term("NP'", {"num": 1, "gen": 6, "case": "+nom", "gap": "+"}),
+                     term("WS", {"gap": "-"}),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
  
  // PS 2.5
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
-                     [term("NP'", {"num": 3, "case": "+nom", "gap": "+"}),
-                      term("WS", {"gap": "-"}),
-                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
+                    [term("NP'", {"num": 3, "gen": 6, "case": "+nom", "gap": "+"}),
+                     term("WS", {"gap": "-"}),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
 
  // PS 3
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
-                     [term("NP'", {"num": 1, "case": "+nom", "gap": "-"}),
-                      space(),
-                      term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4})]));
+                    [term("NP'", {"num": 1, "gen": 6, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4})]));
  
  // PS 4a
  // NOTE(goto): this is slightly different in that the "num" variable
@@ -371,19 +371,19 @@ function grammar() {
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "+", "tp": 6, "tense": 5}),
                     [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
                      term("WS", {"gap": "-"}),
-                     term("NP'", {"num": 3, "case": "-nom", "gap": "+"})]));
+                     term("NP'", {"num": 3, "gen": 7, "case": "-nom", "gap": "+"})]));
  
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "-", "tp": 6, "tense": 5}),
                     [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
                      space(),
-                     term("NP'", {"num": 3, "case": "-nom", "gap": "-"})]));
+                     term("NP'", {"num": 3, "gen": 7, "case": "-nom", "gap": "-"})]));
  
  // PS 7
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 3, "gap": "-", "tp": 5, "tense": 4}),
                     [term("V", {"num": 1, "fin": 2, "stat": 3, "trans": "-", "tp": 5, "tense": 4})]));
  
  // PS 8
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "+"}),
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "+"}),
                     [term("GAP")]));
  
  // page 36 makes a simplification, which we introduce back manually:
@@ -391,33 +391,33 @@ function grammar() {
  // the case values +nom and -nom. 
  
  // PS 9
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                      [term("DET", {"num": 1}), 
                       space(),
-                      term("N", {"num": 1})]));
+                      term("N", {"num": 1, "gen": 2})]));
  
  // PS 10
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                      [term("PN", {"num": 1})]));
   
  // PS 11
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
-                     [term("PRO", {"num": 1, "case": 3, "refl": 4})]));
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                    [term("PRO", {"num": 1, "gen": 2, "case": 3, "refl": 4})]));
 
  // PS 12
- result.push(phrase(term("NP'", {"num": "plur", "case": 2, "gap": "-"}),
-                    [term("NP", {"num": 3, "case": 2, "gap": "-"}),
+ result.push(phrase(term("NP'", {"num": "plur", "gen": "?", "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 5,"case": 2, "gap": "-"}),
                      space(),
                      literal("and"),
                      space(),
-                     term("NP", {"num": 4, "case": 2, "gap": "-"})], 
+                     term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
                     undefined,
                     undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // PS 12.5
- result.push(phrase(term("NP'", {"num": 1, "case": 3, "gap": 4}),
-                    [term("NP", {"num": 1, "case": 3, "gap": 4})], 
+ result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
+                    [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})], 
                     undefined,
                     undefined,
                     "(root) => { return root.children[0]; }",
@@ -425,10 +425,10 @@ function grammar() {
  
 
  // PS 13
- result.push(phrase(term("N", {"num": 1}),
-                     [term("N", {"num": 1}),
-                      space(),
-                      term("RC", {"num": 1})]));
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                    [term("N", {"num": 1, "gen": 2}),
+                     space(),
+                     term("RC", {"num": 1})]));
  // PS 14
  // NOTE(goto): this is in slight disagreement with the book, because it is forcing
  // the sentence to agree with the relative clause number feature to disallow the
@@ -457,7 +457,7 @@ function grammar() {
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
                     [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
                      space(),
-                     term("NP", {"num": 1, "case": 5, "gap": 3})]));
+                     term("NP", {"num": 1, "gen": 8, "case": 5, "gap": 3})]));
 
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
                     [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
@@ -465,10 +465,10 @@ function grammar() {
                      term("PP")]));
 
  // Adnominal adjectives (page 271)
- result.push(phrase(term("N", {"num": 1}),
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
                      [term("ADJ"),
                       space(),
-                      term("N", {"num": 1})]));
+                      term("N", {"num": 1, "gen": 2})]));
 
  // Conditionals
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
@@ -497,12 +497,12 @@ function grammar() {
                      term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5})]));
 
  // NP Disjunctions
- result.push(phrase(term("NP'", {"num": 3, "case": 2, "gap": "-"}),
-                    [term("NP", {"num": 3, "case": 2, "gap": "-"}),
+ result.push(phrase(term("NP'", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
                      space(),
                      literal("or"),
                      space(),
-                     term("NP", {"num": 3, "case": 2, "gap": "-"})], 
+                     term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"})], 
                     undefined,
                     undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
@@ -524,7 +524,7 @@ function grammar() {
                      term("V", {"num": 1, "fin": 2, "stat": 8, "trans": 3, "tp": 6, "tense": 5})]));
  
  // Non-pronomial possessive phrases
- result.push(phrase(term("NP", {"num": 1, "case": 3, "gap": "-"}),
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                     [term("DET", {"num": "sing", "rn": "+"}), 
                      space(),
                      term("RN", {"num": 1})]));
@@ -534,15 +534,15 @@ function grammar() {
                      literal("'s")]));
 
  // Noun Prepositional Phrases
- result.push(phrase(term("N", {"num": 1}),
-                    [term("N", {"num": 1}), 
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                    [term("N", {"num": 1, "gen": 2}), 
                      space(),
                      term("PP")]));
 
  result.push(phrase(term("PP"),
                     [term("PREP"),
                      space(),
-                     term("NP", {"num": 1, "case": 3, "gap": "-"})]));
+                     term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"})]));
 
  // 17a
  result.push(phrase(term("VP", {"num": 1, "fin": "+", "stat": "+", "gap": 3, "tp": 4, "tense": 5}),
@@ -563,46 +563,32 @@ function grammar() {
                   [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
  
  // LI 2
- result.push(rule(term("PRO", {"num": "sing", "case": "+nom", "refl": "-"}),
-                  [[literal("he")]],
-                  undefined,
-                  {"gen": "male"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "+nom", "refl": "-"}),
+                  [[literal("he")]]));
  
  // LI 3
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "-"}),
-                  [[literal("him")]],
-                  undefined,
-                  {"gen": "male"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom", "refl": "-"}),
+                  [[literal("him")]]));
  
  // LI 4
- result.push(rule(term("PRO", {"num": "sing", "case": "+nom", "refl": "-"}),
-                  [[literal("she")]],
-                  undefined,
-                  {"gen": "fem"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "+nom", "refl": "-"}),
+                  [[literal("she")]]));
  
  // LI 5
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "-"}),
-                  [[literal("her")]],
-                  undefined,
-                  {"gen": "fem"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom", "refl": "-"}),
+                  [[literal("her")]]));
  
  // LI 6
- result.push(rule(term("PRO", {"num": "sing", "case": ["-nom", "+nom"], "refl": "-"}),
-                  [[literal("it")]],
-                  undefined,
-                  {"gen": "-hum"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": ["-nom", "+nom"], "refl": "-"}),
+                  [[literal("it")]]));
   
  // LI 7
- result.push(rule(term("PRO", {"num": "plur", "case": "+nom", "refl": "-"}),
-                  [[literal("they")]],
-                  undefined,
-                  {"gen": ["male", "fem", "-hum"]}));
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "+nom", "refl": "-"}),
+                  [[literal("they")]]));
  
  // LI 8
- result.push(rule(term("PRO", {"num": "plur", "case": "-nom", "refl": "-"}),
-                  [[literal("them")]],
-                  undefined,
-                  {"gen": ["male", "fem", "-hum"]}));
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "-nom", "refl": "-"}),
+                  [[literal("them")]]));
  
  // LI 9
  //result.push(rule(term("PN", {"num": "sing"}),
@@ -623,22 +609,16 @@ function grammar() {
  //                 {"gen": "-hum"}));
  
  // LI 12
- result.push(rule(term("N", {"num": "sing"}),
-                  [[literal("stockbroker")], [literal("man")], [literal("engineer")], [literal("brazilian")]],
-                  undefined,
-                  {"gen": "male"}));
+ result.push(rule(term("N", {"num": "sing", "gen": "male"}),
+                  [[literal("stockbroker")], [literal("man")], [literal("engineer")], [literal("brazilian")]]));
  
  // LI 13
- result.push(rule(term("N", {"num": "sing"}),
-                  [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")], [literal("brazilian")]],
-                  undefined,
-                  {"gen": "fem"}));
+ result.push(rule(term("N", {"num": "sing", "gen": "fem"}),
+                  [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")], [literal("brazilian")]]));
  
  // LI 14
- result.push(rule(term("N", {"num": "sing"}),
-                  [[literal("book")], [literal("donkey")], [literal("horse")], [literal("porsche")]],
-                  undefined,
-                  {"gen": "-hum"}));
+ result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
+                  [[literal("book")], [literal("donkey")], [literal("horse")], [literal("porsche")]]));
  
  // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
  // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
@@ -790,22 +770,16 @@ function grammar() {
                    [[literal("which")]]));
  
  // LI 23
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
-                  [[literal("himself")]],
-                  undefined,
-                  {"gen": "male"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom", "refl": "+"}),
+                  [[literal("himself")]]));
 
  // LI 24
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
-                  [[literal("herself")]],
-                  undefined,
-                  {"gen": "fem"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom", "refl": "+"}),
+                  [[literal("herself")]]));
 
  // LI 25
- result.push(rule(term("PRO", {"num": "sing", "case": "-nom", "refl": "+"}),
-                  [[literal("itself")]],
-                  undefined,
-                  {"gen": "-hum"}));
+ result.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": "-nom", "refl": "+"}),
+                  [[literal("itself")]]));
 
  // GAP
  result.push(rule(term("GAP"),
