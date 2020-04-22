@@ -50,29 +50,31 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe.skip("Rules", function() {
+describe("Rules", function() {
   it("Keeps types", function() {
     let s = first(parse("Mel loves Dani and Anna."), true);
     let subject = S(NP(PN(capture("mel"))), VP_());
     assertThat(match(subject, s).mel.types)
      .equalsTo({
-       "num": "sing"
+       "num": "sing",
+       "gen": "?"
       });
     let object = S(NP(), VP_(VP(V(), NP(capture("object")))));
     assertThat(match(object, s).object["@type"]).equalsTo("NP");
     assertThat(match(object, s).object.types)
      .equalsTo({
-       "case": -684356801, 
+       "case": -3595323571, 
        "gap": "-", 
-       "num": "plur"
+       "num": "plur",
+       "gen": "?"
     });
 
     let root = first(parse("Mel owns a book."), true);
     assertThat(child(root, 1, 0, 1, 1).types)
-     .equalsTo({"num": "sing"});
+     .equalsTo({"num": "sing", "gen": "-hum"});
 
     assertThat(child(first(parse("Mel loves a woman."), true), 1, 0, 1, 1).types)
-     .equalsTo({"num": "sing"});
+     .equalsTo({"num": "sing", "gen": "fem"});
   });
 
   it("match", function() {
@@ -248,7 +250,7 @@ describe.skip("Rules", function() {
     assertThat(head.length).equalsTo(1);
     assertThat(head[0].name).equalsTo("a");
     assertThat(head[0].value).equalsTo("a porsche");
-    assertThat(head[0].types).equalsTo({num: "sing"});
+    assertThat(head[0].types).equalsTo({num: "sing", "gen": "-hum"});
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);
@@ -277,7 +279,7 @@ describe.skip("Rules", function() {
     assertThat(print(node)).equalsTo("a likes Jones");
     assertThat(name).equalsTo("a");
     assertThat(value).equalsTo("A woman");
-    assertThat(types).equalsTo({"num": "sing"});
+    assertThat(types).equalsTo({"num": "sing", "gen": "fem"});
 
     new CRLIN(ids).match(id);
 
@@ -297,11 +299,11 @@ describe.skip("Rules", function() {
     
     let [[a], body1] = rule.match(node);
     assertThat(a.name).equalsTo("a");
-    assertThat(a.types).equalsTo({num: "sing"});
+    assertThat(a.types).equalsTo({num: "sing", "gen": "male"});
 
     let [[b], body2] = rule.match(child(node, 1, 0));
     assertThat(b.name).equalsTo("b");
-    assertThat(b.types).equalsTo({num: "sing"});
+    assertThat(b.types).equalsTo({num: "sing", "gen": "fem"});
 
     assertThat(print(node)).equalsTo("a admires b");
    });
@@ -377,7 +379,7 @@ describe.skip("Rules", function() {
      .equalsTo("Jones(a)");
     assertThat(print(node))
      .equalsTo("a owns a book which he does not like");
-    assertThat(u.types).equalsTo({"num": "sing"});
+    assertThat(u.types).equalsTo({"num": "sing", "gen": "?"});
 
     let [ref, [id]] = new CRID(ids).match(child(node, 1, 0));
     assertThat(print(node)).equalsTo("a owns b");
@@ -719,6 +721,24 @@ describe.skip("Rules", function() {
     `));
   });
 
+  it.skip("CR.VPAND", function() {
+    let node = first(parse("Mary likes and loves Jones."), true);
+
+    // console.log(node);
+
+    let [, [sub]] = new CRAND(new Ids()).match(node, []);
+
+    assertThat(sub.print()).equalsTo(trim(`
+      drs(a, b) {
+        Mary(a)
+        Jones(b)
+        a likes b
+      } and drs() {
+        a loves b
+      }
+    `));
+  });
+
   it("CR.POSS", function() {
     let ids = new Ids();
 
@@ -733,7 +753,7 @@ describe.skip("Rules", function() {
     assertThat(print(node)).equalsTo("b is happy(b)");
 
     // Brother is male and singular
-    assertThat(ref.types).equalsTo({"num": "sing"});
+    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male"});
 
     assertThat(print(brother)).equalsTo("b brother a");
   });
@@ -758,7 +778,7 @@ describe.skip("Rules", function() {
     assertThat(print(node)).equalsTo("a likes c");
 
     // Brother is male and singular
-    assertThat(ref.types).equalsTo({"num": "sing"});
+    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male"});
 
     assertThat(print(brother)).equalsTo("c brother b");
   });

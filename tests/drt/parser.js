@@ -10,7 +10,7 @@ const {ParserRules, ParserStart} = require("./../../src/drt/english.js");
 
 const {capture, match, merge, resolve, process, node} = require("./../../src/drt/processor.js");
 
-describe.only("Runtime", function() {
+describe("Parser", function() {
   it("compile", function() {
     let result = [];
 
@@ -352,7 +352,7 @@ describe.only("Runtime", function() {
 
   it("Jones", function() {
     assertThat(parse("Jones", "PN"))
-     .equalsTo({"@type": "PN", "types": {"num": "sing"}, "loc": 0, "children": ["Jones"]});
+     .equalsTo({"@type": "PN", "types": {"num": "sing", "gen": "male"}, "loc": 0, "children": ["Jones"]});
   });
 
   it("Jones's", function() {
@@ -759,6 +759,18 @@ describe.only("Runtime", function() {
                  VP_(VP(V(V("owns"), "and", V("loves")), NP(DET("a"), N("porsche"))))));
   });
 
+  it.skip("Jones likes.", function() {
+    // TODO(goto): this should be an error as opposed to undefined.
+    assertThat(parse("Jones likes."))
+     .equalsTo(undefined);
+  });
+
+  it("Jones likes and loves Mary.", function() {
+    assertThat(first(parse("Jones likes and loves Mary.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
+  });
+
   it("Mary likes Smith and she loves him.", function() {
     assertThat(first(parse("Mary likes Smith and she loves him.")))
      .equalsTo(S(S(NP(PN("Mary")), VP_(VP(V("likes"), NP(PN("Smith"))))), 
@@ -776,6 +788,31 @@ describe.only("Runtime", function() {
     assertThat(first(parse("Jones's wife is happy.")))
      .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
                  VP_(VP(BE("is"), ADJ("happy")))));
+  });
+
+  it("Jones's wife likes and loves Mary.", function() {
+    assertThat(first(parse("Jones's wife likes and loves Mary.")))
+     .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
+                 VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
+  });
+
+  it("Sam and Dani love Anna and Leo.", function() {
+    assertThat(first(parse("Sam and Dani love Anna and Leo.")))
+     .equalsTo(S(NP(NP(PN("Sam")), 
+                    "and", 
+                    NP(PN("Dani"))),
+                 VP_(VP(V("love"), 
+                        NP(NP(PN("Anna")), 
+                           "and", 
+                           NP(PN("Leo")))))));
+  });
+
+  it("Jones's wife and Smith's brother like and love Mary.", function() {
+    assertThat(first(parse("Jones's wife and Smith's brother like and love Mary.")))
+     .equalsTo(S(NP(NP(DET(PN("Jones"), "'s"), RN("wife")), 
+                    "and", 
+                    NP(DET(PN("Smith"), "'s"), RN("brother"))),
+                 VP_(VP(V(V("like"), "and", V("love")), NP(PN("Mary"))))));
   });
 
   it("Jones owns an unhappy donkey.", function() {

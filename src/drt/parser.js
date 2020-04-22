@@ -398,7 +398,7 @@ function grammar() {
  
  // PS 10
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
-                     [term("PN", {"num": 1})]));
+                    [term("PN", {"num": 1, "gen": 2})]));
   
  // PS 11
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
@@ -506,14 +506,24 @@ function grammar() {
                     undefined,
                     undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
+
+ result.push(phrase(term("NP'", {"num": 3, "gen": "?", "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"})], 
+                    undefined,
+                    undefined,
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // Sentential Conjunctions
  result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
-                    [term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
+                    [term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
                      space(),
                      literal("and"),
                      space(),
-                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
+                     term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
 
  // V Conjunctions
  result.push(phrase(term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5}),
@@ -527,10 +537,10 @@ function grammar() {
  result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
                     [term("DET", {"num": "sing", "rn": "+"}), 
                      space(),
-                     term("RN", {"num": 1})]));
+                     term("RN", {"num": 1, "gen": 2})]));
 
  result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
-                    [term("PN", {"num": 1}), 
+                    [term("PN", {"num": 1, "gen": 2}), 
                      literal("'s")]));
 
  // Noun Prepositional Phrases
@@ -591,22 +601,16 @@ function grammar() {
                   [[literal("them")]]));
  
  // LI 9
- //result.push(rule(term("PN", {"num": "sing"}),
- //[[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]],
- //undefined,
- //{"gen": "male"}));
+ result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
+                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]]));
  
  // LI 10
- // result.push(rule(term("PN", {"num": "sing"}),
- //                  [[literal("Mary")], [literal("Dani")], [literal("Anna")]],
- //                  undefined,
- //                  {"gen": "fem"}));
+ result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
+                  [[literal("Mary")], [literal("Dani")], [literal("Anna")]]));
  
  // LI 11
- //result.push(rule(term("PN", {"num": "sing"}),
- //                 [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]],
- //                 undefined, 
- //                 {"gen": "-hum"}));
+ result.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
+                  [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]]));
  
  // LI 12
  result.push(rule(term("N", {"num": "sing", "gen": "male"}),
@@ -805,28 +809,21 @@ function grammar() {
                   [[literal("were")]]));
 
  // Relative Nouns
- result.push(rule(term("RN", {"num": "sing"}),
+ result.push(rule(term("RN", {"num": "sing", "gen": "male"}),
                   [[literal("husband")], 
                    [literal("father")], 
                    [literal("brother")],
-                   ],
-                  undefined,
-                  {"gen": "male"}));
+                   ]));
 
- result.push(rule(term("RN", {"num": "sing"}),
+ result.push(rule(term("RN", {"num": "sing", "gen": "fem"}),
                   [[literal("wife")], 
                    [literal("mother")], 
-                   [literal("sister")]
-                   ],
-                  undefined,
-                  {"gen": "fem"}));
+                   [literal("sister")]]));
 
- result.push(rule(term("RN", {"num": "sing"}),
+ result.push(rule(term("RN", {"num": "sing", "gen": ["male", "fem"]}),
                   [[literal("parent")], 
                    [literal("child")], 
-                   [literal("sibling")]],
-                  undefined,
-                  {"gen": ["male", "fem"]}));
+                   [literal("sibling")]]));
 
  // to, of, about, at, before, after, by, behind, during, for,
  // from, in, over, under and with.
@@ -854,14 +851,14 @@ function grammar() {
                    ]));
 
  // Extensible proper names.
- result.push(phrase(term("PN", {"num": "sing"}),
+ result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
                     [term("FULLNAME")],
                     undefined,
                     undefined,
                     {"gen": "?"}));
 
  // Variables
- result.push(phrase(term("PN", {"num": "sing"}),
+ result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
                     [term("VAR")],
                     undefined,
                     {"gen": "?", "var": true}));
