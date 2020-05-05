@@ -34,13 +34,12 @@ describe("Parser", function() {
     };
 
     for (let rule of rules) {
-     let {head, tail, prod} = rule;
+     let {head, tail, post, pre} = rule;
      for (let line of tail) {
       let terms = line.map(name).join(" ");
       let types = line.filter(term => term != "null").map(term => JSON.stringify(term.types || {}));
-      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r, ${prod})`;
+      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r, ${post}, ${pre})`;
       result.push(`${name(head)} -> ${terms} {% (d, l, r) => ${body} %}`);
-
      }
     }
 
@@ -385,6 +384,29 @@ describe("Parser", function() {
           "trans": "-",
          }
       });
+  });
+
+  it("kisses", function() {
+    assertThat(parse("kisses", "V"))
+     .equalsTo({
+       "@type": "V",
+       "children": ["kisses"],
+       "loc": 0,
+       "root": "kiss",
+       "types": {
+          "fin": "+",
+          "num": "sing",
+          "stat": "-",
+          "tense": "pres",
+          "tp": "-past",
+          "trans": "+",
+         }
+      });
+  });
+
+  it.skip("rejects lovees", function() {
+    assertThat(parse("lovees", "V"))
+     .equalsTo();
   });
 
   it("loves", function() {

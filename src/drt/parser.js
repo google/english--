@@ -1,12 +1,13 @@
 const {Parser} = require("nearley");
 const {ParserRules, ParserStart} = require("./english.js");
 
-let rule = (head = {}, tail = [], prod) => { 
+let rule = (head = {}, tail = [], post, pre) => { 
  return {
   "@type": "Rule", 
   "head": head, 
   "tail": tail, 
-  "prod": prod
+  "post": post,
+  "pre": pre,
  }
 };
 
@@ -447,8 +448,8 @@ function grammar() {
                    [literal("shine")],
                    ]));
 
- // LI 17
- // LI 18
+ // LI 17, LI 18 are replaced by LI 48 (page 668).
+ // LI 48
  result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2, "tp": 4, "tense": "pres"}),
                   [[term("V", {"trans": 2, "stat": 3})]],
                   "(root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc)"));
@@ -466,15 +467,17 @@ function grammar() {
   `(root) => node(root['@type'], 
                   root.types, 
                   [root.children[0].children[0] + root.children[1]],
-                  root.loc, 
+                  root.loc,
                   {"root": root.children[0].children[0]})`;
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
                   decompose));
 
-                  // "(root) => node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc)"));
- 
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
+                  decompose));
+
  // LI 20
  // Manually expanding into the present / plural.
  // > Except for the verb be, plural verb forms we want here - i.e. the third person plural of the
