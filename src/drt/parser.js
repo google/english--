@@ -463,20 +463,30 @@ function grammar() {
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
  // LI 49
- let decompose = 
-  `(root) => node(root['@type'], 
-                  root.types, 
-                  [root.children[0].children[0] + root.children[1]],
-                  root.loc,
-                  {"root": root.children[0].children[0]})`;
+ let decompose = `
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]})`;
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  decompose));
+                  decompose,
+                  `function (n) { 
+                      let v = n.children[0].children[0]; 
+                      return !(v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z"));
+                   }`
+             ));
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
-                  decompose));
+                  decompose,
+                  `function (n) { 
+                      let v = n.children[0].children[0]; 
+                      return v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z");
+                   }`
+             ));
 
  // LI 20
  // Manually expanding into the present / plural.

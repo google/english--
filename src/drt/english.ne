@@ -111,27 +111,37 @@ V -> "sleep"i {% (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l,
 V -> "come"i {% (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined) %}
 V -> "shine"i {% (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined) %}
 V -> V {% (d, l, r) => process("V", {"num":1,"fin":"-","stat":3,"trans":2,"tp":4,"tense":"pres"}, d, [{"trans":2,"stat":3}], l, r, (root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc), undefined) %}
-V -> V "s"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, (root) => node(root['@type'], 
-                  root.types, 
-                  [root.children[0].children[0] + root.children[1]],
-                  root.loc,
-                  {"root": root.children[0].children[0]}), undefined) %}
-V -> V "es"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, (root) => node(root['@type'], 
-                  root.types, 
-                  [root.children[0].children[0] + root.children[1]],
-                  root.loc,
-                  {"root": root.children[0].children[0]}), undefined) %}
+V -> V "s"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]}), function (n) { 
+                      let v = n.children[0].children[0]; 
+                      return !(v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z"));
+                   }) %}
+V -> V "es"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]}), function (n) { 
+                      let v = n.children[0].children[0]; 
+                      return v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z");
+                   }) %}
 V -> V {% (d, l, r) => process("V", {"num":"plur","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"}], l, r, (root) => node(root['@type'], root.types, root.children[0].children, root.loc), undefined) %}
-V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, (root) => node(root['@type'], 
-                  root.types, 
-                  [root.children[0].children[0] + root.children[1]],
-                  root.loc,
-                  {"root": root.children[0].children[0]}), undefined) %}
-V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"part","stat":2,"trans":3,"tp":4,"tense":5}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, (root) => node(root['@type'], 
-                  root.types, 
-                  [root.children[0].children[0] + root.children[1]],
-                  root.loc,
-                  {"root": root.children[0].children[0]}), undefined) %}
+V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]}), undefined) %}
+V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"part","stat":2,"trans":3,"tp":4,"tense":5}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]}), undefined) %}
 RPRO -> "who"i {% (d, l, r) => process("RPRO", {"num":["sing","plur"]}, d, [{}], l, r, undefined, undefined) %}
 RPRO -> "which"i {% (d, l, r) => process("RPRO", {"num":["sing","plur"]}, d, [{}], l, r, undefined, undefined) %}
 PRO -> "himself"i {% (d, l, r) => process("PRO", {"num":"sing","gen":"male","case":"-nom","refl":"+"}, d, [{}], l, r, undefined, undefined) %}

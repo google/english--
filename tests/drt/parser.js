@@ -404,7 +404,7 @@ describe("Parser", function() {
       });
   });
 
-  it.skip("rejects lovees", function() {
+  it("rejects lovees", function() {
     assertThat(parse("lovees", "V"))
      .equalsTo();
   });

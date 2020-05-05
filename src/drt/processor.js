@@ -111,7 +111,7 @@ function node(type, types = {}, children = [], loc = 0, extras = {}) {
   }, extras);
 }
 
-function process(type, types, data, conditions, location, reject, post = ((x) => x), pre = ((x) => false)) {
+function process(type, types, data, conditions, location, reject, post = ((x) => x), pre = ((x) => true)) {
  // console.log(type);
  // console.log(JSON.stringify(data));
  let children = data.map(c => c || {}).map(c => c.types || {});
@@ -149,8 +149,8 @@ function process(type, types, data, conditions, location, reject, post = ((x) =>
 
  let n = node(type, result, data, location);
 
- if (pre(n)) {
-  return r;
+ if (!pre(n)) {
+  return reject;
  }
 
  return post(n);
