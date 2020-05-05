@@ -454,6 +454,7 @@ function grammar() {
                   "(root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc)"));
  
  // LI 19
+
  // Manually expanding into the present / third person.
  // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
  // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
@@ -489,14 +490,23 @@ function grammar() {
  // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  "(root) => node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc)"));
+                  `(root) => node(root['@type'], 
+                                  root.types, 
+                                  [root.children[0].children[0] + 'ed'], 
+                                  root.loc, 
+                                  {root: root.children[0].children[0]})`
+                  ));
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  "(root) => node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc)"));
+                  `(root) => node(root['@type'], 
+                                  root.types, 
+                                  [root.children[0].children[0] + 'ed'], 
+                                  root.loc, 
+                                  {root: root.children[0].children[0]})`
+                  ));
 
- 
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by
  // the gender of the sentence.
@@ -627,6 +637,7 @@ function clean(node) {
  } else if (typeof node == "object") {
   delete node.types;
   delete node.loc;
+  delete node.root;
   clean(node.children);
  }
  return node;

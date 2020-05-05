@@ -99,8 +99,8 @@ function resolve(features, children, conditions) {
  return result;
 }
 
-function node(type, types = {}, children = [], loc = 0) {
-  return {
+function node(type, types = {}, children = [], loc = 0, extras = {}) {
+  return Object.assign({
     "@type": type,
     "types": types,
     "children": children
@@ -108,7 +108,7 @@ function node(type, types = {}, children = [], loc = 0) {
       .filter(child => child["@type"] != "WS")
       .filter(child => child != '.'),
     "loc": loc
-  };
+  }, extras);
 }
 
 function process(type, types, data, conditions, location, reject, post = ((x) => x)) {

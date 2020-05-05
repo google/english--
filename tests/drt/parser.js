@@ -180,8 +180,6 @@ describe("Parser", function() {
    const parser = new Parser(ParserRules, rule, {
      keepHistory: true
     });
-   // console.log(ParserStart);
-   // console.log(parser.feed(src));
    return parser.feed(src).results[i];
   }
 
@@ -233,6 +231,7 @@ describe("Parser", function() {
     assertThat(parse("walked", "V")).equalsTo({
       "@type": "V",
       "children": ["walked"],
+      "root": "walk",
       "types": {
         "fin": "part",
         "num": -1303940481,
