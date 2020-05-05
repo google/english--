@@ -16,7 +16,7 @@ let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};
 let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
 let literal = (value) => { return {"@type": "Literal", name: value} };
-let phrase = (head, tail, skip, types, prod) => { return rule(head, [tail], prod); };
+let phrase = (head, tail, prod) => { return rule(head, [tail], prod); };
 
 function name(term, pretty) {
  if (typeof term == "string") {
@@ -409,15 +409,11 @@ function grammar() {
                      literal("and"),
                      space(),
                      term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
-                    undefined,
-                    undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // PS 12.5
  result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
                     [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})], 
-                    undefined,
-                    undefined,
                     "(root) => { return root.children[0]; }",
                     ));
  
@@ -501,8 +497,6 @@ function grammar() {
                      literal("or"),
                      space(),
                      term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"})], 
-                    undefined,
-                    undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
 
  result.push(phrase(term("NP'", {"num": 3, "gen": "?", "case": 2, "gap": "-"}),
@@ -511,8 +505,6 @@ function grammar() {
                      literal("or"),
                      space(),
                      term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"})], 
-                    undefined,
-                    undefined,
                     "(root) => { return node('NP', root.types, root.children, root.loc); }"));
  
  // Sentential Conjunctions
@@ -838,16 +830,11 @@ function grammar() {
 
  // Extensible proper names.
  result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
-                    [term("FULLNAME")],
-                    undefined,
-                    undefined,
-                    {"gen": "?"}));
+                    [term("FULLNAME")]));
 
  // Variables
  result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
-                    [term("VAR")],
-                    undefined,
-                    {"gen": "?", "var": true}));
+                    [term("VAR")]));
 
  // LI 33
  result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "fut"}),
