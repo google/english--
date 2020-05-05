@@ -216,6 +216,7 @@ describe("Parser", function() {
       "@type": "V",
       "children": ["walks"],
       "loc": 0,
+      "root": "walk",
       "types": {
         "fin": "+",
         "num": "sing",
@@ -242,6 +243,25 @@ describe("Parser", function() {
       },
       "loc": 0,
     });
+  });
+
+  it("she walks", function() {
+    let result = parse("she walks", "S");
+    assertThat(result.children[1].children[0].children[0])
+     .equalsTo({
+        "@type": "V",
+        "children": ["walks"],
+        "root": "walk",
+        "loc": 4,
+        "types": {
+          "fin": "+",
+          "num": "sing",
+          "stat": "-",
+          "tense": "pres",
+          "tp": "-past",
+          "trans": "-",
+         }
+     });
   });
 
   it("WS", function() {
@@ -355,6 +375,7 @@ describe("Parser", function() {
        "@type": "V",
        "children": ["loves"],
        "loc": 0,
+       "root": "love",
        "types": {
           "fin": "+",
           "num": "sing",

@@ -462,9 +462,18 @@ function grammar() {
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
  // LI 49
+ let decompose = 
+  `(root) => node(root['@type'], 
+                  root.types, 
+                  [root.children[0].children[0] + root.children[1]],
+                  root.loc, 
+                  {"root": root.children[0].children[0]})`;
+
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  "(root) => node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc)"));
+                  decompose));
+
+                  // "(root) => node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc)"));
  
  // LI 20
  // Manually expanding into the present / plural.
@@ -490,22 +499,12 @@ function grammar() {
  // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  `(root) => node(root['@type'], 
-                                  root.types, 
-                                  [root.children[0].children[0] + 'ed'], 
-                                  root.loc, 
-                                  {root: root.children[0].children[0]})`
-                  ));
+                  decompose));
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  `(root) => node(root['@type'], 
-                                  root.types, 
-                                  [root.children[0].children[0] + 'ed'], 
-                                  root.loc, 
-                                  {root: root.children[0].children[0]})`
-                  ));
+                  decompose));
 
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by
