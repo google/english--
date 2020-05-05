@@ -1268,6 +1268,17 @@ describe("DRS", function() {
     `);
   });
 
+  it("John kissed Anna.", function() {
+    assertThat("John kissed Anna.")
+     .equalsTo(`
+       drs(a, b) {
+         John(a)
+         Anna(b)
+         a kissed b
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

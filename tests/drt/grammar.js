@@ -311,7 +311,7 @@ S ->
                `.trim());
   });
 
-  it("custom processor", function() {
+  it.skip("custom processor", function() {
     let rule = phrase(term("A"),
                       [term("A", {"num": 1})], "B");
 

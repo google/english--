@@ -3,13 +3,11 @@ const {ParserRules, ParserStart} = require("./english.js");
 
 let namespace = 0;
 
-let rule = (head = {}, tail = [], skip = false, types = {}, prod) => { 
+let rule = (head = {}, tail = [], prod) => { 
  return {
   "@type": "Rule", 
   "head": head, 
   "tail": tail, 
-  "skip": skip, 
-  "types": types,
   "prod": prod
  }
 };
@@ -18,7 +16,7 @@ let l = (value) => { return literal(value); };
 let space = (optional = false) => { return optional ? "_" : "__"};
 let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
 let literal = (value) => { return {"@type": "Literal", name: value} };
-let phrase = (head, tail, skip, types, prod) => { return rule(head, [tail], skip, types, prod); };
+let phrase = (head, tail, skip, types, prod) => { return rule(head, [tail], prod); };
 
 function name(term, pretty) {
  if (typeof term == "string") {
@@ -686,8 +684,6 @@ function grammar() {
  // LI 18
  result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2, "tp": 4, "tense": "pres"}),
                   [[term("V", {"trans": 2, "stat": 3})]],
-                  undefined, 
-                  undefined,
                   "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0]], root.loc); }",
                   (name, types) => { 
                    return `([child], loc) => child`;
@@ -704,8 +700,6 @@ function grammar() {
  // LI 49
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  undefined, 
-                  undefined,
                   "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
@@ -721,8 +715,6 @@ function grammar() {
  // LI 50
  result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"})]],
-                  undefined, 
-                  undefined,
                   "(root) => { if (root == r) return r; return node(root['@type'], root.types, root.children[0].children, root.loc); }",
                   (name, types) => { 
                    return `([child], loc) => child`;
@@ -742,8 +734,6 @@ function grammar() {
  // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  undefined, 
-                  undefined,
                   "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
@@ -753,8 +743,6 @@ function grammar() {
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  undefined, 
-                  undefined,
                   "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }",
                   (name, types) => { 
                    return "([inf, s], loc) => node(inf['@type'], inf.types, [inf.children[0] + s], loc)";
@@ -787,9 +775,7 @@ function grammar() {
 
  // GAP
  result.push(rule(term("GAP"),
-                  [["null"]],
-                  undefined,
-                  undefined));
+                  [["null"]]));
 
  // ADJ
  result.push(rule(term("ADJ"),
