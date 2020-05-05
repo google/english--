@@ -451,7 +451,7 @@ function grammar() {
  // LI 18
  result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2, "tp": 4, "tense": "pres"}),
                   [[term("V", {"trans": 2, "stat": 3})]],
-                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0]], root.loc); }"));
+                  "(root) => {  return node(root['@type'], root.types, [root.children[0].children[0]], root.loc); }"));
  
  // LI 19
  // Manually expanding into the present / third person.
@@ -463,7 +463,7 @@ function grammar() {
  // LI 49
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
+                  "(root) => { return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
  
  // LI 20
  // Manually expanding into the present / plural.
@@ -474,7 +474,7 @@ function grammar() {
  // LI 50
  result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"})]],
-                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, root.children[0].children, root.loc); }"));
+                  "(root) => { return node(root['@type'], root.types, root.children[0].children, root.loc); }"));
  // Past tense
  // LI 51
  //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "-past", "tense": "pres"}),
@@ -489,12 +489,12 @@ function grammar() {
  // LI 52
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
+                  "(root) => { return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  "(root) => { if (root == r) return r; return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
+                  "(root) => { return node(root['@type'], root.types, [root.children[0].children[0] + root.children[1]], root.loc); }"));
 
  
  // LI 21
