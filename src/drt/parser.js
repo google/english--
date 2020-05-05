@@ -15,90 +15,8 @@ let term = (name, types) => { return {"@type": "Term", name: name, types: types}
 let literal = (value) => { return {"@type": "Literal", name: value} };
 let phrase = (head, tail, prod) => { return rule(head, [tail], prod); };
 
-function name(term, pretty) {
- if (typeof term == "string") {
-  return term;
- }
- if (term["@type"] == "Literal") {
-  return `"${term.name}"${pretty ? "i" : ""}`;
- }
- if (!term.types) {
-  return term.name;
- }
-
- let result = term.name;
- result += "[";
- let first = true;
- for (let [key, value] of Object.entries(term.types)) {
-  if (!first) {
-   result += ", ";
-  }
-  first = false;
-  let val = value;
-  if (Number.isInteger(value)) {
-   val = `@${value}`;
-  } else if (Array.isArray(value)) {
-   val = `${value.join("/")}`;
-  }
-  result += key + "=" + val;
- }
- result += "]";
-
- if (pretty) {
-  result = result.replace(/\[/g, '_');
-  result = result.replace(/\]/g, '');
-  result = result.replace(/\s/g, '');
-  result = result.replace(/,/g, '_');
-  result = result.replace(/-/g, 'n');
-  result = result.replace(/\+/g, 'p');
-  result = result.replace(/=/g, '_');
-  result = result.replace(/\'/g, '_');
- }
- 
- return result;
-}
- 
-function print({head, tail}, pretty = false) {
- let result = "";
- result += name(head, pretty) + " ->";
- for (let line of tail) {
-  for (let term of line) {
-   result += " " + name(term, pretty);
-  }
- }
- return result;
-}
-
 function clone(obj) {
  return JSON.parse(JSON.stringify(obj));
-}
-
-function expand(obj) {
- let queue = [];
- let result = [];
-
- queue.push(obj);
-    
- while (queue.length > 0) {
-  let obj = queue.pop();
-  
-  let vars = Object.entries(obj)
-   .filter(([key, value]) => Array.isArray(value));
-  
-  if (vars.length == 0) {
-   result.unshift(obj);
-   continue;
-  }
-
-  let [key, values] = vars.shift();
-  for (let value of values) {
-   let fix = clone(obj);
-   fix[key] = value;
-   queue.push(fix);
-  }
- };
- 
- return result;
 }
 
 const FEATURES = {
@@ -113,141 +31,6 @@ const FEATURES = {
  "tp": ["+past", "-past"],
 };
 
-function collect(rule) {
- let vars = {};
-
- let ids = -1;
-
- for (let [key, values] of Object.entries(FEATURES)) {
-  if (rule.head.types) {
-   if (Number.isInteger(rule.head.types[key])) {
-    vars[rule.head.types[key]] = FEATURES[key];
-   } else if (Array.isArray(rule.head.types[key])) {
-    vars[`${ids}`] = rule.head.types[key];
-    rule.head.types[key] = ids;
-    ids--;
-   }
-  }
-  for (let line of rule.tail) {
-   for (let term of line) {
-    if (!term.types) {
-     continue;
-    }
-    if (Number.isInteger(term.types[key])) {
-     vars[term.types[key]] = FEATURES[key];
-    } else if (Array.isArray(term.types[key])) {
-     vars[`${ids}`] = term.types[key];
-     term.types[key] = ids;
-     ids--;
-    }
-   }
-  }
- }
-
- return vars;
-}
-
-function replace(rule, vars) {
- let result = clone(rule);
- 
- for (let [feature, values] of Object.entries(FEATURES)) {
-  if (result.head.types && Number.isInteger(result.head.types[feature])) {
-   result.head.types[feature] = vars[result.head.types[feature]];
-  }
-
-  for (let line of result.tail) {
-   for (let term of line) {
-    if (!term.types) {
-     continue;
-    } else if (Number.isInteger(term.types[feature])) {
-     term.types[feature] = vars[term.types[feature]];
-    }
-   }
-  }
- }
- 
- return result;
-}
-
-function generate(rule) {
- let vars = collect(rule);
- let all = expand(vars);
-
- let result = [];
- for (let combo of all) {
-  result.push(replace(rule, combo));
- }
- return result;
-}
-
-
-function compile(grammar, header = true) {
- let rules = {};
-
- let flatten = (expansion) => {
- };
-
- for (let rule of grammar) {
-  for (let expansion of generate(rule)) {
-   let head = name(expansion.head, true);
-   rules[head] = rules[head] || [];
-   // console.log(head);
-   for (let line of expansion.tail) {
-    let list = [];
-    for (let term of line) {
-     list.push(name(term, true));
-    }
-    
-    let prod = processor(expansion, undefined);
-    rules[head].push([list.join(" "), prod]);
-   }
-  }
- }
-
- let result = [];
-
- if (header) {
-  result.push(`@builtin "whitespace.ne"`);
-  result.push(`@include "base.ne"`);
-  result.push(``);
- }
-
- for (let [key, list] of Object.entries(rules)) {
-  result.push(`${key} -> `);
-  let all = [];
-  for (let [line, processor] of list) {
-   all.push(`  ${line} {% ${processor} %}`);
-  }
-  result.push(all.join(" |\n"));
- }
- 
- if (header) {
-  result.push("");
-  result.push("# whitespaces");
-  
-  let whitespaces = rule(term("WS", {"gap": ["sing", "plur", "-"]}));
-  for (let whitespace of generate(whitespaces)) {
-   let gap = whitespace.head.types.gap != "-";
-   result.push(`${print(whitespace, true)} ${gap ? "_" : "__"} {% () => null %}`);
-  }
-  
- }
-
- return result.join("\n");
-}
-
-function processor(rule, name) {
- let result = [];
- result.push("(args, loc)");
- result.push(" => ");
- result.push("node(");
- let types = {};
- Object.assign(types, rule.head.types);
- result.push(`"${name ? name : rule.head.name}", ${JSON.stringify(types)}, args, loc`);
- result.push(")");
- return result.join("");
-}
-
 function parse(source, start = "Sentence") {
  const parser = new Parser(ParserRules, start, {
    keepHistory: true
@@ -255,6 +38,7 @@ function parse(source, start = "Sentence") {
  parser.feed(source);
  return parser.results;
 }
+
 
 function grammar() {
  let result = [];
@@ -860,12 +644,6 @@ module.exports = {
  rule: rule,
  phrase: phrase,
  literal: literal,
- print: print,
- generate: generate,
- processor: processor,
- expand: expand,
- collect: collect,
- compile: compile,
  clone: clone,
  parse: parse,
  grammar: grammar,

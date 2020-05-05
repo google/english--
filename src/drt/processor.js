@@ -111,7 +111,7 @@ function node(type, types = {}, children = [], loc = 0) {
   };
 }
 
-function process(type, types, data, conditions, location, reject) {
+function process(type, types, data, conditions, location, reject, post = ((x) => x)) {
  // console.log(type);
  // console.log(JSON.stringify(data));
  let children = data.map(c => c || {}).map(c => c.types || {});
@@ -146,8 +146,10 @@ function process(type, types, data, conditions, location, reject) {
    result[key] = namespace + value;
   }
  }
+
  let n = node(type, result, data, location);
- return n;
+
+ return post(n);
 }
 
 module.exports = {

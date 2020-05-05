@@ -34,25 +34,15 @@ describe("Parser", function() {
     };
 
     for (let rule of rules) {
-     let {head, tail, skip, prod} = rule;
+     let {head, tail, prod} = rule;
      for (let line of tail) {
       let terms = line.map(name).join(" ");
       let types = line.filter(term => term != "null").map(term => JSON.stringify(term.types || {}));
-
-      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r)`;
-
-      if (skip) {
-       body = `((root) => node("${skip}", Object.assign(root.types, ${JSON.stringify(rule.types)}), root.children[0].children, root.loc))(${body})`;
-      } else if (typeof prod == "string") {
-       body = `(${prod})(${body})`;
-      }
-
+      let body = `process("${head.name}", ${JSON.stringify(head.types || {})}, d, [${types}], l, r, ${prod})`;
       result.push(`${name(head)} -> ${terms} {% (d, l, r) => ${body} %}`);
 
      }
     }
-
-    // result.push("WS -> _");
 
     const fs = require("fs");
     fs.writeFileSync("./src/drt/english.ne", result.join("\n"));
