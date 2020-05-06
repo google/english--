@@ -465,12 +465,14 @@ function grammar() {
  // It seems like the same applies to verbs:
  // https://parentingpatch.com/third-person-singular-simple-present-verbs/
  // LI 49
- let decompose = `
-    (root) => node(root['@type'], 
-                   root.types, 
-                   [root.children[0].children[0] + root.children[1]],
-                   root.loc,
-                   {"root": root.children[0].children[0]})`;
+ function decompose() {
+  return `
+   (root) => node(root['@type'], 
+                  root.types, 
+                  [root.children[0].children[0] + root.children[1]],
+                  root.loc,
+                  {"root": root.children[0].children[0]})`;
+ }
 
  function endsWith(regex) {
   let result = [];
@@ -486,11 +488,11 @@ function grammar() {
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  decompose, endsWith("/.*(?<!(s|x|sh|ch|z))$/")));
+                  decompose(), endsWith("/.*(?<!(s|x|sh|ch|z))$/")));
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
-                  decompose, endsWith("/(s|x|sh|ch|z)$/")));
+                  decompose(), endsWith("/(s|x|sh|ch|z)$/")));
 
  // LI 20
  // Manually expanding into the present / plural.
@@ -516,29 +518,39 @@ function grammar() {
 
  // LI 52
  // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
+
+ // This is the catch all ... we should probably do a bette job here being more precise.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose(), endsWith("/.*(?<![aiou])$/")));
+
+
  // For regular verbs ending in "e", add "d". e.g. hate/hated, seize/seized, assume/assumed, tie/tied, free/freed.
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("d")]],
-                  decompose, endsWith("/e$/")));
+                  decompose(), endsWith("/e$/")));
 
  // For regular verbs ending in "a", "i", "o" or "u", add "ed". e.g. ski/skied, echo/echoed.
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  decompose, endsWith("/[aiou]$/")));
+                  decompose(), endsWith("/[aiou]$/")));
 
  // For regular verbs ending in a vowel + y, e.g. play/played, decay/decayed, enjoy/enjoyed.
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  decompose, endsWith("/[aeiou]y$/")));
+                  decompose(), endsWith("/[aeiou]y$/")));
 
- result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
-                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  decompose, endsWith("/.*(?<![aiou])$/")));
+ // For regular verbs ending in a consonant + y, e.g. cry/cried, magnify/magnified
+ // NOTE(goto): this isn't possible to do with the current setup: "cry" + "ed" won't be matched, and to change the root
+ // to "cri" instead would be wrong/bad/hard. We need to figure out a different parsing scheme here.
+ //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+ //                 [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+ //                 decompose(), endsWith("/[bcdfghjklmnpqrstvwxys]y$/")));
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  decompose));
+                  decompose()));
 
  // LI 21
  // TODO(goto): here is a first example of syntax that is determined by

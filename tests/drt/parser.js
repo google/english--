@@ -424,6 +424,7 @@ describe("Parser", function() {
     assertThat(/.*(?<![aiou])$/.test("walk")).equalsTo(true);
     // past tenses of verbs that end in a vowel + y
     assertThat(/[aeiou]y$/.test("play")).equalsTo(true);
+    assertThat(/[bcdfghjklmnpqrstvwxys]y$/.test("cry")).equalsTo(true);
   });
 
   it("reject verbs", function() {
