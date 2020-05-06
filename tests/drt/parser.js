@@ -1105,6 +1105,29 @@ describe("Parser", function() {
                  VP_(VP(HAVE("had"), VP(V("kissed"), NP(PRO("him")))))));
   });
 
+  it("Jones skied.", function() {
+    // past tense of verbs ending in "a, i, o, u".
+    assertThat(first(parse("Jones skied.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("skied")))));
+  });
+
+  it("Jones skis.", function() {
+    // third person present conjugation of verbs ending in "a, i, o, u".
+    // https://conjugator.reverso.net/conjugation-english-verb-ski.html
+    assertThat(first(parse("Jones skis.")))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("skis")))));
+  });
+
+  it("They ski.", function() {
+    // third person plural present conjugation of verbs ending in "a, i, o, u".
+    // https://conjugator.reverso.net/conjugation-english-verb-ski.html
+    assertThat(first(parse("They ski.")))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(V("ski")))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {
