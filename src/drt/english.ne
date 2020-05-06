@@ -116,19 +116,29 @@ V -> V "s"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans
                    root.types, 
                    [root.children[0].children[0] + root.children[1]],
                    root.loc,
-                   {"root": root.children[0].children[0]}), function (n) { 
-                      let v = n.children[0].children[0]; 
-                      return !(v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z"));
-                   }) %}
+                   {"root": root.children[0].children[0]}), function(n) {
+  let v = n.children[0].children[0];
+  if (v.endsWith("s")) return false;
+  if (v.endsWith("x")) return false;
+  if (v.endsWith("sh")) return false;
+  if (v.endsWith("ch")) return false;
+  if (v.endsWith("z")) return false;
+  return !false;
+}) %}
 V -> V "es"i {% (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
     (root) => node(root['@type'], 
                    root.types, 
                    [root.children[0].children[0] + root.children[1]],
                    root.loc,
-                   {"root": root.children[0].children[0]}), function (n) { 
-                      let v = n.children[0].children[0]; 
-                      return v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z");
-                   }) %}
+                   {"root": root.children[0].children[0]}), function(n) {
+  let v = n.children[0].children[0];
+  if (v.endsWith("s")) return true;
+  if (v.endsWith("x")) return true;
+  if (v.endsWith("sh")) return true;
+  if (v.endsWith("ch")) return true;
+  if (v.endsWith("z")) return true;
+  return !true;
+}) %}
 V -> V {% (d, l, r) => process("V", {"num":"plur","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"}], l, r, (root) => node(root['@type'], root.types, root.children[0].children, root.loc), undefined) %}
 V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
     (root) => node(root['@type'], 

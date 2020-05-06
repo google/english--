@@ -470,23 +470,25 @@ function grammar() {
                    root.loc,
                    {"root": root.children[0].children[0]})`;
 
+ function endsWith(options, apply = true) {
+  let result = [];
+  result.push("function(n) {");
+  result.push("  let v = n.children[0].children[0];");
+  for (let option of options) {
+    result.push(`  if (v.endsWith("${option}")) return ${apply};`);
+  }
+  result.push(`  return !${apply};`);
+  result.push("}");
+  return result.join("\n");
+ }
+
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  decompose,
-                  `function (n) { 
-                      let v = n.children[0].children[0]; 
-                      return !(v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z"));
-                   }`
-             ));
+                  decompose, endsWith(["s", "x", "sh", "ch", "z"], false)));
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
-                  decompose,
-                  `function (n) { 
-                      let v = n.children[0].children[0]; 
-                      return v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z");
-                   }`
-             ));
+                  decompose, endsWith(["s", "x", "sh", "ch", "z"], true)));
 
  // LI 20
  // Manually expanding into the present / plural.
@@ -498,6 +500,7 @@ function grammar() {
  result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"})]],
                   "(root) => node(root['@type'], root.types, root.children[0].children, root.loc)"));
+
  // Past tense
  // LI 51
  //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "-past", "tense": "pres"}),
@@ -510,6 +513,7 @@ function grammar() {
  //                 ));
 
  // LI 52
+ // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   decompose));

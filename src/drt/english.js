@@ -237,24 +237,34 @@ function name(head, tail, reject) {
     {"name": "V", "symbols": ["V"], "postprocess": (d, l, r) => process("V", {"num":1,"fin":"-","stat":3,"trans":2,"tp":4,"tense":"pres"}, d, [{"trans":2,"stat":3}], l, r, (root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc), undefined)},
     {"name": "V$subexpression$25", "symbols": [/[sS]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "V", "symbols": ["V", "V$subexpression$25"], "postprocess":  (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
-        (root) => node(root['@type'], 
-                       root.types, 
-                       [root.children[0].children[0] + root.children[1]],
-                       root.loc,
-                       {"root": root.children[0].children[0]}), function (n) { 
-                          let v = n.children[0].children[0]; 
-                          return !(v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z"));
-                       }) },
+            (root) => node(root['@type'], 
+                           root.types, 
+                           [root.children[0].children[0] + root.children[1]],
+                           root.loc,
+                           {"root": root.children[0].children[0]}), function(n) {
+          let v = n.children[0].children[0];
+          if (v.endsWith("s")) return false;
+          if (v.endsWith("x")) return false;
+          if (v.endsWith("sh")) return false;
+          if (v.endsWith("ch")) return false;
+          if (v.endsWith("z")) return false;
+          return !false;
+        }) },
     {"name": "V$subexpression$26", "symbols": [/[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "V", "symbols": ["V", "V$subexpression$26"], "postprocess":  (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
-        (root) => node(root['@type'], 
-                       root.types, 
-                       [root.children[0].children[0] + root.children[1]],
-                       root.loc,
-                       {"root": root.children[0].children[0]}), function (n) { 
-                          let v = n.children[0].children[0]; 
-                          return v.endsWith("s") || v.endsWith("x") || v.endsWith("sh") || v.endsWith("ch") || v.endsWith("z");
-                       }) },
+            (root) => node(root['@type'], 
+                           root.types, 
+                           [root.children[0].children[0] + root.children[1]],
+                           root.loc,
+                           {"root": root.children[0].children[0]}), function(n) {
+          let v = n.children[0].children[0];
+          if (v.endsWith("s")) return true;
+          if (v.endsWith("x")) return true;
+          if (v.endsWith("sh")) return true;
+          if (v.endsWith("ch")) return true;
+          if (v.endsWith("z")) return true;
+          return !true;
+        }) },
     {"name": "V", "symbols": ["V"], "postprocess": (d, l, r) => process("V", {"num":"plur","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"}], l, r, (root) => node(root['@type'], root.types, root.children[0].children, root.loc), undefined)},
     {"name": "V$subexpression$27", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "V", "symbols": ["V", "V$subexpression$27"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 

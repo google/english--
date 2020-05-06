@@ -409,6 +409,11 @@ describe("Parser", function() {
      .equalsTo();
   });
 
+  it.skip("rejects loveed", function() {
+    assertThat(parse("loveed", "V"))
+     .equalsTo();
+  });
+
   it("loves", function() {
     assertThat(clean(parse("loves", "S")))
      .equalsTo(S(NP(GAP()), VP_(VP(V("loves")))));
