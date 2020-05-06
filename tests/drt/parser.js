@@ -409,9 +409,25 @@ describe("Parser", function() {
      .equalsTo();
   });
 
-  it.skip("rejects loveed", function() {
-    assertThat(parse("loveed", "V"))
-     .equalsTo();
+  it("endsWith", function() {
+    // third person present
+    assertThat(/(s|x|sh|ch|z)$/.test("watch")).equalsTo(true);
+    assertThat(/(s|x|sh|ch|z)$/.test("walk")).equalsTo(false);
+    assertThat(/(s|x|sh|ch|z)$/.test("love")).equalsTo(false);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("argue")).equalsTo(true);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("walk")).equalsTo(true);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("love")).equalsTo(true);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("kiss")).equalsTo(false);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("quiz")).equalsTo(false);
+    assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("fish")).equalsTo(false);
+    // past tenses
+    assertThat(/.*(?<![aiou])$/.test("walk")).equalsTo(true);
+  });
+
+  it("reject verbs", function() {
+    assertThat(parse("kisss", "V")).equalsTo(undefined);
+    // assertThat(parse("quizs", "V")).equalsTo(undefined);
+    // assertThat(parse("fishs", "V")).equalsTo(undefined);
   });
 
   it("loves", function() {

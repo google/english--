@@ -470,25 +470,25 @@ function grammar() {
                    root.loc,
                    {"root": root.children[0].children[0]})`;
 
- function endsWith(options, apply = true) {
+ function endsWith(regex) {
   let result = [];
   result.push("function(n) {");
-  result.push("  let v = n.children[0].children[0];");
-  for (let option of options) {
-    result.push(`  if (v.endsWith("${option}")) return ${apply};`);
-  }
-  result.push(`  return !${apply};`);
+  result.push(`  return ${regex}.test(n.children[0].children[0]);`);
+  // for (let option of options) {
+  // result.push(`  if (${regex}.test(v)) return ${apply};`);
+  //}
+  // result.push(`  return !${apply};`);
   result.push("}");
   return result.join("\n");
  }
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
-                  decompose, endsWith(["s", "x", "sh", "ch", "z"], false)));
+                  decompose, endsWith("/.*(?<!(s|x|sh|ch|z))$/")));
 
  result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
                   [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
-                  decompose, endsWith(["s", "x", "sh", "ch", "z"], true)));
+                  decompose, endsWith("/(s|x|sh|ch|z)$/")));
 
  // LI 20
  // Manually expanding into the present / plural.
@@ -514,9 +514,19 @@ function grammar() {
 
  // LI 52
  // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
+ // For regular verbs ending in "e", add "d". e.g. hate/hated, seize/seized, assume/assumed, tie/tied, free/freed.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("d")]],
+                  decompose, endsWith("/e$/")));
+
+ // For regular verbs ending in "a", "i", "o" or "u", add "ed". e.g. ski/skied, echo/echoed.
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
-                  decompose));
+                  decompose, endsWith("/.*(?<![aiou])$/")));
+
+ //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+ //                 [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+ //                 decompose, endsWith("/[aiou]$/")));
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
