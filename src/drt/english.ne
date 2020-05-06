@@ -98,6 +98,7 @@ V -> "surprise"i {% (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}],
 V -> "love"i {% (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined) %}
 V -> "stink"i {% (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined) %}
 V -> "ski"i {% (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined) %}
+V -> "play"i {% (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined) %}
 V -> "adore"i {% (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined) %}
 V -> "leave"i {% (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined) %}
 V -> "reach"i {% (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined) %}
@@ -144,6 +145,14 @@ V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,
                    root.loc,
                    {"root": root.children[0].children[0]}), function(n) {
   return /[aiou]$/.test(n.children[0].children[0]);
+}) %}
+V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+    (root) => node(root['@type'], 
+                   root.types, 
+                   [root.children[0].children[0] + root.children[1]],
+                   root.loc,
+                   {"root": root.children[0].children[0]}), function(n) {
+  return /[aeiou]y$/.test(n.children[0].children[0]);
 }) %}
 V -> V "ed"i {% (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
     (root) => node(root['@type'], 

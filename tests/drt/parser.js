@@ -420,8 +420,10 @@ describe("Parser", function() {
     assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("kiss")).equalsTo(false);
     assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("quiz")).equalsTo(false);
     assertThat(/.*(?<!(s|x|z|sh|ch))$/.test("fish")).equalsTo(false);
-    // past tenses
+    // past tenses of verbs that don't end with a, i, o or u.
     assertThat(/.*(?<![aiou])$/.test("walk")).equalsTo(true);
+    // past tenses of verbs that end in a vowel + y
+    assertThat(/[aeiou]y$/.test("play")).equalsTo(true);
   });
 
   it("reject verbs", function() {
@@ -1126,6 +1128,12 @@ describe("Parser", function() {
     assertThat(first(parse("They ski.")))
      .equalsTo(S(NP(PRO("They")),
                  VP_(VP(V("ski")))));
+  });
+
+  it("She played.", function() {
+    assertThat(first(parse("She played.")))
+     .equalsTo(S(NP(PRO("She")),
+                 VP_(VP(V("played")))));
   });
 
   function assertThat(x) {

@@ -426,7 +426,8 @@ function grammar() {
  result.push(rule(term("V", {"trans": "-", "stat": "+"}),
                   [[literal("love")],
                    [literal("stink")],
-                   [literal("ski")],
+                   [literal("ski")], // TODO(goto): is this a stative verb?
+                   [literal("play")], // TODO(goto): is this a stative verb?
                    [literal("adore")]]));
 
  // Non-stative berbs in their inifinitive form.
@@ -525,11 +526,14 @@ function grammar() {
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   decompose, endsWith("/[aiou]$/")));
 
+ // For regular verbs ending in a vowel + y, e.g. play/played, decay/decayed, enjoy/enjoyed.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose, endsWith("/[aeiou]y$/")));
+
  result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
                   [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
                   decompose, endsWith("/.*(?<![aiou])$/")));
-
-
 
  // LI 54
  result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
