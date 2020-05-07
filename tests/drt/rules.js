@@ -549,6 +549,29 @@ describe("Rules", function() {
     assertThat(print(from)).equalsTo("a from b");
   });
 
+  it("CR.BE John was happy", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Sam was happy."), true);
+
+    new CRPN(ids).match(node, []);
+    new CRPN(ids).match(child(node, 1, 0, 1), []);
+
+    assertThat(print(node)).equalsTo("a was happy");
+
+    let [[s], [time]] = new CRTENSE(ids).match(node, []);
+    
+    // NOTE(goto): BE should be state=+ and lead to an s0
+    // here instead.
+    assertThat(s.print()).equalsTo("e0");
+    assertThat(time.print()).equalsTo("e0 < @n");
+    
+    let [, [from], , [remove]] = new CRBE(ids).match(node, []);
+
+    assertThat(remove).equalsTo(node);
+    assertThat(print(from)).equalsTo("e0: happy(a)");
+  });
+
   it("CR.COND", function() {
     let ids = new Ids();
 

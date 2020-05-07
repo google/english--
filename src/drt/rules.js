@@ -35,6 +35,7 @@ function transcribe(node, refs) {
  } else if (node["@type"] == "Predicate") {
   return node.print();
  }
+
  let result = [];
  for (let child of node.children || []) {
   result.push(transcribe(child, refs));
@@ -519,6 +520,8 @@ class CRPOSBE extends Rule {
  }
  apply({ref, adj}, node, refs) {
   adj.ref = ref.children[0];
+  // console.log(node);
+  adj.time = node.time;
   return [[], [adj], [], [node]];
  }
 }
@@ -832,20 +835,21 @@ class CRPP extends CompositeRule {
 
 class CRTENSE extends Rule {
  constructor(ids) {
-  super(ids, S(capture("sub"), VP_(VP(V(capture("verb"))))));
+  super(ids, S(capture("sub"), VP_(VP(capture("verb")))));
  }
  apply({verb}, node, refs) {
   // TODO(goto): a lot of things are pushed as sentences
   // artificially, so verbs aren't represented anymore.
   // To fix that requires a bigger refactoring than we'd
   // want right now, so we return early here if the tree
-  // doesn't look like we expect it to look.
-  if ((verb.types || {}).tense != "past") {
+  // Skip if a time was already assigned too.
+  if (node.time || (node.types || {}).tense != "past") {
    return [[], [], [], []];
   }
 
+
   // records at the sentence level the eventuality.
-  let e = referent(this.id("e"), {}, undefined, verb.loc);
+  let e = referent(this.id("e"), {}, undefined, node.loc);
   node.time = e;
    
   // Records the time relationship between the new
@@ -872,7 +876,9 @@ class DRS {
 
  static from(ids = new Ids()) {
   let rules = 
-   [new CREVERY(ids),
+   [
+    new CRTENSE(ids),
+    new CREVERY(ids),
     new CRVPEVERY(ids),
     new CRPP(ids),
     new CRID(ids),
@@ -888,7 +894,6 @@ class DRS {
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
-    new CRTENSE(ids),
     ];
   return new DRS(new CRPN(ids), rules);
  }

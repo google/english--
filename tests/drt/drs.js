@@ -1280,6 +1280,17 @@ describe("DRS", function() {
     `);
   });
 
+  it("John was happy.", function() {
+    assertThat("John was happy.")
+     .equalsTo(`
+       drs(a, e0) {
+         John(a)
+         e0 < @n
+         e0: happy(a)
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
