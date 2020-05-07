@@ -24,6 +24,8 @@ const {
   CRPOSS,
   CRADJ,
   CRPP,
+  CRTENSE,
+  referent,
 } = require("../../src/drt/rules.js");
 
 const {
@@ -873,13 +875,17 @@ describe("Rules", function() {
     let ids = new Ids();
 
     let node = first(parse("Every woman with a donkey loves Jones."), true);
-    
+
     let [a, [jones]] = new CRPN(ids).match(child(node, 1, 0));
 
     assertThat(print(jones)).equalsTo("Jones(a)");
     assertThat(print(node)).equalsTo("Every woman with a donkey loves a");
+    
+    // console.log(node);
+    // return;
 
     let [[], [implication]] = new CREVERY(ids).match(node, []);
+
     assertThat(implication.print()).equalsTo(trim(`
       drs(b, c) {
         b with c
@@ -891,6 +897,64 @@ describe("Rules", function() {
     `));
 
   });
+
+  it("CR.VPPP", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones loves a woman with a donkey."), true);
+    
+    let [[a], [woman, prep]] = new CRPP(ids).match(node);
+
+    assertThat(a.print()).equalsTo("a");
+    assertThat(print(woman)).equalsTo("woman(a)");
+    assertThat(print(prep)).equalsTo("a with a donkey");
+
+    let [[b], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
+
+    assertThat(b.print()).equalsTo("b");
+    assertThat(print(prep)).equalsTo("a with b");
+    assertThat(print(donkey)).equalsTo("donkey(b)");
+  });
+
+  it("CR.SPP", function() {
+    let ids = new Ids();
+
+    let node = first(parse("A woman with a donkey loves Jones."), true);
+    
+    let [[a], [woman, prep]] = new CRPP(ids).match(node);
+
+    assertThat(a.print()).equalsTo("a");
+    assertThat(print(woman)).equalsTo("woman(a)");
+    assertThat(print(prep)).equalsTo("a with a donkey");
+
+    let [[b], [donkey], [], []] = new CRID(ids).match(child(prep, 1, 0));
+
+    assertThat(b.print()).equalsTo("b");
+    assertThat(print(prep)).equalsTo("a with b");
+    assertThat(print(donkey)).equalsTo("donkey(b)");
+  });
+
+  it("CR.TENSE", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Mary kissed Jones."), true);
+    new CRPN(ids).match(node);
+    new CRPN(ids).match(child(node, 1, 0));
+    
+    let [[e], [time]] = new CRTENSE(ids).match(node, []);
+
+    // A new event referent is added.
+    assertThat(e.print()).equalsTo("e0");
+
+    // And assigned as an eventuality referent on the verb.
+    assertThat(print(child(node, 1, 0, 0))).equalsTo("kissed");
+
+    // A new condition is added binding the eventuality to the
+    // utterance time.
+    assertThat(time.print()).equalsTo("e0 < @n");
+
+    assertThat(print(node)).equalsTo("e0: a kissed b");
+   });
 
   class TreeWalker {
    constructor(rules = []) {
@@ -920,7 +984,7 @@ describe("Rules", function() {
      }
     }
     
-    console.log(children);
+    // console.log(children);
     
     return children.join("");
    }

@@ -1271,10 +1271,11 @@ describe("DRS", function() {
   it("John kissed Anna.", function() {
     assertThat("John kissed Anna.")
      .equalsTo(`
-       drs(a, b) {
+       drs(a, b, e0) {
          John(a)
          Anna(b)
-         a kissed b
+         e0: a kissed b
+         e0 < @n
        }
     `);
   });

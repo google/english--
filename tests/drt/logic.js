@@ -69,7 +69,9 @@ describe("Logic", function() {
 
   function transpile(node) {
    if (node["@type"] == "Predicate") {
-    return predicate(node.name, [argument(literal(node.ref.name))]);
+    // console.log(node.children);
+    let args = node.children.map((x) => argument(literal(x.name)));
+    return predicate(node.name, args);
    } else if (node["@type"] == "PN" || node["@type"] == "ADJ") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "N") {

@@ -1137,6 +1137,13 @@ describe("Parser", function() {
                  VP_(VP(V("played")))));
   });
 
+  it("Mary kissed Jones.", function() {
+    assertThat(first(parse("Mary kissed Jones.")))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(V("kissed"),
+                        NP(PN("Jones"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

@@ -33,7 +33,7 @@ function transcribe(node, refs) {
   }
   return node.name;
  } else if (node["@type"] == "Predicate") {
-  return `${node.name}(${node.ref.name})`;
+  return node.print();
  }
  let result = [];
  for (let child of node.children || []) {
@@ -41,6 +41,7 @@ function transcribe(node, refs) {
  }
  let suffix = node.ref ? `(${node.ref.name})` : "";
  let prefix = node.neg ? "~" : "";
+ prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
  return prefix + result.join(" ").trim() + suffix;
 }
 
@@ -87,7 +88,11 @@ class Ids {
     }
    })();
  }
- get() {
+ get(prefix) {
+  if (prefix) {
+   this.id = this.id == undefined ? 0 : (this.id + 1);
+   return `${prefix}${this.id}`;
+  }
   return this.gen.next().value;
  }
 }
@@ -108,8 +113,8 @@ class Rule {
   return this.apply(result, node, refs);
  }
 
- id() {
-  return this.ids.get();
+ id(prefix) {
+  return this.ids.get(prefix);
  }
 }
 
@@ -176,7 +181,25 @@ function referent(name, types, value, loc) {
     types: types,
     name: name,
     value: value,
-    loc: loc
+    loc: loc,
+    print() {
+    return this.name;
+   }
+  }
+}
+
+function predicate(name, children) {
+  return {
+   "@type": "Predicate",
+    name: name,
+    children: children,
+    print() {
+      let children = [];
+      for (let child of this.children) {
+       children.push(print(child));
+      }
+      return `${this.name}(${children.join(", ")})`;
+   }
   }
 }
 
@@ -389,11 +412,12 @@ class CRNLIN extends Rule {
   // console.log("crnlin: " + print(node));
 
   // Simple noun
-  let pred = {
-   "@type": "Predicate", 
-   name: child(noun, 0), 
-   ref: node.ref
-  };
+  //let pred = {
+  // "@type": "Predicate", 
+  // name: child(noun, 0), 
+  // ref: node.ref
+  //};
+  let pred = predicate(child(noun, 0), [node.ref]);
   
   return [[], [pred], [], [node]];
  }
@@ -567,6 +591,7 @@ class CREVERY extends Rule {
   n.head.forEach(ref => ref.closure = true);
   n.head.push(ref);
   noun.ref = ref;
+  // console.log(noun);
   n.push(noun);
 
   let v = drs(this.ids);
@@ -792,6 +817,7 @@ class CRVPPP extends Rule {
   child(node, 1, 0).children[1] = u;
 
   noun.ref = u;
+  
   let cond = S(u, VP_(VP(V(prep), np)));
 
   return [[u], [noun, cond], [], []];
@@ -801,6 +827,34 @@ class CRVPPP extends Rule {
 class CRPP extends CompositeRule {
  constructor(ids) {
   super([new CRSPP(ids), new CRVPPP(ids)]);
+ }
+}
+
+class CRTENSE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("sub"), VP_(VP(V(capture("verb"))))));
+ }
+ apply({verb}, node, refs) {
+  // TODO(goto): a lot of things are pushed as sentences
+  // artificially, so verbs aren't represented anymore.
+  // To fix that requires a bigger refactoring than we'd
+  // want right now, so we return early here if the tree
+  // doesn't look like we expect it to look.
+  if ((verb.types || {}).tense != "past") {
+   return [[], [], [], []];
+  }
+
+  // records at the sentence level the eventuality.
+  let e = referent(this.id("e"), {}, undefined, verb.loc);
+  node.time = e;
+   
+  // Records the time relationship between the new
+  // discourse referent e and the utterance time @n.
+  // TODO(goto): support temporal anaphora.
+  let time = before(e, referent("@n"));
+  // let time = predicate("@before", [e, referent("@n")]);
+
+  return [[e], [time], [], []];
  }
 }
 
@@ -834,6 +888,7 @@ class DRS {
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
+    new CRTENSE(ids),
     ];
   return new DRS(new CRPN(ids), rules);
  }
@@ -918,7 +973,8 @@ class DRS {
     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Conjunction" ||
-              cond["@type"] == "Disjunction") {
+              cond["@type"] == "Disjunction" ||
+              cond["@type"] == "Before") {
     result.push(cond.print());
    } else {
     result.push(transcribe(cond));
@@ -965,6 +1021,17 @@ function conjunction(a, b) {
  };
 }
 
+function before(a, b) {
+ return {
+  "@type": "Before",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " < " + this.b.print();
+  }
+ };
+}
+
 module.exports = {
  match: match,
  capture: capture,
@@ -990,4 +1057,5 @@ module.exports = {
  CRPOSS: CRPOSS,
  CRADJ: CRADJ,
  CRPP: CRPP,
+ CRTENSE: CRTENSE,
 };
