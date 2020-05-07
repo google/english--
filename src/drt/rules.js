@@ -834,6 +834,7 @@ class CRPP extends CompositeRule {
  }
 }
 
+// Construction Rule described in page 543
 class CRTENSE extends Rule {
  constructor(ids) {
   super(ids, S(capture("sub"), VP_(VP(capture("verb")))));
@@ -845,7 +846,10 @@ class CRTENSE extends Rule {
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
   let tense = (node.types || {}).tense;
-  if (node.time || !tense || tense != "past") {
+  // console.log(tense);
+  if (node.time || 
+      !tense || 
+      !(tense == "past" || tense == "fut")) {
    return [[], [], [], []];
   }
 
@@ -860,7 +864,13 @@ class CRTENSE extends Rule {
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
   // TODO(goto): support temporal anaphora.
-  let time = tense == "past" ? before(u, referent("@n")) : included(u, referent("@n"));
+  let time;
+  if (tense == "past") {
+   time = before(u, referent("@n"));
+  } else if (tense == "fut") {
+   time = before(referent("@n"), u);
+  }
+  // let time = tense == "past" ?  : included(u, referent("@n"));
   // let time = predicate("@before", [u, referent("@n")]);
   //let time = before(u, referent("@n"));
 

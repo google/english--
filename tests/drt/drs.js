@@ -1302,6 +1302,30 @@ describe("DRS", function() {
     `);
   });
 
+  it("John will kiss Anna.", function() {
+    assertThat("John will kiss Anna.")
+     .equalsTo(`
+       drs(a, b, e0) {
+         John(a)
+         Anna(b)
+         e0: a kiss b
+         @n < e0
+       }
+    `);
+  });
+
+  it.skip("John will not kiss Anna.", function() {
+    assertThat("John will not kiss Anna.")
+     .equalsTo(`
+       drs(a, b, e0) {
+         John(a)
+         Anna(b)
+         e0: a kiss b
+         @n < e0
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
