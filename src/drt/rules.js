@@ -176,15 +176,16 @@ function find({gen, num}, refs, name, loc, exclude = []) {
  return undefined;
 }
 
-function referent(name, types, value, loc) {
+function referent(name, types, value, loc, time = false) {
   return {
    "@type": "Referent",
     types: types,
     name: name,
     value: value,
     loc: loc,
+    time: time,
     print() {
-    return this.name;
+      return this.name;
    }
   }
 }
@@ -844,23 +845,24 @@ class CRTENSE extends Rule {
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
   let tense = (node.types || {}).tense;
-  if (node.time || !tense) {
+  if (node.time || !tense || tense != "past") {
    return [[], [], [], []];
   }
 
+  // console.log("hi");
+
   let state = node.types.stat;
 
-  // console.log(tense);
-
   // records at the sentence level the eventuality.
-  let u = referent(this.id(state == "+" ? "s" : "e"), {}, undefined, node.loc);
+  let u = referent(this.id(state == "+" ? "s" : "e"), {}, undefined, node.loc, true);
   node.time = u;
-   
+  
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
   // TODO(goto): support temporal anaphora.
   let time = tense == "past" ? before(u, referent("@n")) : included(u, referent("@n"));
-  // let time = predicate("@before", [e, referent("@n")]);
+  // let time = predicate("@before", [u, referent("@n")]);
+  //let time = before(u, referent("@n"));
 
   return [[u], [time], [], []];
  }
@@ -969,7 +971,9 @@ class DRS {
  print() {
   let result = [];
   let refs = [];
-  for (let ref of this.head.filter(ref => !ref.closure)) {
+  let individuals = this.head
+   .filter(ref => !ref.closure);
+  for (let ref of individuals) {
    refs.push(`${ref.name}`);
   }
   
