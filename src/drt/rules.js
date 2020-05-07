@@ -843,20 +843,23 @@ class CRTENSE extends Rule {
   // To fix that requires a bigger refactoring than we'd
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
-  if (node.time || (node.types || {}).tense != "past") {
+  let tense = (node.types || {}).tense;
+  if (node.time || !tense) {
    return [[], [], [], []];
   }
 
-  let state = node.types.stat == "+";
+  let state = node.types.stat;
+
+  // console.log(tense);
 
   // records at the sentence level the eventuality.
-  let u = referent(this.id(state ? "s" : "e"), {}, undefined, node.loc);
+  let u = referent(this.id(state == "+" ? "s" : "e"), {}, undefined, node.loc);
   node.time = u;
    
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
   // TODO(goto): support temporal anaphora.
-  let time = before(u, referent("@n"));
+  let time = tense == "past" ? before(u, referent("@n")) : included(u, referent("@n"));
   // let time = predicate("@before", [e, referent("@n")]);
 
   return [[u], [time], [], []];
@@ -980,7 +983,9 @@ class DRS {
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction" ||
-              cond["@type"] == "Before") {
+              cond["@type"] == "Included" ||
+              cond["@type"] == "Before"
+              ) {
     result.push(cond.print());
    } else {
     result.push(transcribe(cond));
@@ -1034,6 +1039,17 @@ function before(a, b) {
   "b": b,
   print() {
    return this.a.print() + " < " + this.b.print();
+  }
+ };
+}
+
+function included(a, b) {
+ return {
+  "@type": "Included",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " <> " + this.b.print();
   }
  };
 }

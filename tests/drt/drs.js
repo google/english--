@@ -1291,6 +1291,18 @@ describe("DRS", function() {
     `);
   });
 
+  it("John knows Mary.", function() {
+    assertThat("John knows Mary.")
+     .equalsTo(`
+       drs(a, b, s0) {
+         John(a)
+         Mary(b)
+         s0: a knows b
+         s0 <> @n
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
