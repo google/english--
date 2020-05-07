@@ -1369,6 +1369,16 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("John has walked.", function() {
+    assertThat("John has walked.")
+     .equalsTo(`
+       drs(a) {
+         John(a)
+         a has walked
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
