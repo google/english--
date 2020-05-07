@@ -491,7 +491,7 @@ class CRNRC extends Rule {
 
 class CRNEG extends Rule {
  constructor(ids) {
-  super(ids, S(capture("np"), VP_(AUX("does"), "not", VP(capture("vp")))));
+  super(ids, S(capture("np"), VP_(AUX(), "not", VP(capture("vp")))));
  }
 
  apply({np, vp}, node, refs) {
@@ -837,7 +837,7 @@ class CRPP extends CompositeRule {
 // Construction Rule described in page 543
 class CRTENSE extends Rule {
  constructor(ids) {
-  super(ids, S(capture("sub"), VP_(VP(capture("verb")))));
+  super(ids, S(capture("sub"), capture("verb")));
  }
  apply({verb}, node, refs) {
   // TODO(goto): a lot of things are pushed as sentences
@@ -846,14 +846,13 @@ class CRTENSE extends Rule {
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
   let tense = (node.types || {}).tense;
-  // console.log(tense);
-  if (node.time || 
-      !tense || 
-      !(tense == "past" || tense == "fut")) {
+  if (node.time) {
    return [[], [], [], []];
   }
 
-  // console.log("hi");
+  if (!tense || !(tense == "past" || tense == "fut")) {
+   return [[], [], [], []];
+  }
 
   let state = node.types.stat;
 

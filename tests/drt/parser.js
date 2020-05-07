@@ -1041,26 +1041,21 @@ describe("Parser", function() {
     // future tense
     assertThat(first(parse("Jones will walk.")))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("walk")))));
-    // "will" makes its contribution to the
-    // S node feature tense and then gets discarded.
-    assertThat(parse("Jones will walk.")
-               .children[0].types.tense)
-     .equalsTo("fut");
+                 VP_(AUX("will"), VP(V("walk")))));
   });
 
   it("Jones will kiss Anna.", function() {
     // future tense
     assertThat(first(parse("Jones will kiss Anna.")))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("kiss"), NP(PN("Anna"))))));
+                 VP_(AUX("will"), VP(V("kiss"), NP(PN("Anna"))))));
   });
 
   it("Jones will not kiss Anna.", function() {
     // future tense
     assertThat(first(parse("Jones will not kiss Anna.")))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_("not", VP(V("kiss"), NP(PN("Anna"))))));
+                 VP_(AUX("will"), "not", VP(V("kiss"), NP(PN("Anna"))))));
   });
 
   it("Jones did not walk.", function() {

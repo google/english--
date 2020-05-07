@@ -111,9 +111,7 @@ function grammar() {
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 4, "tense": "fut"}),
                     [term("AUX", {"num": 1, "fin": "+", "tp": 4, "tense": "fut"}),
                      space(),
-                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 4, "tense": "pres"})],
-                    // "will" makes its contribution via the "tense: fut" feature and is then removed.
-                    "(root) => { root.children.shift(); return root; }"));
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 4, "tense": "pres"})]));
  
  // PS 4b
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": "fut"}),
@@ -121,9 +119,7 @@ function grammar() {
                      space(),
                      literal("not"),
                      space(),
-                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 5, "tense": "pres"})],
-                    // "will" makes its contribution via the "tense: fut" feature and is then removed.
-                    "(root) => { root.children.shift(); return root; }"));
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 5, "tense": "pres"})]));
  
  // PS 4c
  result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"}),

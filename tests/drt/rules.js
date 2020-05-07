@@ -425,6 +425,30 @@ describe("Rules", function() {
     `));
   });
 
+  it("CR.NEG", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Jones will not own a porsche."), true);
+
+    new CRPN(ids).match(node);
+
+    assertThat(print(node)).equalsTo("a will not own a porsche");
+
+    let [head, body, , remove] = new CRNEG(ids).match(node, []);
+
+    assertThat(remove.length).equalsTo(1);
+    assertThat(remove[0]).equalsTo(node);
+
+    assertThat(body.length).equalsTo(1);
+    assertThat(body[0].print()).equalsTo(trim(`
+      ~drs(s0, b) {
+        s0: a own b
+        @n < s0
+        porsche(b)
+      }
+    `));
+  });
+
   it("CR.BE", function() {
     let ids = new Ids();
 
