@@ -1342,6 +1342,33 @@ describe("DRS", function() {
     `);
   });
 
+  it("John likes Anna.", function() {
+    assertThat("John likes Anna.")
+     .equalsTo(`
+       drs(a, b) {
+         John(a)
+         Anna(b)
+         a likes b
+       }
+    `);
+  });
+
+  it("John does not like Anna.", function() {
+    // This is a slightly different result we get at
+    // page 555, with regards to the temporal
+    // referents.
+    assertThat("John does not like Anna.")
+     .equalsTo(`
+       drs(a, b) {
+         John(a)
+         Anna(b)
+         ~drs() {
+           a like b
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
