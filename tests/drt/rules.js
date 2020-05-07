@@ -443,7 +443,7 @@ describe("Rules", function() {
     assertThat(body[0].print()).equalsTo(trim(`
       ~drs(s0, b) {
         s0: a own b
-        @n < s0
+        @now < s0
         porsche(b)
       }
     `));
@@ -588,7 +588,7 @@ describe("Rules", function() {
     // NOTE(goto): BE should be state=+ and lead to an s0
     // here instead.
     assertThat(s.print()).equalsTo("s0");
-    assertThat(time.print()).equalsTo("s0 < @n");
+    assertThat(time.print()).equalsTo("s0 < @now");
     
     let [, [from], , [remove]] = new CRBE(ids).match(node, []);
 
@@ -998,7 +998,7 @@ describe("Rules", function() {
 
     // A new condition is added binding the eventuality to the
     // utterance time.
-    assertThat(time.print()).equalsTo("e0 < @n");
+    assertThat(time.print()).equalsTo("e0 < @now");
 
     assertThat(print(node)).equalsTo("e0: a kissed b");
    });

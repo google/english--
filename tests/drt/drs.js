@@ -1275,7 +1275,7 @@ describe("DRS", function() {
          John(a)
          Anna(b)
          e0: a kissed b
-         e0 < @n
+         e0 < @now
        }
     `);
   });
@@ -1285,7 +1285,7 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, s0) {
          John(a)
-         s0 < @n
+         s0 < @now
          s0: happy(a)
        }
     `);
@@ -1309,7 +1309,7 @@ describe("DRS", function() {
          John(a)
          Anna(b)
          e0: a will kiss b
-         @n < e0
+         @now < e0
        }
     `);
   });
@@ -1320,7 +1320,7 @@ describe("DRS", function() {
        drs(a, b, e0) {
          John(a)
          Anna(b)
-         @n < e0
+         @now < e0
          ~drs() {
            e0: a kiss b
          }
@@ -1334,7 +1334,7 @@ describe("DRS", function() {
        drs(a, b, e0) {
          John(a)
          Anna(b)
-         e0 < @n
+         e0 < @now
          ~drs() {
            e0: a kiss b
          }

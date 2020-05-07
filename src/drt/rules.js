@@ -865,9 +865,9 @@ class CRTENSE extends Rule {
   // TODO(goto): support temporal anaphora.
   let time;
   if (tense == "past") {
-   time = before(u, referent("@n"));
+   time = before(u, referent("@now"));
   } else if (tense == "fut") {
-   time = before(referent("@n"), u);
+   time = before(referent("@now"), u);
   }
   // let time = tense == "past" ?  : included(u, referent("@n"));
   // let time = predicate("@before", [u, referent("@n")]);
