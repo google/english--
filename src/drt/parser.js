@@ -211,12 +211,12 @@ function grammar() {
                       term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 4, "tense": 3})]));
 
  // PS Adjectives (page 57)
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": "+", "gap": 3, "tp": 6, "tense": 5}),
                     [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
                      space(),
                      term("ADJ")]));
 
- result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": "+", "gap": 3, "tp": 6, "tense": 5}),
                     [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
                      space(),
                      literal("not"),

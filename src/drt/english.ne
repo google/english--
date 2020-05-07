@@ -26,8 +26,8 @@ NP_ -> NP __ "and"i __ NP {% (d, l, r) => process("NP'", {"num":"plur","gen":"?"
 NP_ -> NP {% (d, l, r) => process("NP'", {"num":1,"gen":2,"case":3,"gap":4}, d, [{"num":1,"gen":2,"case":3,"gap":4}], l, r, (root) => { return root.children[0]; }, undefined) %}
 N -> N __ RC {% (d, l, r) => process("N", {"num":1,"gen":2}, d, [{"num":1,"gen":2},{},{"num":1}], l, r, undefined, undefined) %}
 RC -> RPRO __ S {% (d, l, r) => process("RC", {"num":1}, d, [{"num":1},{},{"num":1,"stat":2,"gap":"+","tp":4,"tense":3}], l, r, undefined, undefined) %}
-VP -> BE __ ADJ {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r, undefined, undefined) %}
-VP -> BE __ "not"i __ ADJ {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{},{},{}], l, r, undefined, undefined) %}
+VP -> BE __ ADJ {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":"+","gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r, undefined, undefined) %}
+VP -> BE __ "not"i __ ADJ {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":"+","gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{},{},{}], l, r, undefined, undefined) %}
 VP -> BE __ NP {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":7,"tense":6}, d, [{"num":1,"fin":2,"tp":7,"tense":6},{},{"num":1,"gen":8,"case":5,"gap":3}], l, r, undefined, undefined) %}
 VP -> BE __ PP {% (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r, undefined, undefined) %}
 N -> ADJ __ N {% (d, l, r) => process("N", {"num":1,"gen":2}, d, [{},{},{"num":1,"gen":2}], l, r, undefined, undefined) %}

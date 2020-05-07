@@ -847,18 +847,19 @@ class CRTENSE extends Rule {
    return [[], [], [], []];
   }
 
+  let state = node.types.stat == "+";
 
   // records at the sentence level the eventuality.
-  let e = referent(this.id("e"), {}, undefined, node.loc);
-  node.time = e;
+  let u = referent(this.id(state ? "s" : "e"), {}, undefined, node.loc);
+  node.time = u;
    
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
   // TODO(goto): support temporal anaphora.
-  let time = before(e, referent("@n"));
+  let time = before(u, referent("@n"));
   // let time = predicate("@before", [e, referent("@n")]);
 
-  return [[e], [time], [], []];
+  return [[u], [time], [], []];
  }
 }
 

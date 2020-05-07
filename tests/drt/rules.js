@@ -563,13 +563,13 @@ describe("Rules", function() {
     
     // NOTE(goto): BE should be state=+ and lead to an s0
     // here instead.
-    assertThat(s.print()).equalsTo("e0");
-    assertThat(time.print()).equalsTo("e0 < @n");
+    assertThat(s.print()).equalsTo("s0");
+    assertThat(time.print()).equalsTo("s0 < @n");
     
     let [, [from], , [remove]] = new CRBE(ids).match(node, []);
 
     assertThat(remove).equalsTo(node);
-    assertThat(print(from)).equalsTo("e0: happy(a)");
+    assertThat(print(from)).equalsTo("s0: happy(a)");
   });
 
   it("CR.COND", function() {

@@ -1283,10 +1283,10 @@ describe("DRS", function() {
   it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
-       drs(a, e0) {
+       drs(a, s0) {
          John(a)
-         e0 < @n
-         e0: happy(a)
+         s0 < @n
+         s0: happy(a)
        }
     `);
   });
