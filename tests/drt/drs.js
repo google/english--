@@ -1369,12 +1369,14 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John has walked.", function() {
-    assertThat("John has walked.")
+  it("John has kissed Anna.", function() {
+    assertThat("John has kissed Mary.")
      .equalsTo(`
-       drs(a) {
+       drs(a, b, e0) {
          John(a)
-         a has walked
+         Mary(b)
+         e0: a kissed b
+         @now <> e0
        }
     `);
   });

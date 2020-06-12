@@ -18,7 +18,7 @@ const {
   nodes} = require("./parser.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP,
+ S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE,
  Discourse, Sentence
 } = nodes;
 
@@ -877,6 +877,31 @@ class CRTENSE extends Rule {
  }
 }
 
+// Construction Rule described in page 589
+class CRASPECT extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("sub"), VP_(VP(HAVE(), VP(capture("verb"))))));
+ }
+ apply({sub, verb}, node, refs) {
+  let stat = (verb.types || {}).stat;
+
+  if (!stat || stat != "-") {
+   return [[], [], [], []];
+  }
+
+  let e = referent(this.id("e"), {}, undefined, node.loc, true);
+
+  node.time = e;
+
+  child(node, 1, 0, 1).types.stat = "-";
+  child(node, 1).children[0] = child(node, 1, 0, 1);
+
+  let time = included(referent("@now"), e);
+
+  return [[e], [time], [], []];
+ }
+}
+
 function drs(ids) {
  return DRS.from(ids);
 }
@@ -892,6 +917,7 @@ class DRS {
  static from(ids = new Ids()) {
   let rules = 
    [
+    new CRASPECT(ids),
     new CRTENSE(ids),
     new CREVERY(ids),
     new CRVPEVERY(ids),
@@ -1093,4 +1119,5 @@ module.exports = {
  CRADJ: CRADJ,
  CRPP: CRPP,
  CRTENSE: CRTENSE,
+ CRASPECT: CRASPECT,
 };

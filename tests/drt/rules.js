@@ -25,6 +25,7 @@ const {
   CRADJ,
   CRPP,
   CRTENSE,
+  CRASPECT,
   referent,
 } = require("../../src/drt/rules.js");
 
@@ -999,6 +1000,28 @@ describe("Rules", function() {
     // A new condition is added binding the eventuality to the
     // utterance time.
     assertThat(time.print()).equalsTo("e0 < @now");
+
+    assertThat(print(node)).equalsTo("e0: a kissed b");
+   });
+
+  it("Mary has kissed Jones.", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Mary has kissed Jones."), true);
+    new CRPN(ids).match(node);
+    new CRPN(ids).match(child(node, 1, 0, 1));
+    
+    let [[e], [time]] = new CRASPECT(ids).match(node, []);
+
+    // A new event referent is added.
+    assertThat(e.print()).equalsTo("e0");
+
+    // And assigned as an eventuality referent on the verb.
+    assertThat(print(child(node, 1, 0, 0))).equalsTo("kissed");
+
+    // A new condition is added binding the eventuality to the
+    // utterance time.
+    assertThat(time.print()).equalsTo("@now <> e0");
 
     assertThat(print(node)).equalsTo("e0: a kissed b");
    });
