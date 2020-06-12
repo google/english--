@@ -942,12 +942,16 @@ describe("Parser", function() {
                         "?"));
   });
 
-  it.skip("Sam's wife is Dani", function() {
-    assertThat(clean(parse("Sam's wife is Dani")[0]))
-     .equalsTo(Sentence("Is", 
-                        NP(PN("Mary")), 
-                        ADJ("happy"), 
-                        "?"));
+  it("Sam's wife is Dani.", function() {
+    assertThat(first(parse("Sam's wife is Dani.")))
+     .equalsTo(S(NP(DET(PN("Sam"), "'s"), RN("wife")),
+                 VP_(VP(BE("is"), NP(PN("Dani"))))));
+  });
+
+  it("Sam's wife was Dani.", function() {
+    assertThat(first(parse("Sam's wife was Dani.")))
+     .equalsTo(S(NP(DET(PN("Sam"), "'s"), RN("wife")),
+                 VP_(VP(BE("was"), NP(PN("Dani"))))));
   });
 
   it("John is a happy man", function() {

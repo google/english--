@@ -1,0 +1,1 @@
+- Mary kissed John. John was kissed by Mary. Are these isormorphic?
