@@ -1011,6 +1011,13 @@ describe("Rules", function() {
     new CRPN(ids).match(node);
     new CRPN(ids).match(child(node, 1, 0, 1));
     
+    // let [[foo], [bar]] = new CRTENSE(ids).match(node, []);
+
+    // console.log(print(foo));
+
+    // return;
+
+
     let [[e], [time]] = new CRASPECT(ids).match(node, []);
 
     // A new event referent is added.

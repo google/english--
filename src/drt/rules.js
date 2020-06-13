@@ -850,6 +850,8 @@ class CRTENSE extends Rule {
    return [[], [], [], []];
   }
 
+  // console.log(node);
+
   if (!tense || !(tense == "past" || tense == "fut")) {
    return [[], [], [], []];
   }
