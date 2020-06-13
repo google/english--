@@ -1381,6 +1381,31 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("John has not kissed Mary.", function() {
+    assertThat("John has not kissed Mary.")
+     .equalsTo(`
+       drs(a, b, e0) {
+         John(a)
+         Mary(b)
+         e0: a kissed b
+         @now <> e0
+       }
+    `);
+  });
+
+  it("John has owned a porsche.", function() {
+    assertThat("John has owned a porsche.")
+     .equalsTo(`
+       drs(a, e0, s1, b) {
+         John(a)
+         s1: a owned b
+         e0 <> s1
+         e0 == s1
+         porsche(b)
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

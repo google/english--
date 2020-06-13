@@ -1161,6 +1161,17 @@ describe("Parser", function() {
                         NP(PN("Jones"))))));
   });
 
+  it.skip("Mary has loved Anna.", function() {
+    // statitive verbs ending in "e" need to eat the "e" in
+    // the "ed" expansion.
+    // also, statitive verbs that are intransitive don't 
+    // seem to expand either.
+    assertThat(first(parse("Mary has loved Anna.")))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(V("knows"),
+                        NP(PN("Jones"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

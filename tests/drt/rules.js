@@ -1026,6 +1026,32 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("e0: a kissed b");
    });
 
+  it("Mary has owned a horse.", function() {
+    let ids = new Ids();
+
+    let node = first(parse("Mary has owned a horse."), true);
+    new CRPN(ids).match(node);
+    new CRID(ids).match(child(node, 1, 0, 1));
+    
+    let [[e, s], [included, equals]] = new CRASPECT(ids).match(node, []);
+
+    // A new eventuality is added.
+    assertThat(e.print()).equalsTo("e0");
+    // A new state referent is added.
+    assertThat(s.print()).equalsTo("s1");
+
+    // A new condition is added binding the state to the
+    // utterance time.
+    assertThat(included.print()).equalsTo("e0 <> s1");
+
+    // TODO(goto): this isn't exactly right. it should be
+    // end(s1) instead, but I'll get to this once I know
+    // more how it is used.
+    assertThat(equals.print()).equalsTo("e0 == s1");
+
+    assertThat(print(node)).equalsTo("s1: a owned b");
+   });
+
   class TreeWalker {
    constructor(rules = []) {
     this.rules = rules;

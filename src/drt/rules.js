@@ -882,23 +882,25 @@ class CRASPECT extends Rule {
  constructor(ids) {
   super(ids, S(capture("sub"), VP_(VP(HAVE(), VP(capture("verb"))))));
  }
- apply({sub, verb}, node, refs) {
+ apply({sub, verb}, node) {
   let stat = (verb.types || {}).stat;
 
-  if (!stat || stat != "-") {
+  if (!stat) {
    return [[], [], [], []];
   }
 
-  let e = referent(this.id("e"), {}, undefined, node.loc, true);
-
-  node.time = e;
-
-  child(node, 1, 0, 1).types.stat = "-";
   child(node, 1).children[0] = child(node, 1, 0, 1);
 
-  let time = included(referent("@now"), e);
-
-  return [[e], [time], [], []];
+  if (stat == "-") {
+   let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   node.time = e;
+   return [[e], [included(referent("@now"), e)], [], []];
+  } else if (stat == "+") {
+   let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   let s = referent(this.id("s"), {}, undefined, node.loc, true);
+   node.time = s;
+   return [[e, s], [included(e, s), equals(e, s)], [], []];
+  }
  }
 }
 
@@ -1022,6 +1024,7 @@ class DRS {
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction" ||
+              cond["@type"] == "Equals" ||
               cond["@type"] == "Included" ||
               cond["@type"] == "Before"
               ) {
@@ -1089,6 +1092,17 @@ function included(a, b) {
   "b": b,
   print() {
    return this.a.print() + " <> " + this.b.print();
+  }
+ };
+}
+
+function equals(a, b) {
+ return {
+  "@type": "Equals",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " == " + this.b.print();
   }
  };
 }
