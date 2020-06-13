@@ -1369,7 +1369,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("John has kissed Anna.", function() {
+  it("John has kissed Mary.", function() {
     assertThat("John has kissed Mary.")
      .equalsTo(`
        drs(a, b, e0) {
