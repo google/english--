@@ -90,7 +90,7 @@ describe("Logic", function() {
      second = second.children[0].name;
     } else if (second["@type"] == "NP") {
      second = second.children[0].children[0];
-    } 
+    }
     return predicate(verb, [argument(literal(first)),
                             argument(literal(second))]);
    }
@@ -109,8 +109,10 @@ describe("Logic", function() {
     if (s["@type"] == "Implication") {
      let x = s.a.head
       .filter(ref => !ref.closure)
+      .filter(ref => !ref.time)
       .map(ref => ref.name)
-      .join("");
+      .join(", ");
+     // console.log(s.a.head);
      kb.push(forall(x, implies(spread(compile(s.a)[1]),
                                spread(compile(s.b)[1]))));
     } else {
@@ -159,11 +161,14 @@ describe("Logic", function() {
    let q = DrtParser.parse(s)[0].children;
 
    if (q[0] == "Is") {
+    console.log(q);
     let drs = DRS.from();
     let body = S(q[1], VP_(VP(BE("is"), q[2])));
+    // console.log(q[1]);
     let b = clone(body);
     drs.push(body);
     let result = spread(compile(drs)[1]);
+    // console.log(drs.print());
     for (let ref of drs.head) {
      result.quantifiers.push(quantifier("exists", ref.name));
     }
@@ -171,6 +176,8 @@ describe("Logic", function() {
     let answer = () => {
      return print(b);
     };
+
+    // console.log(result);
 
     return [result, answer];
    }
@@ -348,6 +355,7 @@ describe("Logic", function() {
         man(b).
      `)
      .query("Is Socrates mortal?")
+     .sameAs("exists (a) Socrates(a) && mortal(a).")
      .equalsTo("Socrates is mortal")
      .because(`
         Socrates(b).
@@ -403,18 +411,33 @@ describe("Logic", function() {
      },
      query(y) {
       let [q, answer] = query(y);
+      //console.log(toString(program([rewrite(q)])));
+      // console.log(toString(program([kb])));
+      // console.log(q);
       let result = new Reasoner(rewrite(kb))
        .go(rewrite(q));
       let next = result.next();
       assertThat(next.done).equalsTo(false);
-      let ref = next.value.bindings["x@1"];
+      // console.log(next.value);
       return {
+       sameAs(rules) {
+        assertThat(trim(toString(program([q])))).equalsTo(trim(rules));
+        return this;
+       },
        because(c) {
         // assertThat();
         assertThat(trim(next.value.toString())).equalsTo(trim(c));
         return this;
        },
        equalsTo(z) {
+        let ref = next.value.bindings["x@1"];
+        if (!ref) {
+         // If there wasn't a specific entity that we were
+         // looking for, just test for truthness.
+         let refs = Object.keys(next.value.bindings);
+         ref = next.value.bindings[refs[0]];
+        }
+        Assert.notEqual(ref, undefined, "Should have returned an answer");
         assertThat(answer(ref && drs[0][ref.name])).equalsTo(z);
         return this;
        }

@@ -1271,11 +1271,10 @@ describe("DRS", function() {
   it("John kissed Anna.", function() {
     assertThat("John kissed Anna.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Anna(b)
-         e0: a kissed b
-         e0 < @now
+         a kissed b
        }
     `);
   });
@@ -1283,10 +1282,9 @@ describe("DRS", function() {
   it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
-       drs(a, s0) {
+       drs(a) {
          John(a)
-         s0 < @now
-         s0: happy(a)
+         happy(a)
        }
     `);
   });
@@ -1305,11 +1303,10 @@ describe("DRS", function() {
   it("John will kiss Anna.", function() {
     assertThat("John will kiss Anna.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Anna(b)
-         e0: a will kiss b
-         @now < e0
+         a will kiss b
        }
     `);
   });
@@ -1317,12 +1314,11 @@ describe("DRS", function() {
   it("John will not kiss Anna.", function() {
     assertThat("John will not kiss Anna.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Anna(b)
-         @now < e0
          ~drs() {
-           e0: a kiss b
+           a kiss b
          }
        }
     `);
@@ -1331,12 +1327,11 @@ describe("DRS", function() {
   it("John did not kiss Anna.", function() {
     assertThat("John did not kiss Anna.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Anna(b)
-         e0 < @now
          ~drs() {
-           e0: a kiss b
+           a kiss b
          }
        }
     `);
@@ -1372,11 +1367,10 @@ describe("DRS", function() {
   it("John has kissed Mary.", function() {
     assertThat("John has kissed Mary.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Mary(b)
-         e0: a kissed b
-         @now <> e0
+         a kissed b
        }
     `);
   });
@@ -1384,11 +1378,10 @@ describe("DRS", function() {
   it.skip("John has not kissed Mary.", function() {
     assertThat("John has not kissed Mary.")
      .equalsTo(`
-       drs(a, b, e0) {
+       drs(a, b) {
          John(a)
          Mary(b)
-         e0: a kissed b
-         @now <> e0
+         a kissed b
        }
     `);
   });
@@ -1396,11 +1389,9 @@ describe("DRS", function() {
   it("John has owned a porsche.", function() {
     assertThat("John has owned a porsche.")
      .equalsTo(`
-       drs(a, e0, s1, b) {
+       drs(a, b) {
          John(a)
-         s1: a owned b
-         e0 <> s1
-         e0 == s1
+         a owned b
          porsche(b)
        }
     `);

@@ -42,7 +42,7 @@ function transcribe(node, refs) {
  }
  let suffix = node.ref ? `(${node.ref.name})` : "";
  let prefix = node.neg ? "~" : "";
- prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
+ // prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
  return prefix + result.join(" ").trim() + suffix;
 }
 
@@ -846,36 +846,45 @@ class CRTENSE extends Rule {
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
   let tense = (node.types || {}).tense;
+
+  // console.log(verb);
+
   if (node.time) {
    return [[], [], [], []];
   }
 
-  // console.log(node);
-
-  if (!tense || !(tense == "past" || tense == "fut")) {
+  if (!tense) {
    return [[], [], [], []];
   }
 
-  let state = node.types.stat;
-
-  // records at the sentence level the eventuality.
-  let u = referent(this.id(state == "+" ? "s" : "e"), {}, undefined, node.loc, true);
-  node.time = u;
-  
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
-  // TODO(goto): support temporal anaphora.
-  let time;
-  if (tense == "past") {
-   time = before(u, referent("@now"));
-  } else if (tense == "fut") {
-   time = before(referent("@now"), u);
-  }
-  // let time = tense == "past" ?  : included(u, referent("@n"));
-  // let time = predicate("@before", [u, referent("@n")]);
-  //let time = before(u, referent("@n"));
 
-  return [[u], [time], [], []];
+  if (node.types.stat == "-") {
+   let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   node.time = e;
+   let conds = [];
+   //if (tense == "past") {
+   // conds.push(before(e, referent("@now")));
+   //} else if (tense == "fut") {
+   // conds.push(before(referent("@now"), e));
+   //}
+   return [[e], conds, [], []];
+  } else {
+   let s = referent(this.id("s"), {}, undefined, node.loc, true);
+   node.time = s;
+   let conds = [];
+   //if (tense == "pres") {
+   // TODO(goto): while the follow is incorrect it really leads
+   // to a verbose representation
+   // conds.push(equals(referent("@now"), s));
+   //} else if (tense == "past") {
+   // conds.push(before(s, referent("@now")));
+   //} else if (tense == "fut") {
+   // conds.push(before(referent("@now"), s));
+   //}
+   return [[s], conds, [], []];
+  }
  }
 }
 
@@ -896,12 +905,14 @@ class CRASPECT extends Rule {
   if (stat == "-") {
    let e = referent(this.id("e"), {}, undefined, node.loc, true);
    node.time = e;
-   return [[e], [included(referent("@now"), e)], [], []];
+   // included(referent("@now"), e)
+   return [[e], [], [], []];
   } else if (stat == "+") {
    let e = referent(this.id("e"), {}, undefined, node.loc, true);
    let s = referent(this.id("s"), {}, undefined, node.loc, true);
    node.time = s;
-   return [[e, s], [included(e, s), equals(e, s)], [], []];
+   // included(e, s), equals(e, s)
+   return [[e, s], [], [], []];
   }
  }
 }
@@ -1011,7 +1022,8 @@ class DRS {
   let result = [];
   let refs = [];
   let individuals = this.head
-   .filter(ref => !ref.closure);
+   .filter(ref => !ref.closure)
+   .filter(ref => !ref.time);
   for (let ref of individuals) {
    refs.push(`${ref.name}`);
   }
@@ -1025,11 +1037,7 @@ class DRS {
     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Conjunction" ||
-              cond["@type"] == "Disjunction" ||
-              cond["@type"] == "Equals" ||
-              cond["@type"] == "Included" ||
-              cond["@type"] == "Before"
-              ) {
+              cond["@type"] == "Disjunction") {
     result.push(cond.print());
    } else {
     result.push(transcribe(cond));

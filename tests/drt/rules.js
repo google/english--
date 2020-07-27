@@ -442,9 +442,8 @@ describe("Rules", function() {
 
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
-      ~drs(s0, b) {
-        s0: a own b
-        @now < s0
+      ~drs(b) {
+        a own b
         porsche(b)
       }
     `));
@@ -589,12 +588,12 @@ describe("Rules", function() {
     // NOTE(goto): BE should be state=+ and lead to an s0
     // here instead.
     assertThat(s.print()).equalsTo("s0");
-    assertThat(time.print()).equalsTo("s0 < @now");
+    // assertThat(time.print()).equalsTo("s0 < @now");
     
     let [, [from], , [remove]] = new CRBE(ids).match(node, []);
 
     assertThat(remove).equalsTo(node);
-    assertThat(print(from)).equalsTo("s0: happy(a)");
+    assertThat(print(from)).equalsTo("happy(a)");
   });
 
   it("CR.COND", function() {
@@ -999,9 +998,9 @@ describe("Rules", function() {
 
     // A new condition is added binding the eventuality to the
     // utterance time.
-    assertThat(time.print()).equalsTo("e0 < @now");
+    // assertThat(time.print()).equalsTo("e0 < @now");
 
-    assertThat(print(node)).equalsTo("e0: a kissed b");
+    assertThat(print(node)).equalsTo("a kissed b");
    });
 
   it("Mary has kissed Jones.", function() {
@@ -1028,9 +1027,9 @@ describe("Rules", function() {
 
     // A new condition is added binding the eventuality to the
     // utterance time.
-    assertThat(time.print()).equalsTo("@now <> e0");
+    // assertThat(time.print()).equalsTo("@now <> e0");
 
-    assertThat(print(node)).equalsTo("e0: a kissed b");
+    assertThat(print(node)).equalsTo("a kissed b");
    });
 
   it("Mary has owned a horse.", function() {
@@ -1049,14 +1048,14 @@ describe("Rules", function() {
 
     // A new condition is added binding the state to the
     // utterance time.
-    assertThat(included.print()).equalsTo("e0 <> s1");
+    // assertThat(included.print()).equalsTo("e0 <> s1");
 
     // TODO(goto): this isn't exactly right. it should be
     // end(s1) instead, but I'll get to this once I know
     // more how it is used.
-    assertThat(equals.print()).equalsTo("e0 == s1");
+    // assertThat(equals.print()).equalsTo("e0 == s1");
 
-    assertThat(print(node)).equalsTo("s1: a owned b");
+    assertThat(print(node)).equalsTo("a owned b");
    });
 
   class TreeWalker {

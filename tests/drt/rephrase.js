@@ -43,7 +43,7 @@ const {
  Discourse, Sentence
 } = nodes;
 
-describe("Paraphrase", function() {
+describe.skip("Paraphrase", function() {
 
   it("Mel loves a woman who likes Leo. She loves Anna. She loves Anna's brother.", function() {
     let ids = new Ids();
