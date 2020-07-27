@@ -33,6 +33,7 @@ function transcribe(node, refs) {
   }
   return node.name;
  } else if (node["@type"] == "Predicate") {
+  // console.log(node);
   return node.print();
  } else if (node["@type"] == "V" && node.root) {
   return node.root;
@@ -55,6 +56,8 @@ function transcribe(node, refs) {
  //if (node.types.tense) {
  // console.log(node);
  //}
+
+ // console.log(node);
  let time = "";
  switch (node.time) {
   case "past": 
@@ -210,17 +213,24 @@ function referent(name, types, value, loc) {
   }
 }
 
-function predicate(name, children) {
+function predicate(name, children, time) {
   return {
    "@type": "Predicate",
     name: name,
     children: children,
+    time: time,
     print() {
       let children = [];
       for (let child of this.children) {
        children.push(print(child));
       }
-      return `${this.name}(${children.join(", ")})`;
+      let e = "";
+      if (time == "past") {
+       e = "< ";
+      } else if (time == "fut") {
+       e = "> ";
+      }
+      return `${e}${this.name}(${children.join(", ")})`;
    }
   }
 }
@@ -439,7 +449,9 @@ class CRNLIN extends Rule {
   // name: child(noun, 0), 
   // ref: node.ref
   //};
-  let pred = predicate(child(noun, 0), [node.ref]);
+  // console.log(node);
+
+  let pred = predicate(child(noun, 0), [node.ref], node.time);
   
   return [[], [pred], [], [node]];
  }
@@ -581,6 +593,13 @@ class CRNBE extends Rule {
  apply({ref, det, noun}, node, refs) {
   let np = clone(noun);
   np.ref = child(ref, 0);
+
+  // Matches the DRS found in (3.57) on page 269.
+
+  if (node.types && node.types.tense) {
+   np.time = node.types.tense;
+  }
+
   return [[], [np], [], [node]];
  }
 }

@@ -80,12 +80,18 @@ describe("Logic", function() {
      `);
   });
 
-  it("Every man is mortal. Socrates is a man.", function() {
-    enter("Every man is mortal. Socrates is a man.")
+  it("Every man is mortal.", function() {
+    enter("Every man is mortal.")
      .equalsTo(`
-        forall (a) man(a) => mortal(pres, a).
-        Socrates(b).
-        man(b).
+       forall (a) man(pres, a) => mortal(pres, a).
+     `);
+  });
+
+  it("Socrates is a man.", function() {
+    enter("Socrates is a man.")
+     .equalsTo(`
+        Socrates(a).
+        man(pres, a).
      `);
   });
 
@@ -131,9 +137,9 @@ describe("Logic", function() {
   it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
     enter("Every man is mortal. Socrates is a man.")
      .equalsTo(`
-        forall (a) man(a) => mortal(pres, a).
+        forall (a) man(pres, a) => mortal(pres, a).
         Socrates(b).
-        man(b).
+        man(pres, b).
      `)
      .query("Is Socrates mortal?")
      .sameAs("exists (a) Socrates(a) && mortal(pres, a).")
@@ -141,8 +147,8 @@ describe("Logic", function() {
      .because(`
         Socrates(b).
         exists (a = b) Socrates(a).
-        man(b).
-        forall (a = b) man(a) => mortal(pres, a).
+        man(pres, b).
+        forall (a = b) man(pres, a) => mortal(pres, a).
         exists (a = b) mortal(pres, b).
         exists (a = b) Socrates(a) && mortal(pres, a).
      `);
@@ -206,7 +212,9 @@ describe("Logic", function() {
    // console.log(node);
    if (node["@type"] == "Predicate") {
     // console.log(node.children);
+    // console.log("hi");
     let args = node.children.map((x) => argument(literal(x.name)));
+    args.unshift(argument(literal(node.time || "pres")));
     return predicate(node.name, args);
    } else if (node["@type"] == "PN") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
@@ -214,6 +222,7 @@ describe("Logic", function() {
     return predicate(node.children[0], [argument(literal(node.time || "pres")), 
                                         argument(literal(node.ref.name))]);
    } else if (node["@type"] == "N") {
+    // console.log("hi");
    } else if (node["@type"] == "S") {
     // let verb = node.children[1].children[0].children[0].children[0];
     let verb = node.children[1].children[0].children[0];
@@ -267,10 +276,11 @@ describe("Logic", function() {
     if (s["@type"] == "Implication") {
      let x = s.a.head
       .filter(ref => !ref.closure)
-      .filter(ref => !ref.time)
+      // .filter(ref => !ref.time)
       .map(ref => ref.name)
       .join(", ");
      // console.log(s.a.head);
+     // console.log(s.a.body);
      kb.push(forall(x, implies(spread(compile(s.a)[1]),
                                spread(compile(s.b)[1]))));
     } else {
@@ -408,10 +418,10 @@ describe("Logic", function() {
      .equalsTo(`
        Brazil(a).
        Mary(b).
-       forall (c) like(pres, c, b) && man(c) => love(pres, c, a).
+       forall (c) like(pres, c, b) && man(pres, c) => love(pres, c, a).
        Jones(d).
        like(pres, d, b).
-       man(d).
+       man(pres, d).
      `)
      .query("Who loves Brazil?")
      .equalsTo("Jones love Brazil")
@@ -420,9 +430,9 @@ describe("Logic", function() {
        exists (x) exists (a = a) Brazil(a).
        like(pres, d, b).
        exists (c = d) like(pres, c, b).
-       man(d).
-       exists (c = d) like(pres, c, b) && man(c).
-       forall (c = d) like(pres, c, b) && man(c) => love(pres, c, a).
+       man(pres, d).
+       exists (c = d) like(pres, c, b) && man(pres, c).
+       forall (c = d) like(pres, c, b) && man(pres, c) => love(pres, c, a).
        exists (x = d) exists (a = a) love(pres, x, a).
        exists (x = d) exists (a = a) Brazil(a) && love(pres, x, a).
      `);
@@ -479,19 +489,14 @@ describe("Logic", function() {
      .equalsTo("Sam 's wife is behind Anna");
   });
 
-  it.skip("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
-
-    // NOTE(goto): this really makes me wonder if our characterization of
-    // adjectives is correct. I'm thinking that the tensed tuple here
-    // needs to be the BE() rather than the adjective.
-
+  it("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
     enter("Sam is a brazilian engineer. Every brazilian is from Brazil.")
      .equalsTo(`
        Sam(a).
        brazilian(pres, a).
-       engineer(a).
+       engineer(pres, a).
        Brazil(b).
-       forall (c) brazilian(c) => from(pres, c, b).
+       forall (c) brazilian(pres, c) => from(pres, c, b).
      `)
      .query("Who is from Brazil?")
      .sameAs(`

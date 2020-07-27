@@ -1396,6 +1396,41 @@ describe("DRS", function() {
     `);
   });
 
+  it("John was happy.", function() {
+    assertThat("John was happy.")
+     .equalsTo(`
+       drs(a) {
+        John(a)
+        < happy(a)
+       }
+    `);
+  });
+
+  it("John was an engineer.", function() {
+    // Matches the DRS found in (3.57) on page 269.
+    assertThat("John was an engineer.")
+     .equalsTo(`
+       drs(a) {
+        John(a)
+        < engineer(a)
+       }
+    `);
+  });
+
+  it("Every brazilian was happy.", function() {
+    // Matches the DRS found in (3.57) on page 269.
+    assertThat("Every brazilian was happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilian(a)
+         } => drs() {
+           < happy(a)
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
