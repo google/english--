@@ -227,6 +227,13 @@ function grammar() {
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
                     [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
                      space(),
+                     literal("not"),
+                     space(),
+                     term("NP", {"num": 1, "gen": 8, "case": 5, "gap": 3})]));
+
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
+                     space(),
                      term("NP", {"num": 1, "gen": 8, "case": 5, "gap": 3})]));
 
  result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),

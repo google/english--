@@ -95,6 +95,14 @@ describe("Logic", function() {
      `);
   });
 
+  it("Sam was not an engineer.", function() {
+    enter("Sam was not an engineer.")
+     .equalsTo(`
+       Sam(a).
+       ~engineer(past, a).
+     `);
+  });
+
   it.skip("Who from Brazil loves Mary?", function() {
     let code = [];
     code.push("Jones is happy.");
@@ -215,7 +223,9 @@ describe("Logic", function() {
     // console.log("hi");
     let args = node.children.map((x) => argument(literal(x.name)));
     args.unshift(argument(literal(node.time || "pres")));
-    return predicate(node.name, args);
+    // console.log(node);
+    let pred = predicate(node.name, args);
+    return node.neg ? negation(pred) : pred;
    } else if (node["@type"] == "PN") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "ADJ") {

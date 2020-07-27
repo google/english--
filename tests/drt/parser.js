@@ -1172,6 +1172,20 @@ describe("Parser", function() {
                         NP(PN("Jones"))))));
   });
 
+  it("Mary was an engineer.", function() {
+    assertThat(first(parse("Mary was an engineer.")))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(BE("was"),
+                        NP(DET("an"), N("engineer"))))));
+  });
+
+  it("Mary was not an engineer.", function() {
+    assertThat(first(parse("Mary was not an engineer.")))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(BE("was"), "not",
+                        NP(DET("an"), N("engineer"))))));
+  });
+
   function assertThat(x) {
    return {
     equalsTo(y) {

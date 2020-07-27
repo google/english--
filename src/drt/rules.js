@@ -213,24 +213,26 @@ function referent(name, types, value, loc) {
   }
 }
 
-function predicate(name, children, time) {
+function predicate(name, children, neg, time) {
   return {
    "@type": "Predicate",
     name: name,
     children: children,
+    neg: neg,
     time: time,
     print() {
       let children = [];
       for (let child of this.children) {
        children.push(print(child));
       }
+      let n = neg ? "~" : "";
       let e = "";
       if (time == "past") {
        e = "< ";
       } else if (time == "fut") {
        e = "> ";
       }
-      return `${e}${this.name}(${children.join(", ")})`;
+      return `${e}${n}${this.name}(${children.join(", ")})`;
    }
   }
 }
@@ -441,17 +443,7 @@ class CRNLIN extends Rule {
    return [[], [], [], []];
   }
 
-  // console.log("crnlin: " + print(node));
-
-  // Simple noun
-  //let pred = {
-  // "@type": "Predicate", 
-  // name: child(noun, 0), 
-  // ref: node.ref
-  //};
-  // console.log(node);
-
-  let pred = predicate(child(noun, 0), [node.ref], node.time);
+  let pred = predicate(child(noun, 0), [node.ref], node.neg, node.time);
   
   return [[], [pred], [], [node]];
  }
@@ -578,6 +570,8 @@ class CRNEGBE extends Rule {
   adj.ref = ref.children[0];
   adj.neg = true;
 
+  // console.log("hi");
+
   if (node.types && node.types.tense) {
    adj.time = node.types.tense;
   }
@@ -604,9 +598,29 @@ class CRNBE extends Rule {
  }
 }
 
+class CRNEGNBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
+ }
+ apply({ref, det, noun}, node, refs) {
+  let np = clone(noun);
+  np.ref = child(ref, 0);
+
+  np.neg = true;
+
+  // Matches the DRS found in (3.57) on page 269.
+
+  if (node.types && node.types.tense) {
+   np.time = node.types.tense;
+  }
+
+  return [[], [np], [], [node]];
+ }
+}
+
 class CRBE extends CompositeRule {
  constructor(ids) {
-  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids), new CRPREPBE(ids)]);
+  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids), new CRNEGNBE(ids), new CRPREPBE(ids)]);
  }
 }
 

@@ -1417,6 +1417,17 @@ describe("DRS", function() {
     `);
   });
 
+  it("John was not an engineer.", function() {
+    // Matches the DRS found in (3.57) on page 269.
+    assertThat("John was not an engineer.")
+     .equalsTo(`
+       drs(a) {
+        John(a)
+        < ~engineer(a)
+       }
+    `);
+  });
+
   it("Every brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("Every brazilian was happy.")
