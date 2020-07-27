@@ -1274,7 +1274,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Anna(b)
-         a kissed b
+         < a kissed b
        }
     `);
   });
@@ -1306,7 +1306,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Anna(b)
-         a will kiss b
+         > a will kiss b
        }
     `);
   });
@@ -1318,7 +1318,7 @@ describe("DRS", function() {
          John(a)
          Anna(b)
          ~drs() {
-           a kiss b
+           > a kiss b
          }
        }
     `);
@@ -1331,7 +1331,7 @@ describe("DRS", function() {
          John(a)
          Anna(b)
          ~drs() {
-           a kiss b
+           < a kiss b
          }
        }
     `);
@@ -1390,7 +1390,7 @@ describe("DRS", function() {
     assertThat("John has owned a porsche.")
      .equalsTo(`
        drs(a, b) {
-         John(a)
+        John(a)
          a owned b
          porsche(b)
        }

@@ -36,6 +36,8 @@ function transcribe(node, refs) {
   return node.print();
  }
 
+ // console.log(node);
+
  let result = [];
  for (let child of node.children || []) {
   result.push(transcribe(child, refs));
@@ -43,6 +45,9 @@ function transcribe(node, refs) {
  let suffix = node.ref ? `(${node.ref.name})` : "";
  let prefix = node.neg ? "~" : "";
  // prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
+ //if (node.types.tense) {
+ // console.log(node);
+ //}
  return prefix + result.join(" ").trim() + suffix;
 }
 
@@ -176,14 +181,13 @@ function find({gen, num}, refs, name, loc, exclude = []) {
  return undefined;
 }
 
-function referent(name, types, value, loc, time = false) {
+function referent(name, types, value, loc) {
   return {
    "@type": "Referent",
     types: types,
     name: name,
     value: value,
     loc: loc,
-    time: time,
     print() {
       return this.name;
    }
@@ -522,7 +526,7 @@ class CRPOSBE extends Rule {
  apply({ref, adj}, node, refs) {
   adj.ref = ref.children[0];
   // console.log(node);
-  adj.time = node.time;
+  // adj.time = node.time;
   return [[], [adj], [], [node]];
  }
 }
@@ -849,9 +853,9 @@ class CRTENSE extends Rule {
 
   // console.log(verb);
 
-  if (node.time) {
-   return [[], [], [], []];
-  }
+  //if (node.time) {
+  // return [[], [], [], []];
+  //}
 
   if (!tense) {
    return [[], [], [], []];
@@ -860,20 +864,23 @@ class CRTENSE extends Rule {
   // Records the time relationship between the new
   // discourse referent e and the utterance time @n.
 
+  // node.tense = tense;
+
   if (node.types.stat == "-") {
-   let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   node.time = e;
-   let conds = [];
+   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   // node.time = e;
+   // node.tense = tense;
+   // let conds = [];
    //if (tense == "past") {
    // conds.push(before(e, referent("@now")));
    //} else if (tense == "fut") {
    // conds.push(before(referent("@now"), e));
    //}
-   return [[e], conds, [], []];
+   return [[], [], [], []];
   } else {
-   let s = referent(this.id("s"), {}, undefined, node.loc, true);
-   node.time = s;
-   let conds = [];
+   // let s = referent(this.id("s"), {}, undefined, node.loc, true);
+   // node.time = s;
+   // let conds = [];
    //if (tense == "pres") {
    // TODO(goto): while the follow is incorrect it really leads
    // to a verbose representation
@@ -883,7 +890,7 @@ class CRTENSE extends Rule {
    //} else if (tense == "fut") {
    // conds.push(before(referent("@now"), s));
    //}
-   return [[s], conds, [], []];
+   return [[], [], [], []];
   }
  }
 }
@@ -903,16 +910,16 @@ class CRASPECT extends Rule {
   child(node, 1).children[0] = child(node, 1, 0, 1);
 
   if (stat == "-") {
-   let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   node.time = e;
+   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   // node.time = e;
    // included(referent("@now"), e)
-   return [[e], [], [], []];
+   return [[], [], [], []];
   } else if (stat == "+") {
-   let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   let s = referent(this.id("s"), {}, undefined, node.loc, true);
-   node.time = s;
+   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   // let s = referent(this.id("s"), {}, undefined, node.loc, true);
+   // node.time = s;
    // included(e, s), equals(e, s)
-   return [[e, s], [], [], []];
+   return [[], [], [], []];
   }
  }
 }
@@ -933,7 +940,7 @@ class DRS {
   let rules = 
    [
     new CRASPECT(ids),
-    new CRTENSE(ids),
+    // new CRTENSE(ids),
     new CREVERY(ids),
     new CRVPEVERY(ids),
     new CRPP(ids),
@@ -1022,8 +1029,8 @@ class DRS {
   let result = [];
   let refs = [];
   let individuals = this.head
-   .filter(ref => !ref.closure)
-   .filter(ref => !ref.time);
+   .filter(ref => !ref.closure);
+   // .filter(ref => !ref.time);
   for (let ref of individuals) {
    refs.push(`${ref.name}`);
   }
@@ -1040,7 +1047,16 @@ class DRS {
               cond["@type"] == "Disjunction") {
     result.push(cond.print());
    } else {
-    result.push(transcribe(cond));
+    // console.log(cond);
+    let prefix = "";
+    let {types} = cond;
+    let {tense} = types || {};
+    if (tense == "fut") {
+     prefix = "> ";
+    } else if (tense == "past") {
+     prefix = "< ";
+    }
+    result.push(prefix + transcribe(cond));
    }
   }
   
