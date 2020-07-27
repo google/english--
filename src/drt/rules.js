@@ -34,6 +34,8 @@ function transcribe(node, refs) {
   return node.name;
  } else if (node["@type"] == "Predicate") {
   return node.print();
+ } else if (node["@type"] == "V" && node.root) {
+  return node.root;
  }
 
  // console.log(node);

@@ -68,6 +68,7 @@ describe("Logic", function() {
   });
 
   function transpile(node) {
+   // console.log(node);
    if (node["@type"] == "Predicate") {
     // console.log(node.children);
     let args = node.children.map((x) => argument(literal(x.name)));
@@ -76,12 +77,21 @@ describe("Logic", function() {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "N") {
    } else if (node["@type"] == "S") {
-    let verb = node.children[1].children[0].children[0].children[0];
-    if (verb["@type"] == "V" ||
-        verb["@type"] == "RN" ||
-        verb["@type"] == "PREP") {
+    // let verb = node.children[1].children[0].children[0].children[0];
+    let verb = node.children[1].children[0].children[0];
+    if (verb.root) {
+     // console.log(verb);
+     verb = verb.root;
+    } else {
      verb = verb.children[0];
     }
+    // console.log(node.children[1].children[0].children[0]);
+    //if (verb["@type"] == "V" ||
+    //    verb["@type"] == "RN" ||
+    //    verb["@type"] == "PREP") {
+    // verb = verb.children[0];
+     // console.log(verb);
+    //}
     let first = node.children[0].name;
     let second = node.children[1].children[0].children[1];
     if (second["@type"] == "Referent") {
@@ -149,7 +159,7 @@ describe("Logic", function() {
 
   it("Who likes Smith?", function() {
     assertThat(trim(toString(program([query("Who likes Smith?")[0]]))))
-     .equalsTo("exists (x) exists (a) Smith(a) && likes(x, a).");
+     .equalsTo("exists (x) exists (a) Smith(a) && like(x, a).");
   });
 
   it("Is Mary happy?", function() {
@@ -161,7 +171,7 @@ describe("Logic", function() {
    let q = DrtParser.parse(s)[0].children;
 
    if (q[0] == "Is") {
-    console.log(q);
+    // console.log(q);
     let drs = DRS.from();
     let body = S(q[1], VP_(VP(BE("is"), q[2])));
     // console.log(q[1]);
@@ -228,7 +238,7 @@ describe("Logic", function() {
       Jones(a).
       happy(a).
       Smith(b).
-      likes(a, b).
+      like(a, b).
     `));
 
     let [q, answer] = query("Who likes Smith?");
@@ -241,20 +251,20 @@ describe("Logic", function() {
      .equalsTo(toString(Parser.parse(`
        Smith(b).
        exists (x) exists (a = b) Smith(a).
-       likes(a, b).
-       exists (x = a) exists (a = b) likes(x, b).
-       exists (x = a) exists (a = b) Smith(a) && likes(x, a).
+       like(a, b).
+       exists (x = a) exists (a = b) like(x, b).
+       exists (x = a) exists (a = b) Smith(a) && like(x, a).
      `)));
 
     let ref = next.value.bindings["x@1"];
     assertThat(drs[0][ref.name]).equalsTo("Jones");
-    assertThat(answer(drs[0][ref.name])).equalsTo("Jones likes Smith");
+    assertThat(answer(drs[0][ref.name])).equalsTo("Jones like Smith");
   });
 
   it("John loves Mary. Who loves Mary?", function() {
     enter("John loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("John loves Mary");
+     .equalsTo("John love Mary");
   });
 
   it("John loves Mary. Who does John love?", function() {
@@ -262,31 +272,31 @@ describe("Logic", function() {
     // to allow this to work.
     enter("John loves Mary.")
      .query("Who does John loves?")
-     .equalsTo("John loves Mary");
+     .equalsTo("John love Mary");
   });
 
   it("A man loves Mary. Who loves Mary?", function() {
     enter("A man loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("A man loves Mary");
+     .equalsTo("A man love Mary");
   });
 
   it("A man from Brazil loves Mary. Who loves Mary?", function() {
     enter("A man from Brazil loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("A man from Brazil loves Mary");
+     .equalsTo("A man from Brazil love Mary");
   });
 
   it("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("A man loves Mary. He likes Brazil.")
      .query("Who likes Brazil?")
-     .equalsTo("A man likes Brazil");
+     .equalsTo("A man like Brazil");
   });
 
   it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("Jones loves Mary. She likes Brazil.")
      .query("Who likes Brazil?")
-     .equalsTo("Mary likes Brazil");
+     .equalsTo("Mary like Brazil");
   });
 
   it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
@@ -294,23 +304,23 @@ describe("Logic", function() {
      .equalsTo(`
        Brazil(a).
        Mary(b).
-       forall (c) likes(c, b) && man(c) => loves(c, a).
+       forall (c) like(c, b) && man(c) => love(c, a).
        Jones(d).
-       likes(d, b).
+       like(d, b).
        man(d).
      `)
      .query("Who loves Brazil?")
-     .equalsTo("Jones loves Brazil")
+     .equalsTo("Jones love Brazil")
      .because(`
        Brazil(a).
        exists (x) exists (a = a) Brazil(a).
-       likes(d, b).
-       exists (c = d) likes(c, b).
+       like(d, b).
+       exists (c = d) like(c, b).
        man(d).
-       exists (c = d) likes(c, b) && man(c).
-       forall (c = d) likes(c, b) && man(c) => loves(c, a).
-       exists (x = d) exists (a = a) loves(x, a).
-       exists (x = d) exists (a = a) Brazil(a) && loves(x, a).
+       exists (c = d) like(c, b) && man(c).
+       forall (c = d) like(c, b) && man(c) => love(c, a).
+       exists (x = d) exists (a = a) love(x, a).
+       exists (x = d) exists (a = a) Brazil(a) && love(x, a).
      `);
    });
 
@@ -323,28 +333,28 @@ describe("Logic", function() {
   it("Jones admires a woman who likes him. Who likes Jones?", function() {
     enter("Jones admires a woman who likes him.")
      .query("Who likes Jones?")
-     .equalsTo("a woman who likes him likes Jones");
+     .equalsTo("a woman who like him like Jones");
   });
 
   it("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
     enter("A man who loves Dani fascinates Anna.")
      .query("Who fascinates Anna?")
-     .equalsTo("A man who loves Dani fascinates Anna");
+     .equalsTo("A man who love Dani fascinate Anna");
     enter("A man who loves Dani fascinates Anna.")
      .query("Who loves Dani?")
-     .equalsTo("A man who loves Dani loves Dani");
+     .equalsTo("A man who love Dani love Dani");
   });
 
   it("Jones owns a book which Smith loves. Who owns a book?", function() {
     enter("Jones owns a book which Smith loves.")
      .query("Who owns a book?")
-     .equalsTo("Jones owns a book");
+     .equalsTo("Jones own a book");
   });
 
   it("Jones is a man who loves Mary. Who loves Mary?", function() {
     enter("Jones is a man who loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("Jones loves Mary");
+     .equalsTo("Jones love Mary");
   });
 
   it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
