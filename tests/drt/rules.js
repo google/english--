@@ -26,6 +26,7 @@ const {
   CRPP,
   CRTENSE,
   CRASPECT,
+  CRWILL,
   referent,
 } = require("../../src/drt/rules.js");
 
@@ -573,7 +574,7 @@ describe("Rules", function() {
     assertThat(print(from)).equalsTo("a from b");
   });
 
-  it("CR.BE John was happy", function() {
+  it("John was happy", function() {
     let ids = new Ids();
 
     let node = first(parse("Sam was happy."), true);
@@ -583,8 +584,6 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a was happy");
 
-    let [[], []] = new CRTENSE(ids).match(node, []);
-    
     // NOTE(goto): BE should be state=+ and lead to an s0
     // here instead.
     // assertThat(s.print()).equalsTo("s0");
@@ -593,7 +592,7 @@ describe("Rules", function() {
     let [, [from], , [remove]] = new CRBE(ids).match(node, []);
 
     assertThat(remove).equalsTo(node);
-    assertThat(print(from)).equalsTo("happy(a)");
+    assertThat(print(from)).equalsTo("< happy(a)");
   });
 
   it("CR.COND", function() {
@@ -1005,17 +1004,19 @@ describe("Rules", function() {
 
   it("Mary will kiss Jones.", function() {
     let ids = new Ids();
-    let node = first(parse("Mary will kiss Jones."), true);    
-    new CRTENSE(ids).match(node, []);
+    let node = first(parse("Mary will kiss Jones."), true);
+    new CRWILL(ids).match(child(node, 1), []);
     assertThat(print(node)).equalsTo("Mary kiss Jones");
     assertThat(node.types.tense).equalsTo("fut");
    });
 
-  it("Mary will not kiss Jones.", function() {
+  it.skip("Mary will not kiss Jones.", function() {
     let ids = new Ids();
     let node = first(parse("Mary will not kiss Jones."), true);
-    // console.log(child(node, 1, 2, 0));
-    new CRTENSE(ids).match(node, []);
+
+    // let [head, body, , remove] = new CRNEG(ids).match(node, []);
+    
+    new CRWILL(ids).match(child(node, 1), []);
     assertThat(print(node)).equalsTo("Mary not kiss Jones");
     assertThat(node.types.tense).equalsTo("fut");
    });

@@ -1284,7 +1284,17 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          John(a)
-         happy(a)
+         < happy(a)
+       }
+    `);
+  });
+
+  it("John was not happy.", function() {
+    assertThat("John was not happy.")
+     .equalsTo(`
+       drs(a) {
+         John(a)
+         < ~happy(a)
        }
     `);
   });
@@ -1296,17 +1306,6 @@ describe("DRS", function() {
          John(a)
          Mary(b)
          a know b
-       }
-    `);
-  });
-
-  it("John will kiss Anna.", function() {
-    assertThat("John will kiss Anna.")
-     .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Anna(b)
-         > a kiss b
        }
     `);
   });

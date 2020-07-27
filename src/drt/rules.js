@@ -50,7 +50,16 @@ function transcribe(node, refs) {
  //if (node.types.tense) {
  // console.log(node);
  //}
- return prefix + result.join(" ").trim() + suffix;
+ let time = "";
+ switch (node.time) {
+  case "past": 
+   time = "< ";
+   break;
+  case "fut": 
+   time = "> ";
+   break;
+ }
+ return time + prefix + result.join(" ").trim() + suffix;
 }
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
@@ -527,8 +536,9 @@ class CRPOSBE extends Rule {
  }
  apply({ref, adj}, node, refs) {
   adj.ref = ref.children[0];
-  // console.log(node);
-  // adj.time = node.time;
+  if (node.types && node.types.tense) {
+   adj.time = node.types.tense;
+  }
   return [[], [adj], [], [node]];
  }
 }
@@ -550,6 +560,11 @@ class CRNEGBE extends Rule {
  apply({ref, adj}, node, refs) {
   adj.ref = ref.children[0];
   adj.neg = true;
+
+  if (node.types && node.types.tense) {
+   adj.time = node.types.tense;
+  }
+
   return [[], [adj], [], [node]];
  }
 }
@@ -840,78 +855,41 @@ class CRPP extends CompositeRule {
  }
 }
 
+class CRWILL extends Rule {
+ constructor(ids) {
+  super(ids, VP_(AUX("will"), VP(capture("verb"))));
+ }
+ apply({verb, aux}, node, refs) {
+  let {types} = node;
+  let {tense} = types || {};
+
+  if (tense != "fut") {
+   return [[], [], [], []];
+  }
+
+  // page 541: 
+  //
+  // We face a minor technical complication in this case, 
+  // which has to do with the auxiliary will. Will makes its 
+  // semantic contribution via the feature value "fut". 
+  //
+  // Once it has made this contribution it can be discarded. 
+  // We account for this by pruning the auxiliary from the 
+  // sentence structure that remains after the first construction
+  // step, in the course of which the contribution of will is 
+  // explicitly represented, has been performed.
+  node.children.shift();
+
+  return [[], [], [], []];
+ }
+}
+
 // Construction Rule described in page 543
 class CRTENSE extends Rule {
  constructor(ids) {
   super(ids, S(capture("sub"), VP_(capture("verb"))));
  }
  apply({verb}, node, refs) {
-  // TODO(goto): a lot of things are pushed as sentences
-  // artificially, so verbs aren't represented anymore.
-  // To fix that requires a bigger refactoring than we'd
-  // want right now, so we return early here if the tree
-  // Skip if a time was already assigned too.
-  let {types} = node;
-  let {tense} = types || {};
-
-  // console.log(verb);
-
-  //if (node.time) {
-  // return [[], [], [], []];
-  //}
-
-  if (!tense) {
-   return [[], [], [], []];
-  }
-
-  // Records the time relationship between the new
-  // discourse referent e and the utterance time @n.
-
-  // node.tense = tense;
-
-  if (tense == "fut" &&
-      verb.children[0]["@type"] == "AUX" &&
-      verb.children[0].children[0] == "will") {
-   // page 541: 
-   //
-   //   We face a minor technical complication in this case, 
-   // which has to do with the auxiliary will. Will makes its 
-   // semantic contribution via the feature value "fut". 
-   //
-   //   Once it has made this contribution it can be discarded. 
-   // We account for this by pruning the auxiliary from the 
-   // sentence structure that remains after the first construction
-   // step, in the course of which the contribution of will is 
-   // explicitly represented, has been performed.
-   verb.children.shift();
-  }
-
-  if (node.types.stat == "-") {
-   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   // node.time = e;
-   // node.tense = tense;
-   // let conds = [];
-   //if (tense == "past") {
-   // conds.push(before(e, referent("@now")));
-   //} else if (tense == "fut") {
-   // conds.push(before(referent("@now"), e));
-   //}
-   return [[], [], [], []];
-  } else {
-   // let s = referent(this.id("s"), {}, undefined, node.loc, true);
-   // node.time = s;
-   // let conds = [];
-   //if (tense == "pres") {
-   // TODO(goto): while the follow is incorrect it really leads
-   // to a verbose representation
-   // conds.push(equals(referent("@now"), s));
-   //} else if (tense == "past") {
-   // conds.push(before(s, referent("@now")));
-   //} else if (tense == "fut") {
-   // conds.push(before(referent("@now"), s));
-   //}
-   return [[], [], [], []];
-  }
  }
 }
 
@@ -976,7 +954,8 @@ class DRS {
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
-    new CRTENSE(ids),
+    // new CRTENSE(ids),
+    new CRWILL(ids),
     ];
   return new DRS(new CRPN(ids), rules);
  }
@@ -1180,4 +1159,5 @@ module.exports = {
  CRPP: CRPP,
  CRTENSE: CRTENSE,
  CRASPECT: CRASPECT,
+ CRWILL: CRWILL,
 };
