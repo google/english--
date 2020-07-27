@@ -28,6 +28,67 @@ const {
 
 describe("Logic", function() {
 
+  it("Sam loves Dani.", function() {
+    enter("Sam loves Dani.")
+     .equalsTo(`
+       Sam(a).
+       Dani(b).
+       love(pres, a, b).
+     `);
+  });  
+
+  it("Sam will love Dani.", function() {
+    enter("Sam will love Dani.")
+     .equalsTo(`
+       Sam(a).
+       Dani(b).
+       love(fut, a, b).
+     `);
+  });
+
+  it("Sam was happy.", function() {
+    enter("Sam was happy.")
+     .equalsTo(`
+       Sam(a).
+       happy(past, a).
+     `);
+  });
+
+  it("Sam is happy.", function() {
+    enter("Sam is happy.")
+     .equalsTo(`
+       Sam(a).
+       happy(pres, a).
+     `);
+  });
+
+  it("Sam is from Brazil.", function() {
+    enter("Sam is from Brazil.")
+     .equalsTo(`
+       Sam(a).
+       Brazil(b).
+       from(pres, a, b).
+     `);
+  });
+
+  it.skip("Sam was from Brazil.", function() {
+    enter("Sam was from Brazil.")
+     .equalsTo(`
+       Sam(a).
+       Brazil(b).
+       from(past, a, b).
+     `);
+  });
+
+  it("Every man is mortal. Socrates is a man.", function() {
+    enter("Every man is mortal. Socrates is a man.")
+     .equalsTo(`
+        forall (a) man(a) => mortal(pres, a).
+        Socrates(b).
+        man(b).
+     `);
+  });
+
   it.skip("Who from Brazil loves Mary?", function() {
     let code = [];
     code.push("Jones is happy.");
@@ -67,14 +128,91 @@ describe("Logic", function() {
      `)));
   });
 
+  it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
+    enter("Every man is mortal. Socrates is a man.")
+     .equalsTo(`
+        forall (a) man(a) => mortal(pres, a).
+        Socrates(b).
+        man(b).
+     `)
+     .query("Is Socrates mortal?")
+     .sameAs("exists (a) Socrates(a) && mortal(pres, a).")
+     .equalsTo("Socrates is mortal")
+     .because(`
+        Socrates(b).
+        exists (a = b) Socrates(a).
+        man(b).
+        forall (a = b) man(a) => mortal(pres, a).
+        exists (a = b) mortal(pres, b).
+        exists (a = b) Socrates(a) && mortal(pres, a).
+     `);
+  });
+
+  it("Who does Mary like?", function() {
+    assertThat(trim(toString(program([query("Who does Mary like?")[0]]))))
+     .equalsTo("exists (x) exists (a) Mary(a) && like(pres, a, x).");
+  });
+
+  it("Who likes Smith?", function() {
+    assertThat(trim(toString(program([query("Who likes Smith?")[0]]))))
+     .equalsTo("exists (x) exists (a) Smith(a) && like(pres, x, a).");
+  });
+
+  it("Who liked Smith?", function() {
+    assertThat(trim(toString(program([query("Who liked Smith?")[0]]))))
+     .equalsTo("exists (x) exists (a) Smith(a) && like(past, x, a).");
+  });
+
+  it("Is Mary happy?", function() {
+    assertThat(trim(toString(program([query("Is Mary happy?")[0]]))))
+     .equalsTo("exists (a) Mary(a) && happy(pres, a).");
+  });
+
+  it("Who likes Smith?", function() {
+    let code = [];
+    code.push("Jones is happy.");
+    code.push("He likes Smith.");
+    let drs = compile(parse(code.join(" ")));
+    let kb = program(drs[1]);
+
+    assertThat(trim(toString(kb))).equalsTo(trim(`
+      Jones(a).
+      happy(pres, a).
+      Smith(b).
+      like(pres, a, b).
+    `));
+
+    let [q, answer] = query("Who likes Smith?");
+    let result = new Reasoner(rewrite(kb))
+     .go(rewrite(q));
+
+    let next = result.next();
+    assertThat(next.done).equalsTo(false);
+    assertThat(toString(Parser.parse(next.value.toString())))
+     .equalsTo(toString(Parser.parse(`
+       Smith(b).
+       exists (x) exists (a = b) Smith(a).
+       like(pres, a, b).
+       exists (x = a) exists (a = b) like(pres, x, b).
+       exists (x = a) exists (a = b) Smith(a) && like(pres, x, a).
+     `)));
+
+    let ref = next.value.bindings["x@1"];
+    assertThat(drs[0][ref.name]).equalsTo("Jones");
+    assertThat(answer(drs[0][ref.name])).equalsTo("Jones like Smith");
+  });
+
   function transpile(node) {
    // console.log(node);
    if (node["@type"] == "Predicate") {
     // console.log(node.children);
     let args = node.children.map((x) => argument(literal(x.name)));
     return predicate(node.name, args);
-   } else if (node["@type"] == "PN" || node["@type"] == "ADJ") {
+   } else if (node["@type"] == "PN") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
+   } else if (node["@type"] == "ADJ") {
+    return predicate(node.children[0], [argument(literal(node.time || "pres")), 
+                                        argument(literal(node.ref.name))]);
    } else if (node["@type"] == "N") {
    } else if (node["@type"] == "S") {
     // let verb = node.children[1].children[0].children[0].children[0];
@@ -83,8 +221,10 @@ describe("Logic", function() {
      // console.log(verb);
      verb = verb.root;
     } else {
+     // console.log(verb);
      verb = verb.children[0];
     }
+    // console.log(node.types.tense);
     // console.log(node.children[1].children[0].children[0]);
     //if (verb["@type"] == "V" ||
     //    verb["@type"] == "RN" ||
@@ -101,7 +241,15 @@ describe("Logic", function() {
     } else if (second["@type"] == "NP") {
      second = second.children[0].children[0];
     }
-    return predicate(verb, [argument(literal(first)),
+
+    // console.log(node);
+    let {types} = node;
+    let {tense} = types || {};
+    // let tense = node.types.tense;
+    // console.log(tense);
+
+    return predicate(verb, [argument(literal(tense || "pres")),
+                            argument(literal(first)),
                             argument(literal(second))]);
    }
    throw new Error("Unknown type: " + node["@type"]);
@@ -152,21 +300,6 @@ describe("Logic", function() {
     
   });
 
-  it("Who does Mary like?", function() {
-    assertThat(trim(toString(program([query("Who does Mary like?")[0]]))))
-     .equalsTo("exists (x) exists (a) Mary(a) && like(a, x).");
-  });
-
-  it("Who likes Smith?", function() {
-    assertThat(trim(toString(program([query("Who likes Smith?")[0]]))))
-     .equalsTo("exists (x) exists (a) Smith(a) && like(x, a).");
-  });
-
-  it("Is Mary happy?", function() {
-    assertThat(trim(toString(program([query("Is Mary happy?")[0]]))))
-     .equalsTo("exists (a) Mary(a) && happy(a).");
-  });
-
   function query(s) {
    let q = DrtParser.parse(s)[0].children;
 
@@ -197,7 +330,12 @@ describe("Logic", function() {
    let vp = gap == "vp" ? q[3] : q[2].children[0];
    let drs = DRS.from();
    let x = referent("x");
+
    let body = S(np, VP_(vp));
+
+   body.types = {tense: vp.types.tense};
+
+   // console.log(body);
 
    let b = clone(body);
 
@@ -226,40 +364,6 @@ describe("Logic", function() {
    }
    return [result, answer];
   }
-
-  it("Who likes Smith?", function() {
-    let code = [];
-    code.push("Jones is happy.");
-    code.push("He likes Smith.");
-    let drs = compile(parse(code.join(" ")));
-    let kb = program(drs[1]);
-
-    assertThat(trim(toString(kb))).equalsTo(trim(`
-      Jones(a).
-      happy(a).
-      Smith(b).
-      like(a, b).
-    `));
-
-    let [q, answer] = query("Who likes Smith?");
-    let result = new Reasoner(rewrite(kb))
-     .go(rewrite(q));
-
-    let next = result.next();
-    assertThat(next.done).equalsTo(false);
-    assertThat(toString(Parser.parse(next.value.toString())))
-     .equalsTo(toString(Parser.parse(`
-       Smith(b).
-       exists (x) exists (a = b) Smith(a).
-       like(a, b).
-       exists (x = a) exists (a = b) like(x, b).
-       exists (x = a) exists (a = b) Smith(a) && like(x, a).
-     `)));
-
-    let ref = next.value.bindings["x@1"];
-    assertThat(drs[0][ref.name]).equalsTo("Jones");
-    assertThat(answer(drs[0][ref.name])).equalsTo("Jones like Smith");
-  });
 
   it("John loves Mary. Who loves Mary?", function() {
     enter("John loves Mary.")
@@ -304,9 +408,9 @@ describe("Logic", function() {
      .equalsTo(`
        Brazil(a).
        Mary(b).
-       forall (c) like(c, b) && man(c) => love(c, a).
+       forall (c) like(pres, c, b) && man(c) => love(pres, c, a).
        Jones(d).
-       like(d, b).
+       like(pres, d, b).
        man(d).
      `)
      .query("Who loves Brazil?")
@@ -314,13 +418,13 @@ describe("Logic", function() {
      .because(`
        Brazil(a).
        exists (x) exists (a = a) Brazil(a).
-       like(d, b).
-       exists (c = d) like(c, b).
+       like(pres, d, b).
+       exists (c = d) like(pres, c, b).
        man(d).
-       exists (c = d) like(c, b) && man(c).
-       forall (c = d) like(c, b) && man(c) => love(c, a).
-       exists (x = d) exists (a = a) love(x, a).
-       exists (x = d) exists (a = a) Brazil(a) && love(x, a).
+       exists (c = d) like(pres, c, b) && man(c).
+       forall (c = d) like(pres, c, b) && man(c) => love(pres, c, a).
+       exists (x = d) exists (a = a) love(pres, x, a).
+       exists (x = d) exists (a = a) Brazil(a) && love(pres, x, a).
      `);
    });
 
@@ -357,26 +461,6 @@ describe("Logic", function() {
      .equalsTo("Jones love Mary");
   });
 
-  it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
-    enter("Every man is mortal. Socrates is a man.")
-     .equalsTo(`
-        forall (a) man(a) => mortal(a).
-        Socrates(b).
-        man(b).
-     `)
-     .query("Is Socrates mortal?")
-     .sameAs("exists (a) Socrates(a) && mortal(a).")
-     .equalsTo("Socrates is mortal")
-     .because(`
-        Socrates(b).
-        exists (a = b) Socrates(a).
-        man(b).
-        forall (a = b) man(a) => mortal(a).
-        exists (a = b) mortal(b).
-        exists (a = b) Socrates(a) && mortal(a).
-     `);
-  });
-
   it("Sam is from Brazil. Who is from Brazil?", function() {
     enter("Sam is from Brazil.")
      .query("Who is from Brazil?")
@@ -395,10 +479,51 @@ describe("Logic", function() {
      .equalsTo("Sam 's wife is behind Anna");
   });
 
-  it("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
+  it.skip("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
+
+    // NOTE(goto): this really makes me wonder if our characterization of
+    // adjectives is correct. I'm thinking that the tensed tuple here
+    // needs to be the BE() rather than the adjective.
+
     enter("Sam is a brazilian engineer. Every brazilian is from Brazil.")
+     .equalsTo(`
+       Sam(a).
+       brazilian(pres, a).
+       engineer(a).
+       Brazil(b).
+       forall (c) brazilian(c) => from(pres, c, b).
+     `)
      .query("Who is from Brazil?")
+     .sameAs(`
+       exists (x) exists (a) Brazil(a) && from(pres, x, a).
+     `)
      .equalsTo("Sam is from Brazil");
+  });
+
+  it("Sam loved Anna. Who loved Anna?", function() {
+    enter("Sam loved Anna.")
+     .equalsTo(`
+       Sam(a).
+       Anna(b).
+       love(past, a, b).
+     `)
+     .query("Who loved Anna?")
+     .sameAs(`
+       exists (x) exists (a) Anna(a) && love(past, x, a).
+     `)
+     .equalsTo("Sam love Anna");
+  });
+
+  it.skip("Sam will love Anna. Who will love Anna?", function() {
+    enter("Sam will love Anna.")
+     .equalsTo(`
+       Sam(a).
+       Anna(b).
+       love(fut, a, b).
+     `)
+     .query("Who will love Anna?")
+     .sameAs("")
+     .equalsTo("Sam love Anna");
   });
 
   // maybe we need to introduce variables?
