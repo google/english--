@@ -1003,6 +1003,22 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a kissed b");
    });
 
+  it("Mary will kiss Jones.", function() {
+    let ids = new Ids();
+    let node = first(parse("Mary will kiss Jones."), true);    
+    new CRTENSE(ids).match(node, []);
+    assertThat(print(node)).equalsTo("Mary kiss Jones");
+    assertThat(node.types.tense).equalsTo("fut");
+   });
+
+  it("Mary will not kiss Jones.", function() {
+    let ids = new Ids();
+    let node = first(parse("Mary will not kiss Jones."), true);
+    new CRTENSE(ids).match(node, []);
+    assertThat(print(node)).equalsTo("Mary not kiss Jones");
+    assertThat(node.types.tense).equalsTo("fut");
+   });
+
   it("Mary has kissed Jones.", function() {
     let ids = new Ids();
 

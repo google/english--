@@ -1306,7 +1306,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Anna(b)
-         > a will kiss b
+         > a kiss b
        }
     `);
   });

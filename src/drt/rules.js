@@ -841,7 +841,7 @@ class CRPP extends CompositeRule {
 // Construction Rule described in page 543
 class CRTENSE extends Rule {
  constructor(ids) {
-  super(ids, S(capture("sub"), capture("verb")));
+  super(ids, S(capture("sub"), VP_(capture("verb"))));
  }
  apply({verb}, node, refs) {
   // TODO(goto): a lot of things are pushed as sentences
@@ -849,7 +849,8 @@ class CRTENSE extends Rule {
   // To fix that requires a bigger refactoring than we'd
   // want right now, so we return early here if the tree
   // Skip if a time was already assigned too.
-  let tense = (node.types || {}).tense;
+  let {types} = node;
+  let {tense} = types || {};
 
   // console.log(verb);
 
@@ -865,6 +866,23 @@ class CRTENSE extends Rule {
   // discourse referent e and the utterance time @n.
 
   // node.tense = tense;
+
+  if (tense == "fut" &&
+      verb.children[0]["@type"] == "AUX" &&
+      verb.children[0].children[0] == "will") {
+   // page 541: 
+   //
+   //   We face a minor technical complication in this case, 
+   // which has to do with the auxiliary will. Will makes its 
+   // semantic contribution via the feature value "fut". 
+   //
+   //   Once it has made this contribution it can be discarded. 
+   // We account for this by pruning the auxiliary from the 
+   // sentence structure that remains after the first construction
+   // step, in the course of which the contribution of will is 
+   // explicitly represented, has been performed.
+   verb.children.shift();
+  }
 
   if (node.types.stat == "-") {
    // let e = referent(this.id("e"), {}, undefined, node.loc, true);
@@ -940,7 +958,6 @@ class DRS {
   let rules = 
    [
     new CRASPECT(ids),
-    // new CRTENSE(ids),
     new CREVERY(ids),
     new CRVPEVERY(ids),
     new CRPP(ids),
@@ -957,6 +974,7 @@ class DRS {
     new CRNPOR(ids),
     new CRAND(ids),
     new CRADJ(ids),
+    new CRTENSE(ids),
     ];
   return new DRS(new CRPN(ids), rules);
  }
