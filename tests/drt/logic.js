@@ -526,9 +526,21 @@ describe("Logic", function() {
        Anna(b).
        love(fut, a, b).
      `)
-     .query("Who will love Anna?")
-     .sameAs("")
-     .equalsTo("Sam love Anna");
+     //.query("Who will love Anna?")
+     //.sameAs("")
+     //.equalsTo("Sam love Anna");
+  });
+
+  it.skip("Sam was a brazilian engineer. Every brazilian who was an engineer was happy. Was Sam happy?", function() {
+    enter("Sam was a brazilian engineer. Every brazilian who was an engineer was happy.")
+     .equalsTo(`
+       Sam(a).
+       brazilian(pres, a).
+       engineer(pres, a).
+       forall (b) brazilian(pres, b) && engineer(past, b) => happy(past, b).
+     `)
+     .query("Was Sam happy?")
+     .equalsTo("Sam was happy.");
   });
 
   // maybe we need to introduce variables?
@@ -539,7 +551,6 @@ describe("Logic", function() {
   // if a person "a" is a child of a person "b" then "b" is parent of "a".
   // if a person (a) is a child of a person (b) then (b) is parent of (a).
   
-
   function enter(code) {
     let drs = compile(parse(code));
     let kb = program(drs[1]);
