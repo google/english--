@@ -210,11 +210,11 @@ describe("Nearley", function() {
      throw new Error("expected error");
     } catch (e) {
      let error = reportError(e, parser);
-     console.log(`Instead of a ${JSON.stringify(error.token)}, I was expecting to see one of the following:`);
+     //console.log(`Instead of a ${JSON.stringify(error.token)}, I was expecting to see one of the following:`);
      for (let expected of error.expected) {
-      console.log(`    A ${expected.symbol} based on:`);
+      //console.log(`    A ${expected.symbol} based on:`);
       for (let based of expected.based) {
-       console.log(`        ${based}`);
+       //console.log(`        ${based}`);
       }
      }
      
@@ -250,6 +250,81 @@ describe("Nearley", function() {
 
     parser.feed("1+1");
     assertThat(parser.results).equalsTo([{left: 1, op: "+", right: 1}]);
+   });
+
+  it("reject", function() {
+    let parser = create(`
+      # the first rule always rejects
+      number -> [0-4]:+ {% (data, location, reject) => reject %}
+      number -> [0-9]:+ {% ([number], location, reject) => "hello" %}
+    `);
+
+    parser.feed("1");
+    assertThat(parser.results).equalsTo(["hello"]);
+   });
+
+  it("javascript", function() {
+    let parser = create(`
+      @{%
+        function foo(num) {
+         return parseInt(num);
+        }
+      %}
+      number -> [0-9]:+ {% ([number], location, reject) => foo(number) %}
+    `);
+
+    parser.feed("1");
+    assertThat(parser.results).equalsTo([1]);
+   });
+
+  it("builtin", function() {
+    let parser = create(`
+      @builtin "whitespace.ne"
+      expression -> number _ "+" _ number
+      number -> [0-9]:+ {% ([number], location, reject) => parseInt(number) %}
+    `);
+
+    parser.feed("1 + 1");
+    assertThat(parser.results).equalsTo([[1, null, "+", null, 1]]);
+   });
+
+  it("DRT", function() {
+    let parser = create(`
+      @builtin "whitespace.ne"
+
+      @{%
+        function node(type) {
+         return (data, location, reject) => {
+          let children = data.filter((ws) => ws != null);
+          return {
+           "@type": type,
+           "children": children,
+          };
+         }
+        }
+      %}
+
+      S -> NP _ VP {% node("S") %}
+      VP -> V _ NP {% node("VP") %}
+      NP -> PN {% node("NP") %}
+      PN -> "Sam" {% node("PN") %}
+      PN -> "Dani" {% node("PN") %}
+      V -> "likes" {% node("V") %}
+    `);
+
+    parser.feed("Sam likes Dani");
+
+    let node = (type, ...children) => { 
+     return {"@type": type, "children": children} 
+    };
+
+    assertThat(parser.results)
+     .equalsTo([node("S", 
+                     node("NP", node("PN", "Sam")),
+                     node("VP", 
+                          node("V", "likes"), 
+                          node("NP", node("PN", "Dani"))))
+                ]);
    });
 
   function assertThat(x) {
