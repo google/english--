@@ -4,7 +4,7 @@ const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
-describe("Nearley", function() {
+describe.only("Nearley", function() {
 
   function parse(source) {
     const parser = new nearley.Parser(grammar);
@@ -288,28 +288,214 @@ describe("Nearley", function() {
     assertThat(parser.results).equalsTo([[1, null, "+", null, 1]]);
    });
 
-  it("DRT", function() {
+  function bind(type, types = {}, expects = []) {
+   return (data, location, reject) => {
+    let result = data
+      .filter((ws) => ws != null);
+
+    let children = result.filter((node) => node["@type"]);
+
+    if (expects.length != children.length) {
+     return reject;
+    }
+
+    let variables = {};
+
+    for (let i = 0; i < expects.length; i++) {
+     let expected = expects[i];
+     let child = children[i];
+     if (expected["@type"] != child["@type"]) {
+      return reject;
+     }
+     for (let [key, value] of Object.entries(expected.types || {})) {
+      if (typeof value == "number") {
+       if (variables[value] &&
+           variables[value] != child.types[key]) {
+        // existing and conflicting variable
+        return reject;
+       }
+       // collects variables
+       variables[value] = child.types[key];
+      } else if (expected.types[key] != child.types[key]) {
+       return reject;
+      }
+     }
+    }
+
+    // Sets variables
+    for (let [key, value] of Object.entries(types)) {
+     if (typeof value == "number") {
+      if (!variables[value]) {
+       // console.log(variables);
+       // console.log(variables);
+       return reject;
+      }
+      types[key] = variables[value];
+     }
+    }
+
+    return {
+      "@type": type,
+      "types": types,
+      "children": result,
+      };
+   };
+  }
+
+  it("whitespace", function() {
+    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+
+    assertThat(post([{
+        "@type": "V", 
+      }, null, {
+        "@type": "NP", 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {},
+      "children": [{"@type": "V"}, {"@type": "NP"}]
+    });
+
+  });
+  
+  it("rejects based on length", function() {
+    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+    const rejected = "rejected";
+    assertThat(post([], "", rejected))
+    .equalsTo(rejected);
+   });
+
+  it("rejects based on length", function() {
+    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+    const rejected = "rejected";
+    assertThat(post([null,null], "", rejected))
+    .equalsTo(rejected);
+
+   });
+
+  it("rejects based on length", function() {
+    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+    const rejected = "rejected";
+    assertThat(post([{"@type": "V"},{"@type": "DET"}], "", rejected))
+    .equalsTo(rejected);
+   });
+
+  it("rejects based on types", function() {
+    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+    const rejected = "rejected";
+    assertThat(post([{"@type": "V"},{"@type": "DET"}], "", rejected))
+     .equalsTo(rejected);
+  });
+
+  it("rejects based on types", function() {
+    let post = bind("NP", {}, [{"@type": "PN", "types": {"num": "sing"}}]);
+    const rejected = "rejected";
+    assertThat(post([{"@type": "PN", "types": {"num": "plur"}}], "", rejected))
+     .equalsTo(rejected);
+  });
+
+  it("rejects based on conflicting bindings", function() {
+    let post = bind("VP", {"num": 1}, [{ 
+       "@type": "V",
+       "types": {"num": 1}
+      }, {
+       "@type": "NP",
+       "types": {"num": 1}
+      }]);
+
+    const reject = "reject";
+    assertThat(post([{
+        "@type": "V", 
+        "types": {"num": "sing"}, 
+      }, {
+        "@type": "NP", 
+        "types": {"num": "plur"}, 
+    }], undefined, reject))
+    .equalsTo(reject);
+  });
+
+  it("binds", function() {
+    let post = bind("NP", {"num": 1}, [{ 
+       "@type": "PN",
+       "types": {"num": 1}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"num": "sing"}, 
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"num": "sing"}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"num": "sing"},
+      }]
+    });
+  });
+
+  it("binds to literals", function() {
+    let post = bind("PN", {"num": "sing"});
+
+    assertThat(post(["Sam"]))
+    .equalsTo({
+      "@type": "PN", 
+      "types": {"num": "sing"}, 
+      "children": ["Sam"]
+    });
+  });
+
+  it("binds multiple", function() {
+    let post = bind("NP", {"num": 1, "gen": 2}, [{ 
+       "@type": "PN",
+       "types": {"num": 1, "gen": 2}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"num": "sing", "gen": "-hum"}, 
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"num": "sing", "gen": "-hum"}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"num": "sing", "gen": "-hum"},
+      }]
+    });
+  });
+
+  it("Basic DRT", function() {
     let parser = create(`
       @builtin "whitespace.ne"
 
-      @{%
-        function node(type) {
-         return (data, location, reject) => {
-          let children = data.filter((ws) => ws != null);
-          return {
-           "@type": type,
-           "children": children,
-          };
-         }
-        }
-      %}
+      @{% ${bind.toString()} %}
 
-      S -> NP _ VP {% node("S") %}
-      VP -> V _ NP {% node("VP") %}
-      NP -> PN {% node("NP") %}
-      PN -> "Sam" {% node("PN") %}
-      PN -> "Dani" {% node("PN") %}
-      V -> "likes" {% node("V") %}
+      S -> NP _ VP {%
+        bind("S", {"num": 1}, [{
+          "@type": "NP",
+          "types": {"num": 1}
+          }, {
+          "@type": "VP",
+          "types": {"num": 1}
+          }])
+      %}
+      VP -> V _ NP {% 
+        bind("VP", {"num": "sing"}, [{
+           "@type": "V",
+          }, {
+           "@type": "NP",
+          }]) 
+      %}
+      NP -> PN {% 
+        bind("NP", {"num": 1}, [{ 
+           "@type": "PN",
+           "types": {"num": 1}
+        }]) 
+      %}
+      PN -> "Sam" {% bind("PN", {"num": "sing"}) %}
+      PN -> "Dani" {% bind("PN", {"num": "sing"}) %}
+      V -> "likes" {% bind("V", {"num": "sing"}) %}
     `);
 
     parser.feed("Sam likes Dani");
@@ -318,13 +504,229 @@ describe("Nearley", function() {
      return {"@type": type, "children": children} 
     };
 
-    assertThat(parser.results)
-     .equalsTo([node("S", 
-                     node("NP", node("PN", "Sam")),
-                     node("VP", 
-                          node("V", "likes"), 
-                          node("NP", node("PN", "Dani"))))
-                ]);
+    assertThat(parser.results[0].types).equalsTo({
+      "num": "sing"
+    });
+
+    function clear(root) {
+     delete root.types;
+     for (let child of root.children || []) {
+      clear(child);
+     }
+     return root;
+    }
+
+    assertThat(clear(parser.results[0]))
+     .equalsTo(node("S",
+                    node("NP", node("PN", "Sam")),
+                    node("VP", 
+                         node("V", "likes"), 
+                         node("NP", node("PN", "Dani"))))
+               );
+   });
+
+  it.only("Nearley features", function() {
+    let parser = create(`
+      @builtin "whitespace.ne"
+      @builtin "number.ne"
+      @builtin "string.ne"
+
+      rules -> (_ rule _ "."):+ _ {% ([rules]) => {
+        return rules.map(([ws, rule]) => rule);
+      } %}
+
+      rule -> head __ "->" __ tail {%
+        ([head, ws0, arrow, ws1, tail]) => {
+         return {
+          "head": head,
+          "tail": tail
+         }
+        }
+      %}
+
+      head -> name {% id %}
+      tail -> (term __ {% id %}):* term {%
+        ([beginning, end]) => {
+         return [...beginning, end];
+        }
+      %}
+
+      term -> name {% id %}
+      term -> string {% id %}
+
+      name -> word features:? {% 
+        ([word, features]) => {
+         return {
+          name: word,
+          types: Object.fromEntries(features || [])
+         }
+        }
+      %}
+      string -> dqstring {% ([str]) => '"' + str + '"' %}
+
+      features -> "[" props "]" {% ([p0, props, p1]) => {
+        // console.log(props);
+        return props;
+      }%}
+
+      props -> (keyvalue _ "," _ {% id %}):* keyvalue:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ word {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+      keyvalue -> word _ "=" _ int {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      word -> [a-zA-Z]:+ {% ([char]) => {
+        return char.join("");
+      }%}
+
+    `);
+
+    parser.feed(`
+      foo[num=1] -> bar hello[].
+      hello -> world.
+      a -> "hi".
+      a -> b "c" d.
+    `);
+
+    let term = (name, types = {}) => {
+     return {name: name, types: types};
+    };
+
+    assertThat(parser.results).equalsTo([[{
+        "head": term("foo", {"num": 1}),
+        "tail": [term("bar"), term("hello")]
+       }, {
+        "head": term("hello"), 
+        "tail": [term("world")]
+       }, {
+        "head": term("a"), 
+        "tail": ["\"hi\""]
+       }, {
+        "head": term("a"), 
+        "tail": [term("b"), "\"c\"", term("d")]
+       }]]);
+  });
+
+  it("Preliminary DRT", function() {
+    let parser = create(`
+      @builtin "whitespace.ne"
+
+      @{% ${bind.toString()} %}
+
+      S -> NP _ VP {%
+        bind("S", {"num": 1}, [{
+          "@type": "NP",
+          "types": {"num": 1}
+          }, {
+          "@type": "VP",
+          "types": {"num": 1}
+          }])
+      %}
+      VP -> V _ NP {% 
+        bind("VP", {"num": "sing"}, [{
+           "@type": "V",
+          }, {
+           "@type": "NP",
+          }]) 
+      %}
+      NP -> PN {% 
+        bind("NP", {"num": 1}, [{ 
+           "@type": "PN",
+           "types": {"num": 1}
+        }]) 
+      %}
+      PN -> "Sam" {% bind("PN", {"num": "sing"}) %}
+      PN -> "Dani" {% bind("PN", {"num": "sing"}) %}
+      V -> "likes" {% bind("V", {"num": "sing"}) %}
+
+      # Lexical Insertion Rules
+
+      # LI 1
+      DET -> "a" {% bind("DET", {"num": "sing"}) %}
+      DET -> "every" {% bind("DET", {"num": "sing"}) %}
+      DET -> "the" {% bind("DET", {"num": "sing"}) %}
+      DET -> "some" {% bind("DET", {"num": "sing"}) %}
+
+      # LI 2
+      PRO -> "he" {% 
+        bind("PRO", {
+          "num": "sing", 
+          "gen": "male", 
+          "case": "+nom"
+        }) %}
+
+      # LI 3
+      PRO -> "him" {% 
+        bind("PRO", {
+          "num": "sing", 
+          "gen": "male", 
+          "case": "-nom"
+        }) %}
+
+      # LI 4
+      PRO -> "she" {% 
+        bind("PRO", {
+          "num": "sing", 
+          "gen": "fem", 
+          "case": "+nom"
+        }) %}
+
+      # LI 5
+      PRO -> "her" {% 
+        bind("PRO", {
+          "num": "sing", 
+          "gen": "male", 
+          "case": "-nom"
+        }) %}
+
+      # LI 6
+      PRO -> "it" {% 
+        bind("PRO", {
+          "num": "sing", 
+          "gen": "-hum", 
+          "case": ["-nom", "+nom"]
+        }) %}
+    `);
+
+    parser.feed("Sam likes Dani");
+
+    let node = (type, ...children) => { 
+     return {"@type": type, "children": children} 
+    };
+
+    assertThat(parser.results[0].types).equalsTo({
+      "num": "sing"
+    });
+
+    function clear(root) {
+     delete root.types;
+     for (let child of root.children || []) {
+      clear(child);
+     }
+     return root;
+    }
+
+    assertThat(clear(parser.results[0]))
+     .equalsTo(node("S",
+                    node("NP", node("PN", "Sam")),
+                    node("VP", 
+                         node("V", "likes"), 
+                         node("NP", node("PN", "Dani"))))
+               );
    });
 
   function assertThat(x) {
