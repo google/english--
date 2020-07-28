@@ -103,6 +103,15 @@ describe("Logic", function() {
      `);
   });
 
+  it("Sam was not an engineer from Brazil.", function() {
+    enter("Sam was not an engineer from Brazil.")
+     .equalsTo(`
+       Sam(a).
+       Brazil(b).
+       ~from(pres, a, b) && engineer(pres, a).
+     `);
+  });
+
   it.skip("Who from Brazil loves Mary?", function() {
     let code = [];
     code.push("Jones is happy.");
@@ -224,33 +233,32 @@ describe("Logic", function() {
     let args = node.children.map((x) => argument(literal(x.name)));
     args.unshift(argument(literal(node.time || "pres")));
     // console.log(node);
-    let pred = predicate(node.name, args);
-    return node.neg ? negation(pred) : pred;
+    return predicate(node.name, args);
    } else if (node["@type"] == "PN") {
     return predicate(node.children[0], [argument(literal(node.ref.name))]);
    } else if (node["@type"] == "ADJ") {
+    // console.log(node);
     return predicate(node.children[0], [argument(literal(node.time || "pres")), 
                                         argument(literal(node.ref.name))]);
    } else if (node["@type"] == "N") {
     // console.log("hi");
    } else if (node["@type"] == "S") {
+    // console.log(node);
     // let verb = node.children[1].children[0].children[0].children[0];
     let verb = node.children[1].children[0].children[0];
     if (verb.root) {
      // console.log(verb);
      verb = verb.root;
     } else {
-     // console.log(verb);
      verb = verb.children[0];
     }
-    // console.log(node.types.tense);
-    // console.log(node.children[1].children[0].children[0]);
-    //if (verb["@type"] == "V" ||
-    //    verb["@type"] == "RN" ||
-    //    verb["@type"] == "PREP") {
-    // verb = verb.children[0];
-     // console.log(verb);
-    //}
+
+    if (verb["@type"] == "V" ||
+        verb["@type"] == "RN" ||
+        verb["@type"] == "PREP") {
+     verb = verb.children[0];
+    }
+
     let first = node.children[0].name;
     let second = node.children[1].children[0].children[1];
     if (second["@type"] == "Referent") {
@@ -261,11 +269,8 @@ describe("Logic", function() {
      second = second.children[0].children[0];
     }
 
-    // console.log(node);
     let {types} = node;
     let {tense} = types || {};
-    // let tense = node.types.tense;
-    // console.log(tense);
 
     return predicate(verb, [argument(literal(tense || "pres")),
                             argument(literal(first)),
@@ -283,14 +288,19 @@ describe("Logic", function() {
    }
 
    for (let s of drs.body) {
-    if (s["@type"] == "Implication") {
+    if (s instanceof DRS) {
+     // console.log("hi");
+    } else if (s["@type"] == "Negation") {
      let x = s.a.head
       .filter(ref => !ref.closure)
-      // .filter(ref => !ref.time)
       .map(ref => ref.name)
       .join(", ");
-     // console.log(s.a.head);
-     // console.log(s.a.body);
+     kb.push(negation(spread(compile(s.a)[1])));
+    } else if (s["@type"] == "Implication") {
+     let x = s.a.head
+      .filter(ref => !ref.closure)
+      .map(ref => ref.name)
+      .join(", ");
      kb.push(forall(x, implies(spread(compile(s.a)[1]),
                                spread(compile(s.b)[1]))));
     } else {

@@ -458,8 +458,12 @@ class CRPPLIN extends Rule {
    return [[], [], [], []];
   }
 
+  // console.log(node);
+
   noun.ref = node.ref;
   let cond = S(node.ref, VP_(VP(V(prep), child(np, 1))));
+
+  // noun.neg = node.neg;
 
   return [[], [noun, cond], [], [node]];
  }
@@ -603,10 +607,14 @@ class CRNEGNBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
  }
  apply({ref, det, noun}, node, refs) {
+  let sub = drs(this.ids);
+
+  sub.head = clone(refs);
+  sub.head.forEach(ref => ref.closure = true);
+  // sub.neg = true;
+
   let np = clone(noun);
   np.ref = child(ref, 0);
-
-  np.neg = true;
 
   // Matches the DRS found in (3.57) on page 269.
 
@@ -614,7 +622,9 @@ class CRNEGNBE extends Rule {
    np.time = node.types.tense;
   }
 
-  return [[], [np], [], [node]];
+  sub.push(np);
+
+  return [[], [negation(sub)], [], [node]];
  }
 }
 
@@ -1080,6 +1090,7 @@ class DRS {
    if (cond instanceof DRS) {
     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
+              cond["@type"] == "Negation" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction") {
     result.push(cond.print());
@@ -1122,6 +1133,16 @@ function implication(a, b) {
    "b": b,
    print() {
    return this.a.print() + " => " + this.b.print();
+  }
+ };
+}
+
+function negation(a) {
+ return {
+   "@type": "Negation",
+   "a": a,
+   print() {
+   return "~" + this.a.print();
   }
  };
 }

@@ -1422,8 +1422,24 @@ describe("DRS", function() {
     assertThat("John was not an engineer.")
      .equalsTo(`
        drs(a) {
+         John(a)
+         ~drs() {
+           < engineer(a)
+         }
+       }
+    `);
+  });
+
+  it("John was not an engineer.", function() {
+    assertThat("John was not an engineer from Brazil.")
+     .equalsTo(`
+      drs(a, b) {
         John(a)
-        < ~engineer(a)
+        Brazil(b)
+        ~drs() {
+          a from b
+          engineer(a)
+        }
        }
     `);
   });
