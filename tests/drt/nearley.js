@@ -331,7 +331,7 @@ describe.only("Nearley", function() {
 
     let children = result.filter((node) => node["@type"]);
 
-    // console.log(`Trying to bind ${signature}`);
+    //console.log(`Trying to bind ${signature}`);
     //let foo = children.map((x) => {
     //  return `${x["@type"]}${JSON.stringify(x.types)}`;
     //}).join(" ");
@@ -1024,6 +1024,28 @@ describe.only("Nearley", function() {
       N[num=sing, gen=fem] -> "woman".
       N[num=sing, gen=-hum] -> "book".
 
+      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+
+      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+
+      PREP -> "behind".
+      PREP -> "in".
+      PREP -> "over".
+      PREP -> "under".
+      PREP -> "near".
+
+      PREP -> "before".
+      PREP -> "after".
+      PREP -> "during".
+
+      PREP -> "from".
+      PREP -> "to".
+      PREP -> "of".
+      PREP -> "about".
+      PREP -> "by".
+      PREP -> "for".
+      PREP -> "with".
+
       AUX[num=sing, fin=+] -> "does".
       AUX[num=plur, fin=+] -> "do".
 
@@ -1359,6 +1381,26 @@ describe.only("Nearley", function() {
                  VP_(VP(V("likes"), NP(DET(NP(PN("Jones")), "'s"), N("book"))))));
   });
 
+  it("Jones likes a book about Brazil", function() {
+    assertThat(sentence("Jones likes a book about Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"),
+                        NP(DET("a"), 
+                           N(N("book"), 
+                             PP(PREP("about"), NP(PN("Brazil"))))
+                           )))));
+  });
+
+  it("Jones likes a book from Brazil", function() {
+    assertThat(sentence("Jones likes a book from Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"),
+                        NP(DET("a"), 
+                           N(N("book"), 
+                             PP(PREP("from"), NP(PN("Brazil"))))
+                           )))));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1387,6 +1429,8 @@ describe.only("Nearley", function() {
   let GAP = (...children) => node("GAP", ...children);
   let BE = (...children) => node("BE", ...children);
   let ADJ = (...children) => node("ADJ", ...children);
+  let PREP = (...children) => node("PREP", ...children);
+  let PP = (...children) => node("PP", ...children);
 
   function assertThat(x) {
    return {
