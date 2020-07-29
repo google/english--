@@ -941,6 +941,8 @@ describe.only("Nearley", function() {
     let source = `
       Sentence -> S[num=1, gap=2] _ ".".
 
+      S[num=1, gap=-] -> "if" __ S[num=2, gap=3] __ "then" __ S[num=4, gap=5].
+
       S[num=1, gap=-] -> 
           NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
 
@@ -1294,6 +1296,15 @@ describe.only("Nearley", function() {
                  VP_(VP(BE("is"),
                         "not",
                         DET("a"), N("woman")))));
+  });
+
+  it("If Mary is happy then Jones is happy.", function() {
+    assertThat(sentence("If Mary is happy then Jones is happy."))
+     .equalsTo(S("If",
+                 S(NP(PN("Mary")), VP_(VP(BE("is"), ADJ("happy")))),
+                 "then",
+                 S(NP(PN("Jones")), VP_(VP(BE("is"), ADJ("happy")))),
+                 ));
   });
 
   function clear(root) {
