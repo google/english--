@@ -921,7 +921,7 @@ describe("Nearley", function() {
       VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
 
       VP[num=1, fin=2, gap=3] ->
-        V[num=1, fin=2, trans=+] __ NP[num=1, gen=4, case=-nom, gap=3].
+        V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=3].
 
       VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
 
@@ -1067,6 +1067,18 @@ describe("Nearley", function() {
     assertThat(sentence("He likes it."))
      .equalsTo(S(NP(PRO("He")),
                  VP_(VP(V("likes"), NP(PRO("it"))))));
+   });
+
+  it("They like it.", function() {
+    assertThat(sentence("They like it."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(V("like"), NP(PRO("it"))))));
+   });
+
+  it("She likes them.", function() {
+    assertThat(sentence("She likes them."))
+     .equalsTo(S(NP(PRO("She")),
+                 VP_(VP(V("likes"), NP(PRO("them"))))));
    });
 
   function clear(root) {
