@@ -1307,6 +1307,20 @@ describe.only("Nearley", function() {
                  ));
   });
 
+  it("Jones and Mary like a book.", function() {
+    assertThat(sentence("Jones and Mary like a book."))
+     .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
+                 VP_(VP(V("like"), NP(DET("a"), N("book"))))));
+  });
+
+  it("Jones like Mary and Brazil.", function() {
+    assertThat(sentence("Jones likes Mary and Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), 
+                        NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
+                        ))));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
