@@ -943,6 +943,8 @@ describe.only("Nearley", function() {
 
       S[num=1, gap=-] -> "if" __ S[num=2, gap=3] __ "then" __ S[num=4, gap=5].
 
+      S[num=1, gap=-] -> S[num=2, gap=3] __ "and" __ S[num=4, gap=5].
+
       S[num=1, gap=-] -> 
           NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
 
@@ -997,13 +999,22 @@ describe.only("Nearley", function() {
       DET[num=sing] -> "the".
       DET[num=sing] -> "some".
 
+      DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
+
       PRO[num=sing, gen=male, case=+nom] -> "he".
       PRO[num=sing, gen=male, case=-nom] -> "him".
+
       PRO[num=sing, gen=fem, case=+nom] -> "she".
       PRO[num=sing, gen=fem, case=-nom] -> "her".
+
       PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> "it".
+
       PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> "they".
       PRO[num=plur, gen=[male, fem, -hum], case=-nom] -> "them".
+
+      PRO[num=sing, gen=male, case=-nom, refl=+] -> "himself".
+      PRO[num=sing, gen=fem, case=-nom, refl=+] -> "herself".
+      PRO[num=sing, gen=-hum, case=-nom, refl=+] -> "itself".
 
       PN[num=sing, gen=male] -> "Jones".
       PN[num=sing, gen=fem] -> "Mary".
@@ -1319,6 +1330,33 @@ describe.only("Nearley", function() {
                  VP_(VP(V("likes"), 
                         NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
                         ))));
+  });
+
+  it("Jones likes Brazil and he likes Mary.", function() {
+    assertThat(sentence("Jones likes Brazil and he likes Mary."))
+     .equalsTo(S(S(NP(PN("Jones")),VP_(VP(V("likes"), NP(PN("Brazil"))))),
+                 "and",
+                 S(NP(PRO("he")),VP_(VP(V("likes"), NP(PN("Mary"))))),
+                 ));
+  });
+
+  it("Jones likes himself", function() {
+    assertThat(sentence("Jones likes himself."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"),
+                        NP(PRO("himself"))))));
+  });
+
+  it("Jones's book is foolish", function() {
+    assertThat(sentence("Jones's book is foolish."))
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("book")),
+                 VP_(VP(BE("is"), ADJ("foolish")))));
+  });
+
+  it("Mary likes Jones's book", function() {
+    assertThat(sentence("Mary likes Jones's book."))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(V("likes"), NP(DET(NP(PN("Jones")), "'s"), N("book"))))));
   });
 
   function clear(root) {
