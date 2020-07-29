@@ -1037,14 +1037,6 @@ describe("Nearley", function() {
    return clear(parser.results[0]).children[0];
   }
 
-  it("Jones does not like Mary", function() {
-    assertThat(sentence("Jones does not love Mary."))
-     .equalsTo(S(NP(PN("Jones")),
-                 VP_(AUX("does"), 
-                     "not", 
-                     VP(V("love"), NP(PN("Mary"))))));
-   });
-
   it("Jones likes him.", function() {
     assertThat(sentence("Jones likes him."))
      .equalsTo(S(NP(PN("Jones")),
@@ -1081,6 +1073,68 @@ describe("Nearley", function() {
                  VP_(VP(V("likes"), NP(PRO("them"))))));
    });
 
+  it("Jones does not like Mary", function() {
+    assertThat(sentence("Jones does not love Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("does"), 
+                     "not", 
+                     VP(V("love"), NP(PN("Mary"))))));
+   });
+
+  it("He does not love her", function() {
+    assertThat(sentence("He does not love her."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(AUX("does"), 
+                     "not", 
+                     VP(V("love"), NP(PRO("her"))))));
+   });
+
+  it("They do not love her", function() {
+    assertThat(sentence("They do not love her."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(AUX("do"), 
+                     "not", 
+                     VP(V("love"), NP(PRO("her"))))));
+  });
+
+  it("It does not love them", function() {
+    assertThat(sentence("It does not love them."))
+     .equalsTo(S(NP(PRO("It")),
+                 VP_(AUX("does"), 
+                     "not", 
+                     VP(V("love"), NP(PRO("them"))))));
+  });
+
+  it("He likes a book.", function() {
+    assertThat(sentence("He likes a book."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V("likes"), NP(DET("a"), N("book"))))));
+   });
+
+  it("He likes every book.", function() {
+    assertThat(sentence("He likes every book."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V("likes"), NP(DET("every"), N("book"))))));
+   });
+
+  it("Every man likes him.", function() {
+    assertThat(sentence("Every man likes him."))
+     .equalsTo(S(NP(DET("Every"), N("man")),
+                 VP_(VP(V("likes"), NP(PRO("him"))))));
+   });
+
+  it("A woman likes him.", function() {
+    assertThat(sentence("A woman likes him."))
+     .equalsTo(S(NP(DET("A"), N("woman")),
+                 VP_(VP(V("likes"), NP(PRO("him"))))));
+  });
+
+  it("The woman likes him.", function() {
+    assertThat(sentence("The woman likes him."))
+     .equalsTo(S(NP(DET("The"), N("woman")),
+                 VP_(VP(V("likes"), NP(PRO("him"))))));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1102,6 +1156,8 @@ describe("Nearley", function() {
   let V = (...children) => node("V", ...children);
   let AUX = (...children) => node("AUX", ...children);
   let PRO = (...children) => node("PRO", ...children);
+  let DET = (...children) => node("DET", ...children);
+  let N = (...children) => node("N", ...children);
 
   function assertThat(x) {
    return {
