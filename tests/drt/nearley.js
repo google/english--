@@ -331,8 +331,11 @@ describe("Nearley", function() {
 
     let children = result.filter((node) => node["@type"]);
 
-    //console.log(`Trying to bind ${signature}`);
-    //console.log(`To ${JSON.stringify(children)}`);
+    // console.log(`Trying to bind ${signature}`);
+    //let foo = children.map((x) => {
+    //  return `${x["@type"]}${JSON.stringify(x.types)}`;
+    //}).join(" ");
+    //console.log(`To ${foo}`);
 
     if (expects.length != children.length) {
      // console.log("not the same length");
@@ -1073,6 +1076,9 @@ describe("Nearley", function() {
   function sentence(s, start) {
    let parser = ccc(start);
    parser.feed(s);
+   if (start) {
+    return parser.results;
+   }
    return clear(parser.results[0]).children[0];
   }
 
@@ -1213,6 +1219,25 @@ describe("Nearley", function() {
                                 S(NP(GAP()), 
                                   VP_(VP(V("likes"), 
                                          NP(PN("Mary")))))
+                                )))
+                        ))));
+   });
+
+  it("Every man who likes Brazil likes a woman which likes Jones.", function() {
+    assertThat(sentence("Every man who likes Brazil likes a woman who likes Jones."))
+     .equalsTo(S(NP(DET("Every"), 
+                    N(N("man"), 
+                      RC(RPRO("who"),
+                         S(NP(GAP()),
+                           VP_(VP(V("likes"), NP(PN("Brazil")))))
+                         ))),
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), 
+                           N(N("woman"), 
+                             RC(RPRO("who"),
+                                S(NP(GAP()), 
+                                  VP_(VP(V("likes"), 
+                                         NP(PN("Jones")))))
                                 )))
                         ))));
    });
