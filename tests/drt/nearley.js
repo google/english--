@@ -4,7 +4,7 @@ const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
-describe.only("Nearley", function() {
+describe("Nearley", function() {
 
   function parse(source) {
     const parser = new nearley.Parser(grammar);
@@ -299,13 +299,37 @@ describe.only("Nearley", function() {
    });
 
   function bind(type, types = {}, expects = []) {
+   
    return (data, location, reject) => {
-    let result = data
+    // Creates a copy of the types because it is reused
+    // across multiple calls and we assign values to it.
+    let bindings = JSON.parse(JSON.stringify(types));
+    let signature = `${type}${JSON.stringify(bindings)} -> `;
+    // console.log(data);
+    for (let child of expects) {
+     signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
+    }
+    
+    let hash = (str) => {
+     return str.split("")
+     .reduce((prevHash, currVal) =>
+             (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+    }
+       
+    // console.log(hash(signature));
+    let namespace = hash(signature);
+
+    // console.log(`Trying ${signature}.`);
+    
+    // Creates a copy of the input data, because it is
+    // reused across multiple calls.
+    let result = JSON.parse(JSON.stringify(data))
       .filter((ws) => ws != null);
 
     let children = result.filter((node) => node["@type"]);
 
     if (expects.length != children.length) {
+     // console.log("not the same length");
      return reject;
     }
 
@@ -315,59 +339,51 @@ describe.only("Nearley", function() {
      let expected = expects[i];
      let child = children[i];
      if (expected["@type"] != child["@type"]) {
+      // console.log("Children of different types");
       return reject;
      }
      for (let [key, value] of Object.entries(expected.types || {})) {
       if (typeof value == "number") {
        if (variables[value] &&
            variables[value] != child.types[key]) {
-        // existing and conflicting variable
+        // console.log("Existing and conflicting variables");
         return reject;
        }
        // collects variables
        variables[value] = child.types[key];
-      } else if (expected.types[key] != child.types[key]) {
-       // rejects if the expected types don't match what
-       // we got.
+      } else if (typeof child.types[key] == "number") {
+       child.types[key] = value;
+      } else if (child.types[key] && expected.types[key] != child.types[key]) {
+       // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
        return reject;
       }
      }
     }
-
-    let hash = (str) => {
-     return str.split("")
-       .reduce((prevHash, currVal) =>
-               (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
-    }
-
-    let signature = `${type}${JSON.stringify(types)} -> `;
-
-    for (let child of children) {
-     signature += `${child["@type"]}${JSON.stringify(child.types || {})} `;
-    }
-    
-    // console.log(hash(signature));
-    let namespace = hash(signature);
     
     // Sets variables
-    for (let [key, value] of Object.entries(types)) {
+    for (let [key, value] of Object.entries(bindings)) {
      if (typeof value == "number") {
+      // console.log(key);
+      // console.log("hello");
       if (!variables[value]) {
        // console.log(variables);
        // console.log(types);
        // console.log(variables);
        // console.log("hi");
        // return reject;
-       types[key] = namespace + value;
+       bindings[key] = namespace + value;
       } else {
-       types[key] = variables[value];
+       // console.log(`${key} = ${variables[value]}`);
+       bindings[key] = variables[value];
       }
      }
     }
 
+    // console.log(JSON.stringify(types));
+
     return {
       "@type": type,
-      "types": types,
+      "types": bindings,
       "children": result,
       };
    };
@@ -477,10 +493,30 @@ describe.only("Nearley", function() {
     }]))
     .equalsTo({
       "@type": "NP", 
-      "types": {"num": -1638024502}, 
+      "types": {"num": -568255581}, 
       "children": [{
         "@type": "PN", 
         "types": {"gen": "male"},
+      }]
+    });
+  });
+
+  it("binds tail variable to head", function() {
+    let post = bind("NP", {}, [{ 
+       "@type": "PN",
+       "types": {"gen": "-"}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"gen": -1638024502},
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"gen": "-"},
       }]
     });
   });
@@ -531,6 +567,26 @@ describe.only("Nearley", function() {
       "types": {"num": "sing"}, 
       "children": [{
         "@type": "PN", 
+        "types": {"num": "sing", "gen": "-hum"},
+      }]
+    });
+  });
+
+  it("binds ignoring fewer", function() {
+    let post = bind("VP", {}, [{ 
+       "@type": "NP",
+       "types": {"num": 1, "gend": 2, "case": "-nom", "gap": 3}
+    }]);
+
+    assertThat(post([{
+      "@type": "NP", 
+      "types": {"num": "sing", "gen": "-hum"}, 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {}, 
+      "children": [{
+        "@type": "NP", 
         "types": {"num": "sing", "gen": "-hum"},
       }]
     });
@@ -736,10 +792,9 @@ describe.only("Nearley", function() {
           NP[num=1, gen=2, case=+nom, gap=-] _ VP_[num=1, fin=+, gap=np].
 
       VP_[num=1, fin=+, gap=2] ->
-          AUX[num=1, fin=+] _ "not" _VP[num=3, fin=-, gap=2].
+          AUX[num=1, fin=+] _ "not" _ VP[num=3, fin=-, gap=2].
 
-      VP_[num=1, fin=+, gap=2] ->
-          VP[num=1, fin=+, gap=2].
+      VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
 
       VP[num=1, fin=2, gap=3] ->
           V[num=1, fin=2, trans=+] _ NP[num=1, gen=4, case=-nom, gap=3].
@@ -785,7 +840,7 @@ describe.only("Nearley", function() {
       AUX[num=sing, fin=+] -> "does".
       AUX[num=plur, fin=+] -> "do".
 
-      V[num=[sing, plur], trans=+, fin=-] -> "like".
+      V[num=[sing, plur], trans=+, fin=-] -> "love".
       V[num=[sing, plur], trans=-, fin=-] -> "rotate".
 
       V[num=sing, trans=1, fin=+] -> "likes".
@@ -796,6 +851,14 @@ describe.only("Nearley", function() {
     `;
 
     grammar.feed(source);
+    //grammar.feed(`
+    //  NP[num=1, gen=2] -> PN[num=1, gen=2].
+    //   VP[num=1, fin=2, gap=3] ->
+    //       V[num=1, fin=2, trans=+] _ NP[num=1, gen=4, case=-nom, gap=3].
+    //  VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
+    //  PN[num=sing, gen=fem] -> "Mary".
+    //  V[num=sing, trans=1, fin=+] -> "likes".
+    //`);
 
     let result = [];
 
@@ -824,17 +887,9 @@ describe.only("Nearley", function() {
      feed(`%}`);
     }
 
-    let parser = create(result.join("\n"), "PN");
-    parser.feed("Jones");
-    assertThat(parser.results).equalsTo([{
-       "@type": "PN",
-       "children": ["Jones"],
-       "types": {
-         "gen": "male",
-         "num": "sing",
-       }
-      }]);
-
+    let parser = create(result.join("\n"));
+    parser.feed("Jones likes Mary");
+    // assertThat(parser.results).equalsTo([{}]);
   });
 
   it("Preliminary DRT", function() {
