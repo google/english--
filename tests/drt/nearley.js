@@ -304,12 +304,18 @@ describe("Nearley", function() {
     // Creates a copy of the types because it is reused
     // across multiple calls and we assign values to it.
     let bindings = JSON.parse(JSON.stringify(types));
+
+    // Creates a copy of the input data, because it is
+    // reused across multiple calls.
+    let result = JSON.parse(JSON.stringify(data))
+      .filter((ws) => ws != null);
+
     let signature = `${type}${JSON.stringify(bindings)} -> `;
     // console.log(data);
     for (let child of expects) {
      signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
     }
-    
+
     let hash = (str) => {
      return str.split("")
      .reduce((prevHash, currVal) =>
@@ -319,13 +325,8 @@ describe("Nearley", function() {
     // console.log(hash(signature));
     let namespace = hash(signature);
 
-    // console.log(`Trying ${signature}.`);
-    
-    // Creates a copy of the input data, because it is
-    // reused across multiple calls.
-    let result = JSON.parse(JSON.stringify(data))
-      .filter((ws) => ws != null);
-
+    // console.log(`Trying ${signature} to bind to ${JSON.stringify(result)}.`);
+        
     let children = result.filter((node) => node["@type"]);
 
     if (expects.length != children.length) {
@@ -344,16 +345,32 @@ describe("Nearley", function() {
      }
      for (let [key, value] of Object.entries(expected.types || {})) {
       if (typeof value == "number") {
-       if (variables[value] &&
-           variables[value] != child.types[key]) {
-        // console.log("Existing and conflicting variables");
-        return reject;
+       if (variables[value]) {
+        if (Array.isArray(variables[value])) {
+         if (!variables[value].includes(child.types[key])) {
+          return reject;
+         }
+        } else if (Array.isArray(child.types[key])) {
+         if (!child.types[key].includes(variables[value])) {
+          return reject;
+         }
+         continue;
+        } else if (variables[value] != child.types[key]) {
+         // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
+         return reject;
+        }
        }
        // collects variables
        variables[value] = child.types[key];
       } else if (typeof child.types[key] == "number") {
        child.types[key] = value;
-      } else if (child.types[key] && expected.types[key] != child.types[key]) {
+      } else if (Array.isArray(child.types[key])) {
+       if (!child.types[key].includes(expected.types[key])) {
+        return reject;
+       }
+       child.types[key] = expected.types[key];
+      } else if (typeof child.types[key] == "string" &&
+                 expected.types[key] != child.types[key]) {
        // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
        return reject;
       }
@@ -407,38 +424,33 @@ describe("Nearley", function() {
   
   it("rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
-    const rejected = "rejected";
-    assertThat(post([], "", rejected))
-    .equalsTo(rejected);
+    assertThat(post([]))
+    .equalsTo(undefined);
    });
 
   it("rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
-    const rejected = "rejected";
-    assertThat(post([null,null], "", rejected))
-    .equalsTo(rejected);
+    assertThat(post([null,null]))
+    .equalsTo(undefined);
 
    });
 
   it("rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
-    const rejected = "rejected";
-    assertThat(post([{"@type": "V"},{"@type": "DET"}], "", rejected))
-    .equalsTo(rejected);
+    assertThat(post([{"@type": "V"},{"@type": "DET"}]))
+    .equalsTo(undefined);
    });
 
   it("rejects based on types", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
-    const rejected = "rejected";
-    assertThat(post([{"@type": "V"},{"@type": "DET"}], "", rejected))
-     .equalsTo(rejected);
+    assertThat(post([{"@type": "V"},{"@type": "DET"}]))
+     .equalsTo(undefined);
   });
 
   it("rejects based on types", function() {
     let post = bind("NP", {}, [{"@type": "PN", "types": {"num": "sing"}}]);
-    const rejected = "rejected";
-    assertThat(post([{"@type": "PN", "types": {"num": "plur"}}], "", rejected))
-     .equalsTo(rejected);
+    assertThat(post([{"@type": "PN", "types": {"num": "plur"}}]))
+     .equalsTo(undefined);
   });
 
   it("rejects based on conflicting bindings", function() {
@@ -450,15 +462,27 @@ describe("Nearley", function() {
        "types": {"num": 1}
       }]);
 
-    const reject = "reject";
     assertThat(post([{
         "@type": "V", 
         "types": {"num": "sing"}, 
       }, {
         "@type": "NP", 
         "types": {"num": "plur"}, 
-    }], undefined, reject))
-    .equalsTo(reject);
+    }]))
+    .equalsTo(undefined);
+  });
+
+  it("rejects invalid array entry", function() {
+    let post = bind("NP", {"gen": "male"}, [{
+       "@type": "PN",
+       "types": {"gen": "male"}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"gen": ["-hum", "fem"]}, 
+    }]))
+    .equalsTo(undefined);
   });
 
   it("binds", function() {
@@ -588,6 +612,104 @@ describe("Nearley", function() {
       "children": [{
         "@type": "NP", 
         "types": {"num": "sing", "gen": "-hum"},
+      }]
+    });
+  });
+
+  it("binds to arrays", function() {
+    let post = bind("NP", {"gen": 1}, [{
+       "@type": "PN",
+       "types": {"gen": 1}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"gen": ["male", "fem"]}, 
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"gen": ["male", "fem"]}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"gen": ["male", "fem"]}, 
+      }]
+    });
+  });
+
+  it("binds to array entry", function() {
+    let post = bind("NP", {"gen": "male"}, [{
+       "@type": "PN",
+       "types": {"gen": "male"}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"gen": ["male", "fem"]}, 
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"gen": "male"}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"gen": "male"}, 
+      }]
+    });
+  });
+
+  it("binds and array entry to a literal", function() {
+    let post = bind("VP", {"num": 1}, [{
+       "@type": "V",
+       "types": {"num": 1}
+      }, {
+       "@type": "NP",
+       "types": {"num": 1}
+      }]);
+
+    assertThat(post([{
+        "@type": "V", 
+        "types": {"num": ["sing", "plur"]}, 
+      }, {
+        "@type": "NP", 
+        "types": {"num": "sing"}, 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {"num": "sing"}, 
+      "children": [{
+          "@type": "V", 
+          "types": {"num": ["sing", "plur"]}, 
+        }, {
+          "@type": "NP", 
+          "types": {"num": "sing"}, 
+      }]
+    });
+  });
+
+  it("binds and array entry to a literal", function() {
+    let post = bind("VP", {"num": 1}, [{
+       "@type": "V",
+       "types": {"num": 1}
+      }, {
+       "@type": "NP",
+       "types": {"num": 1}
+      }]);
+
+    assertThat(post([{
+        "@type": "V", 
+        "types": {"num": "sing"}, 
+      }, {
+        "@type": "NP", 
+        "types": {"num": ["sing", "plur"]}, 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {"num": "sing"}, 
+      "children": [{
+          "@type": "V", 
+          "types": {"num": "sing"}, 
+        }, {
+          "@type": "NP", 
+          "types": {"num": ["sing", "plur"]}, 
       }]
     });
   });
@@ -778,43 +900,45 @@ describe("Nearley", function() {
        }]]);
   });
 
-  it("Compiler compiler compiler", function() {
+  function ccc(start) {
     let grammar = rules();
 
     let source = `
+      Sentence -> S[num=1] _ ".".
+
       S[num=1] -> 
-          NP[num=1, gen=2, case=+nom] _ VP_[num=1, fin=+].
+          NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
 
       S[num=1, gap=np] -> 
-          NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
+          NP[num=1, gen=2, case=+nom, gap=np] __ VP_[num=1, fin=+, gap=-].
 
       S[num=1, gap=np] ->
-          NP[num=1, gen=2, case=+nom, gap=-] _ VP_[num=1, fin=+, gap=np].
+          NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np].
 
       VP_[num=1, fin=+, gap=2] ->
-          AUX[num=1, fin=+] _ "not" _ VP[num=3, fin=-, gap=2].
+          AUX[num=1, fin=+] __ "not" __ VP[num=3, fin=-, gap=2].
 
       VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
 
       VP[num=1, fin=2, gap=3] ->
-          V[num=1, fin=2, trans=+] _ NP[num=1, gen=4, case=-nom, gap=3].
+        V[num=1, fin=2, trans=+] __ NP[num=1, gen=4, case=-nom, gap=3].
 
       VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
 
       NP[num=1, gen=2, case=3, gap=np] -> null.
 
-      NP[num=1, gen=2, case=3] -> DET[num=1] _ N[num=1, gen=2].
+      NP[num=1, gen=2, case=3] -> DET[num=1] __ N[num=1, gen=2].
 
       NP[num=1, gen=2] -> PN[num=1, gen=2].
  
       NP[num=1, gen=2, case = 3] -> PRO[num=1, gen=2, case=3].
 
       NP[num=plur, gen=1, case=2] -> 
-        NP[num=3, gen=4, case=2] _ "and" NP[num=5, gen=6, case=2].
+        NP[num=3, gen=4, case=2] __ "and" __ NP[num=5, gen=6, case=2].
 
-      N[num=1, gen=2] -> N[num=1, gen=2] _ RC[num=1, gen=2].
+      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
 
-      RC[num=1, gen=2] -> RPRO[num=1, gen=2] _ S[num=1, gap=np].
+      RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
       DET[num=sing] -> "a".
       DET[num=sing] -> "every".
@@ -851,14 +975,6 @@ describe("Nearley", function() {
     `;
 
     grammar.feed(source);
-    //grammar.feed(`
-    //  NP[num=1, gen=2] -> PN[num=1, gen=2].
-    //   VP[num=1, fin=2, gap=3] ->
-    //       V[num=1, fin=2, trans=+] _ NP[num=1, gen=4, case=-nom, gap=3].
-    //  VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
-    //  PN[num=sing, gen=fem] -> "Mary".
-    //  V[num=sing, trans=1, fin=+] -> "likes".
-    //`);
 
     let result = [];
 
@@ -887,118 +1003,68 @@ describe("Nearley", function() {
      feed(`%}`);
     }
 
-    let parser = create(result.join("\n"));
-    parser.feed("Jones likes Mary");
-    // assertThat(parser.results).equalsTo([{}]);
-  });
+    return create(result.join("\n"), start);
+  }
 
-  it("Preliminary DRT", function() {
-    let parser = create(`
-      @builtin "whitespace.ne"
-
-      @{% ${bind.toString()} %}
-
-      S -> NP _ VP {%
-        bind("S", {"num": 1}, [{
-          "@type": "NP",
-          "types": {"num": 1}
-          }, {
-          "@type": "VP",
-          "types": {"num": 1}
-          }])
-      %}
-      VP -> V _ NP {% 
-        bind("VP", {"num": "sing"}, [{
-           "@type": "V",
-          }, {
-           "@type": "NP",
-          }]) 
-      %}
-      NP -> PN {% 
-        bind("NP", {"num": 1}, [{ 
-           "@type": "PN",
-           "types": {"num": 1}
-        }]) 
-      %}
-      PN -> "Sam" {% bind("PN", {"num": "sing"}) %}
-      PN -> "Dani" {% bind("PN", {"num": "sing"}) %}
-      V -> "likes" {% bind("V", {"num": "sing"}) %}
-
-      # Lexical Insertion Rules
-
-      # LI 1
-      DET -> "a" {% bind("DET", {"num": "sing"}) %}
-      DET -> "every" {% bind("DET", {"num": "sing"}) %}
-      DET -> "the" {% bind("DET", {"num": "sing"}) %}
-      DET -> "some" {% bind("DET", {"num": "sing"}) %}
-
-      # LI 2
-      PRO -> "he" {% 
-        bind("PRO", {
-          "num": "sing", 
-          "gen": "male", 
-          "case": "+nom"
-        }) %}
-
-      # LI 3
-      PRO -> "him" {% 
-        bind("PRO", {
-          "num": "sing", 
-          "gen": "male", 
-          "case": "-nom"
-        }) %}
-
-      # LI 4
-      PRO -> "she" {% 
-        bind("PRO", {
-          "num": "sing", 
-          "gen": "fem", 
-          "case": "+nom"
-        }) %}
-
-      # LI 5
-      PRO -> "her" {% 
-        bind("PRO", {
-          "num": "sing", 
-          "gen": "male", 
-          "case": "-nom"
-        }) %}
-
-      # LI 6
-      PRO -> "it" {% 
-        bind("PRO", {
-          "num": "sing", 
-          "gen": "-hum", 
-          "case": ["-nom", "+nom"]
-        }) %}
-    `);
-
-    parser.feed("Sam likes Dani");
-
-    let node = (type, ...children) => { 
-     return {"@type": type, "children": children} 
-    };
-
-    assertThat(parser.results[0].types).equalsTo({
-      "num": "sing"
-    });
-
-    function clear(root) {
-     delete root.types;
-     for (let child of root.children || []) {
-      clear(child);
-     }
-     return root;
-    }
-
+  it("Jones likes Mary", function() {
+    let parser = ccc();
+    parser.feed("Jones likes Mary.");
     assertThat(clear(parser.results[0]))
-     .equalsTo(node("S",
-                    node("NP", node("PN", "Sam")),
-                    node("VP", 
-                         node("V", "likes"), 
-                         node("NP", node("PN", "Dani"))))
-               );
+     .equalsTo(Sentence(S(NP(PN("Jones")),
+                          VP_(VP(V("likes"),
+                                 NP(PN("Mary"))))), 
+                        "."));
    });
+
+  it("Jones like Mary", function() {
+    let parser = ccc();
+    try {
+     parser.feed("Jones like Mary.");
+     throw new Error("expected error");
+    } catch (e) {
+     // expected syntax error.
+     let error = reportError(e, parser);
+     // We only realize there is an error when we
+     // see the ".", because it commits to the end
+     // of the sentence and we don't have any option
+     // that works. That's unfortunate, because
+     // the number disagreement between the verb and
+     // the subject could've been caught earlier :(
+     assertThat(error.token).equalsTo(".");
+    }
+   });
+
+  it("Jones does not like Mary", function() {
+    let parser = ccc();
+    parser.feed("Jones does not love Mary.");
+    assertThat(clear(parser.results[0]))
+     .equalsTo(Sentence(S(NP(PN("Jones")),
+                          VP_(AUX("does"), 
+                              "not", 
+                              VP(V("love"), NP(PN("Mary"))))), 
+                        "."));
+   });
+
+  function clear(root) {
+   delete root.types;
+   for (let child of root.children || []) {
+    clear(child);
+   }
+   return root;
+  }
+
+  let node = (type, ...children) => { 
+   return {"@type": type, "children": children} 
+  };
+
+  let Sentence = (...children) => node("Sentence", ...children);
+  let S = (...children) => node("S", ...children);
+  let NP = (...children) => node("NP", ...children);
+  let PN = (...children) => node("PN", ...children);
+  let VP_ = (...children) => node("VP_", ...children);
+  let VP = (...children) => node("VP", ...children);
+  let V = (...children) => node("V", ...children);
+  let AUX = (...children) => node("AUX", ...children);
 
   function assertThat(x) {
    return {
