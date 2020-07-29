@@ -985,6 +985,11 @@ describe.only("Nearley", function() {
       VP[num=1, fin=2] -> BE[num=1, fin=2] __ ADJ.
       VP[num=1, fin=2] -> BE[num=1, fin=2] __ "not" __ ADJ.
 
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ DET[num=1] __ N[num=1, gen=3].
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ "not" __ DET[num=1] __ N[num=1, gen=3].
+
       DET[num=sing] -> "a".
       DET[num=sing] -> "every".
       DET[num=sing] -> "the".
@@ -1275,6 +1280,21 @@ describe.only("Nearley", function() {
                                 )))
                         ))));
    });
+
+  it("Jones is a man.", function() {
+    assertThat(sentence("Jones is a man."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), 
+                        DET("a"), N("man")))));
+  });
+
+  it("Jones is not a woman.", function() {
+    assertThat(sentence("Jones is not a woman."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"),
+                        "not",
+                        DET("a"), N("woman")))));
+  });
 
   function clear(root) {
    delete root.types;
