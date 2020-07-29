@@ -306,7 +306,6 @@ describe("Nearley", function() {
     // Creates a copy of the types because it is reused
     // across multiple calls and we assign values to it.
     let bindings = JSON.parse(JSON.stringify(types));
-    // console.log(expects);
 
     // Creates a copy of the input data, because it is
     // reused across multiple calls.
@@ -317,7 +316,6 @@ describe("Nearley", function() {
     let expects = conditions.filter((x) => x["@type"] != "null");
 
     let signature = `${type}${JSON.stringify(bindings)} -> `;
-    // console.log(data);
     for (let child of expects) {
      signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
     }
@@ -331,9 +329,10 @@ describe("Nearley", function() {
     // console.log(hash(signature));
     let namespace = hash(signature);
 
-    // console.log(`Trying ${signature} to bind to ${JSON.stringify(result)}.`);
-        
     let children = result.filter((node) => node["@type"]);
+
+    //console.log(`Trying to bind ${signature}`);
+    //console.log(`To ${JSON.stringify(children)}`);
 
     if (expects.length != children.length) {
      // console.log("not the same length");
@@ -356,6 +355,9 @@ describe("Nearley", function() {
          if (!variables[value].includes(child.types[key])) {
           return reject;
          }
+        } else if (typeof variables[value] == "number") {
+         // console.log("hi");
+         variables[value] = child.types[key];
         } else if (Array.isArray(child.types[key])) {
          if (!child.types[key].includes(variables[value])) {
           return reject;
@@ -715,6 +717,35 @@ describe("Nearley", function() {
     });
   });
 
+  it("binds and literal to variable", function() {
+    let post = bind("VP", {"num": 1}, [{
+       "@type": "V",
+       "types": {"num": 1}
+      }, {
+       "@type": "NP",
+       "types": {"num": 1}
+      }]);
+
+    assertThat(post([{
+        "@type": "V", 
+        "types": {"num": 1234}, 
+      }, {
+        "@type": "NP", 
+        "types": {"num": "sing"}, 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {"num": "sing"}, 
+      "children": [{
+          "@type": "V", 
+          "types": {"num": 1234}, 
+        }, {
+          "@type": "NP", 
+          "types": {"num": "sing"}, 
+      }]
+    });
+  });
+
   it("Basic DRT", function() {
     let parser = create(`
       @builtin "whitespace.ne"
@@ -910,8 +941,8 @@ describe("Nearley", function() {
       S[num=1, gap=-] -> 
           NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
 
-      S[num=1, gap=np] -> 
-          NP[num=1, gen=2, case=+nom, gap=np] __ VP_[num=1, fin=+, gap=-].
+      S[num=1, gap=np] ->
+          NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
 
       S[num=1, gap=np] ->
           NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np].
@@ -1039,8 +1070,8 @@ describe("Nearley", function() {
     }
    });
 
-  function sentence(s) {
-   let parser = ccc();
+  function sentence(s, start) {
+   let parser = ccc(start);
    parser.feed(s);
    return clear(parser.results[0]).children[0];
   }
@@ -1168,6 +1199,20 @@ describe("Nearley", function() {
                                 S(NP(PN("Mary")), 
                                   VP_(VP(V("likes"), 
                                          NP(GAP()))))
+                                )))
+                        ))));
+   });
+
+  it("Jones likes a woman which likes Mary.", function() {
+    assertThat(sentence("Jones likes a book which likes Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), 
+                           N(N("book"), 
+                             RC(RPRO("which"),
+                                S(NP(GAP()), 
+                                  VP_(VP(V("likes"), 
+                                         NP(PN("Mary")))))
                                 )))
                         ))));
    });
