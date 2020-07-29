@@ -1022,7 +1022,9 @@ describe.only("Nearley", function() {
 
       N[num=sing, gen=male] -> "man".
       N[num=sing, gen=fem] -> "woman".
+      N[num=sing, gen=fem] -> "girl".
       N[num=sing, gen=-hum] -> "book".
+      N[num=sing, gen=-hum] -> "telescope".
 
       N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
 
@@ -1398,6 +1400,16 @@ describe.only("Nearley", function() {
                         NP(DET("a"), 
                            N(N("book"), 
                              PP(PREP("from"), NP(PN("Brazil"))))
+                           )))));
+  });
+
+  it("Jones likes a girl with a telescope.", function() {
+    assertThat(sentence("Jones likes a girl with a telescope."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"),
+                        NP(DET("a"), 
+                           N(N("girl"), 
+                             PP(PREP("with"), NP(DET("a"), N("telescope"))))
                            )))));
   });
 
