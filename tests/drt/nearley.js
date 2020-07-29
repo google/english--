@@ -4,6 +4,8 @@ const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
+const {child} = require("../../src/drt/rules.js");
+
 describe("Nearley", function() {
 
   function parse(source) {
@@ -298,17 +300,21 @@ describe("Nearley", function() {
     assertThat(parser.results).equalsTo([[1, null, "+", null, 1]]);
    });
 
-  function bind(type, types = {}, expects = []) {
+  function bind(type, types = {}, conditions = []) {
    
    return (data, location, reject) => {
     // Creates a copy of the types because it is reused
     // across multiple calls and we assign values to it.
     let bindings = JSON.parse(JSON.stringify(types));
+    // console.log(expects);
 
     // Creates a copy of the input data, because it is
     // reused across multiple calls.
     let result = JSON.parse(JSON.stringify(data))
       .filter((ws) => ws != null);
+
+    // Ignores the null type.
+    let expects = conditions.filter((x) => x["@type"] != "null");
 
     let signature = `${type}${JSON.stringify(bindings)} -> `;
     // console.log(data);
@@ -372,6 +378,8 @@ describe("Nearley", function() {
       } else if (typeof child.types[key] == "string" &&
                  expected.types[key] != child.types[key]) {
        // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
+       return reject;
+      } else if (!child.types[key]) {
        return reject;
       }
      }
@@ -596,24 +604,17 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds ignoring fewer", function() {
+  it("rejects fewer of expected types", function() {
     let post = bind("VP", {}, [{ 
        "@type": "NP",
-       "types": {"num": 1, "gend": 2, "case": "-nom", "gap": 3}
+       "types": {"num": 1, "gen": 2, "case": "-nom", "gap": 3}
     }]);
 
     assertThat(post([{
       "@type": "NP", 
       "types": {"num": "sing", "gen": "-hum"}, 
     }]))
-    .equalsTo({
-      "@type": "VP", 
-      "types": {}, 
-      "children": [{
-        "@type": "NP", 
-        "types": {"num": "sing", "gen": "-hum"},
-      }]
-    });
+    .equalsTo(undefined);
   });
 
   it("binds to arrays", function() {
@@ -904,9 +905,9 @@ describe("Nearley", function() {
     let grammar = rules();
 
     let source = `
-      Sentence -> S[num=1] _ ".".
+      Sentence -> S[num=1, gap=2] _ ".".
 
-      S[num=1] -> 
+      S[num=1, gap=-] -> 
           NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
 
       S[num=1, gap=np] -> 
@@ -920,21 +921,28 @@ describe("Nearley", function() {
 
       VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
 
-      VP[num=1, fin=2, gap=3] ->
-        V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=3].
+      VP[num=1, fin=2, gap=-] ->
+         V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=-].
 
-      VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
+      VP[num=1, fin=2, gap=np] ->
+         V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
 
-      NP[num=1, gen=2, case=3, gap=np] -> null.
+      VP[num=1, fin=2, gap=-] -> V[num=1, fin=2, trans=-].
 
-      NP[num=1, gen=2, case=3] -> DET[num=1] __ N[num=1, gen=2].
+      NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
-      NP[num=1, gen=2] -> PN[num=1, gen=2].
+      GAP -> null.
+
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
+
+      NP[num=1, gen=2, case=3, gap=-] -> PN[num=1, gen=2].
  
-      NP[num=1, gen=2, case=3] -> PRO[num=1, gen=2, case=3].
+      NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
 
-      NP[num=plur, gen=1, case=2] -> 
-        NP[num=3, gen=4, case=2] __ "and" __ NP[num=5, gen=6, case=2].
+      NP[num=plur, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "and" __ 
+        NP[num=5, gen=6, case=2, gap=-].
 
       N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
 
@@ -1135,6 +1143,35 @@ describe("Nearley", function() {
                  VP_(VP(V("likes"), NP(PRO("him"))))));
   });
 
+  it("Jones and Mary like him.", function() {
+    assertThat(sentence("Jones and Mary like him."))
+     .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
+                 VP_(VP(V("like"), NP(PRO("him"))))));
+  });
+
+  it("He likes Jones and Mary.", function() {
+    assertThat(sentence("He likes Jones and Mary."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V("likes"), 
+                        NP(NP(PN("Jones")), 
+                           "and", 
+                           NP(PN("Mary")))))));
+  });
+
+  it("Jones likes a book which Mary likes.", function() {
+    assertThat(sentence("Jones likes a book which Mary likes."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), 
+                           N(N("book"), 
+                             RC(RPRO("which"),
+                                S(NP(PN("Mary")), 
+                                  VP_(VP(V("likes"), 
+                                         NP(GAP()))))
+                                )))
+                        ))));
+   });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1158,6 +1195,9 @@ describe("Nearley", function() {
   let PRO = (...children) => node("PRO", ...children);
   let DET = (...children) => node("DET", ...children);
   let N = (...children) => node("N", ...children);
+  let RC = (...children) => node("RC", ...children);
+  let RPRO = (...children) => node("RPRO", ...children);
+  let GAP = (...children) => node("GAP", ...children);
 
   function assertThat(x) {
    return {
