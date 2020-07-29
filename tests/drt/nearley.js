@@ -6,7 +6,7 @@ const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
 const {child} = require("../../src/drt/rules.js");
 
-describe("Nearley", function() {
+describe.only("Nearley", function() {
 
   function parse(source) {
     const parser = new nearley.Parser(grammar);
@@ -982,6 +982,9 @@ describe("Nearley", function() {
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
+      VP[num=1, fin=2] -> BE[num=1, fin=2] __ ADJ.
+      VP[num=1, fin=2] -> BE[num=1, fin=2] __ "not" __ ADJ.
+
       DET[num=sing] -> "a".
       DET[num=sing] -> "every".
       DET[num=sing] -> "the".
@@ -1014,6 +1017,12 @@ describe("Nearley", function() {
  
       RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
       RPRO[num=[sing, plur], gen=-hum] -> "which".
+
+      BE[num=sing, fin=1] -> "is".
+      BE[num=plur, fin=1] -> "are".
+
+      ADJ -> "happy".
+      ADJ -> "foolish".
     `;
 
     grammar.feed(source);
@@ -1242,6 +1251,31 @@ describe("Nearley", function() {
                         ))));
    });
 
+   it("Jones is happy.", function() {
+    assertThat(sentence("Jones is happy."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), ADJ("happy")))));
+   });
+
+   it("They are happy.", function() {
+    assertThat(sentence("They are happy."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(BE("are"), ADJ("happy")))));
+   });
+
+  it("Jones likes a woman who is happy.", function() {
+    assertThat(sentence("Jones likes a woman who is happy."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), 
+                           N(N("woman"), 
+                             RC(RPRO("who"),
+                                S(NP(GAP()), 
+                                  VP_(VP(BE("is"), ADJ("happy"))))
+                                )))
+                        ))));
+   });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1268,6 +1302,8 @@ describe("Nearley", function() {
   let RC = (...children) => node("RC", ...children);
   let RPRO = (...children) => node("RPRO", ...children);
   let GAP = (...children) => node("GAP", ...children);
+  let BE = (...children) => node("BE", ...children);
+  let ADJ = (...children) => node("ADJ", ...children);
 
   function assertThat(x) {
    return {
