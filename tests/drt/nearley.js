@@ -931,7 +931,7 @@ describe("Nearley", function() {
 
       NP[num=1, gen=2] -> PN[num=1, gen=2].
  
-      NP[num=1, gen=2, case = 3] -> PRO[num=1, gen=2, case=3].
+      NP[num=1, gen=2, case=3] -> PRO[num=1, gen=2, case=3].
 
       NP[num=plur, gen=1, case=2] -> 
         NP[num=3, gen=4, case=2] __ "and" __ NP[num=5, gen=6, case=2].
@@ -947,7 +947,7 @@ describe("Nearley", function() {
 
       PRO[num=sing, gen=male, case=+nom] -> "he".
       PRO[num=sing, gen=male, case=-nom] -> "him".
-      PRO[num=sing, gen=fem, case=-nom] -> "she".
+      PRO[num=sing, gen=fem, case=+nom] -> "she".
       PRO[num=sing, gen=fem, case=-nom] -> "her".
       PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> "it".
       PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> "they".
@@ -990,7 +990,7 @@ describe("Nearley", function() {
     feed(``);
 
     for (let {head, tail} of grammar.results[0] || []) {
-     let term = (x) => typeof x == "string" ? x : x.name;
+     let term = (x) => typeof x == "string" ? `${x}i` : x.name;
      feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
      feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
      for (let term of tail) {
@@ -1007,13 +1007,10 @@ describe("Nearley", function() {
   }
 
   it("Jones likes Mary", function() {
-    let parser = ccc();
-    parser.feed("Jones likes Mary.");
-    assertThat(clear(parser.results[0]))
-     .equalsTo(Sentence(S(NP(PN("Jones")),
-                          VP_(VP(V("likes"),
-                                 NP(PN("Mary"))))), 
-                        "."));
+    assertThat(sentence("Jones likes Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"),
+                        NP(PN("Mary"))))));
    });
 
   it("Jones like Mary", function() {
@@ -1034,15 +1031,42 @@ describe("Nearley", function() {
     }
    });
 
+  function sentence(s) {
+   let parser = ccc();
+   parser.feed(s);
+   return clear(parser.results[0]).children[0];
+  }
+
   it("Jones does not like Mary", function() {
-    let parser = ccc();
-    parser.feed("Jones does not love Mary.");
-    assertThat(clear(parser.results[0]))
-     .equalsTo(Sentence(S(NP(PN("Jones")),
-                          VP_(AUX("does"), 
-                              "not", 
-                              VP(V("love"), NP(PN("Mary"))))), 
-                        "."));
+    assertThat(sentence("Jones does not love Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("does"), 
+                     "not", 
+                     VP(V("love"), NP(PN("Mary"))))));
+   });
+
+  it("Jones likes him.", function() {
+    assertThat(sentence("Jones likes him."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), NP(PRO("him"))))));
+   });
+
+  it("She likes him.", function() {
+    assertThat(sentence("She likes him."))
+     .equalsTo(S(NP(PRO("She")),
+                 VP_(VP(V("likes"), NP(PRO("him"))))));
+   });
+
+  it("She likes her.", function() {
+    assertThat(sentence("She likes her."))
+     .equalsTo(S(NP(PRO("She")),
+                 VP_(VP(V("likes"), NP(PRO("her"))))));
+   });
+
+  it("He likes it.", function() {
+    assertThat(sentence("He likes it."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V("likes"), NP(PRO("it"))))));
    });
 
   function clear(root) {
@@ -1065,6 +1089,7 @@ describe("Nearley", function() {
   let VP = (...children) => node("VP", ...children);
   let V = (...children) => node("V", ...children);
   let AUX = (...children) => node("AUX", ...children);
+  let PRO = (...children) => node("PRO", ...children);
 
   function assertThat(x) {
    return {
