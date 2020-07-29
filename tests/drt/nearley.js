@@ -22,20 +22,30 @@ describe.only("Nearley", function() {
     return module.exports;
   }
 
-  function create(source) {
-    let grammar = parse(source);
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar),
-                                      {keepHistory: true});
+  function create(source, start) {
+   let {ParserRules, ParserStart} = parse(source);
+   let rule = start ? start : ParserStart;
+   // console.log(grammar.ParserStart);
+    
+   //console.log(grammar);
 
-    //parser.reportError = function(token) {
-    // var message = this.lexer.formatError(token, "Invalid syntax") + "\n";
-    // message += "Unexpected " + (token.type ? token.type + " token: " : "");
-    // message +=
-    // JSON.stringify(token.value !== undefined ? token.value : token) + "\n";
-    // return JSON.stringify({message: message, token: token});
-    //};
+   const parser = new nearley.Parser(ParserRules, rule, {
+     keepHistory: true
+    });
 
-    return parser;
+   //const parser = new nearley.Parser(
+   //    nearley.Grammar.fromCompiled(grammar, start),
+   //    {keepHistory: true});
+   
+   //parser.reportError = function(token) {
+   // var message = this.lexer.formatError(token, "Invalid syntax") + "\n";
+   // message += "Unexpected " + (token.type ? token.type + " token: " : "");
+   // message +=
+   // JSON.stringify(token.value !== undefined ? token.value : token) + "\n";
+   // return JSON.stringify({message: message, token: token});
+   //};
+   
+   return parser;
   }
 
   it("basic", function() {
@@ -317,20 +327,41 @@ describe.only("Nearley", function() {
        // collects variables
        variables[value] = child.types[key];
       } else if (expected.types[key] != child.types[key]) {
+       // rejects if the expected types don't match what
+       // we got.
        return reject;
       }
      }
     }
 
+    let hash = (str) => {
+     return str.split("")
+       .reduce((prevHash, currVal) =>
+               (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+    }
+
+    let signature = `${type}${JSON.stringify(types)} -> `;
+
+    for (let child of children) {
+     signature += `${child["@type"]}${JSON.stringify(child.types || {})} `;
+    }
+    
+    // console.log(hash(signature));
+    let namespace = hash(signature);
+    
     // Sets variables
     for (let [key, value] of Object.entries(types)) {
      if (typeof value == "number") {
       if (!variables[value]) {
        // console.log(variables);
+       // console.log(types);
        // console.log(variables);
-       return reject;
+       // console.log("hi");
+       // return reject;
+       types[key] = namespace + value;
+      } else {
+       types[key] = variables[value];
       }
-      types[key] = variables[value];
      }
     }
 
@@ -434,6 +465,26 @@ describe.only("Nearley", function() {
     });
   });
 
+  it("binds keeps free variables", function() {
+    let post = bind("NP", {"num": 1}, [{ 
+       "@type": "PN",
+       "types": {"gen": 2}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"gen": "male"},
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"num": -1638024502}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"gen": "male"},
+      }]
+    });
+  });
+
   it("binds to literals", function() {
     let post = bind("PN", {"num": "sing"});
 
@@ -458,6 +509,26 @@ describe.only("Nearley", function() {
     .equalsTo({
       "@type": "NP", 
       "types": {"num": "sing", "gen": "-hum"}, 
+      "children": [{
+        "@type": "PN", 
+        "types": {"num": "sing", "gen": "-hum"},
+      }]
+    });
+  });
+
+  it("binds ignoring extras", function() {
+    let post = bind("NP", {"num": 1}, [{ 
+       "@type": "PN",
+       "types": {"num": 1}
+    }]);
+
+    assertThat(post([{
+      "@type": "PN", 
+      "types": {"num": "sing", "gen": "-hum"}, 
+    }]))
+    .equalsTo({
+      "@type": "NP", 
+      "types": {"num": "sing"}, 
       "children": [{
         "@type": "PN", 
         "types": {"num": "sing", "gen": "-hum"},
@@ -525,8 +596,8 @@ describe.only("Nearley", function() {
                );
    });
 
-  it.only("Nearley features", function() {
-    let parser = create(`
+  function rules() {
+    return create(`
       @builtin "whitespace.ne"
       @builtin "number.ne"
       @builtin "string.ne"
@@ -583,23 +654,47 @@ describe.only("Nearley", function() {
          return [key, value];
         }
       %}
+
       keyvalue -> word _ "=" _ int {% 
         ([key, ws0, eq, ws1, value]) => {
          return [key, value];
         }
       %}
 
-      word -> [a-zA-Z]:+ {% ([char]) => {
+      keyvalue -> word _ "=" _ array {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      array -> "[" values "]" {% ([p0, values, p1]) => values %}
+
+      values -> (word _ "," _ {% id %}):* word:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      word -> [a-zA-Z_\+\-]:+ {% ([char]) => {
         return char.join("");
       }%}
 
     `);
+  }
+
+  it("Nearley features", function() {
+    let parser = rules();
 
     parser.feed(`
-      foo[num=1] -> bar hello[].
+      foo[num=1] -> bar hello[gender=male].
       hello -> world.
       a -> "hi".
       a -> b "c" d.
+      S -> NP _ VP_.
+      PRO[gen=-hum, case=[+nom, -nom]] -> "it".
     `);
 
     let term = (name, types = {}) => {
@@ -608,7 +703,7 @@ describe.only("Nearley", function() {
 
     assertThat(parser.results).equalsTo([[{
         "head": term("foo", {"num": 1}),
-        "tail": [term("bar"), term("hello")]
+        "tail": [term("bar"), term("hello", {"gender": "male"})]
        }, {
         "head": term("hello"), 
         "tail": [term("world")]
@@ -618,7 +713,128 @@ describe.only("Nearley", function() {
        }, {
         "head": term("a"), 
         "tail": [term("b"), "\"c\"", term("d")]
+       }, {
+        "head": term("S"), 
+        "tail": [term("NP"), term("_"), term("VP_")]
+       }, {
+        "head": term("PRO", {"case": ["+nom", "-nom"], "gen": "-hum"}), 
+        "tail": ["\"it\""]
        }]]);
+  });
+
+  it("Compiler compiler compiler", function() {
+    let grammar = rules();
+
+    let source = `
+      S[num=1] -> 
+          NP[num=1, gen=2, case=+nom] _ VP_[num=1, fin=+].
+
+      S[num=1, gap=np] -> 
+          NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
+
+      S[num=1, gap=np] ->
+          NP[num=1, gen=2, case=+nom, gap=-] _ VP_[num=1, fin=+, gap=np].
+
+      VP_[num=1, fin=+, gap=2] ->
+          AUX[num=1, fin=+] _ "not" _VP[num=3, fin=-, gap=2].
+
+      VP_[num=1, fin=+, gap=2] ->
+          VP[num=1, fin=+, gap=2].
+
+      VP[num=1, fin=2, gap=3] ->
+          V[num=1, fin=2, trans=+] _ NP[num=1, gen=4, case=-nom, gap=3].
+
+      VP[num=1, fin=2, gap=3] -> V[num=1, fin=2, trans=-].
+
+      NP[num=1, gen=2, case=3, gap=np] -> null.
+
+      NP[num=1, gen=2, case=3] -> DET[num=1] _ N[num=1, gen=2].
+
+      NP[num=1, gen=2] -> PN[num=1, gen=2].
+ 
+      NP[num=1, gen=2, case = 3] -> PRO[num=1, gen=2, case=3].
+
+      NP[num=plur, gen=1, case=2] -> 
+        NP[num=3, gen=4, case=2] _ "and" NP[num=5, gen=6, case=2].
+
+      N[num=1, gen=2] -> N[num=1, gen=2] _ RC[num=1, gen=2].
+
+      RC[num=1, gen=2] -> RPRO[num=1, gen=2] _ S[num=1, gap=np].
+
+      DET[num=sing] -> "a".
+      DET[num=sing] -> "every".
+      DET[num=sing] -> "the".
+      DET[num=sing] -> "some".
+
+      PRO[num=sing, gen=male, case=+nom] -> "he".
+      PRO[num=sing, gen=male, case=-nom] -> "him".
+      PRO[num=sing, gen=fem, case=-nom] -> "she".
+      PRO[num=sing, gen=fem, case=-nom] -> "her".
+      PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> "it".
+      PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> "they".
+      PRO[num=plur, gen=[male, fem, -hum], case=-nom] -> "them".
+
+      PN[num=sing, gen=male] -> "Jones".
+      PN[num=sing, gen=fem] -> "Mary".
+      PN[num=sing, gen=-hum] -> "Brazil".
+
+      N[num=sing, gen=male] -> "man".
+      N[num=sing, gen=fem] -> "woman".
+      N[num=sing, gen=-hum] -> "book".
+
+      AUX[num=sing, fin=+] -> "does".
+      AUX[num=plur, fin=+] -> "do".
+
+      V[num=[sing, plur], trans=+, fin=-] -> "like".
+      V[num=[sing, plur], trans=-, fin=-] -> "rotate".
+
+      V[num=sing, trans=1, fin=+] -> "likes".
+      V[num=plur, trans=1, fin=+] -> "like".
+ 
+      RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
+      RPRO[num=[sing, plur], gen=-hum] -> "which".
+    `;
+
+    grammar.feed(source);
+
+    let result = [];
+
+    function feed(source) {
+     result.push(source);
+    }
+
+    feed(`@builtin "whitespace.ne"`);
+    feed(``);
+    feed(`@{%`);
+    feed(`${bind.toString()}`);
+    feed(`%}`);
+    feed(``);
+
+    for (let {head, tail} of grammar.results[0] || []) {
+     let term = (x) => typeof x == "string" ? x : x.name;
+     feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+     feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+     for (let term of tail) {
+      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+       continue;
+      }
+      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+     }
+     feed(`  ])`);
+     feed(`%}`);
+    }
+
+    let parser = create(result.join("\n"), "PN");
+    parser.feed("Jones");
+    assertThat(parser.results).equalsTo([{
+       "@type": "PN",
+       "children": ["Jones"],
+       "types": {
+         "gen": "male",
+         "num": "sing",
+       }
+      }]);
+
   });
 
   it("Preliminary DRT", function() {
