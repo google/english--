@@ -1130,14 +1130,14 @@ describe.only("Nearley", function() {
 
       V[num=1, fin=-, stat=-, trans=2] -> VERB[trans=2, stat=-].
 
-      V[num=sing, fin=+, stat=1, tp=-past, tense=pres] -> 
-        VERB[trans=2, stat=1] "s".
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+         VERB[trans=2, stat=1] "s".
 
-      V[num=plur, fin=+, stat=1, tp=-past, tense=pres] -> 
-        VERB[trans=2, stat=1].
+      V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+         VERB[trans=2, stat=1].
 
       V[num=1, fin=+, stat=2, tp=-past, tense=[pres, past], trans=3] -> 
-        VERB[trans=3, stat=2] "ed".
+         VERB[trans=3, stat=2] "ed".
 
       ADJ -> "happy".
       ADJ -> "foolish".
@@ -1530,6 +1530,18 @@ describe.only("Nearley", function() {
                  VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
+  it("Jones walks.", function() {
+    assertThat(sentence("Jones walks."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("walk"), "s")))));
+   });
+
+  it("They walk.", function() {
+    assertThat(sentence("They walk."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(V(VERB("walk"))))));
+   });
+
   it("Jones walked.", function() {
     assertThat(sentence("Jones walked."))
      .equalsTo(S(NP(PN("Jones")),
@@ -1540,6 +1552,20 @@ describe.only("Nearley", function() {
    assertThat(sentence("Jones was happy."))
     .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("was"), ADJ("happy")))));
+  });
+
+  it("Jones kissed Mary.", function() {
+    assertThat(sentence("Jones kissed Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("kiss"), "ed"),
+                        NP(PN("Mary"))))));
+  });
+
+  it("They kissed Mary.", function() {
+    assertThat(sentence("They kissed Mary."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(V(VERB("kiss"), "ed"),
+                        NP(PN("Mary"))))));
   });
 
   function clear(root) {
