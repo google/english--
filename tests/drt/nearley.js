@@ -864,7 +864,7 @@ const RuntimeGrammar = Nearley.compile(`
       }%}
 `);
 
-class RuntimeParser {
+class FeaturedNearley {
  constructor() {
   this.parser = new Nearley(RuntimeGrammar);
  }
@@ -874,7 +874,7 @@ class RuntimeParser {
  }
 
  static compile(source) {
-  let parser = new RuntimeParser();
+  let parser = new FeaturedNearley();
   let grammar = parser.feed(source);
 
   let result = [];
@@ -912,7 +912,7 @@ class RuntimeParser {
  }
 }
 
-describe("RuntimeParser", function() {
+describe("FeaturedNearley", function() {
   it("Rejects at Runtime", function() {
     let parser = Nearley.from(`
       @builtin "whitespace.ne"
@@ -974,7 +974,7 @@ describe("RuntimeParser", function() {
    });
 
   it("Nearley features", function() {
-    let parser = new RuntimeParser();
+    let parser = new FeaturedNearley();
 
     let result = parser.feed(`
       foo[num=1] -> bar hello[gender=male].
@@ -1011,7 +1011,7 @@ describe("RuntimeParser", function() {
   });
 });
 
-const DRTGrammar = RuntimeParser.compile(`
+const DRTGrammar = FeaturedNearley.compile(`
       Sentence -> S_ _ ".".
 
       Question ->
@@ -1223,7 +1223,7 @@ const DRTGrammar = RuntimeParser.compile(`
       ADJ -> "foolish".
 `);
 
-class DRTParser {
+class Parser {
  constructor (start){
   this.parser = new Nearley(DRTGrammar, start);
  }
@@ -1236,7 +1236,7 @@ class DRTParser {
 describe("DRT", function() {
 
   function sentence(s, start) {
-   let parser = new DRTParser(start);
+   let parser = new Parser(start);
    let results = parser.feed(s);
    if (start) {
     return clear(results[0]);
