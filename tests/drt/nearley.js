@@ -366,6 +366,10 @@ describe.only("Nearley", function() {
           return reject;
          }
          continue;
+        } else if (typeof child.types[key] == "number") {
+         // console.log("hi");
+         variables[child.types[key]] = variables[value];
+         continue;
         } else if (variables[value] != child.types[key]) {
          // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
          return reject;
@@ -589,6 +593,35 @@ describe.only("Nearley", function() {
     });
   });
 
+  it("binds multiple", function() {
+    let post = bind("S", {"num": 1}, [{ 
+       "@type": "NP",
+       "types": {"num": 1}
+      }, { 
+       "@type": "VP_",
+       "types": {"num": 1}
+      }]);
+
+    assertThat(post([{
+        "@type": "NP", 
+        "types": {"num": "sing"}, 
+      }, {
+        "@type": "VP_", 
+        "types": {"num": 2}, 
+      }]))
+    .equalsTo({
+      "@type": "S", 
+      "types": {"num": "sing"}, 
+      "children": [{
+         "@type": "NP", 
+         "types": {"num": "sing"},
+       }, {
+         "@type": "VP_", 
+         "types": {"num": 2},
+      }]
+    });
+  });
+
   it("binds ignoring extras", function() {
     let post = bind("NP", {"num": 1}, [{ 
        "@type": "PN",
@@ -720,7 +753,7 @@ describe.only("Nearley", function() {
     });
   });
 
-  it("binds and literal to variable", function() {
+  it("binds literal to variable", function() {
     let post = bind("VP", {"num": 1}, [{
        "@type": "V",
        "types": {"num": 1}
@@ -941,12 +974,12 @@ describe.only("Nearley", function() {
     let source = `
       Sentence -> S[num=1, gap=2] _ ".".
 
-      S[num=1, gap=-] -> "if" __ S[num=2, gap=3] __ "then" __ S[num=4, gap=5].
+      S[num=1, gap=-] -> "if" __ S[num=2, gap=-] __ "then" __ S[num=4, gap=-].
 
-      S[num=1, gap=-] -> S[num=2, gap=3] __ "and" __ S[num=4, gap=5].
+      S[num=1, gap=-] -> S[num=2, gap=-] __ "and" __ S[num=4, gap=-].
 
       S[num=1, gap=-] -> 
-          NP[num=1, gen=2, case=+nom] __ VP_[num=1, fin=+].
+        NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=-].
 
       S[num=1, gap=np] ->
           NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
@@ -986,8 +1019,8 @@ describe.only("Nearley", function() {
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
-      VP[num=1, fin=2] -> BE[num=1, fin=2] __ ADJ.
-      VP[num=1, fin=2] -> BE[num=1, fin=2] __ "not" __ ADJ.
+      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ ADJ.
+      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ "not" __ ADJ.
 
       VP[num=1, fin=2] -> 
         BE[num=1, fin=2] __ PP.
@@ -1054,8 +1087,14 @@ describe.only("Nearley", function() {
       PREP -> "for".
       PREP -> "with".
 
-      AUX[num=sing, fin=+] -> "does".
-      AUX[num=plur, fin=+] -> "do".
+      AUX[num=sing, fin=+, tp=-past, tense=pres] -> "does".
+      AUX[num=plur, fin=+, tp=-past, tense=pres] -> "do".
+
+      AUX[num=1, fin=+, tp=-past, tense=past] -> "did".
+      AUX[num=1, fin=+, tp=+past, tense=pres] -> "did".
+
+      AUX[num=1, fin=+, tp=-past, tense=fut] -> "will".
+      AUX[num=1, fin=+, tp=+past, tense=fut] -> "would".
 
       V[num=[sing, plur], trans=+, fin=-] -> "love".
       V[num=[sing, plur], trans=-, fin=-] -> "rotate".
@@ -1066,8 +1105,39 @@ describe.only("Nearley", function() {
       RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
       RPRO[num=[sing, plur], gen=-hum] -> "which".
 
-      BE[num=sing, fin=1] -> "is".
-      BE[num=plur, fin=1] -> "are".
+      BE[num=sing, fin=+, tp=-past, tense=pres] -> "is".
+      BE[num=plur, fin=+, tp=-past, tense=pres] -> "are".
+
+      BE[num=sing, fin=+, tp=-past, tense=past] -> "was".
+      BE[num=plur, fin=+, tp=-past, tense=past] -> "were".
+
+      BE[num=sing, fin=+, tp=+past, tense=pres] -> "was".
+      BE[num=plur, fin=+, tp=+past, tense=pres] -> "were".
+
+      BE[fin=-] -> "be".
+      BE[fin=part] -> "been".
+
+      HAVE[fin=-1] -> "have".
+
+      HAVE[num=sing, fin=+, tp=-past, tense=pres] -> "has".
+      HAVE[num=plur, fin=+, tp=-past, tense=pres] -> "have".
+
+      HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
+      HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
+
+      VERB[trans=+, stat=-] -> "kiss".
+      VERB[trans=-, stat=-] -> "walk".
+
+      V[num=1, fin=-, stat=-, trans=2] -> VERB[trans=2, stat=-].
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres] -> 
+        VERB[trans=2, stat=1] "s".
+
+      V[num=plur, fin=+, stat=1, tp=-past, tense=pres] -> 
+        VERB[trans=2, stat=1].
+
+      V[num=1, fin=+, stat=2, tp=-past, tense=[pres, past], trans=3] -> 
+        VERB[trans=3, stat=2] "ed".
 
       ADJ -> "happy".
       ADJ -> "foolish".
@@ -1460,6 +1530,18 @@ describe.only("Nearley", function() {
                  VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
+  it("Jones walked.", function() {
+    assertThat(sentence("Jones walked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("walk"), "ed")))));
+   });
+
+  it("Jones was happy.", function() {
+   assertThat(sentence("Jones was happy."))
+    .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("was"), ADJ("happy")))));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1490,6 +1572,7 @@ describe.only("Nearley", function() {
   let ADJ = (...children) => node("ADJ", ...children);
   let PREP = (...children) => node("PREP", ...children);
   let PP = (...children) => node("PP", ...children);
+  let VERB = (...children) => node("VERB", ...children);
 
   function assertThat(x) {
    return {
