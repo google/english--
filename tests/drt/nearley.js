@@ -972,20 +972,32 @@ describe.only("Nearley", function() {
     let grammar = rules();
 
     let source = `
-      Sentence -> S[num=1, gap=2] _ ".".
+      Sentence -> S_ _ ".".
 
-      S[num=1, gap=-] -> "if" __ S[num=2, gap=-] __ "then" __ S[num=4, gap=-].
+      S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
-      S[num=1, gap=-] -> S[num=2, gap=-] __ "and" __ S[num=4, gap=-].
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          "if" __ 
+          S[num=1, gap=-, tp=2, tense=3] __ 
+          "then" __ 
+          S[num=1, gap=-, tp=2, tense=3].
 
-      S[num=1, gap=-] -> 
-          NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=-].
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "and" __ 
+          S[num=5, gap=-, tp=2, tense=3].
 
-      S[num=1, gap=np] ->
-          NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
+      S[num=1, gap=-, tp=3, tense=4] -> 
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
-      S[num=1, gap=np] ->
-          NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np].
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=np] _ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=np, tp=3, tense=4].
 
       VP_[num=1, fin=+, gap=2, stat=3, tp=4, tense=fut] ->
         AUX[num=1, fin=+, tp=4, tense=fut] __ 
@@ -1007,6 +1019,11 @@ describe.only("Nearley", function() {
 
       VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
           HAVE[num=1, fin=+, tp=4, tense=5] __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          "not" __
           VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
 
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
@@ -1220,7 +1237,7 @@ describe.only("Nearley", function() {
    if (start) {
     return parser.results;
    }
-   return clear(parser.results[0]).children[0];
+   return clear(parser.results[0]).children[0].children[0];
   }
 
   it("Jones likes him.", function() {
@@ -1570,12 +1587,6 @@ describe.only("Nearley", function() {
                  VP_(AUX("will"), VP(V(VERB("walk"))))));
   });
 
-  it("They will walk.", function() {
-    assertThat(sentence("They will walk."))
-     .equalsTo(S(NP(PRO("They")),
-                 VP_(AUX("will"), VP(V(VERB("walk"))))));
-  });
-
   it("Jones would walk.", function() {
     assertThat(sentence("Jones would walk."))
      .equalsTo(S(NP(PN("Jones")),
@@ -1610,6 +1621,12 @@ describe.only("Nearley", function() {
    assertThat(sentence("Jones was happy."))
     .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("was"), ADJ("happy")))));
+  });
+
+  it("They were happy.", function() {
+   assertThat(sentence("They were happy."))
+    .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(BE("were"), ADJ("happy")))));
   });
 
   it("Jones loves Mary.", function() {
@@ -1655,6 +1672,18 @@ describe.only("Nearley", function() {
     assertThat(sentence("They had walked."))
      .equalsTo(S(NP(PRO("They")),
                  VP_(VP(HAVE("had"), VP(V(VERB("walk"), "ed"))))));
+  });
+
+  it("Jones has not walked.", function() {
+    assertThat(sentence("Jones has not walked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(HAVE("has"), "not", VP(V(VERB("walk"), "ed"))))));
+  });
+
+  it("They have not walked.", function() {
+    assertThat(sentence("They have not walked."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(HAVE("have"), "not", VP(V(VERB("walk"), "ed"))))));
   });
 
   function clear(root) {
