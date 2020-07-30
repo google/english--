@@ -1005,6 +1005,10 @@ describe.only("Nearley", function() {
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
         V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
 
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
       GAP -> null.
@@ -1145,6 +1149,9 @@ describe.only("Nearley", function() {
 
       V[num=1, fin=+, stat=2, tp=-past, tense=[pres, past], trans=3] -> 
          VERB[trans=3, stat=2] "ed".
+
+      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=5] -> 
+         VERB[trans=5, stat=2] "ed".
 
       ADJ -> "happy".
       ADJ -> "foolish".
@@ -1626,6 +1633,30 @@ describe.only("Nearley", function() {
                         NP(PN("Mary"))))));
   });
 
+  it("Jones has walked.", function() {
+    assertThat(sentence("Jones has walked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(HAVE("has"), VP(V(VERB("walk"), "ed"))))));
+  });
+
+  it("Jones had walked.", function() {
+    assertThat(sentence("Jones had walked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(HAVE("had"), VP(V(VERB("walk"), "ed"))))));
+  });
+
+  it("They have walked.", function() {
+    assertThat(sentence("They have walked."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(HAVE("have"), VP(V(VERB("walk"), "ed"))))));
+  });
+
+  it("They had walked.", function() {
+    assertThat(sentence("They had walked."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(HAVE("had"), VP(V(VERB("walk"), "ed"))))));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1657,6 +1688,7 @@ describe.only("Nearley", function() {
   let PREP = (...children) => node("PREP", ...children);
   let PP = (...children) => node("PP", ...children);
   let VERB = (...children) => node("VERB", ...children);
+  let HAVE = (...children) => node("HAVE", ...children);
 
   function assertThat(x) {
    return {
