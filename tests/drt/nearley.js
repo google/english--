@@ -6,26 +6,38 @@ const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
 const {child} = require("../../src/drt/rules.js");
 
-describe("Nearley", function() {
+class Parser {
+ constructor(parser) {
+  this.parser = parser;
+ }
 
-  function parse(source) {
-    const parser = new nearley.Parser(grammar);
-    parser.feed(source);
-    const ast = parser.results[0];
-    const info = compile(ast, {});
-    // Generate JavaScript code from the rules
-    const code = generate(info, "grammar");
-    // console.log(code);
-    // Pretend this is a CommonJS environment to catch exports from the grammar.
-    const module = { exports: {} };
-    eval(code);
-
-    // console.log(module.exports);
-    return module.exports;
+ feed(code) {
+  try {
+   this.parser.feed(code);
+   return this.parser.results;
+  } catch (e) {
+   throw this.reportError(e);
   }
+ }
 
-  function create(source, start) {
-   let {ParserRules, ParserStart} = parse(source);
+ static parse(source) {
+  const parser = new nearley.Parser(grammar);
+  parser.feed(source);
+  const ast = parser.results[0];
+  const info = compile(ast, {});
+  // Generate JavaScript code from the rules
+  const code = generate(info, "grammar");
+  // console.log(code);
+  // Pretend this is a CommonJS environment to catch exports from the grammar.
+  const module = { exports: {} };
+  eval(code);
+
+  // console.log(module.exports);
+  return module.exports;
+ }
+
+ static create(source, start) {
+   let {ParserRules, ParserStart} = Parser.parse(source);
    let rule = start ? start : ParserStart;
    // console.log(grammar.ParserStart);
     
@@ -47,53 +59,39 @@ describe("Nearley", function() {
    // return JSON.stringify({message: message, token: token});
    //};
    
-   return parser;
+   return new Parser(parser);
   }
-
-  it("basic", function() {
-    let parser = create(`
-      main -> (statement):+
-      statement -> "foo" | "bar"
-    `);
-    parser.feed("foo");
-    assertThat(parser.results).equalsTo([[[[["foo"]]]]]);
-  });
-
-  it("incomplete", function() {
-    let parser = create(`
-      main -> (statement):+
-      statement -> "foo" | "bar"
-    `);
-    parser.feed("fo");
-    // When there is still a possibility of completing
-    // a valid parse, it returns []s.
-    assertThat(parser.results).equalsTo([]);
-  });
-
 
   /*
     Generates a user friendly error report given the caught error 
     object and the Nearley parser instance.
   */
-  function reportError(e, parser) {
+  reportError(e) {
    // console.log(e.message);
+   let {parser} = this;
    const lastColumnIndex = parser.table.length - 2;
    const lastColumn = parser.table[lastColumnIndex];
    const token = parser.lexer.buffer[parser.current];
-   let result = {token: token, expected: []};
+   let result = {
+    token: token, 
+    expected: [],
+    toString() {
+     return e.message;
+    }
+   };
    // result.token = token;
    // Display each state that is expecting a terminal symbol next.
    for (let i = 0; i < lastColumn.states.length; i++) {
     const state = lastColumn.states[i];
     const nextSymbol = state.rule.symbols[state.dot];
-    if (nextSymbol && isTerminalSymbol(nextSymbol)) {
-     const symbolDisplay = getSymbolDisplay(nextSymbol);
+    if (nextSymbol && this.isTerminalSymbol(nextSymbol)) {
+     const symbolDisplay = this.getSymbolDisplay(nextSymbol);
      // console.log(`    A ${symbolDisplay} based on:`);
      let expected = {symbol: symbolDisplay, based: []};
      result.expected.push(expected);
      // Display the "state stack" - which shows you how this state
      // came to be, step by step.
-     const stateStack = buildStateStack(lastColumnIndex, i, parser);
+     const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
      for (let j = 0; j < stateStack.length; j++) {
       const state = stateStack[j];
       expected.based.push(state.rule.toString(state.dot));
@@ -103,7 +101,7 @@ describe("Nearley", function() {
    return result;
   }
 
-  function getSymbolDisplay(symbol) {
+  getSymbolDisplay(symbol) {
    const type = typeof symbol;
    if (type === "string") {
     return symbol;
@@ -133,22 +131,22 @@ describe("Nearley", function() {
     will bet the starting state, with each successive item in the array
     going further back into history.
   */
-  function buildStateStack(columnIndex, stateIndex, parser) {
+  buildStateStack(columnIndex, stateIndex, parser) {
    const state = parser.table[columnIndex].states[stateIndex];
    if (state.dot === 0) { // state not started
     // Find the previous state entry in the table that predicted this state
-    const match = findPreviousStateWhere(
-                                         (thatState) => {
-                                          const nextSymbol = thatState.rule.symbols[thatState.dot];
-                return nextSymbol && 
-                                          isNonTerminalSymbol(nextSymbol) && 
+    const match = this.findPreviousStateWhere(
+                                              (thatState) => {
+                                               const nextSymbol = thatState.rule.symbols[thatState.dot];
+                                               return nextSymbol && 
+                                          this.isNonTerminalSymbol(nextSymbol) && 
                                           state.rule.name === nextSymbol;
                                          },
                                          columnIndex,
                                          stateIndex,
                                          parser);
     if (match) {
-     return [state, ...buildStateStack(match[0], match[1], parser)]
+     return [state, ...this.buildStateStack(match[0], match[1], parser)]
       } else {
      return [state];
     }
@@ -163,7 +161,7 @@ describe("Nearley", function() {
                  )[0];
         return [
                 state,
-                ...buildStateStack(state.reference, match[1], parser)
+                ...this.buildStateStack(state.reference, match[1], parser)
                 ];
    }
   }
@@ -180,7 +178,7 @@ describe("Nearley", function() {
     This returns a 3-tuple: [columnIndex, stateIndex, stateObject] of the matching
     state, or null.
   */
-  function findPreviousStateWhere(predicate, columnIndex, stateIndex, parser) {
+  findPreviousStateWhere(predicate, columnIndex, stateIndex, parser) {
    let i = columnIndex;
    let j = stateIndex;
    let column = parser.table[i];
@@ -203,38 +201,58 @@ describe("Nearley", function() {
    }
   }
 
-  function isTerminalSymbol(symbol) {
+  isTerminalSymbol(symbol) {
    return typeof symbol !== "string";
   }
 
-  function isNonTerminalSymbol(symbol) {
-   return !isTerminalSymbol(symbol);
+  isNonTerminalSymbol(symbol) {
+   return !this.isTerminalSymbol(symbol);
   }
+}
 
-  it("error", function() {
-    let parser = create(`
+describe("Nearley", function() {
+
+  it("Basic", function() {
+    let parser = Parser.create(`
+      main -> (statement):+
+      statement -> "foo" | "bar"
+    `);
+    assertThat(parser.feed("foo")).equalsTo([[[[["foo"]]]]]);
+  });
+
+  it("Incomplete", function() {
+    let parser = Parser.create(`
+      main -> (statement):+
+      statement -> "foo" | "bar"
+    `);
+    // When there is still a possibility of completing
+    // a valid parse, it returns []s.
+    assertThat(parser.feed("fo")).equalsTo([]);
+  });
+
+  it("Error", function() {
+    let parser = Parser.create(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
 
     try {
      parser.feed("bah");
-     throw new Error("expected error");
-    } catch (e) {
-     let error = reportError(e, parser);
-     //console.log(`Instead of a ${JSON.stringify(error.token)}, I was expecting to see one of the following:`);
+     throw new Error();
+    } catch (error) {
+     // console.log(error);
+     // console.log(`Instead of a ${JSON.stringify(error.token)}, I was expecting to see one of the following:`);
      for (let expected of error.expected) {
-      //console.log(`    A ${expected.symbol} based on:`);
+      // console.log(`    A ${expected.symbol} based on:`);
       for (let based of expected.based) {
-       //console.log(`        ${based}`);
-      }
+       // console.log(`        ${based}`);
+      } 
      }
-     
     }
   });
 
-  it("rules", function() {
-    let parser = create(`
+  it("Rules", function() {
+    let parser = Parser.create(`
       expression -> number "+" number
       expression -> number "-" number
       expression -> number "*" number
@@ -242,12 +260,11 @@ describe("Nearley", function() {
       number -> [0-9]:+
     `);
 
-    parser.feed("1+1");
-    assertThat(parser.results).equalsTo([[[["1"]], "+", [["1"]]]]);
+    assertThat(parser.feed("1+1")).equalsTo([[[["1"]], "+", [["1"]]]]);
    });
 
-  it("postprocessors", function() {
-    let parser = create(`
+  it("Postprocessors", function() {
+    let parser = Parser.create(`
       expression -> number "+" number {%
         function([left, op, right]) {
           return {left: left, op: op, right: right};
@@ -260,23 +277,21 @@ describe("Nearley", function() {
       %}
     `);
 
-    parser.feed("1+1");
-    assertThat(parser.results).equalsTo([{left: 1, op: "+", right: 1}]);
+    assertThat(parser.feed("1+1")).equalsTo([{left: 1, op: "+", right: 1}]);
    });
 
-  it("reject", function() {
-    let parser = create(`
+  it("Reject", function() {
+    let parser = Parser.create(`
       # the first rule always rejects
       number -> [0-4]:+ {% (data, location, reject) => reject %}
       number -> [0-9]:+ {% ([number], location, reject) => "hello" %}
     `);
 
-    parser.feed("1");
-    assertThat(parser.results).equalsTo(["hello"]);
+    assertThat(parser.feed("1")).equalsTo(["hello"]);
    });
 
-  it("javascript", function() {
-    let parser = create(`
+  it("Javascript", function() {
+    let parser = Parser.create(`
       @{%
         function foo(num) {
          return parseInt(num);
@@ -285,145 +300,146 @@ describe("Nearley", function() {
       number -> [0-9]:+ {% ([number], location, reject) => foo(number) %}
     `);
 
-    parser.feed("1");
-    assertThat(parser.results).equalsTo([1]);
+    assertThat(parser.feed("1")).equalsTo([1]);
    });
 
-  it("builtin", function() {
-    let parser = create(`
+  it("Builtin", function() {
+    let parser = Parser.create(`
       @builtin "whitespace.ne"
       expression -> number _ "+" _ number
       number -> [0-9]:+ {% ([number], location, reject) => parseInt(number) %}
     `);
 
-    parser.feed("1 + 1");
-    assertThat(parser.results).equalsTo([[1, null, "+", null, 1]]);
+    assertThat(parser.feed("1 + 1")).equalsTo([[1, null, "+", null, 1]]);
    });
 
-  function bind(type, types = {}, conditions = []) {
+ });
+
+function bind(type, types = {}, conditions = []) {
    
-   return (data, location, reject) => {
-    // Creates a copy of the types because it is reused
-    // across multiple calls and we assign values to it.
-    let bindings = JSON.parse(JSON.stringify(types));
+ return (data, location, reject) => {
+  // Creates a copy of the types because it is reused
+  // across multiple calls and we assign values to it.
+  let bindings = JSON.parse(JSON.stringify(types));
 
-    // Creates a copy of the input data, because it is
-    // reused across multiple calls.
-    let result = JSON.parse(JSON.stringify(data))
-      .filter((ws) => ws != null);
+  // Creates a copy of the input data, because it is
+  // reused across multiple calls.
+  let result = JSON.parse(JSON.stringify(data))
+  .filter((ws) => ws != null);
+  
+  // Ignores the null type.
+  let expects = conditions.filter((x) => x["@type"] != "null");
 
-    // Ignores the null type.
-    let expects = conditions.filter((x) => x["@type"] != "null");
-
-    let signature = `${type}${JSON.stringify(bindings)} -> `;
-    for (let child of expects) {
-     signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
-    }
-
-    let hash = (str) => {
-     return str.split("")
-     .reduce((prevHash, currVal) =>
-             (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
-    }
-       
-    // console.log(hash(signature));
-    let namespace = hash(signature);
-
-    let children = result.filter((node) => node["@type"]);
-
-    //console.log(`Trying to bind ${signature}`);
-    //let foo = children.map((x) => {
-    //  return `${x["@type"]}${JSON.stringify(x.types)}`;
-    //}).join(" ");
-    //console.log(`To ${foo}`);
-
-    if (expects.length != children.length) {
-     // console.log("not the same length");
-     return reject;
-    }
-
-    let variables = {};
-
-    for (let i = 0; i < expects.length; i++) {
-     let expected = expects[i];
-     let child = children[i];
-     if (expected["@type"] != child["@type"]) {
-      // console.log("Children of different types");
-      return reject;
-     }
-     for (let [key, value] of Object.entries(expected.types || {})) {
-      if (typeof value == "number") {
-       if (variables[value]) {
-        if (Array.isArray(variables[value])) {
-         if (!variables[value].includes(child.types[key])) {
-          return reject;
-         }
-        } else if (typeof variables[value] == "number") {
-         // console.log("hi");
-         variables[value] = child.types[key];
-        } else if (Array.isArray(child.types[key])) {
-         if (!child.types[key].includes(variables[value])) {
-          return reject;
-         }
-         continue;
-        } else if (typeof child.types[key] == "number") {
-         // console.log("hi");
-         variables[child.types[key]] = variables[value];
-         continue;
-        } else if (variables[value] != child.types[key]) {
-         // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
-         return reject;
-        }
-       }
-       // collects variables
-       variables[value] = child.types[key];
-      } else if (typeof child.types[key] == "number") {
-       child.types[key] = value;
-      } else if (Array.isArray(child.types[key])) {
-       if (!child.types[key].includes(expected.types[key])) {
-        return reject;
-       }
-       child.types[key] = expected.types[key];
-      } else if (typeof child.types[key] == "string" &&
-                 expected.types[key] != child.types[key]) {
-       // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
-       return reject;
-      } else if (!child.types[key]) {
-       return reject;
-      }
-     }
-    }
-    
-    // Sets variables
-    for (let [key, value] of Object.entries(bindings)) {
-     if (typeof value == "number") {
-      // console.log(key);
-      // console.log("hello");
-      if (!variables[value]) {
-       // console.log(variables);
-       // console.log(types);
-       // console.log(variables);
-       // console.log("hi");
-       // return reject;
-       bindings[key] = namespace + value;
-      } else {
-       // console.log(`${key} = ${variables[value]}`);
-       bindings[key] = variables[value];
-      }
-     }
-    }
-
-    // console.log(JSON.stringify(types));
-
-    return {
-      "@type": type,
-      "types": bindings,
-      "children": result,
-      };
-   };
+  let signature = `${type}${JSON.stringify(bindings)} -> `;
+  for (let child of expects) {
+   signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
   }
 
-  it("whitespace", function() {
+  let hash = (str) => {
+   return str.split("")
+   .reduce((prevHash, currVal) =>
+           (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+  }
+       
+  // console.log(hash(signature));
+  let namespace = hash(signature);
+
+  let children = result.filter((node) => node["@type"]);
+
+  //console.log(`Trying to bind ${signature}`);
+  //let foo = children.map((x) => {
+  //  return `${x["@type"]}${JSON.stringify(x.types)}`;
+  //}).join(" ");
+  //console.log(`To ${foo}`);
+
+  if (expects.length != children.length) {
+   // console.log("not the same length");
+   return reject;
+  }
+
+  let variables = {};
+
+  for (let i = 0; i < expects.length; i++) {
+   let expected = expects[i];
+   let child = children[i];
+   if (expected["@type"] != child["@type"]) {
+    // console.log("Children of different types");
+    return reject;
+   }
+   for (let [key, value] of Object.entries(expected.types || {})) {
+    if (typeof value == "number") {
+     if (variables[value]) {
+      if (Array.isArray(variables[value])) {
+       if (!variables[value].includes(child.types[key])) {
+        return reject;
+       }
+      } else if (typeof variables[value] == "number") {
+       // console.log("hi");
+       variables[value] = child.types[key];
+      } else if (Array.isArray(child.types[key])) {
+       if (!child.types[key].includes(variables[value])) {
+        return reject;
+       }
+       continue;
+      } else if (typeof child.types[key] == "number") {
+       // console.log("hi");
+       variables[child.types[key]] = variables[value];
+       continue;
+      } else if (variables[value] != child.types[key]) {
+       // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
+       return reject;
+      }
+     }
+     // collects variables
+     variables[value] = child.types[key];
+    } else if (typeof child.types[key] == "number") {
+     child.types[key] = value;
+    } else if (Array.isArray(child.types[key])) {
+     if (!child.types[key].includes(expected.types[key])) {
+      return reject;
+     }
+     child.types[key] = expected.types[key];
+    } else if (typeof child.types[key] == "string" &&
+               expected.types[key] != child.types[key]) {
+     // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
+     return reject;
+    } else if (!child.types[key]) {
+     return reject;
+    }
+   }
+  }
+    
+  // Sets variables
+  for (let [key, value] of Object.entries(bindings)) {
+   if (typeof value == "number") {
+    // console.log(key);
+    // console.log("hello");
+    if (!variables[value]) {
+     // console.log(variables);
+     // console.log(types);
+     // console.log(variables);
+     // console.log("hi");
+     // return reject;
+     bindings[key] = namespace + value;
+    } else {
+     // console.log(`${key} = ${variables[value]}`);
+     bindings[key] = variables[value];
+    }
+   }
+  }
+
+  // console.log(JSON.stringify(types));
+
+  return {
+   "@type": type,
+   "types": bindings,
+   "children": result,
+  };
+ };
+}
+
+describe("Binding", function() {
+  it("Whitespace", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
 
     assertThat(post([{
@@ -439,38 +455,38 @@ describe("Nearley", function() {
 
   });
   
-  it("rejects based on length", function() {
+  it("Rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([]))
     .equalsTo(undefined);
    });
 
-  it("rejects based on length", function() {
+  it("Rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([null,null]))
     .equalsTo(undefined);
 
    });
 
-  it("rejects based on length", function() {
+  it("Rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([{"@type": "V"},{"@type": "DET"}]))
     .equalsTo(undefined);
    });
 
-  it("rejects based on types", function() {
+  it("Rejects based on types", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([{"@type": "V"},{"@type": "DET"}]))
      .equalsTo(undefined);
   });
 
-  it("rejects based on types", function() {
+  it("Rejects based on types", function() {
     let post = bind("NP", {}, [{"@type": "PN", "types": {"num": "sing"}}]);
     assertThat(post([{"@type": "PN", "types": {"num": "plur"}}]))
      .equalsTo(undefined);
   });
 
-  it("rejects based on conflicting bindings", function() {
+  it("Rejects based on conflicting bindings", function() {
     let post = bind("VP", {"num": 1}, [{ 
        "@type": "V",
        "types": {"num": 1}
@@ -489,7 +505,7 @@ describe("Nearley", function() {
     .equalsTo(undefined);
   });
 
-  it("rejects invalid array entry", function() {
+  it("Rejects invalid array entry", function() {
     let post = bind("NP", {"gen": "male"}, [{
        "@type": "PN",
        "types": {"gen": "male"}
@@ -502,7 +518,7 @@ describe("Nearley", function() {
     .equalsTo(undefined);
   });
 
-  it("binds", function() {
+  it("Binds", function() {
     let post = bind("NP", {"num": 1}, [{ 
        "@type": "PN",
        "types": {"num": 1}
@@ -522,7 +538,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds keeps free variables", function() {
+  it("Binds keeps free variables", function() {
     let post = bind("NP", {"num": 1}, [{ 
        "@type": "PN",
        "types": {"gen": 2}
@@ -542,7 +558,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds tail variable to head", function() {
+  it("Binds tail variable to head", function() {
     let post = bind("NP", {}, [{ 
        "@type": "PN",
        "types": {"gen": "-"}
@@ -562,7 +578,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds to literals", function() {
+  it("Binds to literals", function() {
     let post = bind("PN", {"num": "sing"});
 
     assertThat(post(["Sam"]))
@@ -573,7 +589,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds multiple", function() {
+  it("Binds multiple", function() {
     let post = bind("NP", {"num": 1, "gen": 2}, [{ 
        "@type": "PN",
        "types": {"num": 1, "gen": 2}
@@ -593,7 +609,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds multiple", function() {
+  it("Binds multiple", function() {
     let post = bind("S", {"num": 1}, [{ 
        "@type": "NP",
        "types": {"num": 1}
@@ -622,7 +638,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds ignoring extras", function() {
+  it("Binds ignoring extras", function() {
     let post = bind("NP", {"num": 1}, [{ 
        "@type": "PN",
        "types": {"num": 1}
@@ -642,7 +658,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("rejects fewer of expected types", function() {
+  it("Rejects fewer of expected types", function() {
     let post = bind("VP", {}, [{ 
        "@type": "NP",
        "types": {"num": 1, "gen": 2, "case": "-nom", "gap": 3}
@@ -655,7 +671,7 @@ describe("Nearley", function() {
     .equalsTo(undefined);
   });
 
-  it("binds to arrays", function() {
+  it("Binds to arrays", function() {
     let post = bind("NP", {"gen": 1}, [{
        "@type": "PN",
        "types": {"gen": 1}
@@ -675,7 +691,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds to array entry", function() {
+  it("Binds to array entry", function() {
     let post = bind("NP", {"gen": "male"}, [{
        "@type": "PN",
        "types": {"gen": "male"}
@@ -695,7 +711,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds and array entry to a literal", function() {
+  it("Binds and array entry to a literal", function() {
     let post = bind("VP", {"num": 1}, [{
        "@type": "V",
        "types": {"num": 1}
@@ -724,7 +740,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds and array entry to a literal", function() {
+  it("Binds and array entry to a literal", function() {
     let post = bind("VP", {"num": 1}, [{
        "@type": "V",
        "types": {"num": 1}
@@ -753,7 +769,7 @@ describe("Nearley", function() {
     });
   });
 
-  it("binds literal to variable", function() {
+  it("Binds literal to variable", function() {
     let post = bind("VP", {"num": 1}, [{
        "@type": "V",
        "types": {"num": 1}
@@ -781,69 +797,19 @@ describe("Nearley", function() {
       }]
     });
   });
+});
 
-  it("Basic DRT", function() {
-    let parser = create(`
-      @builtin "whitespace.ne"
+class RuntimeParser {
+ constructor (parser) {
+  this.parser = parser;
+ }
 
-      @{% ${bind.toString()} %}
+ feed(code) {
+  return this.parser.feed(code);
+ }
 
-      S -> NP _ VP {%
-        bind("S", {"num": 1}, [{
-          "@type": "NP",
-          "types": {"num": 1}
-          }, {
-          "@type": "VP",
-          "types": {"num": 1}
-          }])
-      %}
-      VP -> V _ NP {% 
-        bind("VP", {"num": "sing"}, [{
-           "@type": "V",
-          }, {
-           "@type": "NP",
-          }]) 
-      %}
-      NP -> PN {% 
-        bind("NP", {"num": 1}, [{ 
-           "@type": "PN",
-           "types": {"num": 1}
-        }]) 
-      %}
-      PN -> "Sam" {% bind("PN", {"num": "sing"}) %}
-      PN -> "Dani" {% bind("PN", {"num": "sing"}) %}
-      V -> "likes" {% bind("V", {"num": "sing"}) %}
-    `);
-
-    parser.feed("Sam likes Dani");
-
-    let node = (type, ...children) => { 
-     return {"@type": type, "children": children} 
-    };
-
-    assertThat(parser.results[0].types).equalsTo({
-      "num": "sing"
-    });
-
-    function clear(root) {
-     delete root.types;
-     for (let child of root.children || []) {
-      clear(child);
-     }
-     return root;
-    }
-
-    assertThat(clear(parser.results[0]))
-     .equalsTo(node("S",
-                    node("NP", node("PN", "Sam")),
-                    node("VP", 
-                         node("V", "likes"), 
-                         node("NP", node("PN", "Dani"))))
-               );
-   });
-
-  function rules() {
-    return create(`
+ static create() {
+   let parser = Parser.create(`
       @builtin "whitespace.ne"
       @builtin "number.ne"
       @builtin "string.ne"
@@ -929,12 +895,78 @@ describe("Nearley", function() {
       }%}
 
     `);
-  }
+
+   return new RuntimeParser(parser);
+ }
+}
+
+describe("RuntimeParser", function() {
+
+  it("Rejects at Runtime", function() {
+    let parser = Parser.create(`
+      @builtin "whitespace.ne"
+
+      @{% ${bind.toString()} %}
+
+      S -> NP _ VP {%
+        bind("S", {"num": 1}, [{
+          "@type": "NP",
+          "types": {"num": 1}
+          }, {
+          "@type": "VP",
+          "types": {"num": 1}
+          }])
+      %}
+      VP -> V _ NP {% 
+        bind("VP", {"num": "sing"}, [{
+           "@type": "V",
+          }, {
+           "@type": "NP",
+          }]) 
+      %}
+      NP -> PN {% 
+        bind("NP", {"num": 1}, [{ 
+           "@type": "PN",
+           "types": {"num": 1}
+        }]) 
+      %}
+      PN -> "Sam" {% bind("PN", {"num": "sing"}) %}
+      PN -> "Dani" {% bind("PN", {"num": "sing"}) %}
+      V -> "likes" {% bind("V", {"num": "sing"}) %}
+    `);
+
+    let result = parser.feed("Sam likes Dani");
+
+    let node = (type, ...children) => { 
+     return {"@type": type, "children": children} 
+    };
+
+    assertThat(result[0].types).equalsTo({
+      "num": "sing"
+    });
+
+    function clear(root) {
+     delete root.types;
+     for (let child of root.children || []) {
+      clear(child);
+     }
+     return root;
+    }
+
+    assertThat(clear(result[0]))
+     .equalsTo(node("S",
+                    node("NP", node("PN", "Sam")),
+                    node("VP", 
+                         node("V", "likes"), 
+                         node("NP", node("PN", "Dani"))))
+               );
+   });
+
 
   it("Nearley features", function() {
-    let parser = rules();
+    let parser = RuntimeParser.create();
 
-    parser.feed(`
+    let result = parser.feed(`
       foo[num=1] -> bar hello[gender=male].
       hello -> world.
       a -> "hi".
@@ -947,7 +979,7 @@ describe("Nearley", function() {
      return {name: name, types: types};
     };
 
-    assertThat(parser.results).equalsTo([[{
+    assertThat(result).equalsTo([[{
         "head": term("foo", {"num": 1}),
         "tail": [term("bar"), term("hello", {"gender": "male"})]
        }, {
@@ -968,10 +1000,56 @@ describe("Nearley", function() {
        }]]);
   });
 
-  function ccc(start) {
-    let grammar = rules();
+});
 
-    let source = `
+class DRTParser {
+ constructor (parser){
+  this.parser = parser;
+ }
+
+ feed(code) {
+  return this.parser.feed(code);
+ }
+
+ static from(start) {
+    let parser = RuntimeParser.create();
+    const source = DRTParser.source();
+    let grammar = parser.feed(source);
+
+    // console.log(grammar);
+
+    let result = [];
+
+    function feed(source) {
+     result.push(source);
+    }
+
+    feed(`@builtin "whitespace.ne"`);
+    feed(``);
+    feed(`@{%`);
+    feed(`${bind.toString()}`);
+    feed(`%}`);
+    feed(``);
+
+    for (let {head, tail} of grammar[0] || []) {
+     let term = (x) => typeof x == "string" ? `${x}i` : x.name;
+     feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+     feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+     for (let term of tail) {
+      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+       continue;
+      }
+      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+     }
+     feed(`  ])`);
+     feed(`%}`);
+    }
+
+    return new DRTParser(Parser.create(result.join("\n"), start));
+  }
+
+ static source() {
+  return `
       Sentence -> S_ _ ".".
 
       Question ->
@@ -1181,38 +1259,20 @@ describe("Nearley", function() {
 
       ADJ -> "happy".
       ADJ -> "foolish".
-    `;
+   `;
+ }
 
-    grammar.feed(source);
+}
 
-    let result = [];
+describe("DRT", function() {
 
-    function feed(source) {
-     result.push(source);
-    }
-
-    feed(`@builtin "whitespace.ne"`);
-    feed(``);
-    feed(`@{%`);
-    feed(`${bind.toString()}`);
-    feed(`%}`);
-    feed(``);
-
-    for (let {head, tail} of grammar.results[0] || []) {
-     let term = (x) => typeof x == "string" ? `${x}i` : x.name;
-     feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
-     feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-     for (let term of tail) {
-      if (term.name == "_" || term.name == "__" || typeof term == "string") {
-       continue;
-      }
-      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
-     }
-     feed(`  ])`);
-     feed(`%}`);
-    }
-
-    return create(result.join("\n"), start);
+  function sentence(s, start) {
+   let parser = DRTParser.from(start);
+   let results = parser.feed(s);
+   if (start) {
+    return clear(results[0]);
+   }
+   return clear(results[0]).children[0].children[0];
   }
 
   it("Jones likes Mary", function() {
@@ -1223,13 +1283,11 @@ describe("Nearley", function() {
    });
 
   it("Jones like Mary", function() {
-    let parser = ccc();
+    let parser = DRTParser.from();
     try {
      parser.feed("Jones like Mary.");
      throw new Error("expected error");
-    } catch (e) {
-     // expected syntax error.
-     let error = reportError(e, parser);
+    } catch (error) {
      // We only realize there is an error when we
      // see the ".", because it commits to the end
      // of the sentence and we don't have any option
@@ -1239,15 +1297,6 @@ describe("Nearley", function() {
      assertThat(error.token).equalsTo(".");
     }
    });
-
-  function sentence(s, start) {
-   let parser = ccc(start);
-   parser.feed(s);
-   if (start) {
-    return clear(parser.results[0]);
-   }
-   return clear(parser.results[0]).children[0].children[0];
-  }
 
   it("Jones likes him.", function() {
     assertThat(sentence("Jones likes him."))
@@ -1780,13 +1829,12 @@ describe("Nearley", function() {
   let PP = (...children) => node("PP", ...children);
   let VERB = (...children) => node("VERB", ...children);
   let HAVE = (...children) => node("HAVE", ...children);
-
-  function assertThat(x) {
-   return {
-    equalsTo(y) {
-     Assert.deepEqual(x, y);
-    }
-   }
-  }
 });
 
+function assertThat(x) {
+ return {
+  equalsTo(y) {
+   Assert.deepEqual(x, y);
+  }
+ }
+}
