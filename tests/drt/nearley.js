@@ -974,6 +974,12 @@ describe.only("Nearley", function() {
     let source = `
       Sentence -> S_ _ ".".
 
+      Question ->
+          "Who" __
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4] _
+          "?"
+          .
+
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
       S[num=1, gap=-, tp=2, tense=3] -> 
@@ -1235,7 +1241,7 @@ describe.only("Nearley", function() {
    let parser = ccc(start);
    parser.feed(s);
    if (start) {
-    return parser.results;
+    return clear(parser.results[0]);
    }
    return clear(parser.results[0]).children[0].children[0];
   }
@@ -1276,7 +1282,7 @@ describe.only("Nearley", function() {
                  VP_(VP(V(VERB("like"), "s"), NP(PRO("them"))))));
    });
 
-  it("Jones does not like Mary", function() {
+  it("Jones does not love Mary", function() {
     assertThat(sentence("Jones does not love Mary."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("does"), 
@@ -1686,6 +1692,31 @@ describe.only("Nearley", function() {
                  VP_(VP(HAVE("have"), "not", VP(V(VERB("walk"), "ed"))))));
   });
 
+  it("Who walks?", function() {
+    assertThat(sentence("Who walks?", "Question"))
+     .equalsTo(Question("Who", VP_(VP(V(VERB("walk"), "s"))), "?"));
+  });
+
+  it("Who likes Mary?", function() {
+    assertThat(sentence("Who likes Mary?", "Question"))
+     .equalsTo(Question("Who", VP_(VP(V(VERB("like"), "s"),
+                                      NP(PN("Mary")))), "?"));
+  });
+
+  it("Who does not love Mary?", function() {
+    assertThat(sentence("Who does not love Mary?", "Question"))
+     .equalsTo(Question("Who", VP_(AUX("does"), 
+                                   "not", 
+                                   VP(V(VERB("love")),
+                                      NP(PN("Mary")))), "?"));
+  });
+
+  it("Who will walk?", function() {
+    assertThat(sentence("Who will walk?", "Question"))
+     .equalsTo(Question("Who", VP_(AUX("will"), 
+                                   VP(V(VERB("walk")))), "?"));
+  });
+
   function clear(root) {
    delete root.types;
    for (let child of root.children || []) {
@@ -1699,6 +1730,8 @@ describe.only("Nearley", function() {
   };
 
   let Sentence = (...children) => node("Sentence", ...children);
+  let Question = (...children) => node("Question", ...children);
+
   let S = (...children) => node("S", ...children);
   let NP = (...children) => node("NP", ...children);
   let PN = (...children) => node("PN", ...children);
