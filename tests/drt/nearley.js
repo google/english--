@@ -1096,7 +1096,6 @@ describe.only("Nearley", function() {
       AUX[num=1, fin=+, tp=-past, tense=fut] -> "will".
       AUX[num=1, fin=+, tp=+past, tense=fut] -> "would".
 
-      V[num=[sing, plur], trans=+, fin=-] -> "love".
       V[num=[sing, plur], trans=-, fin=-] -> "rotate".
 
       V[num=sing, trans=1, fin=+] -> "likes".
@@ -1126,6 +1125,7 @@ describe.only("Nearley", function() {
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
       VERB[trans=+, stat=-] -> "kiss".
+      VERB[trans=+, stat=-] -> "love".
       VERB[trans=-, stat=-] -> "walk".
 
       V[num=1, fin=-, stat=-, trans=2] -> VERB[trans=2, stat=-].
@@ -1250,7 +1250,7 @@ describe.only("Nearley", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("does"), 
                      "not", 
-                     VP(V("love"), NP(PN("Mary"))))));
+                     VP(V(VERB("love")), NP(PN("Mary"))))));
    });
 
   it("He does not love her", function() {
@@ -1258,7 +1258,7 @@ describe.only("Nearley", function() {
      .equalsTo(S(NP(PRO("He")),
                  VP_(AUX("does"), 
                      "not", 
-                     VP(V("love"), NP(PRO("her"))))));
+                     VP(V(VERB("love")), NP(PRO("her"))))));
    });
 
   it("They do not love her", function() {
@@ -1266,7 +1266,7 @@ describe.only("Nearley", function() {
      .equalsTo(S(NP(PRO("They")),
                  VP_(AUX("do"), 
                      "not", 
-                     VP(V("love"), NP(PRO("her"))))));
+                     VP(V(VERB("love")), NP(PRO("her"))))));
   });
 
   it("It does not love them", function() {
@@ -1274,7 +1274,7 @@ describe.only("Nearley", function() {
      .equalsTo(S(NP(PRO("It")),
                  VP_(AUX("does"), 
                      "not", 
-                     VP(V("love"), NP(PRO("them"))))));
+                     VP(V(VERB("love")), NP(PRO("them"))))));
   });
 
   it("He likes a book.", function() {
@@ -1552,6 +1552,13 @@ describe.only("Nearley", function() {
    assertThat(sentence("Jones was happy."))
     .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("was"), ADJ("happy")))));
+  });
+
+  it("Jones loves Mary.", function() {
+    assertThat(sentence("Jones loves Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("love"), "s"),
+                        NP(PN("Mary"))))));
   });
 
   it("Jones kissed Mary.", function() {
