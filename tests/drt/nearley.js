@@ -1096,11 +1096,6 @@ describe.only("Nearley", function() {
       AUX[num=1, fin=+, tp=-past, tense=fut] -> "will".
       AUX[num=1, fin=+, tp=+past, tense=fut] -> "would".
 
-      V[num=[sing, plur], trans=-, fin=-] -> "rotate".
-
-      V[num=sing, trans=1, fin=+] -> "likes".
-      V[num=plur, trans=1, fin=+] -> "like".
- 
       RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
       RPRO[num=[sing, plur], gen=-hum] -> "which".
 
@@ -1124,6 +1119,8 @@ describe.only("Nearley", function() {
       HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
+      VERB[trans=1, stat=+] -> "like".
+ 
       VERB[trans=+, stat=-] -> "kiss".
       VERB[trans=+, stat=-] -> "love".
       VERB[trans=-, stat=-] -> "walk".
@@ -1178,7 +1175,7 @@ describe.only("Nearley", function() {
   it("Jones likes Mary", function() {
     assertThat(sentence("Jones likes Mary."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"),
+                 VP_(VP(V(VERB("like"), "s"),
                         NP(PN("Mary"))))));
    });
 
@@ -1212,37 +1209,37 @@ describe.only("Nearley", function() {
   it("Jones likes him.", function() {
     assertThat(sentence("Jones likes him."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("him"))))));
    });
 
   it("She likes him.", function() {
     assertThat(sentence("She likes him."))
      .equalsTo(S(NP(PRO("She")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("him"))))));
    });
 
   it("She likes her.", function() {
     assertThat(sentence("She likes her."))
      .equalsTo(S(NP(PRO("She")),
-                 VP_(VP(V("likes"), NP(PRO("her"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("her"))))));
    });
 
   it("He likes it.", function() {
     assertThat(sentence("He likes it."))
      .equalsTo(S(NP(PRO("He")),
-                 VP_(VP(V("likes"), NP(PRO("it"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("it"))))));
    });
 
   it("They like it.", function() {
     assertThat(sentence("They like it."))
      .equalsTo(S(NP(PRO("They")),
-                 VP_(VP(V("like"), NP(PRO("it"))))));
+                 VP_(VP(V(VERB("like")), NP(PRO("it"))))));
    });
 
   it("She likes them.", function() {
     assertThat(sentence("She likes them."))
      .equalsTo(S(NP(PRO("She")),
-                 VP_(VP(V("likes"), NP(PRO("them"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("them"))))));
    });
 
   it("Jones does not like Mary", function() {
@@ -1280,43 +1277,43 @@ describe.only("Nearley", function() {
   it("He likes a book.", function() {
     assertThat(sentence("He likes a book."))
      .equalsTo(S(NP(PRO("He")),
-                 VP_(VP(V("likes"), NP(DET("a"), N("book"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(DET("a"), N("book"))))));
    });
 
   it("He likes every book.", function() {
     assertThat(sentence("He likes every book."))
      .equalsTo(S(NP(PRO("He")),
-                 VP_(VP(V("likes"), NP(DET("every"), N("book"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(DET("every"), N("book"))))));
    });
 
   it("Every man likes him.", function() {
     assertThat(sentence("Every man likes him."))
      .equalsTo(S(NP(DET("Every"), N("man")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("him"))))));
    });
 
   it("A woman likes him.", function() {
     assertThat(sentence("A woman likes him."))
      .equalsTo(S(NP(DET("A"), N("woman")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("him"))))));
   });
 
   it("The woman likes him.", function() {
     assertThat(sentence("The woman likes him."))
      .equalsTo(S(NP(DET("The"), N("woman")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(PRO("him"))))));
   });
 
   it("Jones and Mary like him.", function() {
     assertThat(sentence("Jones and Mary like him."))
      .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
-                 VP_(VP(V("like"), NP(PRO("him"))))));
+                 VP_(VP(V(VERB("like")), NP(PRO("him"))))));
   });
 
   it("He likes Jones and Mary.", function() {
     assertThat(sentence("He likes Jones and Mary."))
      .equalsTo(S(NP(PRO("He")),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(NP(PN("Jones")), 
                            "and", 
                            NP(PN("Mary")))))));
@@ -1325,12 +1322,12 @@ describe.only("Nearley", function() {
   it("Jones likes a book which Mary likes.", function() {
     assertThat(sentence("Jones likes a book which Mary likes."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("book"), 
                              RC(RPRO("which"),
                                 S(NP(PN("Mary")), 
-                                  VP_(VP(V("likes"), 
+                                  VP_(VP(V(VERB("like"), "s"), 
                                          NP(GAP()))))
                                 )))
                         ))));
@@ -1339,12 +1336,12 @@ describe.only("Nearley", function() {
   it("Jones likes a woman which likes Mary.", function() {
     assertThat(sentence("Jones likes a book which likes Mary."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("book"), 
                              RC(RPRO("which"),
                                 S(NP(GAP()), 
-                                  VP_(VP(V("likes"), 
+                                  VP_(VP(V(VERB("like"), "s"), 
                                          NP(PN("Mary")))))
                                 )))
                         ))));
@@ -1356,14 +1353,14 @@ describe.only("Nearley", function() {
                     N(N("man"), 
                       RC(RPRO("who"),
                          S(NP(GAP()),
-                           VP_(VP(V("likes"), NP(PN("Brazil")))))
+                           VP_(VP(V(VERB("like"), "s"), NP(PN("Brazil")))))
                          ))),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("woman"), 
                              RC(RPRO("who"),
                                 S(NP(GAP()), 
-                                  VP_(VP(V("likes"), 
+                                  VP_(VP(V(VERB("like"), "s"), 
                                          NP(PN("Jones")))))
                                 )))
                         ))));
@@ -1384,7 +1381,7 @@ describe.only("Nearley", function() {
   it("Jones likes a woman who is happy.", function() {
     assertThat(sentence("Jones likes a woman who is happy."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("woman"), 
                              RC(RPRO("who"),
@@ -1421,29 +1418,31 @@ describe.only("Nearley", function() {
   it("Jones and Mary like a book.", function() {
     assertThat(sentence("Jones and Mary like a book."))
      .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
-                 VP_(VP(V("like"), NP(DET("a"), N("book"))))));
+                 VP_(VP(V(VERB("like")), NP(DET("a"), N("book"))))));
   });
 
-  it("Jones like Mary and Brazil.", function() {
+  it("Jones likes Mary and Brazil.", function() {
     assertThat(sentence("Jones likes Mary and Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), 
-                        NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
+                 VP_(VP(V(VERB("like"), "s"), 
+                     NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
                         ))));
   });
 
   it("Jones likes Brazil and he likes Mary.", function() {
     assertThat(sentence("Jones likes Brazil and he likes Mary."))
-     .equalsTo(S(S(NP(PN("Jones")),VP_(VP(V("likes"), NP(PN("Brazil"))))),
+     .equalsTo(S(S(NP(PN("Jones")),
+                   VP_(VP(V(VERB("like"), "s"), NP(PN("Brazil"))))),
                  "and",
-                 S(NP(PRO("he")),VP_(VP(V("likes"), NP(PN("Mary"))))),
+                 S(NP(PRO("he")),
+                   VP_(VP(V(VERB("like"), "s"), NP(PN("Mary"))))),
                  ));
   });
 
   it("Jones likes himself", function() {
     assertThat(sentence("Jones likes himself."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"),
+                 VP_(VP(V(VERB("like"), "s"),
                         NP(PRO("himself"))))));
   });
 
@@ -1456,13 +1455,13 @@ describe.only("Nearley", function() {
   it("Mary likes Jones's book", function() {
     assertThat(sentence("Mary likes Jones's book."))
      .equalsTo(S(NP(PN("Mary")),
-                 VP_(VP(V("likes"), NP(DET(NP(PN("Jones")), "'s"), N("book"))))));
+                 VP_(VP(V(VERB("like"), "s"), NP(DET(NP(PN("Jones")), "'s"), N("book"))))));
   });
 
   it("Jones likes a book about Brazil", function() {
     assertThat(sentence("Jones likes a book about Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"),
+                 VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("book"), 
                              PP(PREP("about"), NP(PN("Brazil"))))
@@ -1472,7 +1471,7 @@ describe.only("Nearley", function() {
   it("Jones likes a book from Brazil", function() {
     assertThat(sentence("Jones likes a book from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"),
+                 VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("book"), 
                              PP(PREP("from"), NP(PN("Brazil"))))
@@ -1482,7 +1481,7 @@ describe.only("Nearley", function() {
   it("Jones likes a girl with a telescope.", function() {
     assertThat(sentence("Jones likes a girl with a telescope."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"),
+                 VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("girl"), 
                              PP(PREP("with"), NP(DET("a"), N("telescope"))))
@@ -1506,7 +1505,7 @@ describe.only("Nearley", function() {
   it("Jones likes a girl who is from Brazil.", function() {
     assertThat(sentence("Jones likes a girl who is from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V("likes"), 
+                 VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("girl"), 
                              RC(RPRO("who"),
