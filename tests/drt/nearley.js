@@ -6,7 +6,7 @@ const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
 const {child} = require("../../src/drt/rules.js");
 
-describe.only("Nearley", function() {
+describe("Nearley", function() {
 
   function parse(source) {
     const parser = new nearley.Parser(grammar);
@@ -1012,10 +1012,12 @@ describe.only("Nearley", function() {
       VP_[num=1, fin=+, gap=2] ->
           AUX[num=1, fin=+] __ "not" __ VP[num=3, fin=-, gap=2].
 
-      VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
+      VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
+          VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
 
-      VP[num=1, fin=2, gap=-] ->
-          V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=-].
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
+          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
+          NP[num=6, gen=7, case=-nom, gap=-].
 
       VP[num=1, fin=2, gap=np] ->
           V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
@@ -1152,6 +1154,7 @@ describe.only("Nearley", function() {
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
       VERB[trans=1, stat=+] -> "like".
+
       VERB[trans=+, stat=-] -> "hit".
       VERB[trans=+, stat=-] -> "beat".
       VERB[trans=+, stat=-] -> "kiss".
@@ -1642,6 +1645,22 @@ describe.only("Nearley", function() {
                         NP(PN("Mary"))))));
   });
 
+  it("Jones will love Mary.", function() {
+    assertThat(sentence("Jones will love Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("will"), 
+                     VP(V(VERB("love")),
+                        NP(PN("Mary"))))));
+  });
+
+  it("Jones will not love Mary.", function() {
+    assertThat(sentence("Jones will not love Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("will"), "not",
+                     VP(V(VERB("love")),
+                        NP(PN("Mary"))))));
+  });
+
   it("Jones kissed Mary.", function() {
     assertThat(sentence("Jones kissed Mary."))
      .equalsTo(S(NP(PN("Jones")),
@@ -1717,7 +1736,17 @@ describe.only("Nearley", function() {
                                    VP(V(VERB("walk")))), "?"));
   });
 
+  it("Who will love Mary?", function() {
+    assertThat(sentence("Who will love Mary?", "Question"))
+     .equalsTo(Question("Who", VP_(AUX("will"), 
+                                   VP(V(VERB("love")),
+                                      NP(PN("Mary")))), "?"));
+  });
+
   function clear(root) {
+   if (!root) {
+    return;
+   }
    delete root.types;
    for (let child of root.children || []) {
     clear(child);
