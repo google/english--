@@ -979,7 +979,7 @@ describe.only("Nearley", function() {
       S[num=1, gap=-] -> S[num=2, gap=-] __ "and" __ S[num=4, gap=-].
 
       S[num=1, gap=-] -> 
-        NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=-].
+          NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=-].
 
       S[num=1, gap=np] ->
           NP[num=1, gen=2, case=+nom, gap=np] _ VP_[num=1, fin=+, gap=-].
@@ -993,10 +993,10 @@ describe.only("Nearley", function() {
       VP_[num=1, fin=+, gap=2] -> VP[num=1, fin=+, gap=2].
 
       VP[num=1, fin=2, gap=-] ->
-         V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=-].
+          V[num=1, fin=2, trans=+] __ NP[num=4, gen=5, case=-nom, gap=-].
 
       VP[num=1, fin=2, gap=np] ->
-         V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
+          V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
 
       VP[num=1, fin=2, gap=-] -> V[num=1, fin=2, trans=-].
 
@@ -1120,10 +1120,15 @@ describe.only("Nearley", function() {
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
       VERB[trans=1, stat=+] -> "like".
- 
+      VERB[trans=+, stat=-] -> "hit".
+      VERB[trans=+, stat=-] -> "beat".
       VERB[trans=+, stat=-] -> "kiss".
       VERB[trans=+, stat=-] -> "love".
+
       VERB[trans=-, stat=-] -> "walk".
+      VERB[trans=-, stat=-] -> "leave".
+      VERB[trans=-, stat=-] -> "sleep".
+      VERB[trans=-, stat=-] -> "come".
 
       V[num=1, fin=-, stat=-, trans=2] -> VERB[trans=2, stat=-].
 
@@ -1543,6 +1548,12 @@ describe.only("Nearley", function() {
 
   it("Jones walked.", function() {
     assertThat(sentence("Jones walked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("walk"), "ed")))));
+   });
+
+  it.skip("Jones will walk.", function() {
+    assertThat(sentence("Jones will walk."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("walk"), "ed")))));
    });
