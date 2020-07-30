@@ -865,17 +865,54 @@ const RuntimeGrammar = Parser.compile(`
 `);
 
 class RuntimeParser {
- constructor () {
+ constructor() {
   this.parser = new Parser(RuntimeGrammar);
  }
 
  feed(code) {
   return this.parser.feed(code);
  }
+
+ static compile(source) {
+  let parser = new RuntimeParser();
+  let grammar = parser.feed(source);
+
+  let result = [];
+
+  function feed(code) {
+   result.push(code);
+  }
+
+  feed(`@builtin "whitespace.ne"`);
+  feed(``);
+  feed(`@{%`);
+  feed(`${bind.toString()}`);
+  feed(`%}`);
+  feed(``);
+
+  // console.log(grammar[0].length);
+  
+  for (let {head, tail} of grammar[0]) {
+   // console.log("hi");
+   let term = (x) => typeof x == "string" ? `${x}i` : x.name;
+   feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+                     for (let term of tail) {
+                      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+                       continue;
+                      }
+                      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+                     }
+                     feed(`  ])`);
+        feed(`%}`);
+
+  }
+ 
+  return Parser.compile(result.join("\n"));
+ }
 }
 
 describe("RuntimeParser", function() {
-
   it("Rejects at Runtime", function() {
     let parser = Parser.from(`
       @builtin "whitespace.ne"
@@ -936,7 +973,6 @@ describe("RuntimeParser", function() {
                );
    });
 
-
   it("Nearley features", function() {
     let parser = new RuntimeParser();
 
@@ -973,11 +1009,9 @@ describe("RuntimeParser", function() {
         "tail": ["\"it\""]
        }]]);
   });
-
 });
 
-const DRTSyntax = `
-
+const DRTGrammar = RuntimeParser.compile(`
       Sentence -> S_ _ ".".
 
       Question ->
@@ -1187,7 +1221,7 @@ const DRTSyntax = `
 
       ADJ -> "happy".
       ADJ -> "foolish".
- `;
+`);
 
 class DRTParser {
  constructor (start){
@@ -1198,46 +1232,6 @@ class DRTParser {
   return this.parser.feed(code);
  }
 }
-
-function DRT(source) {
- let parser = new RuntimeParser();
- let grammar = parser.feed(source);
-
- let result = [];
-
- function feed(code) {
-  result.push(code);
- }
-
- feed(`@builtin "whitespace.ne"`);
- feed(``);
- feed(`@{%`);
- feed(`${bind.toString()}`);
- feed(`%}`);
- feed(``);
-
- // console.log(grammar[0].length);
-
- for (let {head, tail} of grammar[0]) {
-  // console.log("hi");
-  let term = (x) => typeof x == "string" ? `${x}i` : x.name;
-  feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
-       feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-                    for (let term of tail) {
-                     if (term.name == "_" || term.name == "__" || typeof term == "string") {
-                      continue;
-                     }
-                     feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
-                    }
-                    feed(`  ])`);
-       feed(`%}`);
-
- }
- 
- return Parser.compile(result.join("\n"));
-}
-
-const DRTGrammar = DRT(DRTSyntax);
 
 describe("DRT", function() {
 
