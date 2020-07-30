@@ -7,8 +7,12 @@ const grammar = require("nearley/lib/nearley-language-bootstrapped");
 const {child} = require("../../src/drt/rules.js");
 
 class Parser {
- constructor(parser) {
-  this.parser = parser;
+ constructor({ParserRules, ParserStart}, start) {
+  let rule = start ? start : ParserStart;
+
+  this.parser = new nearley.Parser(ParserRules, rule, {
+    keepHistory: true
+  });   
  }
 
  feed(code) {
@@ -20,56 +24,24 @@ class Parser {
   }
  }
 
- static of(source) {
+ static compile(source) {
   const parser = new nearley.Parser(grammar);
   parser.feed(source);
   const ast = parser.results[0];
   const info = compile(ast, {});
   // Generate JavaScript code from the rules
   const code = generate(info, "grammar");
-  // console.log(code);
-  // Pretend this is a CommonJS environment to catch exports from the grammar.
   const module = { exports: {} };
   eval(code);
 
-  // console.log(module.exports);
   return module.exports;
  }
 
- //static build(source) {
- // return Parser.parse(source);
- //}
+ static from(code, start) {
+  return new Parser(Parser.compile(code), start);
+ }
 
- static create(code, start) {
-  return Parser.from(Parser.of(code), start);
- } 
-
- static from({ParserRules, ParserStart}, start) {
-   let rule = start ? start : ParserStart;
-   // console.log(grammar.ParserStart);
-    
-   //console.log(grammar);
-
-   const parser = new nearley.Parser(ParserRules, rule, {
-     keepHistory: true
-    });
-
-   //const parser = new nearley.Parser(
-   //    nearley.Grammar.fromCompiled(grammar, start),
-   //    {keepHistory: true});
-   
-   //parser.reportError = function(token) {
-   // var message = this.lexer.formatError(token, "Invalid syntax") + "\n";
-   // message += "Unexpected " + (token.type ? token.type + " token: " : "");
-   // message +=
-   // JSON.stringify(token.value !== undefined ? token.value : token) + "\n";
-   // return JSON.stringify({message: message, token: token});
-   //};
-   
-   return new Parser(parser);
-  }
-
-  /*
+ /*
     Generates a user friendly error report given the caught error 
     object and the Nearley parser instance.
   */
@@ -220,7 +192,7 @@ class Parser {
 describe("Nearley", function() {
 
   it("Basic", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -228,7 +200,7 @@ describe("Nearley", function() {
   });
 
   it("Incomplete", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -238,7 +210,7 @@ describe("Nearley", function() {
   });
 
   it("Error", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -259,7 +231,7 @@ describe("Nearley", function() {
   });
 
   it("Rules", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       expression -> number "+" number
       expression -> number "-" number
       expression -> number "*" number
@@ -271,7 +243,7 @@ describe("Nearley", function() {
    });
 
   it("Postprocessors", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       expression -> number "+" number {%
         function([left, op, right]) {
           return {left: left, op: op, right: right};
@@ -288,7 +260,7 @@ describe("Nearley", function() {
    });
 
   it("Reject", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       # the first rule always rejects
       number -> [0-4]:+ {% (data, location, reject) => reject %}
       number -> [0-9]:+ {% ([number], location, reject) => "hello" %}
@@ -298,7 +270,7 @@ describe("Nearley", function() {
    });
 
   it("Javascript", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       @{%
         function foo(num) {
          return parseInt(num);
@@ -311,7 +283,7 @@ describe("Nearley", function() {
    });
 
   it("Builtin", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       @builtin "whitespace.ne"
       expression -> number _ "+" _ number
       number -> [0-9]:+ {% ([number], location, reject) => parseInt(number) %}
@@ -806,7 +778,7 @@ describe("Binding", function() {
   });
 });
 
-const RuntimeGrammar = Parser.of(`
+const RuntimeGrammar = Parser.compile(`
       @builtin "whitespace.ne"
       @builtin "number.ne"
       @builtin "string.ne"
@@ -892,25 +864,20 @@ const RuntimeGrammar = Parser.of(`
       }%}
 `);
 
-
 class RuntimeParser {
- constructor (parser) {
-  this.parser = parser;
+ constructor () {
+  this.parser = new Parser(RuntimeGrammar);
  }
 
  feed(code) {
   return this.parser.feed(code);
- }
-
- static create() {
-  return new RuntimeParser(Parser.from(RuntimeGrammar));
  }
 }
 
 describe("RuntimeParser", function() {
 
   it("Rejects at Runtime", function() {
-    let parser = Parser.create(`
+    let parser = Parser.from(`
       @builtin "whitespace.ne"
 
       @{% ${bind.toString()} %}
@@ -971,7 +938,7 @@ describe("RuntimeParser", function() {
 
 
   it("Nearley features", function() {
-    let parser = RuntimeParser.create();
+    let parser = new RuntimeParser();
 
     let result = parser.feed(`
       foo[num=1] -> bar hello[gender=male].
@@ -1223,22 +1190,17 @@ const DRTSyntax = `
  `;
 
 class DRTParser {
- constructor (parser){
-  this.parser = parser;
+ constructor (start){
+  this.parser = new Parser(DRTGrammar, start);
  }
 
  feed(code) {
   return this.parser.feed(code);
  }
-
- static create(start) {
-  return new DRTParser(Parser.from(DRTGrammar, start));
- }
 }
 
 function DRT(source) {
- // console.log(source);
- let parser = RuntimeParser.create();
+ let parser = new RuntimeParser();
  let grammar = parser.feed(source);
 
  let result = [];
@@ -1272,7 +1234,7 @@ function DRT(source) {
 
  }
  
- return Parser.of(result.join("\n"));
+ return Parser.compile(result.join("\n"));
 }
 
 const DRTGrammar = DRT(DRTSyntax);
@@ -1280,7 +1242,7 @@ const DRTGrammar = DRT(DRTSyntax);
 describe("DRT", function() {
 
   function sentence(s, start) {
-   let parser = DRTParser.create(start);
+   let parser = new DRTParser(start);
    let results = parser.feed(s);
    if (start) {
     return clear(results[0]);
