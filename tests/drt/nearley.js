@@ -987,6 +987,10 @@ describe.only("Nearley", function() {
       S[num=1, gap=np] ->
           NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np].
 
+      VP_[num=1, fin=+, gap=2, stat=3, tp=4, tense=fut] ->
+        AUX[num=1, fin=+, tp=4, tense=fut] __ 
+        VP[num=5, fin=-, gap=2, stat=3, tp=4, tense=pres].
+
       VP_[num=1, fin=+, gap=2] ->
           AUX[num=1, fin=+] __ "not" __ VP[num=3, fin=-, gap=2].
 
@@ -998,7 +1002,8 @@ describe.only("Nearley", function() {
       VP[num=1, fin=2, gap=np] ->
           V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
 
-      VP[num=1, fin=2, gap=-] -> V[num=1, fin=2, trans=-].
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
+        V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
 
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
@@ -1538,7 +1543,7 @@ describe.only("Nearley", function() {
     assertThat(sentence("Jones walks."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("walk"), "s")))));
-   });
+  });
 
   it("They walk.", function() {
     assertThat(sentence("They walk."))
@@ -1552,11 +1557,47 @@ describe.only("Nearley", function() {
                  VP_(VP(V(VERB("walk"), "ed")))));
    });
 
-  it.skip("Jones will walk.", function() {
+  it("Jones will walk.", function() {
     assertThat(sentence("Jones will walk."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V(VERB("walk"), "ed")))));
-   });
+                 VP_(AUX("will"), VP(V(VERB("walk"))))));
+  });
+
+  it("They will walk.", function() {
+    assertThat(sentence("They will walk."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(AUX("will"), VP(V(VERB("walk"))))));
+  });
+
+  it("Jones would walk.", function() {
+    assertThat(sentence("Jones would walk."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("would"), VP(V(VERB("walk"))))));
+  });
+
+  it("Jones does not walk.", function() {
+    assertThat(sentence("Jones does not walk."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("does"), "not", VP(V(VERB("walk"))))));
+  });
+
+  it("Jones did not walk.", function() {
+    assertThat(sentence("Jones did not walk."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("did"), "not", VP(V(VERB("walk"))))));
+  });
+
+  it("Jones would not walk.", function() {
+    assertThat(sentence("Jones would not walk."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("would"), "not", VP(V(VERB("walk"))))));
+  });
+
+  it("Jones will not walk.", function() {
+    assertThat(sentence("Jones will not walk."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(AUX("will"), "not", VP(V(VERB("walk"))))));
+  });
 
   it("Jones was happy.", function() {
    assertThat(sentence("Jones was happy."))
