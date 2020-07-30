@@ -990,9 +990,14 @@ describe.only("Nearley", function() {
       VP[num=1, fin=2] -> BE[num=1, fin=2] __ "not" __ ADJ.
 
       VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ DET[num=1] __ N[num=1, gen=3].
+        BE[num=1, fin=2] __ PP.
       VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ "not" __ DET[num=1] __ N[num=1, gen=3].
+        BE[num=1, fin=2] __ "not" __ PP.
+
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ NP[num=3, gen=4, case=5, gap=-].
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ "not" __ NP[num=3, gen=4, case=5, gap=-].
 
       DET[num=sing] -> "a".
       DET[num=sing] -> "every".
@@ -1023,6 +1028,7 @@ describe.only("Nearley", function() {
       N[num=sing, gen=male] -> "man".
       N[num=sing, gen=fem] -> "woman".
       N[num=sing, gen=fem] -> "girl".
+      N[num=sing, gen=fem] -> "sister".
       N[num=sing, gen=-hum] -> "book".
       N[num=sing, gen=-hum] -> "telescope".
 
@@ -1322,7 +1328,7 @@ describe.only("Nearley", function() {
     assertThat(sentence("Jones is a man."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), 
-                        DET("a"), N("man")))));
+                        NP(DET("a"), N("man"))))));
   });
 
   it("Jones is not a woman.", function() {
@@ -1330,7 +1336,7 @@ describe.only("Nearley", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"),
                         "not",
-                        DET("a"), N("woman")))));
+                        NP(DET("a"), N("woman"))))));
   });
 
   it("If Mary is happy then Jones is happy.", function() {
@@ -1411,6 +1417,47 @@ describe.only("Nearley", function() {
                            N(N("girl"), 
                              PP(PREP("with"), NP(DET("a"), N("telescope"))))
                            )))));
+  });
+
+  it("Jones is from Brazil.", function() {
+    assertThat(sentence("Jones is from Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), 
+                        PP(PREP("from"), NP(PN("Brazil")))))));
+  });
+
+  it("Jones is not from Brazil.", function() {
+    assertThat(sentence("Jones is not from Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), "not",
+                        PP(PREP("from"), NP(PN("Brazil")))))));
+  });
+
+  it("Jones likes a girl who is from Brazil.", function() {
+    assertThat(sentence("Jones likes a girl who is from Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V("likes"), 
+                        NP(DET("a"), 
+                           N(N("girl"), 
+                             RC(RPRO("who"),
+                                S(NP(GAP()),
+                                  VP_(VP(BE("is"), 
+                                         PP(PREP("from"), NP(PN("Brazil"))))))
+                                ))
+                           )))
+                 ));
+  });
+
+  it("Jones's sister is Mary", function() {
+    assertThat(sentence("Jones's sister is Mary."))
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+                 VP_(VP(BE("is"), NP(PN("Mary"))))));
+  });
+
+  it("Jones's sister is not Mary", function() {
+    assertThat(sentence("Jones's sister is not Mary."))
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+                 VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
   function clear(root) {
