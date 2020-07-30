@@ -6,7 +6,7 @@ const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
 const {child} = require("../../src/drt/rules.js");
 
-class Parser {
+class Nearley {
  constructor({ParserRules, ParserStart}, start) {
   let rule = start ? start : ParserStart;
 
@@ -38,7 +38,7 @@ class Parser {
  }
 
  static from(code, start) {
-  return new Parser(Parser.compile(code), start);
+  return new Nearley(Nearley.compile(code), start);
  }
 
  /*
@@ -192,7 +192,7 @@ class Parser {
 describe("Nearley", function() {
 
   it("Basic", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -200,7 +200,7 @@ describe("Nearley", function() {
   });
 
   it("Incomplete", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -210,7 +210,7 @@ describe("Nearley", function() {
   });
 
   it("Error", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       main -> (statement):+
       statement -> "foo" | "bar"
     `);
@@ -231,7 +231,7 @@ describe("Nearley", function() {
   });
 
   it("Rules", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       expression -> number "+" number
       expression -> number "-" number
       expression -> number "*" number
@@ -243,7 +243,7 @@ describe("Nearley", function() {
    });
 
   it("Postprocessors", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       expression -> number "+" number {%
         function([left, op, right]) {
           return {left: left, op: op, right: right};
@@ -260,7 +260,7 @@ describe("Nearley", function() {
    });
 
   it("Reject", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       # the first rule always rejects
       number -> [0-4]:+ {% (data, location, reject) => reject %}
       number -> [0-9]:+ {% ([number], location, reject) => "hello" %}
@@ -270,7 +270,7 @@ describe("Nearley", function() {
    });
 
   it("Javascript", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       @{%
         function foo(num) {
          return parseInt(num);
@@ -283,7 +283,7 @@ describe("Nearley", function() {
    });
 
   it("Builtin", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       @builtin "whitespace.ne"
       expression -> number _ "+" _ number
       number -> [0-9]:+ {% ([number], location, reject) => parseInt(number) %}
@@ -778,7 +778,7 @@ describe("Binding", function() {
   });
 });
 
-const RuntimeGrammar = Parser.compile(`
+const RuntimeGrammar = Nearley.compile(`
       @builtin "whitespace.ne"
       @builtin "number.ne"
       @builtin "string.ne"
@@ -866,7 +866,7 @@ const RuntimeGrammar = Parser.compile(`
 
 class RuntimeParser {
  constructor() {
-  this.parser = new Parser(RuntimeGrammar);
+  this.parser = new Nearley(RuntimeGrammar);
  }
 
  feed(code) {
@@ -908,13 +908,13 @@ class RuntimeParser {
 
   }
  
-  return Parser.compile(result.join("\n"));
+  return Nearley.compile(result.join("\n"));
  }
 }
 
 describe("RuntimeParser", function() {
   it("Rejects at Runtime", function() {
-    let parser = Parser.from(`
+    let parser = Nearley.from(`
       @builtin "whitespace.ne"
 
       @{% ${bind.toString()} %}
@@ -1225,7 +1225,7 @@ const DRTGrammar = RuntimeParser.compile(`
 
 class DRTParser {
  constructor (start){
-  this.parser = new Parser(DRTGrammar, start);
+  this.parser = new Nearley(DRTGrammar, start);
  }
 
  feed(code) {
