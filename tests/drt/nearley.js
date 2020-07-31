@@ -1225,49 +1225,6 @@ const DRTGrammar = FeaturedNearley.compile(`
       ADJ -> "unhappy".
       ADJ -> "foolish".
 
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
-      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
-
-      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
-
-      VERB[trans=1, stat=-, pres=+s] -> "leave".
-      VERB[trans=1, stat=-, past=irregular] -> "left".
-
-      VERB[trans=-, stat=-, pres=+s] -> "come".
-      VERB[trans=-, stat=-, past=irregular] -> "came".
-
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
-
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
-      VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "play".
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "decay".
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "enjoy".
-
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "cr".
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "appl".
-      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cop".
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "repl".
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "tr".
-
-      VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
-      VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
-
       V[num=1, fin=-, stat=-, trans=2] -> 
           VERB[trans=2, stat=-].
 
@@ -1299,7 +1256,50 @@ const DRTGrammar = FeaturedNearley.compile(`
          -> VERB[trans=3, stat=2, past=+red] "red".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, past=irregular].
+         -> VERB[trans=3, stat=2, past=-reg].
+
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
+
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
+
+      VERB[trans=1, stat=-, pres=+s] -> "leave".
+      VERB[trans=1, stat=-, past=-reg] -> "left".
+
+      VERB[trans=-, stat=-, pres=+s] -> "come".
+      VERB[trans=-, stat=-, past=-reg] -> "came".
+
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
+
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
+      VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "play".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "decay".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "enjoy".
+
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "cr".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "appl".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cop".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "repl".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "tr".
+
+      VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
+      VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
 `);
 
 class Parser {
