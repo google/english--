@@ -1218,7 +1218,10 @@ const DRTGrammar = FeaturedNearley.compile(`
       HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
-      VERB[trans=1, stat=+, ends=reg] -> "like".
+      ADJ -> "happy".
+      ADJ -> "foolish".
+
+      VERB[trans=+, stat=+, ends=reg] -> "like".
       VERB[trans=+, stat=-, ends=reg] -> "beat".
       VERB[trans=+, stat=-, ends=reg] -> "listen".
 
@@ -1283,9 +1286,6 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, ends=stress+r] "red".
-
-      ADJ -> "happy".
-      ADJ -> "foolish".
 `);
 
 class Parser {
