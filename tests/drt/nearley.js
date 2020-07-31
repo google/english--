@@ -379,6 +379,12 @@ function bind(type, types = {}, conditions = []) {
      child.types[key] = expected.types[key];
     } else if (typeof child.types[key] == "string" &&
                expected.types[key] != child.types[key]) {
+     if (Array.isArray(expected.types[key]) &&
+         expected.types[key].includes(child.types[key])) {
+      // variables[key] = child.types[key];
+      // console.log(key);
+      continue;
+     }
      // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
      return reject;
     } else if (!child.types[key]) {
@@ -744,6 +750,26 @@ describe("Binding", function() {
           "@type": "NP", 
           "types": {"num": ["sing", "plur"]}, 
       }]
+    });
+  });
+
+  it("Binds literal to an array entry", function() {
+    let post = bind("V", {}, [{
+       "@type": "VERB",
+       "types": {"ends": ["s", "ch"]}
+      }]);
+
+    assertThat(post([{
+        "@type": "VERB",
+        "types": {"ends": "s"}, 
+      }]))
+    .equalsTo({
+      "@type": "V", 
+      "types": {}, 
+      "children": [{
+          "@type": "VERB", 
+          "types": {"ends": "s"}, 
+        }]
     });
   });
 
@@ -1192,31 +1218,71 @@ const DRTGrammar = FeaturedNearley.compile(`
       HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
-      VERB[trans=1, stat=+] -> "like".
+      VERB[trans=1, stat=+, ends=reg] -> "like".
+      VERB[trans=+, stat=-, ends=reg] -> "beat".
+      VERB[trans=+, stat=-, ends=reg] -> "listen".
 
-      VERB[trans=+, stat=-] -> "hit".
-      VERB[trans=+, stat=-] -> "beat".
-      VERB[trans=+, stat=-] -> "kiss".
-      VERB[trans=+, stat=-] -> "love".
+      VERB[trans=-, stat=-, ends=reg] -> "walk".
+      VERB[trans=-, stat=-, ends=reg] -> "leave".
+      VERB[trans=-, stat=-, ends=reg] -> "sleep".
+      VERB[trans=-, stat=-, ends=reg] -> "come".
 
-      VERB[trans=-, stat=-] -> "walk".
-      VERB[trans=-, stat=-] -> "leave".
-      VERB[trans=-, stat=-] -> "sleep".
-      VERB[trans=-, stat=-] -> "come".
+      VERB[trans=+, stat=-, ends=s] -> "kiss".
+      VERB[trans=+, stat=-, ends=x] -> "box".
+      VERB[trans=+, stat=-, ends=ch] -> "watch".
+      VERB[trans=+, stat=-, ends=sh] -> "crash".
 
-      V[num=1, fin=-, stat=-, trans=2] -> VERB[trans=2, stat=-].
+      VERB[trans=+, stat=-, ends=e] -> "seize".
+      VERB[trans=+, stat=-, ends=e] -> "tie".
+      VERB[trans=+, stat=-, ends=e] -> "free".
+      VERB[trans=+, stat=-, ends=e] -> "love".
+
+      VERB[trans=+, stat=-, ends=i] -> "ski".
+      VERB[trans=+, stat=-, ends=o] -> "echo".
+
+      VERB[trans=+, stat=-, ends=vow+y] -> "play".
+      VERB[trans=+, stat=-, ends=vow+y] -> "decay".
+      VERB[trans=+, stat=-, ends=vow+y] -> "enjoy".
+
+      VERB[trans=+, stat=-, ends=con+y] -> "cr".
+      VERB[trans=+, stat=-, ends=con+y] -> "appl".
+      VERB[trans=+, stat=-, ends=con+y] -> "cop".
+      VERB[trans=+, stat=-, ends=con+y] -> "repl".
+      VERB[trans=+, stat=-, ends=con+y] -> "tr".
+
+      VERB[trans=+, stat=-, ends=stress+l] -> "compel".
+      VERB[trans=+, stat=-, ends=stress+r] -> "defer".
+
+      V[num=1, fin=-, stat=-, trans=2] -> 
+          VERB[trans=2, stat=-, ends=[reg, e, vow+y, stress+l, stress+r]].
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-         VERB[trans=2, stat=1] "s".
+          VERB[trans=2, stat=1, ends=[reg, e, vow+y, stress+l, stress+r]] "s".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, ends=[s, x, ch, sh]] "es".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, ends=con+y] "ies".
 
       V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-         VERB[trans=2, stat=1].
+          VERB[trans=2, stat=1, ends=reg].
 
-      V[num=1, fin=+, stat=2, tp=-past, tense=[pres, past], trans=3] -> 
-         VERB[trans=3, stat=2] "ed".
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, ends=[reg, s, x, ch, sh, i, o, vow+y]] 
+          "ed".
 
-      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=5] -> 
-         VERB[trans=5, stat=2] "ed".
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, ends=e] "d".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, ends=[con+y]] "ied".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, ends=stress+l] "led".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, ends=stress+r] "red".
 
       ADJ -> "happy".
       ADJ -> "foolish".
@@ -1234,11 +1300,11 @@ class Parser {
 
 describe("DRT", function() {
 
-  function parse(s, start) {
+  function parse(s, start, raw = false) {
    let parser = new Parser(start);
    let results = parser.feed(s);
    if (start) {
-    return clear(results[0]);
+    return raw ? results[0] : clear(results[0]);
    }
    return clear(results[0]).children[0].children[0];
   }
@@ -1758,6 +1824,74 @@ describe("DRT", function() {
      .equalsTo(Question("Who", VP_(AUX("will"), 
                                    VP(V(VERB("love")),
                                       NP(PN("Mary")))), "?"));
+  });
+
+  // verbs
+
+  it("Verbs", function() {
+    // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+    // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
+
+    // Third person for regular verbs
+    assertThat(parse("listens", "V")).equalsTo(V(VERB("listen"), "s"));
+    assertThat(parse("walks", "V")).equalsTo(V(VERB("walk"), "s"));
+
+    // Third person present for verbs ending in s, x, ch, sh
+    assertThat(parse("kisses", "V")).equalsTo(V(VERB("kiss"), "es"));
+    assertThat(parse("boxes", "V")).equalsTo(V(VERB("box"), "es"));
+    assertThat(parse("watches", "V")).equalsTo(V(VERB("watch"), "es"));
+    assertThat(parse("crashes", "V")).equalsTo(V(VERB("crash"), "es"));
+
+    // Third person present for verbs ending in e
+    assertThat(parse("frees", "V")).equalsTo(V(VERB("free"), "s"));    
+    assertThat(parse("ties", "V")).equalsTo(V(VERB("tie"), "s"));    
+
+    // Third person present ending in vow + y
+    assertThat(parse("plays", "V")).equalsTo(V(VERB("play"), "s"));
+
+    // Third person present ending in consonant + y
+    assertThat(parse("applies", "V")).equalsTo(V(VERB("appl"), "ies"));
+    assertThat(parse("copies", "V")).equalsTo(V(VERB("cop"), "ies"));
+    assertThat(parse("replies", "V")).equalsTo(V(VERB("repl"), "ies"));
+    assertThat(parse("tries", "V")).equalsTo(V(VERB("tr"), "ies"));
+
+    // Third person past for verbs ending in s, x, ch, sh
+    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
+
+    // Third person for verbs where the final syllable is stressed
+    assertThat(parse("compels", "V")).equalsTo(V(VERB("compel"), "s"));    
+    assertThat(parse("defers", "V")).equalsTo(V(VERB("defer"), "s"));
+
+    // Past tense for regular verbs
+    assertThat(parse("listened", "V")).equalsTo(V(VERB("listen"), "ed"));
+    assertThat(parse("walked", "V")).equalsTo(V(VERB("walk"), "ed"));
+
+    // Past tense for verbs ending in s, x, ch, sh
+    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
+    assertThat(parse("boxed", "V")).equalsTo(V(VERB("box"), "ed"));
+    assertThat(parse("watched", "V")).equalsTo(V(VERB("watch"), "ed"));
+    assertThat(parse("crashed", "V")).equalsTo(V(VERB("crash"), "ed"));
+
+    // Past tense for verbs ending in e
+    assertThat(parse("freed", "V")).equalsTo(V(VERB("free"), "d"));
+    assertThat(parse("tied", "V")).equalsTo(V(VERB("tie"), "d"));
+    assertThat(parse("loved", "V")).equalsTo(V(VERB("love"), "d"));
+
+    // Past tense for verbs ending in i, o
+    assertThat(parse("skied", "V")).equalsTo(V(VERB("ski"), "ed"));    
+    assertThat(parse("echoed", "V")).equalsTo(V(VERB("echo"), "ed"));    
+
+    // Past tense for verbs ending in consonant + y
+    assertThat(parse("applied", "V")).equalsTo(V(VERB("appl"), "ied"));
+    assertThat(parse("tried", "V")).equalsTo(V(VERB("tr"), "ied"));
+
+    // Past tense for verbs ending in vowel + y
+    assertThat(parse("played", "V")).equalsTo(V(VERB("play"), "ed"));    
+    assertThat(parse("enjoyed", "V")).equalsTo(V(VERB("enjoy"), "ed"));    
+
+    // Past tense for verbs where the final syllable is stressed
+    assertThat(parse("compelled", "V")).equalsTo(V(VERB("compel"), "led"));    
+    assertThat(parse("deferred", "V")).equalsTo(V(VERB("defer"), "red"));
   });
 
   function clear(root) {
