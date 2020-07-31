@@ -1225,73 +1225,74 @@ const DRTGrammar = FeaturedNearley.compile(`
       ADJ -> "unhappy".
       ADJ -> "foolish".
 
-      VERB[trans=1, stat=+, ends=reg] -> "like".
-      VERB[trans=+, stat=-, ends=reg] -> "beat".
-      VERB[trans=1, stat=-, ends=reg] -> "listen".
-      VERB[trans=+, stat=-, ends=reg] -> "own".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "like".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
 
-      VERB[trans=-, stat=-, ends=reg] -> "walk".
-      VERB[trans=-, stat=-, ends=reg] -> "leave".
-      VERB[trans=-, stat=-, ends=reg] -> "sleep".
-      VERB[trans=-, stat=-, ends=reg] -> "come".
-      VERB[trans=-, stat=-, ends=reg] -> "stink".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
 
-      VERB[trans=+, stat=-, ends=s] -> "kiss".
-      VERB[trans=+, stat=-, ends=x] -> "box".
-      VERB[trans=+, stat=-, ends=ch] -> "watch".
-      VERB[trans=+, stat=-, ends=sh] -> "crash".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
+      VERB[trans=-, stat=-, pres=+s] -> "leave".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
+      VERB[trans=-, stat=-, pres=+s] -> "come".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
 
-      VERB[trans=+, stat=-, ends=e] -> "seize".
-      VERB[trans=+, stat=-, ends=e] -> "tie".
-      VERB[trans=+, stat=-, ends=e] -> "free".
-      VERB[trans=1, stat=-, ends=e] -> "love".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
 
-      VERB[trans=+, stat=-, ends=i] -> "ski".
-      VERB[trans=+, stat=-, ends=o] -> "echo".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
+      VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
 
-      VERB[trans=+, stat=-, ends=vow+y] -> "play".
-      VERB[trans=+, stat=-, ends=vow+y] -> "decay".
-      VERB[trans=+, stat=-, ends=vow+y] -> "enjoy".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "ski".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "echo".
 
-      VERB[trans=+, stat=-, ends=con+y] -> "cr".
-      VERB[trans=+, stat=-, ends=con+y] -> "appl".
-      VERB[trans=+, stat=-, ends=con+y] -> "cop".
-      VERB[trans=+, stat=-, ends=con+y] -> "repl".
-      VERB[trans=+, stat=-, ends=con+y] -> "tr".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "play".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "decay".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "enjoy".
 
-      VERB[trans=+, stat=-, ends=stress+l] -> "compel".
-      VERB[trans=+, stat=-, ends=stress+r] -> "defer".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cr".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "appl".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cop".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "repl".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "tr".
+
+      VERB[trans=+, stat=-, pres=+s, past=+led] -> "compel".
+      VERB[trans=+, stat=-, pres=+s, past=+red] -> "defer".
 
       V[num=1, fin=-, stat=-, trans=2] -> 
-          VERB[trans=2, stat=-, ends=[reg, e, s, vow+y, stress+l, stress+r]].
+          VERB[trans=2, stat=-].
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, ends=[reg, e, vow+y, stress+l, stress+r]] "s".
+          VERB[trans=2, stat=1, pres=+s] "s".
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, ends=[s, x, ch, sh]] "es".
+          VERB[trans=2, stat=1, pres=+es] "es".
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, ends=con+y] "ies".
+          VERB[trans=2, stat=1, pres=+ies] "ies".
 
       V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, ends=[reg, e, vow+y, stress+l, stress+r]].
+          VERB[trans=2, stat=1].
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-          -> VERB[trans=3, stat=2, ends=[reg, s, x, ch, sh, i, o, vow+y]] 
-          "ed".
+          -> VERB[trans=3, stat=2, past=+ed] "ed".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, ends=e] "d".
+         -> VERB[trans=3, stat=2, past=+d] "d".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, ends=[con+y]] "ied".
+         -> VERB[trans=3, stat=2, past=+ied] "ied".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, ends=stress+l] "led".
+         -> VERB[trans=3, stat=2, past=+led] "led".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, ends=stress+r] "red".
+         -> VERB[trans=3, stat=2, past=+red] "red".
 `);
 
 class Parser {
@@ -1879,6 +1880,9 @@ describe("DRT Verbs", function() {
     // https://parentingpatch.com/third-person-singular-simple-present-verbs/
     // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
 
+    // Third person plural for regular verbs
+    assertThat(parse("walk", "V")).equalsTo(V(VERB("walk")));
+
     // Third person for regular verbs
     assertThat(parse("listens", "V")).equalsTo(V(VERB("listen"), "s"));
     assertThat(parse("walks", "V")).equalsTo(V(VERB("walk"), "s"));
@@ -1903,12 +1907,12 @@ describe("DRT Verbs", function() {
     assertThat(parse("replies", "V")).equalsTo(V(VERB("repl"), "ies"));
     assertThat(parse("tries", "V")).equalsTo(V(VERB("tr"), "ies"));
 
-    // Third person past for verbs ending in s, x, ch, sh
-    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
-
     // Third person for verbs where the final syllable is stressed
     assertThat(parse("compels", "V")).equalsTo(V(VERB("compel"), "s"));    
     assertThat(parse("defers", "V")).equalsTo(V(VERB("defer"), "s"));
+
+    // Third person past for verbs ending in s, x, ch, sh
+    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
 
     // Past tense for regular verbs
     assertThat(parse("listened", "V")).equalsTo(V(VERB("listen"), "ed"));
@@ -2054,7 +2058,7 @@ describe("Backwards compatibility", function() {
                       VP(V(VERB("love")), NP(PRO("him"))))));
   });
 
-  it.skip("Jones does not like the book.", function() {
+  it("Jones does not like the book.", function() {
     assertThat(parse("Jones does not like the book."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("does"), "not", 
