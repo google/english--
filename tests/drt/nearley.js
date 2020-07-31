@@ -1233,10 +1233,14 @@ const DRTGrammar = FeaturedNearley.compile(`
       VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
 
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
-      VERB[trans=-, stat=-, pres=+s] -> "leave".
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
-      VERB[trans=-, stat=-, pres=+s] -> "come".
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
+
+      VERB[trans=1, stat=-, pres=+s] -> "leave".
+      VERB[trans=1, stat=-, past=irregular] -> "left".
+
+      VERB[trans=-, stat=-, pres=+s] -> "come".
+      VERB[trans=-, stat=-, past=irregular] -> "came".
 
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
@@ -1293,6 +1297,9 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=+red] "red".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=irregular].
 `);
 
 class Parser {
@@ -1839,6 +1846,22 @@ describe("Statements", function() {
      .equalsTo(S(NP(PRO("They")),
                  VP_(VP(HAVE("have"), "not", VP(V(VERB("walk"), "ed"))))));
   });
+
+  it("They left Brazil.", function() {
+    assertThat(parse("They left Brazil."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(V(VERB("left")),
+                        NP(PN("Brazil"))))));
+  });
+
+  it("They have left Brazil.", function() {
+    assertThat(parse("They have left Brazil."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(HAVE("have"), 
+                        VP(V(VERB("left")),
+                           NP(PN("Brazil")))))));
+  });
+
 });
 
 describe("Questions", function() {
@@ -1944,6 +1967,10 @@ describe("DRT Verbs", function() {
     // Past tense for verbs where the final syllable is stressed
     assertThat(parse("compelled", "V")).equalsTo(V(VERB("compel"), "led"));    
     assertThat(parse("deferred", "V")).equalsTo(V(VERB("defer"), "red"));
+
+    // Past tense for verbs that are irregular.
+    assertThat(parse("left", "V")).equalsTo(V(VERB("left")));
+    assertThat(parse("came", "V")).equalsTo(V(VERB("came")));
   });
 });
 
