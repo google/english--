@@ -1298,16 +1298,54 @@ class Parser {
  }
 }
 
-describe("DRT", function() {
+function clear(root) {
+ if (!root) {
+  return;
+ }
+ delete root.types;
+ for (let child of root.children || []) {
+  clear(child);
+ }
+ return root;
+}
 
-  function parse(s, start, raw = false) {
-   let parser = new Parser(start);
-   let results = parser.feed(s);
-   if (start) {
-    return raw ? results[0] : clear(results[0]);
-   }
-   return clear(results[0]).children[0].children[0];
-  }
+let node = (type, ...children) => { 
+ return {"@type": type, "children": children} 
+};
+
+let Statement = (...children) => node("Statement", ...children);
+let Question = (...children) => node("Question", ...children);
+
+let S = (...children) => node("S", ...children);
+let NP = (...children) => node("NP", ...children);
+let PN = (...children) => node("PN", ...children);
+let VP_ = (...children) => node("VP_", ...children);
+let VP = (...children) => node("VP", ...children);
+let V = (...children) => node("V", ...children);
+let AUX = (...children) => node("AUX", ...children);
+let PRO = (...children) => node("PRO", ...children);
+let DET = (...children) => node("DET", ...children);
+let N = (...children) => node("N", ...children);
+let RC = (...children) => node("RC", ...children);
+let RPRO = (...children) => node("RPRO", ...children);
+let GAP = (...children) => node("GAP", ...children);
+let BE = (...children) => node("BE", ...children);
+let ADJ = (...children) => node("ADJ", ...children);
+let PREP = (...children) => node("PREP", ...children);
+let PP = (...children) => node("PP", ...children);
+let VERB = (...children) => node("VERB", ...children);
+let HAVE = (...children) => node("HAVE", ...children);
+
+function parse(s, start, raw = false) {
+ let parser = new Parser(start);
+ let results = parser.feed(s);
+ if (start) {
+  return raw ? results[0] : clear(results[0]);
+ }
+ return clear(results[0]).children[0].children[0];
+}
+
+describe("DRT", function() {
 
   it("Jones likes Mary", function() {
     assertThat(parse("Jones likes Mary."))
@@ -1825,9 +1863,9 @@ describe("DRT", function() {
                                    VP(V(VERB("love")),
                                       NP(PN("Mary")))), "?"));
   });
+});
 
-  // verbs
-
+describe("DRT Verbs", function() {
   it("Verbs", function() {
     // https://parentingpatch.com/third-person-singular-simple-present-verbs/
     // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
@@ -1893,44 +1931,6 @@ describe("DRT", function() {
     assertThat(parse("compelled", "V")).equalsTo(V(VERB("compel"), "led"));    
     assertThat(parse("deferred", "V")).equalsTo(V(VERB("defer"), "red"));
   });
-
-  function clear(root) {
-   if (!root) {
-    return;
-   }
-   delete root.types;
-   for (let child of root.children || []) {
-    clear(child);
-   }
-   return root;
-  }
-
-  let node = (type, ...children) => { 
-   return {"@type": type, "children": children} 
-  };
-
-  let Statement = (...children) => node("Statement", ...children);
-  let Question = (...children) => node("Question", ...children);
-
-  let S = (...children) => node("S", ...children);
-  let NP = (...children) => node("NP", ...children);
-  let PN = (...children) => node("PN", ...children);
-  let VP_ = (...children) => node("VP_", ...children);
-  let VP = (...children) => node("VP", ...children);
-  let V = (...children) => node("V", ...children);
-  let AUX = (...children) => node("AUX", ...children);
-  let PRO = (...children) => node("PRO", ...children);
-  let DET = (...children) => node("DET", ...children);
-  let N = (...children) => node("N", ...children);
-  let RC = (...children) => node("RC", ...children);
-  let RPRO = (...children) => node("RPRO", ...children);
-  let GAP = (...children) => node("GAP", ...children);
-  let BE = (...children) => node("BE", ...children);
-  let ADJ = (...children) => node("ADJ", ...children);
-  let PREP = (...children) => node("PREP", ...children);
-  let PP = (...children) => node("PP", ...children);
-  let VERB = (...children) => node("VERB", ...children);
-  let HAVE = (...children) => node("HAVE", ...children);
 });
 
 function assertThat(x) {
