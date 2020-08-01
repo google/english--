@@ -1137,6 +1137,8 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
 
+      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
+
       PRO[num=sing, gen=male, case=+nom] -> "he".
       PRO[num=sing, gen=male, case=-nom] -> "him".
 
@@ -1166,6 +1168,13 @@ const DRTGrammar = FeaturedNearley.compile(`
       N[num=sing, gen=-hum] -> "donkey".
       N[num=sing, gen=-hum] -> "porsche".
       N[num=sing, gen=[male, fem]] -> "engineer".
+
+      N[num=sing, gen=male, rn=+] -> "brother".
+      N[num=sing, gen=male, rn=+] -> "father".
+      N[num=sing, gen=male, rn=+] -> "husband".
+      N[num=sing, gen=fem, rn=+] -> "sister".
+      N[num=sing, gen=fem, rn=+] -> "mother".
+      N[num=sing, gen=fem, rn=+] -> "wife".
 
       N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
 
@@ -1284,6 +1293,7 @@ const DRTGrammar = FeaturedNearley.compile(`
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
       VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "surprise".
 
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
@@ -2188,14 +2198,14 @@ describe("Backwards compatibility", function() {
                                 )))))));
   });
 
-  it.skip("Every book which she loves surprises him.", function() {
+  it("Every book which she loves surprises him.", function() {
     assertThat(parse("Every book which she loves surprises him."))
      .equalsTo(S(NP(DET("Every"), 
                     N(N("book"), RC(RPRO("which"), 
                                     S(NP(PRO("she")),
-                                      VP_(VP(V("loves"), NP(GAP()))))
+                                      VP_(VP(V(VERB("love"), "s"), NP(GAP()))))
                                     ))),
-                 VP_(VP(V("surprises"), NP(PRO("him")))
+                 VP_(VP(V(VERB("surprise"), "s"), NP(PRO("him")))
                      )));
 
   });
@@ -2330,15 +2340,15 @@ describe("Backwards compatibility", function() {
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
-  it.skip("Jones's wife is happy.", function() {
+  it("Jones's wife is happy.", function() {
     assertThat(parse("Jones's wife is happy."))
-     .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
   it.skip("Jones's wife likes and loves Mary.", function() {
     assertThat(first(parse("Jones's wife likes and loves Mary.")))
-     .equalsTo(S(NP(DET(PN("Jones"), "'s"), RN("wife")),
+     .equalsTo(S(NP(DET(PN("Jones"), "'s"), N("wife")),
                  VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
   });
 
@@ -2355,15 +2365,15 @@ describe("Backwards compatibility", function() {
 
   it.skip("Jones's wife and Smith's brother like and love Mary.", function() {
     assertThat(first(parse("Jones's wife and Smith's brother like and love Mary.")))
-     .equalsTo(S(NP(NP(DET(PN("Jones"), "'s"), RN("wife")), 
+     .equalsTo(S(NP(NP(DET(PN("Jones"), "'s"), N("wife")), 
                     "and", 
-                    NP(DET(PN("Smith"), "'s"), RN("brother"))),
+                    NP(DET(PN("Smith"), "'s"), N("brother"))),
                  VP_(VP(V(V("like"), "and", V("love")), NP(PN("Mary"))))));
   });
 
-  it.skip("Jones owns an unhappy donkey.", function() {
+  it("Jones owns an unhappy donkey.", function() {
     assertThat(parse("Jones owns an unhappy donkey."))
-     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("an"), N(ADJ("unhappy"), N("donkey")))))));
+     .equalsTo(S(NP(PN("Jones")), VP_(VP(V(VERB("own"), "s"), NP(DET("an"), N(ADJ("unhappy"), N("donkey")))))));
   });
 
   it("Jones likes a woman with a donkey.", function() {
@@ -2417,7 +2427,7 @@ describe("Backwards compatibility", function() {
     assertThat(clean(parse("Who does Smith's brother like?")))
      .equalsTo(Sentence("Who", 
                         AUX("does"),
-                        NP(DET(PN("Smith"), "'s"), RN("brother")), 
+                        NP(DET(PN("Smith"), "'s"), N("brother")), 
                         VP(V("like"), NP(GAP())), 
                         "?"));
   });
@@ -2430,19 +2440,19 @@ describe("Backwards compatibility", function() {
                         "?"));
   });
 
-  it.skip("Sam's wife is Dani.", function() {
-    assertThat(first(parse("Sam's wife is Dani.")))
-     .equalsTo(S(NP(DET(PN("Sam"), "'s"), RN("wife")),
-                 VP_(VP(BE("is"), NP(PN("Dani"))))));
+  it("Jones's wife is Mary.", function() {
+    assertThat(parse("Jones's wife is Mary."))
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+                 VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
-  it.skip("Sam's wife was Dani.", function() {
-    assertThat(first(parse("Sam's wife was Dani.")))
-     .equalsTo(S(NP(DET(PN("Sam"), "'s"), RN("wife")),
-                 VP_(VP(BE("was"), NP(PN("Dani"))))));
+  it("Jones's wife was Mary.", function() {
+    assertThat(parse("Jones's wife was Mary."))
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+                 VP_(VP(BE("was"), NP(PN("Mary"))))));
   });
 
-  it.skip("John is a happy man", function() {
+  it("John is a happy man", function() {
     assertThat(parse("Jones is a happy man."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), NP(DET("a"), N(ADJ("happy"), N("man")))))));
@@ -2473,9 +2483,9 @@ describe("Backwards compatibility", function() {
   it.skip("If A is B's parent then B is A's child.", function() {
     assertThat(first(parse("If A is B's parent then B is A's child.")))
      .equalsTo(S("If", 
-                 S(NP(PN("A")), VP_(VP(BE("is"), NP(DET(PN("B"), "'s"), RN("parent"))))), 
+                 S(NP(PN("A")), VP_(VP(BE("is"), NP(DET(PN("B"), "'s"), N("parent"))))), 
                  "then", 
-                 S(NP(PN("B")), VP_(VP(BE("is"), NP(DET(PN("A"), "'s"), RN("child"))))), 
+                 S(NP(PN("B")), VP_(VP(BE("is"), NP(DET(PN("A"), "'s"), N("child"))))), 
                  ));
   });
 
@@ -2493,7 +2503,7 @@ describe("Backwards compatibility", function() {
 
   it.skip("John is happy with Mary.", function() {
     // TODO(goto): this probably involves second order logic?
-    assertThat(first(parse("John is happy with Mary.")))
+    assertThat(parse("Jones is happy with Mary."))
      .equalsTo(S(NP(PN("John")),
                  VP_(VP(V("loves"), NP(PRO("himself"))))));
   });
@@ -2650,15 +2660,12 @@ describe("Backwards compatibility", function() {
                         NP(PN("Jones"))))));
   });
 
-  it.skip("Mary has loved Anna.", function() {
-    // statitive verbs ending in "e" need to eat the "e" in
-    // the "ed" expansion.
-    // also, statitive verbs that are intransitive don't 
-    // seem to expand either.
-    assertThat(first(parse("Mary has loved Anna.")))
+  it("Mary has loved Anna.", function() {
+    assertThat(parse("Mary has loved Jones."))
      .equalsTo(S(NP(PN("Mary")),
-                 VP_(VP(V("knows"),
-                        NP(PN("Jones"))))));
+                 VP_(VP(HAVE("has"), 
+                        VP(V(VERB("love"), "d"), 
+                           NP(PN("Jones")))))));
   });
 
   it("Mary was an engineer.", function() {
