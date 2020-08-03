@@ -1043,6 +1043,14 @@ const DRTGrammar = FeaturedNearley.compile(`
           "?"
           .
 
+      Question ->
+          "Who" __ 
+          AUX[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          V[num=1, fin=-, trans=+] _
+          "?"
+          .
+
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
       S[num=1, gap=-, tp=2, tense=3] -> 
@@ -2407,30 +2415,66 @@ describe("Backwards compatibility", function() {
                         "?"));
   });
 
-  it.skip("Who does Mary like?", function() {
-    assertThat(clean(parse("Who does Mary like?")))
-     .equalsTo(Sentence("Who", 
+  it("Who does Mary like?", function() {
+    assertThat(parse("Who does Mary like?", "Question"))
+     .equalsTo(Question("Who", 
                         AUX("does"),
                         NP(PN("Mary")), 
-                        VP(V("like"), NP(GAP())), 
+                        V(VERB("like")), 
                         "?"));
   });
 
-  it.skip("Who does the man like?", function() {
-    assertThat(clean(parse("Who does the man like?")))
-     .equalsTo(Sentence("Who", 
+  it("Who will Mary like?", function() {
+    assertThat(parse("Who will Mary like?", "Question"))
+     .equalsTo(Question("Who", 
+                        AUX("will"),
+                        NP(PN("Mary")), 
+                        V(VERB("like")), 
+                        "?"));
+  });
+
+  it("Who would Mary like?", function() {
+    assertThat(parse("Who would Mary like?", "Question"))
+     .equalsTo(Question("Who", 
+                        AUX("would"),
+                        NP(PN("Mary")), 
+                        V(VERB("like")), 
+                        "?"));
+  });
+
+  it("Who would they like?", function() {
+    assertThat(parse("Who do they like?", "Question"))
+     .equalsTo(Question("Who", 
+                        AUX("do"),
+                        NP(PRO("they")), 
+                        V(VERB("like")), 
+                        "?"));
+  });
+
+  it("Who did they like?", function() {
+    assertThat(parse("Who did they like?", "Question"))
+     .equalsTo(Question("Who", 
+                        AUX("did"),
+                        NP(PRO("they")), 
+                        V(VERB("like")), 
+                        "?"));
+  });
+
+  it("Who does the man like?", function() {
+    assertThat(parse("Who does the man like?", "Question"))
+     .equalsTo(Question("Who", 
                         AUX("does"),
                         NP(DET("the"), N("man")), 
-                        VP(V("like"), NP(GAP())), 
+                        V(VERB("like")), 
                         "?"));
   });
 
-  it.skip("Who does Smith's brother like?", function() {
-    assertThat(clean(parse("Who does Smith's brother like?")))
-     .equalsTo(Sentence("Who", 
+  it("Who does Smith's brother like?", function() {
+    assertThat(parse("Who does Smith's brother like?", "Question"))
+     .equalsTo(Question("Who", 
                         AUX("does"),
-                        NP(DET(PN("Smith"), "'s"), N("brother")), 
-                        VP(V("like"), NP(GAP())), 
+                        NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
+                        V(VERB("like")), 
                         "?"));
   });
 
