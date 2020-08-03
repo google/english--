@@ -1,10 +1,36 @@
 const Assert = require("assert");
-const nearley = require("nearley");
-const compile = require("nearley/lib/compile");
-const generate = require("nearley/lib/generate");
-const grammar = require("nearley/lib/nearley-language-bootstrapped");
 const {child} = require("../../src/drt/rules.js");
-const {Nearley, bind, FeaturedNearley, Parser} = require("../../src/drt/nearley.js");
+
+const {
+  Nearley, 
+  bind, 
+  FeaturedNearley, 
+  Parser, 
+  grammar} = require("../../src/drt/nearley.js");
+
+const {
+  Statement,
+  Question,
+  S,
+  NP,
+  PN,
+  VP_,
+  VP,
+  V,
+  AUX,
+  PRO,
+  DET,
+  N,
+  RC,
+  RPRO,
+  GAP,
+  BE,
+  ADJ,
+  PREP,
+  PP,
+  VERB,
+  HAVE,
+  RN} = grammar;
 
 describe("Nearley", function() {
   it("Basic", function() {
@@ -600,34 +626,6 @@ function clear(root) {
  }
  return root;
 }
-
-let node = (type, ...children) => { 
- return {"@type": type, "children": children} 
-};
-
-let Statement = (...children) => node("Statement", ...children);
-let Question = (...children) => node("Question", ...children);
-
-let S = (...children) => node("S", ...children);
-let NP = (...children) => node("NP", ...children);
-let PN = (...children) => node("PN", ...children);
-let VP_ = (...children) => node("VP_", ...children);
-let VP = (...children) => node("VP", ...children);
-let V = (...children) => node("V", ...children);
-let AUX = (...children) => node("AUX", ...children);
-let PRO = (...children) => node("PRO", ...children);
-let DET = (...children) => node("DET", ...children);
-let N = (...children) => node("N", ...children);
-let RC = (...children) => node("RC", ...children);
-let RPRO = (...children) => node("RPRO", ...children);
-let GAP = (...children) => node("GAP", ...children);
-let BE = (...children) => node("BE", ...children);
-let ADJ = (...children) => node("ADJ", ...children);
-let PREP = (...children) => node("PREP", ...children);
-let PP = (...children) => node("PP", ...children);
-let VERB = (...children) => node("VERB", ...children);
-let HAVE = (...children) => node("HAVE", ...children);
-let RN = (...children) => node("RN", ...children);
 
 function parse(s, start, raw = false) {
  let parser = new Parser(start);

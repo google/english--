@@ -761,9 +761,39 @@ class Parser {
  }
 }
 
+let node = (type) => { 
+ return (...children) => {
+  return {"@type": type, "children": children};
+ }
+};
+
 module.exports = {
  Nearley: Nearley,
  bind: bind,
  FeaturedNearley: FeaturedNearley,
  Parser: Parser,
+ grammar: {
+  "Statement": node("Statement"),
+  "Question": node("Question"),
+  "S": node("S"),
+  "NP": node("NP"),
+  "PN": node("PN"),
+  "VP_": node("VP_"),
+  "VP": node("VP"),
+  "V": node("V"),
+  "AUX": node("AUX"),
+  "PRO": node("PRO"),
+  "DET": node("DET"),
+  "N": node("N"),
+  "RC": node("RC"),
+  "RPRO": node("RPRO"),
+  "GAP": node("GAP"),
+  "BE": node("BE"),
+  "ADJ": node("ADJ"),
+  "PREP": node("PREP"),
+  "PP": node("PP"),
+  "VERB": node("VERB"),
+  "HAVE": node("HAVE"),
+  "RN": node("RN"),
+ }
 }
