@@ -1051,6 +1051,13 @@ const DRTGrammar = FeaturedNearley.compile(`
           "?"
           .
 
+      Question ->
+          BE[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          ADJ _
+          "?"
+          .
+
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
       S[num=1, gap=-, tp=2, tense=3] -> 
@@ -2478,10 +2485,34 @@ describe("Backwards compatibility", function() {
                         "?"));
   });
 
-  it.skip("Is Mary happy?", function() {
-    assertThat(clean(parse("Is Mary happy?")))
-     .equalsTo(Sentence("Is", 
+  it("Is Mary happy?", function() {
+    assertThat(parse("Is Mary happy?", "Question"))
+     .equalsTo(Question(BE("Is"), 
                         NP(PN("Mary")), 
+                        ADJ("happy"), 
+                        "?"));
+  });
+
+  it("Was Mary happy?", function() {
+    assertThat(parse("Was Mary happy?", "Question"))
+     .equalsTo(Question(BE("Was"), 
+                        NP(PN("Mary")), 
+                        ADJ("happy"), 
+                        "?"));
+  });
+
+  it("Are they happy?", function() {
+    assertThat(parse("Are they happy?", "Question"))
+     .equalsTo(Question(BE("Are"), 
+                        NP(PRO("they")), 
+                        ADJ("happy"), 
+                        "?"));
+  });
+
+  it("Were they happy?", function() {
+    assertThat(parse("Were they happy?", "Question"))
+     .equalsTo(Question(BE("Were"), 
+                        NP(PRO("they")), 
                         ADJ("happy"), 
                         "?"));
   });
