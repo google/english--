@@ -312,7 +312,458 @@ function bind(type, types = {}, conditions = []) {
  };
 }
 
+const RuntimeGrammar = Nearley.compile(`
+      @builtin "whitespace.ne"
+      @builtin "number.ne"
+      @builtin "string.ne"
+
+      rules -> (_ rule _ "."):+ _ {% ([rules]) => {
+        return rules.map(([ws, rule]) => rule);
+      } %}
+
+      rule -> head __ "->" __ tail {%
+        ([head, ws0, arrow, ws1, tail]) => {
+         return {
+          "head": head,
+          "tail": tail
+         }
+        }
+      %}
+
+      head -> name {% id %}
+      tail -> (term __ {% id %}):* term {%
+        ([beginning, end]) => {
+         return [...beginning, end];
+        }
+      %}
+
+      term -> name {% id %}
+      term -> string {% id %}
+
+      name -> word features:? {% 
+        ([word, features]) => {
+         return {
+          name: word,
+          types: Object.fromEntries(features || [])
+         }
+        }
+      %}
+      string -> dqstring {% ([str]) => '"' + str + '"' %}
+
+      features -> "[" props "]" {% ([p0, props, p1]) => {
+        // console.log(props);
+        return props;
+      }%}
+
+      props -> (keyvalue _ "," _ {% id %}):* keyvalue:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ word {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ int {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ array {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      array -> "[" values "]" {% ([p0, values, p1]) => values %}
+
+      values -> (word _ "," _ {% id %}):* word:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      word -> [a-zA-Z_\+\-]:+ {% ([char]) => {
+        return char.join("");
+      }%}
+`);
+
+class FeaturedNearley {
+ constructor() {
+  this.parser = new Nearley(RuntimeGrammar);
+ }
+
+ feed(code) {
+  return this.parser.feed(code);
+ }
+
+ static compile(source) {
+  let parser = new FeaturedNearley();
+  let grammar = parser.feed(source);
+
+  let result = [];
+
+  function feed(code) {
+   result.push(code);
+  }
+
+  feed(`@builtin "whitespace.ne"`);
+  feed(``);
+  feed(`@{%`);
+  feed(`${bind.toString()}`);
+  feed(`%}`);
+  feed(``);
+
+  // console.log(grammar[0].length);
+  
+  for (let {head, tail} of grammar[0]) {
+   // console.log("hi");
+   let term = (x) => typeof x == "string" ? `${x}i` : x.name;
+   feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+                     for (let term of tail) {
+                      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+                       continue;
+                      }
+                      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+                     }
+                     feed(`  ])`);
+        feed(`%}`);
+
+  }
+ 
+  return Nearley.compile(result.join("\n"));
+ }
+}
+
+const DRTGrammar = FeaturedNearley.compile(`
+      Statement -> S_ _ ".".
+
+      Question ->
+          "Who" __
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4] _
+          "?"
+          .
+
+      Question ->
+          "Who" __ 
+          AUX[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          V[num=1, fin=-, trans=+] _
+          "?"
+          .
+
+      Question ->
+          BE[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          ADJ _
+          "?"
+          .
+
+      S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          "if" __ 
+          S[num=1, gap=-, tp=2, tense=3] __ 
+          "then" __ 
+          S[num=1, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "and" __ 
+          S[num=5, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "or" __ 
+          S[num=5, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=3, tense=4] -> 
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=np] _ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=np, tp=3, tense=4].
+
+      VP_[num=1, fin=+, gap=2, stat=3, tp=4, tense=fut] ->
+        AUX[num=1, fin=+, tp=4, tense=fut] __ 
+        VP[num=5, fin=-, gap=2, stat=3, tp=4, tense=pres].
+
+      VP_[num=1, fin=+, gap=2] ->
+          AUX[num=1, fin=+] __ "not" __ VP[num=3, fin=-, gap=2].
+
+      VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
+          VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
+          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
+          NP[num=6, gen=7, case=-nom, gap=-].
+
+      VP[num=1, fin=2, gap=np] ->
+          V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
+        V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
+
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          "not" __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
+      NP[num=1, gen=2, case=3, gap=np] -> GAP.
+
+      GAP -> null.
+
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
+
+      NP[num=1, gen=2, case=3, gap=-] -> PN[num=1, gen=2].
+ 
+      NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
+
+      NP[num=plur, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "and" __ 
+        NP[num=5, gen=6, case=2, gap=-].
+
+      NP[num=plur, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "or" __ 
+        NP[num=5, gen=6, case=2, gap=-].
+
+      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
+
+      RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
+
+      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ ADJ.
+      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ "not" __ ADJ.
+
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ PP.
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ "not" __ PP.
+
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ NP[num=3, gen=4, case=5, gap=-].
+      VP[num=1, fin=2] -> 
+        BE[num=1, fin=2] __ "not" __ NP[num=3, gen=4, case=5, gap=-].
+
+      DET[num=sing] -> "a".
+      DET[num=sing] -> "an".
+      DET[num=sing] -> "every".
+      DET[num=sing] -> "the".
+      DET[num=sing] -> "some".
+
+      DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
+
+      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
+
+      PRO[num=sing, gen=male, case=+nom] -> "he".
+      PRO[num=sing, gen=male, case=-nom] -> "him".
+
+      PRO[num=sing, gen=fem, case=+nom] -> "she".
+      PRO[num=sing, gen=fem, case=-nom] -> "her".
+
+      PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> "it".
+
+      PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> "they".
+      PRO[num=plur, gen=[male, fem, -hum], case=-nom] -> "them".
+
+      PRO[num=sing, gen=male, case=-nom, refl=+] -> "himself".
+      PRO[num=sing, gen=fem, case=-nom, refl=+] -> "herself".
+      PRO[num=sing, gen=-hum, case=-nom, refl=+] -> "itself".
+
+      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+
+      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+
+      PREP -> "behind".
+      PREP -> "in".
+      PREP -> "over".
+      PREP -> "under".
+      PREP -> "near".
+
+      PREP -> "before".
+      PREP -> "after".
+      PREP -> "during".
+
+      PREP -> "from".
+      PREP -> "to".
+      PREP -> "of".
+      PREP -> "about".
+      PREP -> "by".
+      PREP -> "for".
+      PREP -> "with".
+
+      AUX[num=sing, fin=+, tp=-past, tense=pres] -> "does".
+      AUX[num=plur, fin=+, tp=-past, tense=pres] -> "do".
+
+      AUX[num=1, fin=+, tp=-past, tense=past] -> "did".
+      AUX[num=1, fin=+, tp=+past, tense=pres] -> "did".
+
+      AUX[num=1, fin=+, tp=-past, tense=fut] -> "will".
+      AUX[num=1, fin=+, tp=+past, tense=fut] -> "would".
+
+      RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
+      RPRO[num=[sing, plur], gen=-hum] -> "which".
+
+      BE[num=sing, fin=+, tp=-past, tense=pres] -> "is".
+      BE[num=plur, fin=+, tp=-past, tense=pres] -> "are".
+
+      BE[num=sing, fin=+, tp=-past, tense=past] -> "was".
+      BE[num=plur, fin=+, tp=-past, tense=past] -> "were".
+
+      BE[num=sing, fin=+, tp=+past, tense=pres] -> "was".
+      BE[num=plur, fin=+, tp=+past, tense=pres] -> "were".
+
+      BE[fin=-] -> "be".
+      BE[fin=part] -> "been".
+
+      HAVE[fin=-1] -> "have".
+
+      HAVE[num=sing, fin=+, tp=-past, tense=pres] -> "has".
+      HAVE[num=plur, fin=+, tp=-past, tense=pres] -> "have".
+
+      HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
+      HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
+
+      V[num=1, fin=-, stat=-, trans=2] -> 
+          VERB[trans=2, stat=-].
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+s] "s".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+es] "es".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+ies] "ies".
+
+      V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1].
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, past=+ed] "ed".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+d] "d".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+ied] "ied".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+led] "led".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+red] "red".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=-reg].
+
+
+      ADJ -> "happy".
+      ADJ -> "unhappy".
+      ADJ -> "foolish".
+
+      PN[num=sing, gen=male] -> "Jones".
+      PN[num=sing, gen=male] -> "Smith".
+      PN[num=sing, gen=fem] -> "Mary".
+      PN[num=sing, gen=-hum] -> "Brazil".
+
+      N[num=sing, gen=male] -> "man".
+      N[num=sing, gen=fem] -> "woman".
+      N[num=sing, gen=fem] -> "girl".
+      N[num=sing, gen=fem] -> "sister".
+      N[num=sing, gen=-hum] -> "book".
+      N[num=sing, gen=-hum] -> "telescope".
+      N[num=sing, gen=-hum] -> "donkey".
+      N[num=sing, gen=-hum] -> "porsche".
+      N[num=sing, gen=[male, fem]] -> "engineer".
+      N[num=sing, gen=1] -> "brazilian".
+
+      N[num=sing, gen=male, rn=+] -> "brother".
+      N[num=sing, gen=male, rn=+] -> "father".
+      N[num=sing, gen=male, rn=+] -> "husband".
+      N[num=sing, gen=fem, rn=+] -> "sister".
+      N[num=sing, gen=fem, rn=+] -> "mother".
+      N[num=sing, gen=fem, rn=+] -> "wife".
+
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
+
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
+
+      VERB[trans=1, stat=-, pres=+s] -> "leave".
+      VERB[trans=1, stat=-, past=-reg] -> "left".
+
+      VERB[trans=-, stat=-, pres=+s] -> "come".
+      VERB[trans=-, stat=-, past=-reg] -> "came".
+
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
+
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
+      VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "surprise".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "play".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "decay".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "enjoy".
+
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "cr".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "appl".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cop".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "repl".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "tr".
+
+      VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
+      VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
+`);
+
+class Parser {
+ constructor (start){
+  this.parser = new Nearley(DRTGrammar, start);
+ }
+
+ feed(code) {
+  return this.parser.feed(code);
+ }
+}
+
 module.exports = {
  Nearley: Nearley,
  bind: bind,
+ FeaturedNearley: FeaturedNearley,
+ Parser: Parser,
 }
