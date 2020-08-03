@@ -1071,6 +1071,11 @@ const DRTGrammar = FeaturedNearley.compile(`
           "and" __ 
           S[num=5, gap=-, tp=2, tense=3].
 
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "or" __ 
+          S[num=5, gap=-, tp=2, tense=3].
+
       S[num=1, gap=-, tp=3, tense=4] -> 
           NP[num=1, gen=2, case=+nom, gap=-] __ 
           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
@@ -2323,11 +2328,13 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(VERB("like"), "s"), NP(PRO("it"))))));
    });
 
-  it.skip("Jones loves her or Mary loves her.", function() {
+  it("Jones loves her or Mary loves her.", function() {
     assertThat(parse("Jones loves her or Mary loves her."))
-     .equalsTo(S(S(NP(PN("Jones")), VP_(VP(V("loves"), NP(PRO("her"))))), 
+     .equalsTo(S(S(NP(PN("Jones")), 
+                   VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))), 
                  "or", 
-                 S(NP(PN("Smith")), VP_(VP(V("loves"), NP(PRO("her")))))));
+                 S(NP(PN("Mary")), 
+                   VP_(VP(V(VERB("love"), "s"), NP(PRO("her")))))));
    });
 
   it.skip("Mary loves Jones or likes Smith.", function() {
