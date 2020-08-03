@@ -1127,6 +1127,11 @@ const DRTGrammar = FeaturedNearley.compile(`
         "and" __ 
         NP[num=5, gen=6, case=2, gap=-].
 
+      NP[num=plur, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "or" __ 
+        NP[num=5, gen=6, case=2, gap=-].
+
       N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
@@ -1889,6 +1894,21 @@ describe("Statements", function() {
                            NP(PN("Brazil")))))));
   });
 
+  it("Jones and Mary like him.", function() {
+    assertThat(parse("Jones and Mary like him."))
+     .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
+                 VP_(VP(V(VERB("like")), NP(PRO("him"))))));
+   });
+
+  it("He likes Jones and Mary.", function() {
+    assertThat(parse("He likes Jones and Mary."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V(VERB("like"), "s"), 
+                        NP(NP(PN("Jones")), "and", NP(PN("Mary")))
+                        ))));
+   });
+
+
 });
 
 describe("Questions", function() {
@@ -2184,12 +2204,12 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
   });
 
-  it.skip("every man loves Italy and Brazil", function() {
-    assertThat(parse("Every man loves Italy and Brazil."))
-     .equalsTo(S(NP(DET("every"), N("man")),
-                    VP_(VP(V("loves"), 
-                           NP(NP(PN("Italy")), "and", NP(PN("Brazil")))
-                           ))));
+  it("every man loves Italy and Brazil", function() {
+    assertThat(parse("Every man loves Mary and Brazil."))
+     .equalsTo(S(NP(DET("Every"), N("man")),
+                 VP_(VP(V(VERB("love"), "s"), 
+                        NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
+                        ))));
   });
 
   it("Mary loves a man who loves her.", function() {
@@ -2318,10 +2338,10 @@ describe("Backwards compatibility", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it.skip("Jones or Smith loves her.", function() {
-    assertThat(parse("Jones or Smith loves her."))
+  it("Jones or Smith love her.", function() {
+    assertThat(parse("Jones or Smith love her."))
      .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
-                 VP_(VP(V("loves"), NP(PRO("her"))))));
+                 VP_(VP(V(VERB("love")), NP(PRO("her"))))));
   });
 
   it.skip("Jones likes and loves a porsche.", function() {
@@ -2344,11 +2364,13 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
   });
 
-  it.skip("Mary likes Smith and she loves him.", function() {
-    assertThat(first(parse("Mary likes Smith and she loves him.")))
-     .equalsTo(S(S(NP(PN("Mary")), VP_(VP(V("likes"), NP(PN("Smith"))))), 
+  it("Mary likes Smith and she loves him.", function() {
+    assertThat(parse("Mary likes Smith and she loves him."))
+     .equalsTo(S(S(NP(PN("Mary")), 
+                   VP_(VP(V(VERB("like"), "s"), NP(PN("Smith"))))), 
                  "and", 
-                 S(NP(PRO("she")), VP_(VP(V("loves"), NP(PRO("him")))))));
+                 S(NP(PRO("she")), 
+                   VP_(VP(V(VERB("love"), "s"), NP(PRO("him")))))));
   });
 
   it("Jones is happy.", function() {
@@ -2369,19 +2391,19 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
   });
 
-  it.skip("Sam and Dani love Anna and Leo.", function() {
-    assertThat(first(parse("Sam and Dani love Anna and Leo.")))
-     .equalsTo(S(NP(NP(PN("Sam")), 
+  it("Jones and Smith love Mary and Brazil.", function() {
+    assertThat(parse("Jones and Smith love Mary and Brazil."))
+     .equalsTo(S(NP(NP(PN("Jones")), 
                     "and", 
-                    NP(PN("Dani"))),
-                 VP_(VP(V("love"), 
-                        NP(NP(PN("Anna")), 
+                    NP(PN("Smith"))),
+                 VP_(VP(V(VERB("love")), 
+                        NP(NP(PN("Mary")), 
                            "and", 
-                           NP(PN("Leo")))))));
+                           NP(PN("Brazil")))))));
   });
 
   it.skip("Jones's wife and Smith's brother like and love Mary.", function() {
-    assertThat(first(parse("Jones's wife and Smith's brother like and love Mary.")))
+    assertThat(parse("Jones's wife and Smith's brother like and love Mary."))
      .equalsTo(S(NP(NP(DET(PN("Jones"), "'s"), N("wife")), 
                     "and", 
                     NP(DET(PN("Smith"), "'s"), N("brother"))),
