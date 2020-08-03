@@ -4,7 +4,7 @@ const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 const {child} = require("../../src/drt/rules.js");
-const {Nearley} = require("../../src/drt/nearley.js");
+const {Nearley, bind} = require("../../src/drt/nearley.js");
 
 describe("Nearley", function() {
 
@@ -110,135 +110,6 @@ describe("Nearley", function() {
    });
 
  });
-
-function bind(type, types = {}, conditions = []) {
-   
- return (data, location, reject) => {
-  // Creates a copy of the types because it is reused
-  // across multiple calls and we assign values to it.
-  let bindings = JSON.parse(JSON.stringify(types));
-
-  // Creates a copy of the input data, because it is
-  // reused across multiple calls.
-  let result = JSON.parse(JSON.stringify(data))
-  .filter((ws) => ws != null);
-  
-  // Ignores the null type.
-  let expects = conditions.filter((x) => x["@type"] != "null");
-
-  let signature = `${type}${JSON.stringify(bindings)} -> `;
-  for (let child of expects) {
-   signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
-  }
-
-  let hash = (str) => {
-   return str.split("")
-   .reduce((prevHash, currVal) =>
-           (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
-  }
-       
-  // console.log(hash(signature));
-  let namespace = hash(signature);
-
-  let children = result.filter((node) => node["@type"]);
-
-  //console.log(`Trying to bind ${signature}`);
-  //let foo = children.map((x) => {
-  //  return `${x["@type"]}${JSON.stringify(x.types)}`;
-  //}).join(" ");
-  //console.log(`To ${foo}`);
-
-  if (expects.length != children.length) {
-   // console.log("not the same length");
-   return reject;
-  }
-
-  let variables = {};
-
-  for (let i = 0; i < expects.length; i++) {
-   let expected = expects[i];
-   let child = children[i];
-   if (expected["@type"] != child["@type"]) {
-    // console.log("Children of different types");
-    return reject;
-   }
-   for (let [key, value] of Object.entries(expected.types || {})) {
-    if (typeof value == "number") {
-     if (variables[value]) {
-      if (Array.isArray(variables[value])) {
-       if (!variables[value].includes(child.types[key])) {
-        return reject;
-       }
-      } else if (typeof variables[value] == "number") {
-       // console.log("hi");
-       variables[value] = child.types[key];
-      } else if (Array.isArray(child.types[key])) {
-       if (!child.types[key].includes(variables[value])) {
-        return reject;
-       }
-       continue;
-      } else if (typeof child.types[key] == "number") {
-       // console.log("hi");
-       variables[child.types[key]] = variables[value];
-       continue;
-      } else if (variables[value] != child.types[key]) {
-       // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
-       return reject;
-      }
-     }
-     // collects variables
-     variables[value] = child.types[key];
-    } else if (typeof child.types[key] == "number") {
-     child.types[key] = value;
-    } else if (Array.isArray(child.types[key])) {
-     if (!child.types[key].includes(expected.types[key])) {
-      return reject;
-     }
-     child.types[key] = expected.types[key];
-    } else if (typeof child.types[key] == "string" &&
-               expected.types[key] != child.types[key]) {
-     if (Array.isArray(expected.types[key]) &&
-         expected.types[key].includes(child.types[key])) {
-      // variables[key] = child.types[key];
-      // console.log(key);
-      continue;
-     }
-     // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
-     return reject;
-    } else if (!child.types[key]) {
-     return reject;
-    }
-   }
-  }
-    
-  // Sets variables
-  for (let [key, value] of Object.entries(bindings)) {
-   if (typeof value == "number") {
-    // console.log(key);
-    // console.log("hello");
-    if (!variables[value]) {
-     // console.log(variables);
-     // console.log(types);
-     // console.log(variables);
-     // console.log("hi");
-     // return reject;
-     bindings[key] = namespace + value;
-    } else {
-     // console.log(`${key} = ${variables[value]}`);
-     bindings[key] = variables[value];
-    }
-   }
-  }
-
-  // console.log(JSON.stringify(types));
-
-  return {
-   "@type": type,
-   "types": bindings,
-   "children": result,
-  };
- };
-}
 
 describe("Binding", function() {
   it("Whitespace", function() {
