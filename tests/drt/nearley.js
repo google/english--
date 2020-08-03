@@ -1154,28 +1154,6 @@ const DRTGrammar = FeaturedNearley.compile(`
       PRO[num=sing, gen=fem, case=-nom, refl=+] -> "herself".
       PRO[num=sing, gen=-hum, case=-nom, refl=+] -> "itself".
 
-      PN[num=sing, gen=male] -> "Jones".
-      PN[num=sing, gen=male] -> "Smith".
-      PN[num=sing, gen=fem] -> "Mary".
-      PN[num=sing, gen=-hum] -> "Brazil".
-
-      N[num=sing, gen=male] -> "man".
-      N[num=sing, gen=fem] -> "woman".
-      N[num=sing, gen=fem] -> "girl".
-      N[num=sing, gen=fem] -> "sister".
-      N[num=sing, gen=-hum] -> "book".
-      N[num=sing, gen=-hum] -> "telescope".
-      N[num=sing, gen=-hum] -> "donkey".
-      N[num=sing, gen=-hum] -> "porsche".
-      N[num=sing, gen=[male, fem]] -> "engineer".
-
-      N[num=sing, gen=male, rn=+] -> "brother".
-      N[num=sing, gen=male, rn=+] -> "father".
-      N[num=sing, gen=male, rn=+] -> "husband".
-      N[num=sing, gen=fem, rn=+] -> "sister".
-      N[num=sing, gen=fem, rn=+] -> "mother".
-      N[num=sing, gen=fem, rn=+] -> "wife".
-
       N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
 
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
@@ -1230,10 +1208,6 @@ const DRTGrammar = FeaturedNearley.compile(`
       HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
 
-      ADJ -> "happy".
-      ADJ -> "unhappy".
-      ADJ -> "foolish".
-
       V[num=1, fin=-, stat=-, trans=2] -> 
           VERB[trans=2, stat=-].
 
@@ -1266,6 +1240,34 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=-reg].
+
+
+      ADJ -> "happy".
+      ADJ -> "unhappy".
+      ADJ -> "foolish".
+
+      PN[num=sing, gen=male] -> "Jones".
+      PN[num=sing, gen=male] -> "Smith".
+      PN[num=sing, gen=fem] -> "Mary".
+      PN[num=sing, gen=-hum] -> "Brazil".
+
+      N[num=sing, gen=male] -> "man".
+      N[num=sing, gen=fem] -> "woman".
+      N[num=sing, gen=fem] -> "girl".
+      N[num=sing, gen=fem] -> "sister".
+      N[num=sing, gen=-hum] -> "book".
+      N[num=sing, gen=-hum] -> "telescope".
+      N[num=sing, gen=-hum] -> "donkey".
+      N[num=sing, gen=-hum] -> "porsche".
+      N[num=sing, gen=[male, fem]] -> "engineer".
+      N[num=sing, gen=1] -> "brazilian".
+
+      N[num=sing, gen=male, rn=+] -> "brother".
+      N[num=sing, gen=male, rn=+] -> "father".
+      N[num=sing, gen=male, rn=+] -> "husband".
+      N[num=sing, gen=fem, rn=+] -> "sister".
+      N[num=sing, gen=fem, rn=+] -> "mother".
+      N[num=sing, gen=fem, rn=+] -> "wife".
 
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
@@ -2473,7 +2475,7 @@ describe("Backwards compatibility", function() {
                         ))));
   });
 
-  it.skip("Every brazilian is from Brazil", function() {
+  it("Every brazilian is from Brazil", function() {
     assertThat(parse("Every brazilian is from Brazil."))
      .equalsTo(S(NP(DET("Every"), N("brazilian")),
                  VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
