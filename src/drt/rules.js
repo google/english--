@@ -311,6 +311,8 @@ class CRDETPN extends Rule {
   
   node.children[0] = ref;
 
+  // console.log(node);
+
   return [head, body, [], []];
  }
 }
@@ -397,9 +399,12 @@ class CRSID extends Rule {
  }
 
  apply({det, noun}, node, refs) {
-  if (det.children[0].toLowerCase() != "a") {
+  if (typeof det.children[0] != "string" ||
+      det.children[0].toLowerCase() != "a") {
    return [[], [], [], []];
   }
+
+  // console.log("hi");
 
   let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
   noun.ref = ref;
@@ -810,13 +815,18 @@ class CRAND extends CompositeRule {
 // Possessive Phrases
 class CRSPOSS extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET(NP(capture("name")), "'s"), RN(capture("noun")))));
+  super(ids, S(NP(DET(capture("name"), "'s"), N(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
+  // console.log("hi");
   let u = referent(this.id(), noun.types, print(child(node, 0), refs));
   node.children[0] = u;
   node.ref = u;
+
+  if (noun.types.rn != "+") {
+   return [[], [], [], []];
+  }
 
   let s = S(u, VP_(VP(V(noun), name.children[0])));
 
@@ -826,10 +836,14 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
  constructor(ids) {
-  super(ids, VP(capture("verb"), NP(DET(NP(capture("name")), "'s"), RN(capture("noun")))));
+  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), N(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
+  if (noun.types.rn != "+") {
+   return [[], [], [], []];
+  }
+
   let u = referent(this.id(), noun.types, print(child(node, 1), refs));
   node.children[1] = u;
 

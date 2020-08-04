@@ -853,7 +853,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones's wife is happy.", function() {
+  it("Jones's wife is happy.", function() {
     assertThat("Jones's wife is happy.")
      .equalsTo(`
        drs(a, b) {
@@ -864,7 +864,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones's wife is happy. She likes Smith.", function() {
+  it("Jones's wife is happy. She likes Smith.", function() {
     assertThat("Jones's wife is happy. She likes Smith.")
      .equalsTo(`
        drs(a, b, c) {
@@ -872,12 +872,12 @@ describe("DRS", function() {
          b wife a
          happy(b)
          Smith(c)
-         b like c
+         b likes c
        }
     `);
   });
 
-  it.skip("Smith likes Jones's wife.", function() {
+  it("Smith likes Jones's wife.", function() {
     assertThat("Smith likes Jones's wife.")
      .equalsTo(`
        drs(a, b, c) {
@@ -889,7 +889,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones's wife or Smith's brother love Mary.", function() {
+  it("Jones's wife or Smith's brother love Mary.", function() {
     assertThat("Jones's wife or Smith's brother loves Mary.")
      .equalsTo(`
        drs(a, b, c) {
@@ -897,10 +897,10 @@ describe("DRS", function() {
          Jones(b)
          Smith(c)
          drs(d) {
-           d love a(d)
+           d loves a(d)
            d wife b
          } or drs(e) {
-           e love a(e)
+           e loves a(e)
            e brother c
          }
        }
@@ -1124,12 +1124,12 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Sam loves Anna and Leo.", function() {
-    assertThat("Sam loves Anna and Leo.")
+  it.skip("Jones loves Mary and Smith.", function() {
+    assertThat("Jones loves Mary and Smith.")
      .equalsTo(`
        drs(a) {
-         Sam(a)
-         a love Anna and Leo
+         Jones(a)
+         a loves Mary and Smith
        }
     `);
   });
@@ -1160,8 +1160,8 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Anna's father is Dani's husband.", function() {
-    assertThat("Anna's father is Dani's husband.")
+  it.skip("Jones's father is Mary's husband.", function() {
+    assertThat("Jones's father is Mary's husband.")
      .equalsTo(`
        drs(a, b, c, d) {
          Anna(a)
@@ -1173,11 +1173,11 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Anna's father is a brazilian engineer.", function() {
-    assertThat("Anna's father is a brazilian engineer.")
+  it("Mary's father is a brazilian engineer.", function() {
+    assertThat("Mary's father is a brazilian engineer.")
      .equalsTo(`
        drs(a, b) {
-         Anna(a)
+         Mary(a)
          b father a
          brazilian(b)
          engineer(b)
@@ -1209,20 +1209,20 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Sam's wife is Dani.", function() {
-    assertThat("Sam's wife is Dani.")
+  it("Jones's wife is Mary.", function() {
+    assertThat("Jones's wife is Mary.")
      .equalsTo(`
        drs(a, b, c) {
-         Sam(a)
-         Dani(b)
+         Jones(a)
+         Mary(b)
          c is b(c)
          c wife a
        }
     `);
   });
 
-  it.skip("Dani is Sam's wife.", function() {
-    assertThat("Dani is Sam's wife.")
+  it.skip("Mary is Jones's wife.", function() {
+    assertThat("Mary is Jones's wife.")
      .equalsTo(`
        drs(a, b, c) {
          Dani(a)
@@ -1233,8 +1233,8 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Fabio is Denise's brother. He likes Japan.", function() {
-    assertThat("Fabio is Denise's brother. He likes Japan.")
+  it.skip("Jones is Smith's brother. He likes Brazil.", function() {
+    assertThat("Jones is Smith's brother. He likes Brazil.")
      .equalsTo(`
        drs(a, b, c, d) {
          Fabio(a)
