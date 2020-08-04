@@ -183,6 +183,17 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("Jones 's wife is a");
    });
 
+  it("Jones is Marys's husband.", function() {
+    let ids = new Ids();
+    let node = first(parse("Jones is Mary's husband."), true);
+    let [[u], [jones]] = new CRPN(ids).match(child(node), []);
+    assertThat(u.value).equalsTo("Jones");
+    assertThat(print(node)).equalsTo("a is Mary 's husband");
+    let [[v], [wife]] = new CRPOSS(ids).match(child(node, 1, 0), [u]);
+    assertThat(print(node)).equalsTo("a is b");
+    assertThat(print(wife)).equalsTo("b husband Mary");
+   });
+
   it("Jones owns Ulysses. It fascinates him.", function() {
     let ids = new Ids();
     let sentence = first(parse("Jones owns Ulysses."), true);

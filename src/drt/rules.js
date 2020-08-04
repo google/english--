@@ -445,6 +445,7 @@ class CRNLIN extends Rule {
  constructor(ids) {
   super(ids, N(capture("noun")));
  }
+
  apply({noun}, node) {
   if (!node.ref ||
       node.children.length != 1) {
