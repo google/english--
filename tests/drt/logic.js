@@ -26,53 +26,53 @@ const {
   negation,
   argument} = Parser;
 
-describe.skip("Logic", function() {
+describe("Logic", function() {
 
-  it("Sam loves Dani.", function() {
-    enter("Sam loves Dani.")
+  it("Jones loves Mary.", function() {
+    enter("Jones loves Mary.")
      .equalsTo(`
-       Sam(a).
-       Dani(b).
-       love(pres, a, b).
+       Jones(a).
+       Mary(b).
+       loves(pres, a, b).
      `);
   });  
 
-  it("Sam will love Dani.", function() {
-    enter("Sam will love Dani.")
+  it("Jones will love Mary.", function() {
+    enter("Jones will love Mary.")
      .equalsTo(`
-       Sam(a).
-       Dani(b).
+       Jones(a).
+       Mary(b).
        love(fut, a, b).
      `);
   });
 
-  it("Sam was happy.", function() {
-    enter("Sam was happy.")
+  it("Jones was happy.", function() {
+    enter("Jones was happy.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        happy(past, a).
      `);
   });
 
-  it("Sam is happy.", function() {
-    enter("Sam is happy.")
+  it("Jones is happy.", function() {
+    enter("Jones is happy.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        happy(pres, a).
      `);
   });
 
-  it("Sam is from Brazil.", function() {
-    enter("Sam is from Brazil.")
+  it("Jones is from Brazil.", function() {
+    enter("Jones is from Brazil.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        Brazil(b).
        from(pres, a, b).
      `);
   });
 
-  it.skip("Sam was from Brazil.", function() {
-    enter("Sam was from Brazil.")
+  it.skip("Jones was from Brazil.", function() {
+    enter("Jones was from Brazil.")
      .equalsTo(`
        Sam(a).
        Brazil(b).
@@ -95,18 +95,18 @@ describe.skip("Logic", function() {
      `);
   });
 
-  it("Sam was not an engineer.", function() {
-    enter("Sam was not an engineer.")
+  it("Jones was not an engineer.", function() {
+    enter("Jones was not an engineer.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        ~engineer(past, a).
      `);
   });
 
-  it("Sam was not an engineer from Brazil.", function() {
-    enter("Sam was not an engineer from Brazil.")
+  it("Jones was not an engineer from Brazil.", function() {
+    enter("Jones was not an engineer from Brazil.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        Brazil(b).
        ~from(pres, a, b) && engineer(pres, a).
      `);
@@ -151,7 +151,7 @@ describe.skip("Logic", function() {
      `)));
   });
 
-  it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
+  it.skip("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
     enter("Every man is mortal. Socrates is a man.")
      .equalsTo(`
         forall (a) man(pres, a) => mortal(pres, a).
@@ -171,7 +171,7 @@ describe.skip("Logic", function() {
      `);
   });
 
-  it("Who does Mary like?", function() {
+  it.skip("Who does Mary like?", function() {
     assertThat(trim(toString(program([query("Who does Mary like?")[0]]))))
      .equalsTo("exists (x) exists (a) Mary(a) && like(pres, a, x).");
   });
@@ -186,12 +186,12 @@ describe.skip("Logic", function() {
      .equalsTo("exists (x) exists (a) Smith(a) && like(past, x, a).");
   });
 
-  it("Is Mary happy?", function() {
+  it.skip("Is Mary happy?", function() {
     assertThat(trim(toString(program([query("Is Mary happy?")[0]]))))
      .equalsTo("exists (a) Mary(a) && happy(pres, a).");
   });
 
-  it("Who likes Smith?", function() {
+  it.skip("Who likes Smith?", function() {
     let code = [];
     code.push("Jones is happy.");
     code.push("He likes Smith.");
@@ -395,13 +395,13 @@ describe.skip("Logic", function() {
    return [result, answer];
   }
 
-  it("John loves Mary. Who loves Mary?", function() {
+  it.skip("John loves Mary. Who loves Mary?", function() {
     enter("John loves Mary.")
      .query("Who loves Mary?")
      .equalsTo("John love Mary");
   });
 
-  it("John loves Mary. Who does John love?", function() {
+  it.skip("John loves Mary. Who does John love?", function() {
     // NOTE(goto): we need to compile verbs into the infinitive
     // to allow this to work.
     enter("John loves Mary.")
@@ -409,38 +409,38 @@ describe.skip("Logic", function() {
      .equalsTo("John love Mary");
   });
 
-  it("A man loves Mary. Who loves Mary?", function() {
+  it.skip("A man loves Mary. Who loves Mary?", function() {
     enter("A man loves Mary.")
      .query("Who loves Mary?")
      .equalsTo("A man love Mary");
   });
 
-  it("A man from Brazil loves Mary. Who loves Mary?", function() {
+  it.skip("A man from Brazil loves Mary. Who loves Mary?", function() {
     enter("A man from Brazil loves Mary.")
      .query("Who loves Mary?")
      .equalsTo("A man from Brazil love Mary");
   });
 
-  it("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
+  it.skip("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("A man loves Mary. He likes Brazil.")
      .query("Who likes Brazil?")
      .equalsTo("A man like Brazil");
   });
 
-  it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
+  it.skip("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("Jones loves Mary. She likes Brazil.")
      .query("Who likes Brazil?")
      .equalsTo("Mary like Brazil");
   });
 
-  it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
+  it.skip("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
     enter("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
      .equalsTo(`
        Brazil(a).
        Mary(b).
-       forall (c) like(pres, c, b) && man(pres, c) => love(pres, c, a).
+       forall (c) likes(pres, c, b) && man(pres, c) => loves(pres, c, a).
        Jones(d).
-       like(pres, d, b).
+       likes(pres, d, b).
        man(pres, d).
      `)
      .query("Who loves Brazil?")
@@ -458,19 +458,19 @@ describe.skip("Logic", function() {
      `);
    });
 
-  it("Jones's wife is happy. Who is happy??", function() {
+  it.skip("Jones's wife is happy. Who is happy??", function() {
     enter("Jones's wife is happy.")
      .query("Who is happy?")
      .equalsTo("Jones 's wife is happy");
   });
 
-  it("Jones admires a woman who likes him. Who likes Jones?", function() {
+  it.skip("Jones admires a woman who likes him. Who likes Jones?", function() {
     enter("Jones admires a woman who likes him.")
      .query("Who likes Jones?")
      .equalsTo("a woman who like him like Jones");
   });
 
-  it("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
+  it.skip("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
     enter("A man who loves Dani fascinates Anna.")
      .query("Who fascinates Anna?")
      .equalsTo("A man who love Dani fascinate Anna");
@@ -479,37 +479,37 @@ describe.skip("Logic", function() {
      .equalsTo("A man who love Dani love Dani");
   });
 
-  it("Jones owns a book which Smith loves. Who owns a book?", function() {
+  it.skip("Jones owns a book which Smith loves. Who owns a book?", function() {
     enter("Jones owns a book which Smith loves.")
      .query("Who owns a book?")
      .equalsTo("Jones own a book");
   });
 
-  it("Jones is a man who loves Mary. Who loves Mary?", function() {
+  it.skip("Jones is a man who loves Mary. Who loves Mary?", function() {
     enter("Jones is a man who loves Mary.")
      .query("Who loves Mary?")
      .equalsTo("Jones love Mary");
   });
 
-  it("Sam is from Brazil. Who is from Brazil?", function() {
+  it.skip("Sam is from Brazil. Who is from Brazil?", function() {
     enter("Sam is from Brazil.")
      .query("Who is from Brazil?")
      .equalsTo("Sam is from Brazil");
   });
 
-  it("Sam is a brazilian engineer. Who is a engineer?", function() {
+  it.skip("Sam is a brazilian engineer. Who is a engineer?", function() {
     enter("Sam is a brazilian engineer.")
      .query("Who is a engineer?")
      .equalsTo("Sam is a engineer");
   });
 
-  it("Sam's wife is behind Anna. Who is behind Anna?", function() {
+  it.skip("Sam's wife is behind Anna. Who is behind Anna?", function() {
     enter("Sam's wife is behind Anna.")
      .query("Who is behind Anna?")
      .equalsTo("Sam 's wife is behind Anna");
   });
 
-  it("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
+  it.skip("Sam is a brazilian engineer. Every brazilian is from Brazil. Who is from Brazil?", function() {
     enter("Sam is a brazilian engineer. Every brazilian is from Brazil.")
      .equalsTo(`
        Sam(a).
@@ -525,7 +525,7 @@ describe.skip("Logic", function() {
      .equalsTo("Sam is from Brazil");
   });
 
-  it("Sam loved Anna. Who loved Anna?", function() {
+  it.skip("Sam loved Anna. Who loved Anna?", function() {
     enter("Sam loved Anna.")
      .equalsTo(`
        Sam(a).
