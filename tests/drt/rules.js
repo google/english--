@@ -360,7 +360,7 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a owns b");
    });
 
-  it("CR.NRC", function() {
+  it("A man who likes Smith owns a book", function() {
     let ids = new Ids();
 
     let node = first(parse("A man who likes Smith owns a book."), true);
@@ -386,9 +386,16 @@ describe("Rules", function() {
   });
 
   it("Jones owns a book which he does not like.", function() {
+
+    // console.log(parse("he does not like", "S"));
+
+    // return;
+
     let ids = new Ids();
 
     let node = first(parse("Jones owns a book which he does not like."), true);
+
+    return;
 
     let [[u], [jones], [remove]] = new CRPN(ids).match(node);
 
@@ -440,7 +447,7 @@ describe("Rules", function() {
     `));
   });
 
-  it.skip("Jones will not own a porsche", function() {
+  it("Jones will not own a porsche", function() {
     let ids = new Ids();
 
     let node = first(parse("Jones will not own a porsche."), true);
@@ -587,10 +594,12 @@ describe("Rules", function() {
     assertThat(print(from)).equalsTo("a from b");
   });
 
-  it.skip("Jones was happy", function() {
+  it("Jones was happy", function() {
     let ids = new Ids();
 
     let node = first(parse("Jones was happy."), true);
+
+    // console.log(node);
 
     new CRPN(ids).match(node, []);
     new CRPN(ids).match(child(node, 1, 0, 1), []);
@@ -993,7 +1002,7 @@ describe("Rules", function() {
     assertThat(print(donkey)).equalsTo("donkey(b)");
   });
 
-  it.skip("CR.TENSE", function() {
+  it.skip("Mary kissed Jones.", function() {
     // previously skipped.
     let ids = new Ids();
 
@@ -1024,15 +1033,14 @@ describe("Rules", function() {
     assertThat(node.types.tense).equalsTo("fut");
    });
 
-  it.skip("Mary will not kiss Jones.", function() {
-    // previously skipped
+  it("Mary will not kiss Jones.", function() {
     let ids = new Ids();
     let node = first(parse("Mary will not kiss Jones."), true);
 
-    // let [head, body, , remove] = new CRNEG(ids).match(node, []);
-    
+    let [head, body, , remove] = new CRNEG(ids).match(node, []);
+
     new CRWILL(ids).match(child(node, 1), []);
-    assertThat(print(node)).equalsTo("Mary not kiss Jones");
+    assertThat(print(node)).equalsTo("a kiss b");
     assertThat(node.types.tense).equalsTo("fut");
    });
 

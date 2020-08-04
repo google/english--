@@ -1263,6 +1263,14 @@ describe("DRT Verbs", function() {
     assertThat(parse("left", "V")).equalsTo(V(VERB("left")));
     assertThat(parse("came", "V")).equalsTo(V(VERB("came")));
   });
+
+  it("will not kiss Jones", function() {
+    let {tense, tp} = parse("Mary will not kiss Jones", "S", true).types;
+    assertThat(tense).equalsTo("fut");
+    assertThat(tp).equalsTo("-past");
+    assertThat(parse("will not kiss Jones", "VP_"))
+     .equalsTo(VP_(AUX("will"), "not", VP(V(VERB("kiss")), NP(PN("Jones")))));
+  });
 });
 
 describe("Backwards compatibility", function() {

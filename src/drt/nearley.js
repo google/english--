@@ -504,8 +504,10 @@ const DRTGrammar = FeaturedNearley.compile(`
         AUX[num=1, fin=+, tp=4, tense=fut] __ 
         VP[num=5, fin=-, gap=2, stat=3, tp=4, tense=pres].
 
-      VP_[num=1, fin=+, gap=2] ->
-          AUX[num=1, fin=+] __ "not" __ VP[num=3, fin=-, gap=2].
+      VP_[num=1, fin=+, gap=2, stat=4, tp=5, tense=6] ->
+        AUX[num=1, fin=+, tp=5, tense=6] __ 
+        "not" __ 
+        VP[num=3, fin=-, gap=2, stat=4, tp=5, tense=6].
 
       VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
           VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
@@ -514,8 +516,9 @@ const DRTGrammar = FeaturedNearley.compile(`
           V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
           NP[num=6, gen=7, case=-nom, gap=-].
 
-      VP[num=1, fin=2, gap=np] ->
-          V[num=1, fin=2, trans=+] _ NP[num=4, gen=5, case=-nom, gap=np].
+      VP[num=1, fin=2, gap=np, tp=6, tense=7] ->
+          V[num=1, fin=2, trans=+, tp=6, tense=7] _ 
+          NP[num=4, gen=5, case=-nom, gap=np].
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
         V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
@@ -553,18 +556,24 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
-      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ ADJ.
-      VP[num=1, fin=2] -> BE[num=1, fin=2, tp=3, tense=4] __ "not" __ ADJ.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ ADJ.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ "not" __ ADJ.
 
-      VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ PP.
-      VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ "not" __ PP.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ PP.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ "not" __ PP.
 
-      VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ NP[num=3, gen=4, case=5, gap=-].
-      VP[num=1, fin=2] -> 
-        BE[num=1, fin=2] __ "not" __ NP[num=3, gen=4, case=5, gap=-].
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
+          BE[num=1, fin=2, tp=-past, tense=7] __ 
+          NP[num=3, gen=4, case=5, gap=-].
+
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
+          BE[num=1, fin=2, tp=-past, tense=7] __ 
+          "not" __ 
+          NP[num=3, gen=4, case=5, gap=-].
 
       DET[num=sing] -> "a".
       DET[num=sing] -> "an".
@@ -660,7 +669,10 @@ const DRTGrammar = FeaturedNearley.compile(`
       V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
           VERB[trans=2, stat=1].
 
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, past=+ed] "ed".
+
+      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
           -> VERB[trans=3, stat=2, past=+ed] "ed".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
@@ -777,8 +789,8 @@ let node = (type) => {
  }
 };
 
-function parse(s) {
- let parser = new Parser();
+function parse(s, start) {
+ let parser = new Parser(start);
  let result = parser.feed(s);
  return result;
 }

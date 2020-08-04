@@ -1021,7 +1021,7 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          Jones(a)
-         a love the man
+         a loves the man
        }
     `);
   });
@@ -1257,18 +1257,18 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones kissed Mary.", function() {
+  it("Jones kissed Mary.", function() {
     assertThat("Jones kissed Mary.")
      .equalsTo(`
        drs(a, b) {
          Jones(a)
          Mary(b)
-         < a kiss b
+         < a kissed b
        }
     `);
   });
 
-  it.skip("John was happy.", function() {
+  it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
        drs(a) {
@@ -1278,7 +1278,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John was not happy.", function() {
+  it("John was not happy.", function() {
     assertThat("John was not happy.")
      .equalsTo(`
        drs(a) {
@@ -1299,12 +1299,12 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John will not kiss Anna.", function() {
-    assertThat("John will not kiss Anna.")
+  it("John will not kiss Mary.", function() {
+    assertThat("John will not kiss Mary.")
      .equalsTo(`
        drs(a, b) {
          John(a)
-         Anna(b)
+         Mary(b)
          ~drs() {
            > a kiss b
          }
@@ -1312,12 +1312,12 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John did not kiss Anna.", function() {
-    assertThat("John did not kiss Anna.")
+  it("John did not kiss Mary.", function() {
+    assertThat("John did not kiss Mary.")
      .equalsTo(`
        drs(a, b) {
          John(a)
-         Anna(b)
+         Mary(b)
          ~drs() {
            < a kiss b
          }
@@ -1352,13 +1352,13 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John has kissed Mary.", function() {
+  it("John has kissed Mary.", function() {
     assertThat("John has kissed Mary.")
      .equalsTo(`
        drs(a, b) {
          John(a)
          Mary(b)
-         a kiss b
+         a kissed b
        }
     `);
   });
@@ -1369,7 +1369,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Mary(b)
-         a kiss b
+         a has not kissed b
        }
     `);
   });
@@ -1385,7 +1385,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John was happy.", function() {
+  it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
        drs(a) {
@@ -1395,7 +1395,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John was an engineer.", function() {
+  it("John was an engineer.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("John was an engineer.")
      .equalsTo(`
@@ -1406,7 +1406,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John was not an engineer.", function() {
+  it("John was not an engineer.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("John was not an engineer.")
      .equalsTo(`
@@ -1419,7 +1419,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("John was not an engineer.", function() {
+  it("John was not an engineer from Brazil.", function() {
     assertThat("John was not an engineer from Brazil.")
      .equalsTo(`
       drs(a, b) {
@@ -1433,7 +1433,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Every brazilian was happy.", function() {
+  it("Every brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("Every brazilian was happy.")
      .equalsTo(`
