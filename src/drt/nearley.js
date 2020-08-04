@@ -544,10 +544,10 @@ const DRTGrammar = FeaturedNearley.compile(`
         "and" __ 
         NP[num=5, gen=6, case=2, gap=-].
 
-      NP[num=plur, gen=1, case=2, gap=-] -> 
+      NP[num=3, gen=1, case=2, gap=-] -> 
         NP[num=3, gen=4, case=2, gap=-] __ 
         "or" __ 
-        NP[num=5, gen=6, case=2, gap=-].
+        NP[num=3, gen=6, case=2, gap=-].
 
       N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
 
@@ -682,11 +682,18 @@ const DRTGrammar = FeaturedNearley.compile(`
       ADJ -> "happy".
       ADJ -> "unhappy".
       ADJ -> "foolish".
+      ADJ -> "fast".
+      ADJ -> "beautiful".
+      ADJ -> "mortal".
+      ADJ -> "brazilian".
 
+      PN[num=sing, gen=male] -> "Socrates".
       PN[num=sing, gen=male] -> "Jones".
+      PN[num=sing, gen=male] -> "John".
       PN[num=sing, gen=male] -> "Smith".
       PN[num=sing, gen=fem] -> "Mary".
       PN[num=sing, gen=-hum] -> "Brazil".
+      PN[num=sing, gen=-hum] -> "Ulysses".
 
       N[num=sing, gen=male] -> "man".
       N[num=sing, gen=fem] -> "woman".
@@ -695,6 +702,7 @@ const DRTGrammar = FeaturedNearley.compile(`
       N[num=sing, gen=-hum] -> "book".
       N[num=sing, gen=-hum] -> "telescope".
       N[num=sing, gen=-hum] -> "donkey".
+      N[num=sing, gen=-hum] -> "horse".
       N[num=sing, gen=-hum] -> "porsche".
       N[num=sing, gen=[male, fem]] -> "engineer".
       N[num=sing, gen=1] -> "brazilian".
@@ -733,6 +741,8 @@ const DRTGrammar = FeaturedNearley.compile(`
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
       VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "surprise".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "fascinate".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "admire".
 
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
@@ -767,12 +777,48 @@ let node = (type) => {
  }
 };
 
+function parse(s) {
+ let parser = new Parser();
+ let result = parser.feed(s);
+ return result;
+}
+
+function child(node, ...path) {
+ let result = node;
+ for (let i of path) {
+  result = result.children[i];
+ }
+ return result;
+}
+
+function first(result) {
+ return preprocess(child(result[0], 0, 0));
+}
+
+function preprocess(node) {
+ if (node["@type"] == "V") {
+  // console.log(node);                                                       
+  let root = node.children[0].children[0];
+  let suffix = node.children[1] || "";
+  node.children = [root + suffix];
+  return node;
+ }
+
+ for (let child of node.children || []) {
+  preprocess(child);
+ }
+ return node;
+}
+
 module.exports = {
+ parse: parse,
+ first: first,
+ preprocess: preprocess,
  Nearley: Nearley,
  bind: bind,
  FeaturedNearley: FeaturedNearley,
  Parser: Parser,
- grammar: {
+ nodes: {
   "Statement": node("Statement"),
   "Question": node("Question"),
   "S": node("S"),

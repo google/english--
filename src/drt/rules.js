@@ -1,5 +1,4 @@
 const {
-  parse, 
   parser, 
   term, 
   rule, 
@@ -13,9 +12,9 @@ const {
   collect, 
   processor, 
   grammar,
-  first,
-  clean,
-  nodes} = require("./parser.js");
+  clean} = require("./parser.js");
+
+const {parse, first, nodes} = require("./nearley.js");
 
 const {
  S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE,
@@ -131,6 +130,9 @@ class Rule {
  match(node, refs) {
   let result = match(this.trigger, node);
 
+  // console.log(this.trigger);
+  // console.log(node);
+
   if (!result) {
    return [[], [], [], []];
   }
@@ -243,6 +245,7 @@ class CRSPN extends Rule {
  }
 
  apply({name}, node, refs = []) {
+
   let head = [];
   let body = [];
 
@@ -290,7 +293,7 @@ class CRVPPN extends Rule {
 
 class CRDETPN extends Rule {
  constructor(ids) {
-  super(ids, DET(PN(capture("name")), "'s"));
+  super(ids, DET(NP(PN(capture("name"))), "'s"));
  }
  apply({name}, node, refs) {
   let head = [];
@@ -807,7 +810,7 @@ class CRAND extends CompositeRule {
 // Possessive Phrases
 class CRSPOSS extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+  super(ids, S(NP(DET(NP(capture("name")), "'s"), RN(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
@@ -823,7 +826,7 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
  constructor(ids) {
-  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+  super(ids, VP(capture("verb"), NP(DET(NP(capture("name")), "'s"), RN(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {

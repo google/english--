@@ -6,7 +6,7 @@ const {
   bind, 
   FeaturedNearley, 
   Parser, 
-  grammar} = require("../../src/drt/nearley.js");
+  nodes} = require("../../src/drt/nearley.js");
 
 const {
   Statement,
@@ -30,7 +30,7 @@ const {
   PP,
   VERB,
   HAVE,
-  RN} = grammar;
+  RN} = nodes;
 
 describe("Nearley", function() {
   it("Basic", function() {
@@ -1584,10 +1584,10 @@ describe("Backwards compatibility", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it("Jones or Smith love her.", function() {
-    assertThat(parse("Jones or Smith love her."))
+  it("Jones or Smith loves her.", function() {
+    assertThat(parse("Jones or Smith loves her."))
      .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
-                 VP_(VP(V(VERB("love")), NP(PRO("her"))))));
+                 VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))));
   });
 
   it.skip("Jones likes and loves a porsche.", function() {
