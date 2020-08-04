@@ -974,13 +974,13 @@ describe("Statements", function() {
 
   it("Jones's sister is Mary", function() {
     assertThat(parse("Jones's sister is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("sister")),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's sister is not Mary", function() {
     assertThat(parse("Jones's sister is not Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("sister")),
                  VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
@@ -1152,6 +1152,13 @@ describe("Statements", function() {
                         ))));
    });
 
+  it("He likes Jones's brother.", function() {
+    assertThat(parse("He likes Jones's brother."))
+     .equalsTo(S(NP(PRO("He")),
+                 VP_(VP(V(VERB("like"), "s"), 
+                        NP(DET(NP(PN("Jones")), "'s"), RN("brother"))
+                        ))));
+   });
 
 });
 
@@ -1635,7 +1642,7 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is happy.", function() {
     assertThat(parse("Jones's wife is happy."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
@@ -1756,7 +1763,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Who does Smith's brother like?", "Question"))
      .equalsTo(Question("Who", 
                         AUX("does"),
-                        NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
+                        NP(DET(NP(PN("Smith")), "'s"), RN("brother")), 
                         V(VERB("like")), 
                         "?"));
   });
@@ -1795,13 +1802,13 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is Mary.", function() {
     assertThat(parse("Jones's wife is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's wife was Mary.", function() {
     assertThat(parse("Jones's wife was Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
                  VP_(VP(BE("was"), NP(PN("Mary"))))));
   });
 

@@ -816,18 +816,13 @@ class CRAND extends CompositeRule {
 // Possessive Phrases
 class CRSPOSS extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET(capture("name"), "'s"), N(capture("noun")))));
+  super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
-  // console.log("hi");
   let u = referent(this.id(), noun.types, print(child(node, 0), refs));
   node.children[0] = u;
   node.ref = u;
-
-  if (noun.types.rn != "+") {
-   return [[], [], [], []];
-  }
 
   let s = S(u, VP_(VP(V(noun), name.children[0])));
 
@@ -837,14 +832,10 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
  constructor(ids) {
-  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), N(capture("noun")))));
+  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
  }
 
  apply({name, noun, verb}, node, refs) {
-  if (noun.types.rn != "+") {
-   return [[], [], [], []];
-  }
-
   let u = referent(this.id(), noun.types, print(child(node, 1), refs));
   node.children[1] = u;
 

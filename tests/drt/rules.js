@@ -834,7 +834,7 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("b is happy(b)");
 
     // Brother is male and singular
-    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male", "rn": "+"});
+    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male"});
 
     assertThat(print(brother)).equalsTo("b brother a");
   });
@@ -859,7 +859,7 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a likes c");
 
     // Brother is male and singular
-    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male", "rn": "+"});
+    assertThat(ref.types).equalsTo({"num": "sing", "gen": "male"});
 
     assertThat(print(brother)).equalsTo("c brother b");
   });

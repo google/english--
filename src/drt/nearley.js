@@ -538,6 +538,8 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
 
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ RN[num=1, gen=2].
+
       NP[num=1, gen=2, case=3, gap=-] -> PN[num=1, gen=2].
  
       NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
@@ -719,12 +721,12 @@ const DRTGrammar = FeaturedNearley.compile(`
       N[num=sing, gen=[male, fem]] -> "engineer".
       N[num=sing, gen=1] -> "brazilian".
 
-      N[num=sing, gen=male, rn=+] -> "brother".
-      N[num=sing, gen=male, rn=+] -> "father".
-      N[num=sing, gen=male, rn=+] -> "husband".
-      N[num=sing, gen=fem, rn=+] -> "sister".
-      N[num=sing, gen=fem, rn=+] -> "mother".
-      N[num=sing, gen=fem, rn=+] -> "wife".
+      RN[num=sing, gen=male] -> "brother".
+      RN[num=sing, gen=male] -> "father".
+      RN[num=sing, gen=male] -> "husband".
+      RN[num=sing, gen=fem] -> "sister".
+      RN[num=sing, gen=fem] -> "mother".
+      RN[num=sing, gen=fem] -> "wife".
 
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
