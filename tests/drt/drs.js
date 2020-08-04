@@ -1026,13 +1026,13 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones likes a woman near Smith's brother.", function() {
+  it("Jones likes a woman near Smith's brother.", function() {
     assertThat("Jones likes a woman near Smith's brother.")
      .equalsTo(`
        drs(a, b, c, d) {
          Jones(a)
          Smith(b)
-         a like c
+         a likes c
          c near d
          woman(c)
          d brother b
@@ -1148,24 +1148,24 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones is Mary's husband.", function() {
+  it("Jones is Mary's husband.", function() {
     assertThat("Jones is Mary's husband.")
      .equalsTo(`
        drs(a, b, c) {
-         Sam(a)
-         Dani(b)
+         Jones(a)
+         Mary(b)
          a is c
          c husband b
        }
     `);
   });
 
-  it.skip("Jones's father is Mary's husband.", function() {
+  it("Jones's father is Mary's husband.", function() {
     assertThat("Jones's father is Mary's husband.")
      .equalsTo(`
        drs(a, b, c, d) {
-         Anna(a)
-         Dani(b)
+         Jones(a)
+         Mary(b)
          c is d(c)
          c father a
          d husband b
@@ -1196,12 +1196,12 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Sam's wife is behind Leo's sister", function() {
-    assertThat("Sam's wife is behind Leo's sister.")
+  it("Jones's wife is behind Mary's sister", function() {
+    assertThat("Jones's wife is behind Mary's sister.")
      .equalsTo(`
        drs(a, b, c, d) {
-         Sam(a)
-         Leo(b)
+         Jones(a)
+         Mary(b)
          c wife a
          c behind d
          d sister b
@@ -1221,28 +1221,28 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Mary is Jones's wife.", function() {
+  it("Mary is Jones's wife.", function() {
     assertThat("Mary is Jones's wife.")
      .equalsTo(`
        drs(a, b, c) {
-         Dani(a)
-         Sam(b)
+         Mary(a)
+         Jones(b)
          a is c
          c wife b
        }
     `);
   });
 
-  it.skip("Jones is Smith's brother. He likes Brazil.", function() {
+  it("Jones is Smith's brother. He likes Brazil.", function() {
     assertThat("Jones is Smith's brother. He likes Brazil.")
      .equalsTo(`
        drs(a, b, c, d) {
-         Fabio(a)
-         Denise(b)
+         Jones(a)
+         Smith(b)
          a is c
          c brother b
-         Japan(d)
-         c like d
+         Brazil(d)
+         c likes d
        }
     `);
   });
