@@ -245,7 +245,6 @@ class CRSPN extends Rule {
  }
 
  apply({name}, node, refs = []) {
-
   let head = [];
   let body = [];
 
@@ -354,6 +353,9 @@ class CRSPRO extends Rule {
 
  apply({pronoun}, node, refs) {
   let u = find(pronoun.types, refs, undefined, pronoun.loc);
+
+  // console.log(pronoun.loc);
+  // console.log(refs);
 
   if (!u) {
    throw new Error("Invalid reference: " + pronoun.children[0]);
@@ -1026,6 +1028,7 @@ class DRS {
   while (queue.length > 0) {
    let p = queue.shift();
    // console.log(`${p["@type"]}`);
+   // console.log(p);
    let [refs, names] = this.names.match(p, this.head);
    this.head.push(...refs);
    this.body.push(...names);

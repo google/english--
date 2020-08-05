@@ -304,11 +304,17 @@ function bind(type, types = {}, conditions = []) {
 
   // console.log(JSON.stringify(types));
 
-  return {
+  let n = {
    "@type": type,
    "types": bindings,
    "children": result,
   };
+
+  if (location != undefined) {
+   n["loc"] = location;
+  }
+
+  return n;
  };
 }
 
@@ -677,8 +683,11 @@ const DRTGrammar = FeaturedNearley.compile(`
       V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
           -> VERB[trans=3, stat=2, past=+ed] "ed".
 
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, past=+d] "d".
+      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, past=+d] "d".
+
+      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
+          -> VERB[trans=3, stat=2, past=+d] "d".
 
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=+ied] "ied".
@@ -728,7 +737,6 @@ const DRTGrammar = FeaturedNearley.compile(`
       RN[num=sing, gen=fem] -> "mother".
       RN[num=sing, gen=fem] -> "wife".
 
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "like".
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
       VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
@@ -750,6 +758,7 @@ const DRTGrammar = FeaturedNearley.compile(`
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
 
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "like".
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
       VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".

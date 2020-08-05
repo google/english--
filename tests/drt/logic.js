@@ -1,9 +1,9 @@
 const Assert = require("assert");
 
 const {DRS, referent, print} = require("../../src/drt/rules.js");
-const DrtParser = require("../../src/drt/parser.js");
-const {S, VP_, VP, BE} = DrtParser.nodes;
-const {clone} = DrtParser;
+const DrtParser = require("../../src/drt/nearley.js");
+const {S, VP_, VP, BE, NP, GAP} = DrtParser.nodes;
+const {preprocess} = DrtParser;
 
 const {Parser, Rule} = require("../../src/logic/parser.js");
 const {Forward, normalize, stringify, equals, explain, toString} = require("../../src/logic/forward.js");
@@ -178,23 +178,24 @@ describe("Logic", function() {
 
   it("Who likes Smith?", function() {
     assertThat(trim(toString(program([query("Who likes Smith?")[0]]))))
-     .equalsTo("exists (x) exists (a) Smith(a) && like(pres, x, a).");
+     .equalsTo("exists (x) exists (a) Smith(a) && likes(pres, x, a).");
   });
 
   it("Who liked Smith?", function() {
     assertThat(trim(toString(program([query("Who liked Smith?")[0]]))))
-     .equalsTo("exists (x) exists (a) Smith(a) && like(past, x, a).");
+     .equalsTo("exists (x) exists (a) Smith(a) && liked(past, x, a).");
   });
 
-  it.skip("Is Mary happy?", function() {
+  it("Is Mary happy?", function() {
     assertThat(trim(toString(program([query("Is Mary happy?")[0]]))))
      .equalsTo("exists (a) Mary(a) && happy(pres, a).");
   });
 
-  it.skip("Who likes Smith?", function() {
+  it("Who likes Smith?", function() {
     let code = [];
     code.push("Jones is happy.");
     code.push("He likes Smith.");
+
     let drs = compile(parse(code.join(" ")));
     let kb = program(drs[1]);
 
@@ -202,10 +203,11 @@ describe("Logic", function() {
       Jones(a).
       happy(pres, a).
       Smith(b).
-      like(pres, a, b).
+      likes(pres, a, b).
     `));
 
     let [q, answer] = query("Who likes Smith?");
+
     let result = new Reasoner(rewrite(kb))
      .go(rewrite(q));
 
@@ -215,14 +217,14 @@ describe("Logic", function() {
      .equalsTo(toString(Parser.parse(`
        Smith(b).
        exists (x) exists (a = b) Smith(a).
-       like(pres, a, b).
-       exists (x = a) exists (a = b) like(pres, x, b).
-       exists (x = a) exists (a = b) Smith(a) && like(pres, x, a).
+       likes(pres, a, b).
+       exists (x = a) exists (a = b) likes(pres, x, b).
+       exists (x = a) exists (a = b) Smith(a) && likes(pres, x, a).
      `)));
 
     let ref = next.value.bindings["x@1"];
     assertThat(drs[0][ref.name]).equalsTo("Jones");
-    assertThat(answer(drs[0][ref.name])).equalsTo("Jones like Smith");
+    assertThat(answer(drs[0][ref.name])).equalsTo("Jones likes Smith");
   });
 
   function transpile(node) {
@@ -246,16 +248,19 @@ describe("Logic", function() {
     // console.log(node);
     // let verb = node.children[1].children[0].children[0].children[0];
     let verb = node.children[1].children[0].children[0];
-    if (verb.root) {
-     // console.log(verb);
-     verb = verb.root;
-    } else {
-     verb = verb.children[0];
-    }
+    // console.log(verb);
+    //if (verb.children["@type"] == "VERB") {
+    // let suffix = verb.children.length == 2 ? verb.children[1] : "";
+    // let prefix = verb.children[0].children[0];
+    // verb = prefix + suffix;
+    //} else {
+    verb = verb.children[0];
+    //}
 
     if (verb["@type"] == "V" ||
         verb["@type"] == "RN" ||
         verb["@type"] == "PREP") {
+     // console.log(verb);
      verb = verb.children[0];
     }
 
@@ -330,15 +335,22 @@ describe("Logic", function() {
     
   });
 
-  function query(s) {
-   let q = DrtParser.parse(s)[0].children;
+  function clone(o) {
+   return JSON.parse(JSON.stringify(o));
+  }
 
-   if (q[0] == "Is") {
-    // console.log(q);
+  function query(s) {
+   let q = DrtParser.parse(s, "Question")[0].children;
+   // console.log(q);
+
+   // console.log(q);
+
+   if (q[0]["@type"] == "BE" && q[0].children[0] == "Is") {
+    // console.log("hi");
     let drs = DRS.from();
     let body = S(q[1], VP_(VP(BE("is"), q[2])));
     // console.log(q[1]);
-    let b = clone(body);
+    let b = clone(preprocess(body));
     drs.push(body);
     let result = spread(compile(drs)[1]);
     // console.log(drs.print());
@@ -356,12 +368,17 @@ describe("Logic", function() {
    }
 
    let gap = q.length == 5 ? "vp" : "np";
-   let np = gap == "vp" ? q[2] : q[1];
-   let vp = gap == "vp" ? q[3] : q[2].children[0];
+
+   // console.log(q[3]);
+
+   // console.log(q[1]);
+
+   let np = gap == "vp" ? q[2] : NP(GAP);
+   let vp = gap == "vp" ? q[3] : q[1].children[0];
    let drs = DRS.from();
    let x = referent("x");
 
-   let body = S(np, VP_(vp));
+   let body = S(np, VP_(preprocess(vp)));
 
    body.types = {tense: vp.types.tense};
 
@@ -386,8 +403,16 @@ describe("Logic", function() {
    } else {
     body.children[0] = x;
    }
+
+   // console.log(body);
+   // console.log(x);
+   // console.log(body.children[0])
+
    drs.head.push(x);
    drs.push(body);
+
+   // console.log(drs);
+
    let result = spread(compile(drs)[1]);
    for (let ref of drs.head) {
     result.quantifiers.push(quantifier("exists", ref.name));
@@ -395,10 +420,10 @@ describe("Logic", function() {
    return [result, answer];
   }
 
-  it.skip("John loves Mary. Who loves Mary?", function() {
+  it("John loves Mary. Who loves Mary?", function() {
     enter("John loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("John love Mary");
+     .equalsTo("John loves Mary");
   });
 
   it.skip("John loves Mary. Who does John love?", function() {
@@ -409,31 +434,31 @@ describe("Logic", function() {
      .equalsTo("John love Mary");
   });
 
-  it.skip("A man loves Mary. Who loves Mary?", function() {
+  it("A man loves Mary. Who loves Mary?", function() {
     enter("A man loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("A man love Mary");
+     .equalsTo("A man loves Mary");
   });
 
-  it.skip("A man from Brazil loves Mary. Who loves Mary?", function() {
+  it("A man from Brazil loves Mary. Who loves Mary?", function() {
     enter("A man from Brazil loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("A man from Brazil love Mary");
+     .equalsTo("A man from Brazil loves Mary");
   });
 
-  it.skip("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
+  it("A man loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("A man loves Mary. He likes Brazil.")
      .query("Who likes Brazil?")
-     .equalsTo("A man like Brazil");
+     .equalsTo("A man likes Brazil");
   });
 
-  it.skip("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
+  it("Jones loves Mary. He likes Brazil. Who likes Brazil?", function() {
     enter("Jones loves Mary. She likes Brazil.")
      .query("Who likes Brazil?")
-     .equalsTo("Mary like Brazil");
+     .equalsTo("Mary likes Brazil");
   });
 
-  it.skip("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
+  it("Every man who likes Mary loves Brazil. Jones is a man who likes Mary. Who loves Brazil?", function() {
     enter("Every man who likes Mary loves Brazil. Jones is a man who likes Mary.")
      .equalsTo(`
        Brazil(a).
@@ -444,51 +469,52 @@ describe("Logic", function() {
        man(pres, d).
      `)
      .query("Who loves Brazil?")
-     .equalsTo("Jones love Brazil")
+     .equalsTo("Jones loves Brazil")
      .because(`
        Brazil(a).
        exists (x) exists (a = a) Brazil(a).
-       like(pres, d, b).
-       exists (c = d) like(pres, c, b).
+       likes(pres, d, b).
+       exists (c = d) likes(pres, c, b).
        man(pres, d).
-       exists (c = d) like(pres, c, b) && man(pres, c).
-       forall (c = d) like(pres, c, b) && man(pres, c) => love(pres, c, a).
-       exists (x = d) exists (a = a) love(pres, x, a).
-       exists (x = d) exists (a = a) Brazil(a) && love(pres, x, a).
+       exists (c = d) likes(pres, c, b) && man(pres, c).
+       forall (c = d) likes(pres, c, b) && man(pres, c) => loves(pres, c, a).
+       exists (x = d) exists (a = a) loves(pres, x, a).
+       exists (x = d) exists (a = a) Brazil(a) && loves(pres, x, a).
      `);
    });
 
-  it.skip("Jones's wife is happy. Who is happy??", function() {
+  it("Jones's wife is happy. Who is happy??", function() {
     enter("Jones's wife is happy.")
      .query("Who is happy?")
      .equalsTo("Jones 's wife is happy");
   });
 
-  it.skip("Jones admires a woman who likes him. Who likes Jones?", function() {
+  it("Jones admires a woman who likes him. Who likes Jones?", function() {
     enter("Jones admires a woman who likes him.")
      .query("Who likes Jones?")
-     .equalsTo("a woman who like him like Jones");
+     .equalsTo("a woman who likes him likes Jones");
   });
 
-  it.skip("A man who loves Dani fascinates Anna. Who fascinates Anna?", function() {
-    enter("A man who loves Dani fascinates Anna.")
-     .query("Who fascinates Anna?")
-     .equalsTo("A man who love Dani fascinate Anna");
-    enter("A man who loves Dani fascinates Anna.")
-     .query("Who loves Dani?")
-     .equalsTo("A man who love Dani love Dani");
+  it.skip("A man who loves Mary fascinates Smith. Who fascinates Smith?", function() {
+    enter("A man who loves Mary fascinates Smith.")
+     .query("Who fascinates Smith?")
+     .equalsTo("A man who loves Mary fascinates Smith");
+    // NOTE(goto): the following seems wrong.
+    enter("A man who loves Mary fascinates Smith.")
+     .query("Who loves Mary?")
+     .equalsTo("A man who loves Mary loves Mary");
   });
 
-  it.skip("Jones owns a book which Smith loves. Who owns a book?", function() {
+  it("Jones owns a book which Smith loves. Who owns a book?", function() {
     enter("Jones owns a book which Smith loves.")
      .query("Who owns a book?")
-     .equalsTo("Jones own a book");
+     .equalsTo("Jones owns a book");
   });
 
-  it.skip("Jones is a man who loves Mary. Who loves Mary?", function() {
+  it("Jones is a man who loves Mary. Who loves Mary?", function() {
     enter("Jones is a man who loves Mary.")
      .query("Who loves Mary?")
-     .equalsTo("Jones love Mary");
+     .equalsTo("Jones loves Mary");
   });
 
   it.skip("Sam is from Brazil. Who is from Brazil?", function() {
@@ -525,42 +551,42 @@ describe("Logic", function() {
      .equalsTo("Sam is from Brazil");
   });
 
-  it.skip("Sam loved Anna. Who loved Anna?", function() {
-    enter("Sam loved Anna.")
+  it("Jones loved Mary. Who loved Mary?", function() {
+    enter("Jones loved Mary.")
      .equalsTo(`
-       Sam(a).
-       Anna(b).
-       love(past, a, b).
+       Jones(a).
+       Mary(b).
+       loved(past, a, b).
      `)
-     .query("Who loved Anna?")
+     .query("Who loved Mary?")
      .sameAs(`
-       exists (x) exists (a) Anna(a) && love(past, x, a).
+       exists (x) exists (a) Mary(a) && loved(past, x, a).
      `)
-     .equalsTo("Sam love Anna");
+     .equalsTo("Jones loved Mary");
   });
 
-  it.skip("Sam will love Anna. Who will love Anna?", function() {
-    enter("Sam will love Anna.")
+  it.skip("Jones will love Mary. Who will love Mary?", function() {
+    enter("Jones will love Mary.")
      .equalsTo(`
-       Sam(a).
-       Anna(b).
+       Jones(a).
+       Mary(b).
        love(fut, a, b).
      `)
-     //.query("Who will love Anna?")
+     .query("Who will love Mary?")
      //.sameAs("")
-     //.equalsTo("Sam love Anna");
+     .equalsTo("Jones will love Mary");
   });
 
-  it.skip("Sam was a brazilian engineer. Every brazilian who was an engineer was happy. Was Sam happy?", function() {
-    enter("Sam was a brazilian engineer. Every brazilian who was an engineer was happy.")
+  it.skip("Jones was a brazilian engineer. Every brazilian who was an engineer was happy. Was Sam happy?", function() {
+    enter("Jones was a brazilian engineer. Every brazilian who was an engineer was happy.")
      .equalsTo(`
-       Sam(a).
+       Jones(a).
        brazilian(pres, a).
        engineer(pres, a).
        forall (b) brazilian(pres, b) && engineer(past, b) => happy(past, b).
      `)
-     .query("Was Sam happy?")
-     .equalsTo("Sam was happy.");
+     .query("Was Jones happy?")
+     .equalsTo("Jones was happy.");
   });
 
   // maybe we need to introduce variables?

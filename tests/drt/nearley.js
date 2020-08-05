@@ -563,6 +563,7 @@ describe("FeaturedNearley", function() {
 
     function clear(root) {
      delete root.types;
+     delete root.loc;
      for (let child of root.children || []) {
       clear(child);
      }
@@ -621,6 +622,7 @@ function clear(root) {
   return;
  }
  delete root.types;
+ delete root.loc;
  for (let child of root.children || []) {
   clear(child);
  }
@@ -1192,6 +1194,12 @@ describe("Questions", function() {
     assertThat(parse("Who will love Mary?", "Question"))
      .equalsTo(Question("Who", VP_(AUX("will"), 
                                    VP(V(VERB("love")),
+                                      NP(PN("Mary")))), "?"));
+  });
+
+  it("Who liked Mary?", function() {
+    assertThat(parse("Who liked Mary?", "Question"))
+     .equalsTo(Question("Who", VP_(VP(V(VERB("like"), "d"),
                                       NP(PN("Mary")))), "?"));
   });
 });
