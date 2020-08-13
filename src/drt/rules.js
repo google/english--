@@ -18,7 +18,7 @@ const {parse, first, nodes} = require("./nearley.js");
 
 const {
  S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE,
- Discourse, Sentence
+  Discourse, Sentence, Question
 } = nodes;
 
 
@@ -82,6 +82,8 @@ function match(a, b) {
   if (typeof a.children[i] == "string") {
    if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
     // console.log(a.children[i]);
+    // console.log("hi");
+    // console.log(`${a.children[i]} != ${b.children[i]}`);
     return false;
    }
   } else if (a.children[i]["@type"] == "Match") {
@@ -210,7 +212,7 @@ function referent(name, types, value, loc) {
     value: value,
     loc: loc,
     print() {
-      return this.name;
+    return `${this.name}`;
    }
   }
 }
@@ -981,6 +983,61 @@ class CRASPECT extends Rule {
  }
 }
 
+class CRQUESTIONIS extends Rule {
+ constructor(ids) {
+  super(ids, Question(BE(capture("be")), NP(capture("sub")), ADJ(capture("adj")), "?"));
+ }
+ apply({be, sub, adj}, node) {
+  let q = drs(this.ids);
+
+  q.push(S(sub, VP_(VP(be, adj))));
+
+  return [[], [question(q)], [], [node]];
+ }
+}
+
+class CRQUESTIONWHO extends Rule {
+ constructor(ids) {
+  super(ids, Question("Who", VP_(capture("vp_")), "?"));
+ }
+ apply({vp_}, node, refs = []) {
+  let q = drs(this.ids);
+
+  let u = referent(this.id(), {}, "", refs);
+
+  q.head.push(u);
+
+  q.push(S(u, vp_));
+
+  return [[u], [question(q, u)], [], [node]];
+ }
+}
+
+class CRQUESTIONWHOM extends Rule {
+ constructor(ids) {
+  super(ids, Question("Who", AUX(), NP(capture("sub")), V(capture("verb")), "?"));
+ }
+ apply({sub, verb}, node, refs = []) {
+  let q = drs(this.ids);
+
+  let u = referent(this.id(), {}, "", refs);
+
+  q.head.push(u);
+
+  q.push(S(sub, VP_(VP(verb, u))));
+
+  return [[u], [question(q, u)], [], [node]];
+ }
+}
+
+class CRQUESTION extends CompositeRule {
+ constructor(ids) {
+  super([new CRQUESTIONIS(ids), 
+         new CRQUESTIONWHO(ids), 
+         new CRQUESTIONWHOM(ids)]);
+ }
+}
+
 function drs(ids) {
  return DRS.from(ids);
 }
@@ -1091,7 +1148,7 @@ class DRS {
    .filter(ref => !ref.closure);
    // .filter(ref => !ref.time);
   for (let ref of individuals) {
-   refs.push(`${ref.name}`);
+   refs.push(`${ref.print()}`);
   }
   
   let args = refs.join(", ");
@@ -1103,6 +1160,7 @@ class DRS {
     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Negation" ||
+              cond["@type"] == "Question" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction") {
     result.push(cond.print());
@@ -1203,6 +1261,16 @@ function equals(a, b) {
  };
 }
 
+function question(drs, x) {
+ return {
+   "@type": "Question",
+   "drs": drs,
+   print() {
+    return "exists(" + `${x ? x.print() : ""}` + ") " + this.drs.print() + " ?";
+   }
+ };
+}
+
 module.exports = {
  match: match,
  capture: capture,
@@ -1231,4 +1299,5 @@ module.exports = {
  CRTENSE: CRTENSE,
  CRASPECT: CRASPECT,
  CRWILL: CRWILL,
+ CRQUESTION: CRQUESTION,
 };

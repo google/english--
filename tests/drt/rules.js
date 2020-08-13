@@ -27,6 +27,7 @@ const {
   CRTENSE,
   CRASPECT,
   CRWILL,
+  CRQUESTION,
   referent,
 } = require("../../src/drt/rules.js");
 
@@ -1109,6 +1110,54 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a owned b");
    });
+
+  it("Is Mary happy?", function() {
+    let ids = new Ids();
+
+    let node = parse("Is Mary happy?", "Question")[0];
+
+    let [[], [q]] = new CRQUESTION(ids).match(node);
+
+    assertThat(q.print()).equalsTo(trim(`
+      exists() drs(a) {
+        Mary(a)
+        happy(a)
+      } ?
+    `));
+
+  });
+
+  it("Who likes Jones?", function() {
+    let ids = new Ids();
+
+    let node = parse("Who likes Jones?", "Question")[0];
+
+    let [[], [q]] = new CRQUESTION(ids).match(node);
+
+    assertThat(q.print()).equalsTo(trim(`
+      exists(a) drs(a, b) {
+        Jones(b)
+        a like s b
+      } ?
+    `));
+
+  });
+
+  it("Who does Jones like?", function() {
+    let ids = new Ids();
+
+    let node = parse("Who does Jones like?", "Question")[0];
+
+    let [[], [q]] = new CRQUESTION(ids).match(node);
+
+    assertThat(q.print()).equalsTo(trim(`
+      exists(a) drs(a, b) {
+        Jones(b)
+        b like a
+      } ?
+    `));
+  });
+
 
   class TreeWalker {
    constructor(rules = []) {

@@ -453,6 +453,9 @@ class FeaturedNearley {
 }
 
 const DRTGrammar = FeaturedNearley.compile(`
+      Sentence -> Statement.
+      Sentence -> Question.      
+
       Statement -> S_ _ ".".
 
       Question ->
@@ -800,7 +803,7 @@ let node = (type) => {
  }
 };
 
-function parse(s, start) {
+function parse(s, start = "Statement") {
  let parser = new Parser(start);
  let result = parser.feed(s);
  return result;
@@ -845,6 +848,7 @@ module.exports = {
   "Statement": node("Statement"),
   "Question": node("Question"),
   "S": node("S"),
+  "S_": node("S_"),
   "NP": node("NP"),
   "PN": node("PN"),
   "VP_": node("VP_"),

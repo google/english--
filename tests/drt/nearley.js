@@ -12,6 +12,7 @@ const {
   Statement,
   Question,
   S,
+  S_,
   NP,
   PN,
   VP_,
@@ -629,18 +630,27 @@ function clear(root) {
  return root;
 }
 
-function parse(s, start, raw = false) {
+function parse(s, start = "Statement", raw = false, skip = true) {
+ // console.log(start);
  let parser = new Parser(start);
  let results = parser.feed(s);
- if (start) {
-  return raw ? results[0] : clear(results[0]);
+
+ if (raw) {
+  return results[0];
  }
- return clear(results[0]).children[0].children[0];
+
+ let result = clear(results[0]);
+
+ if (skip) {
+  return child(result, 0, 0);
+ }
+
+ return result;
 }
 
 describe("Statements", function() {
 
-  it("Jones likes Mary", function() {
+  it("Jones likes Mary.", function() {
     assertThat(parse("Jones likes Mary."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
@@ -1166,18 +1176,18 @@ describe("Statements", function() {
 
 describe("Questions", function() {
   it("Who walks?", function() {
-    assertThat(parse("Who walks?", "Question"))
+    assertThat(parse("Who walks?", "Question", false, false))
      .equalsTo(Question("Who", VP_(VP(V(VERB("walk"), "s"))), "?"));
   });
 
   it("Who likes Mary?", function() {
-    assertThat(parse("Who likes Mary?", "Question"))
+    assertThat(parse("Who likes Mary?", "Question", false, false))
      .equalsTo(Question("Who", VP_(VP(V(VERB("like"), "s"),
                                       NP(PN("Mary")))), "?"));
   });
 
   it("Who does not love Mary?", function() {
-    assertThat(parse("Who does not love Mary?", "Question"))
+    assertThat(parse("Who does not love Mary?", "Question", false, false))
      .equalsTo(Question("Who", VP_(AUX("does"), 
                                    "not", 
                                    VP(V(VERB("love")),
@@ -1185,20 +1195,20 @@ describe("Questions", function() {
   });
 
   it("Who will walk?", function() {
-    assertThat(parse("Who will walk?", "Question"))
+    assertThat(parse("Who will walk?", "Question", false, false))
      .equalsTo(Question("Who", VP_(AUX("will"), 
                                    VP(V(VERB("walk")))), "?"));
   });
 
   it("Who will love Mary?", function() {
-    assertThat(parse("Who will love Mary?", "Question"))
+    assertThat(parse("Who will love Mary?", "Question", false, false))
      .equalsTo(Question("Who", VP_(AUX("will"), 
                                    VP(V(VERB("love")),
                                       NP(PN("Mary")))), "?"));
   });
 
   it("Who liked Mary?", function() {
-    assertThat(parse("Who liked Mary?", "Question"))
+    assertThat(parse("Who liked Mary?", "Question", false, false))
      .equalsTo(Question("Who", VP_(VP(V(VERB("like"), "d"),
                                       NP(PN("Mary")))), "?"));
   });
@@ -1210,80 +1220,80 @@ describe("DRT Verbs", function() {
     // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
 
     // Third person plural for regular verbs
-    assertThat(parse("walk", "V")).equalsTo(V(VERB("walk")));
+    assertThat(parse("walk", "V", false, false)).equalsTo(V(VERB("walk")));
 
     // Third person for regular verbs
-    assertThat(parse("listens", "V")).equalsTo(V(VERB("listen"), "s"));
-    assertThat(parse("walks", "V")).equalsTo(V(VERB("walk"), "s"));
+    assertThat(parse("listens", "V", false, false)).equalsTo(V(VERB("listen"), "s"));
+    assertThat(parse("walks", "V", false, false)).equalsTo(V(VERB("walk"), "s"));
 
     // Third person present for verbs ending in s, x, ch, sh
-    assertThat(parse("kisses", "V")).equalsTo(V(VERB("kiss"), "es"));
-    assertThat(parse("boxes", "V")).equalsTo(V(VERB("box"), "es"));
-    assertThat(parse("watches", "V")).equalsTo(V(VERB("watch"), "es"));
-    assertThat(parse("crashes", "V")).equalsTo(V(VERB("crash"), "es"));
+    assertThat(parse("kisses", "V", false, false)).equalsTo(V(VERB("kiss"), "es"));
+    assertThat(parse("boxes", "V", false, false)).equalsTo(V(VERB("box"), "es"));
+    assertThat(parse("watches", "V", false, false)).equalsTo(V(VERB("watch"), "es"));
+    assertThat(parse("crashes", "V", false, false)).equalsTo(V(VERB("crash"), "es"));
 
     // Third person present for verbs ending in e
-    assertThat(parse("frees", "V")).equalsTo(V(VERB("free"), "s"));    
-    assertThat(parse("ties", "V")).equalsTo(V(VERB("tie"), "s"));    
-    assertThat(parse("loves", "V")).equalsTo(V(VERB("love"), "s"));
+    assertThat(parse("frees", "V", false, false)).equalsTo(V(VERB("free"), "s"));    
+    assertThat(parse("ties", "V", false, false)).equalsTo(V(VERB("tie"), "s"));    
+    assertThat(parse("loves", "V", false, false)).equalsTo(V(VERB("love"), "s"));
 
     // Third person present ending in vow + y
-    assertThat(parse("plays", "V")).equalsTo(V(VERB("play"), "s"));
+    assertThat(parse("plays", "V", false, false)).equalsTo(V(VERB("play"), "s"));
 
     // Third person present ending in consonant + y
-    assertThat(parse("applies", "V")).equalsTo(V(VERB("appl"), "ies"));
-    assertThat(parse("copies", "V")).equalsTo(V(VERB("cop"), "ies"));
-    assertThat(parse("replies", "V")).equalsTo(V(VERB("repl"), "ies"));
-    assertThat(parse("tries", "V")).equalsTo(V(VERB("tr"), "ies"));
+    assertThat(parse("applies", "V", false, false)).equalsTo(V(VERB("appl"), "ies"));
+    assertThat(parse("copies", "V", false, false)).equalsTo(V(VERB("cop"), "ies"));
+    assertThat(parse("replies", "V", false, false)).equalsTo(V(VERB("repl"), "ies"));
+    assertThat(parse("tries", "V", false, false)).equalsTo(V(VERB("tr"), "ies"));
 
     // Third person for verbs where the final syllable is stressed
-    assertThat(parse("compels", "V")).equalsTo(V(VERB("compel"), "s"));    
-    assertThat(parse("defers", "V")).equalsTo(V(VERB("defer"), "s"));
+    assertThat(parse("compels", "V", false, false)).equalsTo(V(VERB("compel"), "s"));    
+    assertThat(parse("defers", "V", false, false)).equalsTo(V(VERB("defer"), "s"));
 
     // Third person past for verbs ending in s, x, ch, sh
-    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
+    assertThat(parse("kissed", "V", false, false)).equalsTo(V(VERB("kiss"), "ed"));
 
     // Past tense for regular verbs
-    assertThat(parse("listened", "V")).equalsTo(V(VERB("listen"), "ed"));
-    assertThat(parse("walked", "V")).equalsTo(V(VERB("walk"), "ed"));
+    assertThat(parse("listened", "V", false, false)).equalsTo(V(VERB("listen"), "ed"));
+    assertThat(parse("walked", "V", false, false)).equalsTo(V(VERB("walk"), "ed"));
 
     // Past tense for verbs ending in s, x, ch, sh
-    assertThat(parse("kissed", "V")).equalsTo(V(VERB("kiss"), "ed"));
-    assertThat(parse("boxed", "V")).equalsTo(V(VERB("box"), "ed"));
-    assertThat(parse("watched", "V")).equalsTo(V(VERB("watch"), "ed"));
-    assertThat(parse("crashed", "V")).equalsTo(V(VERB("crash"), "ed"));
+    assertThat(parse("kissed", "V", false, false)).equalsTo(V(VERB("kiss"), "ed"));
+    assertThat(parse("boxed", "V", false, false)).equalsTo(V(VERB("box"), "ed"));
+    assertThat(parse("watched", "V", false, false)).equalsTo(V(VERB("watch"), "ed"));
+    assertThat(parse("crashed", "V", false, false)).equalsTo(V(VERB("crash"), "ed"));
 
     // Past tense for verbs ending in e
-    assertThat(parse("freed", "V")).equalsTo(V(VERB("free"), "d"));
-    assertThat(parse("tied", "V")).equalsTo(V(VERB("tie"), "d"));
-    assertThat(parse("loved", "V")).equalsTo(V(VERB("love"), "d"));
+    assertThat(parse("freed", "V", false, false)).equalsTo(V(VERB("free"), "d"));
+    assertThat(parse("tied", "V", false, false)).equalsTo(V(VERB("tie"), "d"));
+    assertThat(parse("loved", "V", false, false)).equalsTo(V(VERB("love"), "d"));
 
     // Past tense for verbs ending in i, o
-    assertThat(parse("skied", "V")).equalsTo(V(VERB("ski"), "ed"));    
-    assertThat(parse("echoed", "V")).equalsTo(V(VERB("echo"), "ed"));    
+    assertThat(parse("skied", "V", false, false)).equalsTo(V(VERB("ski"), "ed"));    
+    assertThat(parse("echoed", "V", false, false)).equalsTo(V(VERB("echo"), "ed"));    
 
     // Past tense for verbs ending in consonant + y
-    assertThat(parse("applied", "V")).equalsTo(V(VERB("appl"), "ied"));
-    assertThat(parse("tried", "V")).equalsTo(V(VERB("tr"), "ied"));
+    assertThat(parse("applied", "V", false, false)).equalsTo(V(VERB("appl"), "ied"));
+    assertThat(parse("tried", "V", false, false)).equalsTo(V(VERB("tr"), "ied"));
 
     // Past tense for verbs ending in vowel + y
-    assertThat(parse("played", "V")).equalsTo(V(VERB("play"), "ed"));    
-    assertThat(parse("enjoyed", "V")).equalsTo(V(VERB("enjoy"), "ed"));    
+    assertThat(parse("played", "V", false, false)).equalsTo(V(VERB("play"), "ed"));    
+    assertThat(parse("enjoyed", "V", false, false)).equalsTo(V(VERB("enjoy"), "ed"));    
 
     // Past tense for verbs where the final syllable is stressed
-    assertThat(parse("compelled", "V")).equalsTo(V(VERB("compel"), "led"));    
-    assertThat(parse("deferred", "V")).equalsTo(V(VERB("defer"), "red"));
+    assertThat(parse("compelled", "V", false, false)).equalsTo(V(VERB("compel"), "led"));    
+    assertThat(parse("deferred", "V", false, false)).equalsTo(V(VERB("defer"), "red"));
 
     // Past tense for verbs that are irregular.
-    assertThat(parse("left", "V")).equalsTo(V(VERB("left")));
-    assertThat(parse("came", "V")).equalsTo(V(VERB("came")));
+    assertThat(parse("left", "V", false, false)).equalsTo(V(VERB("left")));
+    assertThat(parse("came", "V", false, false)).equalsTo(V(VERB("came")));
   });
 
   it("will not kiss Jones", function() {
-    let {tense, tp} = parse("Mary will not kiss Jones", "S", true).types;
+    let {tense, tp} = parse("Mary will not kiss Jones", "S", true, false).types;
     assertThat(tense).equalsTo("fut");
     assertThat(tp).equalsTo("-past");
-    assertThat(parse("will not kiss Jones", "VP_"))
+    assertThat(parse("will not kiss Jones", "VP_", false, false))
      .equalsTo(VP_(AUX("will"), "not", VP(V(VERB("kiss")), NP(PN("Jones")))));
   });
 });
@@ -1700,21 +1710,21 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who likes Mary?", function() {
-    assertThat(parse("Who likes Mary?", "Question"))
+    assertThat(parse("Who likes Mary?", "Question", false, false))
      .equalsTo(Question("Who", 
                         VP_(VP(V(VERB("like"), "s"), NP(PN("Mary")))), 
                         "?"));
   });
 
   it("Who is happy?", function() {
-    assertThat(parse("Who is happy?", "Question"))
+    assertThat(parse("Who is happy?", "Question", false, false))
      .equalsTo(Question("Who", 
                         VP_(VP(BE("is"), ADJ("happy"))), 
                         "?"));
   });
 
   it("Who does Mary like?", function() {
-    assertThat(parse("Who does Mary like?", "Question"))
+    assertThat(parse("Who does Mary like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("does"),
                         NP(PN("Mary")), 
@@ -1723,7 +1733,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who will Mary like?", function() {
-    assertThat(parse("Who will Mary like?", "Question"))
+    assertThat(parse("Who will Mary like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("will"),
                         NP(PN("Mary")), 
@@ -1732,7 +1742,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who would Mary like?", function() {
-    assertThat(parse("Who would Mary like?", "Question"))
+    assertThat(parse("Who would Mary like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("would"),
                         NP(PN("Mary")), 
@@ -1741,7 +1751,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who would they like?", function() {
-    assertThat(parse("Who do they like?", "Question"))
+    assertThat(parse("Who do they like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("do"),
                         NP(PRO("they")), 
@@ -1750,7 +1760,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who did they like?", function() {
-    assertThat(parse("Who did they like?", "Question"))
+    assertThat(parse("Who did they like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("did"),
                         NP(PRO("they")), 
@@ -1759,7 +1769,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who does the man like?", function() {
-    assertThat(parse("Who does the man like?", "Question"))
+    assertThat(parse("Who does the man like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("does"),
                         NP(DET("the"), N("man")), 
@@ -1768,7 +1778,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Who does Smith's brother like?", function() {
-    assertThat(parse("Who does Smith's brother like?", "Question"))
+    assertThat(parse("Who does Smith's brother like?", "Question", false, false))
      .equalsTo(Question("Who", 
                         AUX("does"),
                         NP(DET(NP(PN("Smith")), "'s"), RN("brother")), 
@@ -1777,7 +1787,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Is Mary happy?", function() {
-    assertThat(parse("Is Mary happy?", "Question"))
+    assertThat(parse("Is Mary happy?", "Question", false, false))
      .equalsTo(Question(BE("Is"), 
                         NP(PN("Mary")), 
                         ADJ("happy"), 
@@ -1785,7 +1795,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Was Mary happy?", function() {
-    assertThat(parse("Was Mary happy?", "Question"))
+    assertThat(parse("Was Mary happy?", "Question", false, false))
      .equalsTo(Question(BE("Was"), 
                         NP(PN("Mary")), 
                         ADJ("happy"), 
@@ -1793,7 +1803,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Are they happy?", function() {
-    assertThat(parse("Are they happy?", "Question"))
+    assertThat(parse("Are they happy?", "Question", false, false))
      .equalsTo(Question(BE("Are"), 
                         NP(PRO("they")), 
                         ADJ("happy"), 
@@ -1801,7 +1811,7 @@ describe("Backwards compatibility", function() {
   });
 
   it("Were they happy?", function() {
-    assertThat(parse("Were they happy?", "Question"))
+    assertThat(parse("Were they happy?", "Question", false, false))
      .equalsTo(Question(BE("Were"), 
                         NP(PRO("they")), 
                         ADJ("happy"), 
