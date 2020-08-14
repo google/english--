@@ -1475,15 +1475,14 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Is Jones happy?", function() {
+  it("Is Jones happy?", function() {
     assertThat("Is Jones happy?")
      .equalsTo(`
        drs() {
-         drs(a) {
-           brazilian(a)
-         } => drs() {
-           < happy(a)
-         }
+         exists() drs(a) {
+           Jones(a) 
+           happy(a)
+         } ?
        }
     `);
   });

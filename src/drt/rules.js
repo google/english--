@@ -94,6 +94,8 @@ function match(a, b) {
    result[a.children[i].name] = b;
    continue;
   } else {
+   //console.log(a);
+   //console.log(b);
    let capture = match(a.children[i], b.children[i]);
    if (!capture) {
     return false;
@@ -1006,7 +1008,7 @@ class CRQUESTIONIS extends Rule {
 
   q.push(S(sub, VP_(VP(be, adj))));
 
-  return [[], [question(q)], [], [node]];
+  return [[], [query(q)], [], [node]];
  }
 }
 
@@ -1023,7 +1025,7 @@ class CRQUESTIONWHO extends Rule {
 
   q.push(S(u, vp_));
 
-  return [[u], [question(q, u)], [], [node]];
+  return [[u], [query(q, u)], [], [node]];
  }
 }
 
@@ -1040,7 +1042,7 @@ class CRQUESTIONWHOM extends Rule {
 
   q.push(S(sub, VP_(VP(verb, u))));
 
-  return [[u], [question(q, u)], [], [node]];
+  return [[u], [query(q, u)], [], [node]];
  }
 }
 
@@ -1069,12 +1071,28 @@ class CRSTEM extends Rule {
  }
 }
 
-class CRPUNCT extends Rule {
+class CRPUNCT1 extends Rule {
  constructor(ids) {
   super(ids, Sentence(Statement(S_(S(capture("s"))))));
  }
- apply({s}, node, refs) {
+ apply({s}, node) {
   return [[], [s], [], [node]];
+ }
+}
+
+class CRPUNCT2 extends Rule {
+ constructor(ids) {
+  super(ids, Sentence(Question(capture("q"))));
+ }
+ apply({q}, node) {
+  return [[], [q], [], [node]];
+ }
+}
+
+class CRPUNCT extends CompositeRule {
+ constructor(ids) {
+  super([new CRPUNCT1(ids), 
+         new CRPUNCT2(ids)]);
  }
 }
 
@@ -1156,17 +1174,13 @@ class DRS {
   let queue = [node];
   this.body.push(node);
 
-  // console.log(JSON.stringify(node, undefined, 2));
-
   while (queue.length > 0) {
    let p = queue.shift();
    // breadth first search: iterate over
    // this level first ...
-   // console.log(`${p["@type"]}`);
    let skip = false;
    for (let rule of this.rules) {
     let [head, body, drs, [remove]] = rule.match(p, this.head);
-    // console.log(body);
     this.head.push(...head);
     this.body.push(...body);
 
@@ -1175,37 +1189,28 @@ class DRS {
      let i = this.body.indexOf(remove);
      if (i == -1) {
       throw new Error("Ooops, deleting an invalid node.");
-     }     
+     }
+     // console.log(remove);
+     // console.log(body);
      this.body.splice(i, 1);
     }
 
-    // for (let del of remove) {
-    // console.log(this.body.indexOf(del));
-    // console.log(del);
-    // let i = this.body.indexOf(del);
-    // skip = true;
-    //}
     queue.push(...body.filter(c => !(c instanceof DRS)));
-    // skip = skip || remove.length > 0;
 
     if (skip) {
-     // console.log(queue);
-     // console.log(this.body);
      break;
     }
    }
 
    if (skip) {
-    // console.log("skipping");
     continue;
    }
+
    // ... and recurse.
    let next = (p && p.children || [])
     .filter(c => typeof c != "string");
    queue.push(...next);
   }
-
-  // console.log(this.body);
 
   return this;
  }
@@ -1229,7 +1234,7 @@ class DRS {
     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Negation" ||
-              cond["@type"] == "Question" ||
+              cond["@type"] == "Query" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction") {
     result.push(cond.print());
@@ -1331,9 +1336,9 @@ function equals(a, b) {
  };
 }
 
-function question(drs, x) {
+function query(drs, x) {
  return {
-   "@type": "Question",
+   "@type": "Query",
    "drs": drs,
    print() {
     return "exists(" + `${x ? x.print() : ""}` + ") " + this.drs.print() + " ?";

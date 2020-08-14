@@ -343,11 +343,11 @@ describe.skip("Logic", function() {
    let q = DrtParser.parse(s, "Question")[0];
    // console.log(q);
 
-   console.log(q);
+   // console.log(s);
 
    // console.log();
    let foo = DRS.from();
-   foo.push(q);
+   foo.feed(s);
    // console.log(q);
    console.log(foo.print());
    return;
