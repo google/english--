@@ -413,7 +413,7 @@ class FeaturedNearley {
   return this.parser.feed(code);
  }
 
- static compile(source) {
+ static compile(source, header) {
   let parser = new FeaturedNearley();
   let grammar = parser.feed(source);
 
@@ -429,6 +429,10 @@ class FeaturedNearley {
   feed(`${bind.toString()}`);
   feed(`%}`);
   feed(``);
+
+  if (header) {
+   feed(header);
+  }
 
   // console.log(grammar[0].length);
   
@@ -453,8 +457,8 @@ class FeaturedNearley {
 }
 
 const DRTGrammar = FeaturedNearley.compile(`
-      Sentence -> Statement.
-      Sentence -> Question.      
+      Sentence -> _ Statement _.
+      Sentence -> _ Question _.      
 
       Statement -> S_ _ ".".
 
@@ -724,7 +728,6 @@ const DRTGrammar = FeaturedNearley.compile(`
       N[num=sing, gen=male] -> "man".
       N[num=sing, gen=fem] -> "woman".
       N[num=sing, gen=fem] -> "girl".
-      N[num=sing, gen=fem] -> "sister".
       N[num=sing, gen=-hum] -> "book".
       N[num=sing, gen=-hum] -> "telescope".
       N[num=sing, gen=-hum] -> "donkey".
@@ -785,6 +788,8 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
       VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
+`, `
+      Discourse -> Sentence:+
 `);
 
 class Parser {
@@ -846,6 +851,7 @@ module.exports = {
  Parser: Parser,
  nodes: {
   "Statement": node("Statement"),
+  "Sentence": node("Sentence"),
   "Question": node("Question"),
   "S": node("S"),
   "S_": node("S_"),

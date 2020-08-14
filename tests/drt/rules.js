@@ -1049,11 +1049,19 @@ describe("Rules", function() {
     let ids = new Ids();
     let node = first(parse("Mary will not kiss Jones."), true);
 
-    let [head, body, , remove] = new CRNEG(ids).match(node, []);
+    let [head, [s], , remove] = new CRNEG(ids).match(node, []);
 
-    new CRWILL(ids).match(child(node, 1), []);
-    assertThat(print(node)).equalsTo("a kiss b");
-    assertThat(node.types.tense).equalsTo("fut");
+    assertThat(s.print()).equalsTo(trim(`
+      ~drs(a, b) {
+        Mary(a)
+        Jones(b)
+        > a kiss b
+      }`
+    ));
+
+    //new CRWILL(ids).match(child(node, 1), []);
+    //assertThat(print(node)).equalsTo("a kiss b");
+    //assertThat(node.types.tense).equalsTo("fut");
    });
 
   it("Mary has kissed Jones.", function() {
@@ -1137,7 +1145,7 @@ describe("Rules", function() {
     assertThat(q.print()).equalsTo(trim(`
       exists(a) drs(a, b) {
         Jones(b)
-        a like s b
+        a likes b
       } ?
     `));
 

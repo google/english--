@@ -1172,6 +1172,15 @@ describe("Statements", function() {
                         ))));
    });
 
+  it("Jones's wife or Smith's brother loves Mary.", function() {
+    assertThat(parse("Jones's wife or Smith's brother loves Mary."))
+     .equalsTo(S(NP(NP(DET(NP(PN("Jones")), "'s"), RN("wife")), 
+                    "or", 
+                    NP(DET(NP(PN("Smith")), "'s"), RN("brother"))),
+                 VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))
+                 ));
+   });
+
 });
 
 describe("Questions", function() {
@@ -1291,6 +1300,14 @@ describe("DRT Verbs", function() {
 
   it("will not kiss Jones", function() {
     let {tense, tp} = parse("Mary will not kiss Jones", "S", true, false).types;
+    assertThat(tense).equalsTo("fut");
+    assertThat(tp).equalsTo("-past");
+    assertThat(parse("will not kiss Jones", "VP_", false, false))
+     .equalsTo(VP_(AUX("will"), "not", VP(V(VERB("kiss")), NP(PN("Jones")))));
+  });
+
+  it.skip("did not kiss Mary", function() {
+    let {tense, tp} = parse("did not kiss Mary", "VP_", true, false).types;
     assertThat(tense).equalsTo("fut");
     assertThat(tp).equalsTo("-past");
     assertThat(parse("will not kiss Jones", "VP_", false, false))

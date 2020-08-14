@@ -17,8 +17,8 @@ const {
 const {parse, first, nodes} = require("./nearley.js");
 
 const {
- S, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE,
-  Discourse, Sentence, Question
+ S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
+  Discourse, Sentence, Statement, Question
 } = nodes;
 
 
@@ -72,7 +72,11 @@ function transcribe(node, refs) {
 let capture = (name) => { return {"@type": "Match", "name": name} };
   
 function match(a, b) {
- if (!b || a["@type"] != b["@type"]) {
+ if (!a || !b) {
+  return false;
+ }
+
+ if (a["@type"] != b["@type"]) {
   return false;
  }
  
@@ -536,23 +540,19 @@ class CRNEG extends Rule {
  }
 
  apply({np, vp}, node, refs) {
-  let head = [];
-  let body = [];
-  let subs = [];
-    
-  let noun = np.children[0];
-  
   let sub = drs(this.ids);
   sub.head = clone(refs);
   sub.head.forEach(ref => ref.closure = true);
   sub.neg = true;
 
-  let s = node;
-  s.children[1].children.splice(0, 2);
+  let s = clone(node);
+  // console.log(s);
+  child(s, 1).children.splice(0, 2);
+  // console.log(child(node, 1));
 
   sub.push(s);
 
-  return [head, [sub], [], [node]];
+  return [[], [sub], [], [node]];
  }
 }
 
@@ -574,7 +574,11 @@ class CRPREPBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE("is"), PP(PREP(capture("prep")), capture("np"))))));
  }
  apply({ref, prep, np}, node, refs) {
+  // console.log("hi");
+  //console.log(print(node));
   let s = S(child(ref, 0), VP_(VP(V(child(prep, 0)), child(np, 1))));
+  // console.log(print(child(np, 1)));
+  // console.log(child(s, 1, 0, 1, 1));
   return [[], [s], [], [node]];
  }
 }
@@ -586,8 +590,6 @@ class CRNEGBE extends Rule {
  apply({ref, adj}, node, refs) {
   adj.ref = ref.children[0];
   adj.neg = true;
-
-  // console.log("hi");
 
   if (node.types && node.types.tense) {
    adj.time = node.types.tense;
@@ -683,8 +685,14 @@ class CREVERY extends Rule {
   let v = drs(this.ids);
   v.head.push(...clone(n.head));
   v.head.forEach(ref => ref.closure = true);
-  node.children[0] = ref;
-  v.push(node);
+
+  let s = clone(node);
+
+  // console.log(child(s, 0, 0, 0).children[0]);
+
+  s.children[0] = ref;
+  // console.log(print(s));
+  v.push(s);
 
   let result = implication(n, v);
    
@@ -708,8 +716,11 @@ class CRVPEVERY extends Rule {
   let verb = drs(this.ids);
   verb.head.push(...clone(n.head));
   verb.head.forEach(ref => ref.closure = true);
-  child(node, 1, 0).children[1] = ref;
-  verb.push(node);
+
+  let s = clone(node);
+
+  child(s, 1, 0).children[1] = ref;
+  verb.push(s);
   
   return [[], [implication(n, verb)], [], [node]];
  }
@@ -756,7 +767,7 @@ class CRVPOR extends Rule {
 class CRNPOR extends Rule {
  constructor(ids) {
   super(ids, S(NP(NP(capture("first")), "or", NP(capture("second"))), 
-                  VP_(capture("vp"))));
+               VP_(capture("vp"))));
  }
  apply({first, second, vp}, node, refs) {
   let a = drs(this.ids);
@@ -840,6 +851,8 @@ class CRVPPOSS extends Rule {
  }
 
  apply({name, noun, verb}, node, refs) {
+  // console.log("hi");
+  
   let u = referent(this.id(), noun.types, print(child(node, 1), refs));
   node.children[1] = u;
 
@@ -870,8 +883,7 @@ class CRADJ extends Rule {
 
 class CRSPP extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), 
-               VP_()));
+  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), VP_()));
  }
  apply({noun, prep, np}, node, refs) {
   let u = referent(this.id(), noun.types);
@@ -894,9 +906,11 @@ class CRSPP extends Rule {
 class CRVPPP extends Rule {
  constructor(ids) {
   super(ids, S(capture("subject"), 
-               VP_(VP(V(), NP(DET(), 
-                              N(N(capture("noun")), PP(PREP(capture("prep")), NP(capture("np"))))
-                              )))));
+               VP_(VP(V(), 
+                      NP(DET(), 
+                         N(N(capture("noun")), 
+                           PP(PREP(capture("prep")), 
+                              NP(capture("np")))))))));
  }
  apply({noun, prep, np}, node, refs) {
   let u = referent(this.id(), noun.types);
@@ -1038,6 +1052,32 @@ class CRQUESTION extends CompositeRule {
  }
 }
 
+class CRSTEM extends Rule {
+ constructor(ids) {
+  super(ids, V(VERB(capture("stem"))));
+ }
+ apply({stem}, node, refs) {
+  let root = stem.children[0];
+  
+  if (node.children.length > 1) {
+   root += node.children[1];
+  }
+
+  node.children = [root];
+
+  return [[], [], [], []];
+ }
+}
+
+class CRPUNCT extends Rule {
+ constructor(ids) {
+  super(ids, Sentence(Statement(S_(S(capture("s"))))));
+ }
+ apply({s}, node, refs) {
+  return [[], [s], [], [node]];
+ }
+}
+
 function drs(ids) {
  return DRS.from(ids);
 }
@@ -1072,12 +1112,19 @@ class DRS {
     new CRADJ(ids),
     // new CRTENSE(ids),
     new CRWILL(ids),
+    new CRQUESTION(ids),
+    new CRSTEM(ids),
+    new CRPUNCT(ids),
     ];
   return new DRS(new CRPN(ids), rules);
  }
 
- feed(s) {
-  this.push(first(parse(s), true));
+ feed(source) {
+  let [[lines]] = parse(source, "Discourse");
+  for (let s of lines) {
+   // console.log(s);
+   this.push(s);
+  }
  }
  
  bind(node) {
@@ -1118,18 +1165,38 @@ class DRS {
    // console.log(`${p["@type"]}`);
    let skip = false;
    for (let rule of this.rules) {
-    let [head, body, drs, remove] = rule.match(p, this.head);
+    let [head, body, drs, [remove]] = rule.match(p, this.head);
     // console.log(body);
     this.head.push(...head);
     this.body.push(...body);
-    for (let del of remove) {
-     let i = this.body.indexOf(del);
+
+    if (remove) {
+     skip = true;
+     let i = this.body.indexOf(remove);
+     if (i == -1) {
+      throw new Error("Ooops, deleting an invalid node.");
+     }     
      this.body.splice(i, 1);
     }
+
+    // for (let del of remove) {
+    // console.log(this.body.indexOf(del));
+    // console.log(del);
+    // let i = this.body.indexOf(del);
+    // skip = true;
+    //}
     queue.push(...body.filter(c => !(c instanceof DRS)));
-    skip = skip || remove.length > 0;
+    // skip = skip || remove.length > 0;
+
+    if (skip) {
+     // console.log(queue);
+     // console.log(this.body);
+     break;
+    }
    }
+
    if (skip) {
+    // console.log("skipping");
     continue;
    }
    // ... and recurse.
@@ -1137,6 +1204,8 @@ class DRS {
     .filter(c => typeof c != "string");
    queue.push(...next);
   }
+
+  // console.log(this.body);
 
   return this;
  }
@@ -1186,6 +1255,7 @@ class DRS {
 
 
 function disjunction(a, b) {
+ // throw new Error("hi");
  return {
   "@type": "Disjunction",
   "a": a,

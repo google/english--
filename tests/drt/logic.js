@@ -26,7 +26,7 @@ const {
   negation,
   argument} = Parser;
 
-describe("Logic", function() {
+describe.skip("Logic", function() {
 
   it("Jones loves Mary.", function() {
     enter("Jones loves Mary.")
@@ -340,10 +340,17 @@ describe("Logic", function() {
   }
 
   function query(s) {
-   let q = DrtParser.parse(s, "Question")[0].children;
+   let q = DrtParser.parse(s, "Question")[0];
    // console.log(q);
 
+   console.log(q);
+
+   // console.log();
+   let foo = DRS.from();
+   foo.push(q);
    // console.log(q);
+   console.log(foo.print());
+   return;
 
    if (q[0]["@type"] == "BE" && q[0].children[0] == "Is") {
     // console.log("hi");
