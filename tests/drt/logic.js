@@ -340,16 +340,18 @@ describe.skip("Logic", function() {
   }
 
   function query(s) {
+   let drs = DRS.from();
+   drs.feed(s);
+   console.log(drs.print());
+  }
+
+  function query2(s) {
    let q = DrtParser.parse(s, "Question")[0];
    // console.log(q);
 
    // console.log(s);
 
    // console.log();
-   let foo = DRS.from();
-   foo.feed(s);
-   // console.log(q);
-   console.log(foo.print());
    return;
 
    if (q[0]["@type"] == "BE" && q[0].children[0] == "Is") {
