@@ -1487,6 +1487,32 @@ describe("DRS", function() {
     `);
   });
 
+  it("Who loves Jones?", function() { 
+    // NOTE(goto): we should probably keep the 
+    // variable b scoped to the question.
+    assertThat("Who loves Jones?")
+     .equalsTo(`
+       drs(a, b) {
+         Jones(a)
+         exists(b) drs(b) {
+           b loves a
+         } ?
+       }
+    `);
+  });
+
+  it("Who does Jones love?", function() { 
+    assertThat("Who does Jones love?")
+     .equalsTo(`
+       drs(a) {
+         exists(a) drs(a, b) {
+           Jones(b)
+           b love a
+         } ?
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

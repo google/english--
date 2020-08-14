@@ -1019,6 +1019,12 @@ class CRQUESTIONWHO extends Rule {
  apply({vp_}, node, refs = []) {
   let q = drs(this.ids);
 
+  // q.head.push(...clone(refs));
+  // q.head.forEach(ref => ref.closure = true);
+  // q.head.push(ref);
+  // noun.ref = ref;
+  // console.log(noun);
+
   let u = referent(this.id(), {}, "", refs);
 
   q.head.push(u);
