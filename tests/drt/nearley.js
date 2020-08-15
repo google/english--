@@ -135,6 +135,54 @@ describe("Nearley", function() {
     assertThat(parser.feed("1 + 1")).equalsTo([[1, null, "+", null, 1]]);
    });
 
+  it("Precedence", function() {
+    let grammar = Nearley.compile(`
+      @builtin "whitespace.ne"
+
+      @{%
+        function op([a, [op], b]) {
+         return {a: a, b: b, op: op};
+        } 
+      %}
+
+      math -> sum {% id %}
+      sum -> sum ("+"|"-") product {% op %} 
+      sum -> product {% id %}
+      product -> product ("*"|"/") exp {% op %}
+      product -> exp {% id %}
+      exp -> number "^" exp {% op %}
+      exp -> number {% id %}
+      number -> [0-9]:+ {% ([number]) => parseInt(number) %}
+    `);
+    assertThat(new Nearley(grammar).feed("1+1"))
+     .equalsTo([{a: 1, op: "+", b: 1}]);
+    assertThat(new Nearley(grammar).feed("1+2/3"))
+     .equalsTo([{a: 1, op: "+", b: {a: 2, op: "/", b: 3}}]);
+
+    let grammar2 = Nearley.compile(`
+      @builtin "whitespace.ne"
+
+      @{%
+        function op([a, [op], b]) {
+         return {a: a, b: b, op: op};
+        } 
+      %}
+
+      math -> product {% id %}
+      product -> product ("*"|"/") sum {% op %}
+      product -> sum {% id %}
+      sum -> sum ("+"|"-") exp {% op %} 
+      sum -> exp {% id %}
+      exp -> number "^" exp {% op %}
+      exp -> number {% id %}
+      number -> [0-9]:+ {% ([number]) => parseInt(number) %}
+    `);
+    assertThat(new Nearley(grammar2).feed("1+1"))
+     .equalsTo([{a: 1, op: "+", b: 1}]);
+    assertThat(new Nearley(grammar2).feed("1+2/3"))
+     .equalsTo([{a: {a: 1, op: "+", b: 2}, op: "/", b: 3}]);
+   });
+
  });
 
 describe("Binding", function() {
