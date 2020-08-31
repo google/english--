@@ -6,7 +6,8 @@ const {
   bind, 
   FeaturedNearley, 
   Parser, 
-  nodes} = require("../../src/drt/nearley.js");
+  nodes,
+  DrtSyntax} = require("../../src/drt/nearley.js");
 
 const {
   Statement,
@@ -42,6 +43,19 @@ describe("Nearley", function() {
     assertThat(parser.feed("foo")).equalsTo([[[[["foo"]]]]]);
   });
 
+  it.skip("Export", function() {
+      const code = FeaturedNearley.compile(DrtSyntax, "", true);
+
+      const fs = require("fs");
+
+      fs.writeFileSync("bin/grammar.js", code);
+    //let code = Nearley.generate(`
+    //  main -> (statement):+
+    //  statement -> "foo" | "bar"
+    //`);
+     // console.log(code);
+  });
+    
   it("Incomplete", function() {
     let parser = Nearley.from(`
       main -> (statement):+

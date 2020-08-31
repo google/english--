@@ -21,14 +21,20 @@ class Nearley {
   }
  }
 
- static compile(source) {
+ static compile(source, raw = false) {
   const parser = new nearley.Parser(grammar);
   parser.feed(source);
   const ast = parser.results[0];
   const info = compile(ast, {});
   // Generate JavaScript code from the rules
   const code = generate(info, "grammar");
+
+  if (raw) {
+    return code;
+  }
+     
   const module = { exports: {} };
+
   eval(code);
 
   return module.exports;
@@ -413,7 +419,7 @@ class FeaturedNearley {
   return this.parser.feed(code);
  }
 
- static compile(source, header) {
+ static compile(source, header, raw) {
   let parser = new FeaturedNearley();
   let grammar = parser.feed(source);
 
@@ -452,11 +458,11 @@ class FeaturedNearley {
 
   }
  
-  return Nearley.compile(result.join("\n"));
+  return Nearley.compile(result.join("\n"), raw);
  }
 }
 
-const DRTGrammar = FeaturedNearley.compile(`
+const DrtSyntax = `
       Sentence -> _ Statement _.
       Sentence -> _ Question _.      
 
@@ -788,9 +794,12 @@ const DRTGrammar = FeaturedNearley.compile(`
 
       VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
       VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
-`, `
-      Discourse -> Sentence:+
-`);
+`;
+
+const DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+
+// console.log("hi");
+// console.log(DRTGrammar);
 
 class Parser {
  constructor (start){
@@ -848,6 +857,7 @@ module.exports = {
  Nearley: Nearley,
  bind: bind,
  FeaturedNearley: FeaturedNearley,
+ DrtSyntax: DrtSyntax,   
  Parser: Parser,
  nodes: {
   "Statement": node("Statement"),
