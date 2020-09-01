@@ -6,7 +6,8 @@
     "test": "mocha -w tests/logic tests/drt",
     "logic": "pegjs src/logic/logic.pegjs",
     "drt": "nearleyc src/drt/english.ne -o src/drt/english.js",
-    "docs": "nearley-railroad  src/drt/english.ne > tests/drt/grammar.html"
+    "docs": "nearley-railroad  src/drt/english.ne > tests/drt/grammar.html",
+    "build": "browserify --s module bin/main.js -o bin/bundle.js"
   },
   "repository": {
     "type": "git",
