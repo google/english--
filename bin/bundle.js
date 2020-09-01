@@ -1,1063 +1,1316 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.module = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-// Generated automatically by nearley, version unknown
+const files = {};
+
+require("fs").readFileSync = function(path) {
+    // console.log("reading " + path);
+    let file = path.split("/");
+    let content = files[file[file.length - 1]];
+    // console.log(content);
+    // debugger;
+    return content;
+};
+
+async function load(path) {
+    // console.log("fetching " + path);
+    let file = await fetch(path);
+    files[path] = await file.text();
+    // console.log(files[path]);
+}
+
+async function compile() {
+    await load("string.ne");
+    await load("number.ne");
+    await load("whitespace.ne");
+    return require("./../src/drt/nearley.js");
+}
+
+module.exports = {
+  compile: compile
+}
+
+},{"./../src/drt/nearley.js":7,"fs":8}],2:[function(require,module,exports){
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], factory) /* global define */
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory()
+  } else {
+    root.moo = factory()
+  }
+}(this, function() {
+  'use strict';
+
+  var hasOwnProperty = Object.prototype.hasOwnProperty
+  var toString = Object.prototype.toString
+  var hasSticky = typeof new RegExp().sticky === 'boolean'
+
+  /***************************************************************************/
+
+  function isRegExp(o) { return o && toString.call(o) === '[object RegExp]' }
+  function isObject(o) { return o && typeof o === 'object' && !isRegExp(o) && !Array.isArray(o) }
+
+  function reEscape(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+  }
+  function reGroups(s) {
+    var re = new RegExp('|' + s)
+    return re.exec('').length - 1
+  }
+  function reCapture(s) {
+    return '(' + s + ')'
+  }
+  function reUnion(regexps) {
+    if (!regexps.length) return '(?!)'
+    var source =  regexps.map(function(s) {
+      return "(?:" + s + ")"
+    }).join('|')
+    return "(?:" + source + ")"
+  }
+
+  function regexpOrLiteral(obj) {
+    if (typeof obj === 'string') {
+      return '(?:' + reEscape(obj) + ')'
+
+    } else if (isRegExp(obj)) {
+      // TODO: consider /u support
+      if (obj.ignoreCase) throw new Error('RegExp /i flag not allowed')
+      if (obj.global) throw new Error('RegExp /g flag is implied')
+      if (obj.sticky) throw new Error('RegExp /y flag is implied')
+      if (obj.multiline) throw new Error('RegExp /m flag is implied')
+      return obj.source
+
+    } else {
+      throw new Error('Not a pattern: ' + obj)
+    }
+  }
+
+  function objectToRules(object) {
+    var keys = Object.getOwnPropertyNames(object)
+    var result = []
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      var thing = object[key]
+      var rules = [].concat(thing)
+      if (key === 'include') {
+        for (var j = 0; j < rules.length; j++) {
+          result.push({include: rules[j]})
+        }
+        continue
+      }
+      var match = []
+      rules.forEach(function(rule) {
+        if (isObject(rule)) {
+          if (match.length) result.push(ruleOptions(key, match))
+          result.push(ruleOptions(key, rule))
+          match = []
+        } else {
+          match.push(rule)
+        }
+      })
+      if (match.length) result.push(ruleOptions(key, match))
+    }
+    return result
+  }
+
+  function arrayToRules(array) {
+    var result = []
+    for (var i = 0; i < array.length; i++) {
+      var obj = array[i]
+      if (obj.include) {
+        var include = [].concat(obj.include)
+        for (var j = 0; j < include.length; j++) {
+          result.push({include: include[j]})
+        }
+        continue
+      }
+      if (!obj.type) {
+        throw new Error('Rule has no type: ' + JSON.stringify(obj))
+      }
+      result.push(ruleOptions(obj.type, obj))
+    }
+    return result
+  }
+
+  function ruleOptions(type, obj) {
+    if (!isObject(obj)) {
+      obj = { match: obj }
+    }
+    if (obj.include) {
+      throw new Error('Matching rules cannot also include states')
+    }
+
+    // nb. error and fallback imply lineBreaks
+    var options = {
+      defaultType: type,
+      lineBreaks: !!obj.error || !!obj.fallback,
+      pop: false,
+      next: null,
+      push: null,
+      error: false,
+      fallback: false,
+      value: null,
+      type: null,
+      shouldThrow: false,
+    }
+
+    // Avoid Object.assign(), so we support IE9+
+    for (var key in obj) {
+      if (hasOwnProperty.call(obj, key)) {
+        options[key] = obj[key]
+      }
+    }
+
+    // type transform cannot be a string
+    if (typeof options.type === 'string' && type !== options.type) {
+      throw new Error("Type transform cannot be a string (type '" + options.type + "' for token '" + type + "')")
+    }
+
+    // convert to array
+    var match = options.match
+    options.match = Array.isArray(match) ? match : match ? [match] : []
+    options.match.sort(function(a, b) {
+      return isRegExp(a) && isRegExp(b) ? 0
+           : isRegExp(b) ? -1 : isRegExp(a) ? +1 : b.length - a.length
+    })
+    return options
+  }
+
+  function toRules(spec) {
+    return Array.isArray(spec) ? arrayToRules(spec) : objectToRules(spec)
+  }
+
+  var defaultErrorRule = ruleOptions('error', {lineBreaks: true, shouldThrow: true})
+  function compileRules(rules, hasStates) {
+    var errorRule = null
+    var fast = Object.create(null)
+    var fastAllowed = true
+    var unicodeFlag = null
+    var groups = []
+    var parts = []
+
+    // If there is a fallback rule, then disable fast matching
+    for (var i = 0; i < rules.length; i++) {
+      if (rules[i].fallback) {
+        fastAllowed = false
+      }
+    }
+
+    for (var i = 0; i < rules.length; i++) {
+      var options = rules[i]
+
+      if (options.include) {
+        // all valid inclusions are removed by states() preprocessor
+        throw new Error('Inheritance is not allowed in stateless lexers')
+      }
+
+      if (options.error || options.fallback) {
+        // errorRule can only be set once
+        if (errorRule) {
+          if (!options.fallback === !errorRule.fallback) {
+            throw new Error("Multiple " + (options.fallback ? "fallback" : "error") + " rules not allowed (for token '" + options.defaultType + "')")
+          } else {
+            throw new Error("fallback and error are mutually exclusive (for token '" + options.defaultType + "')")
+          }
+        }
+        errorRule = options
+      }
+
+      var match = options.match.slice()
+      if (fastAllowed) {
+        while (match.length && typeof match[0] === 'string' && match[0].length === 1) {
+          var word = match.shift()
+          fast[word.charCodeAt(0)] = options
+        }
+      }
+
+      // Warn about inappropriate state-switching options
+      if (options.pop || options.push || options.next) {
+        if (!hasStates) {
+          throw new Error("State-switching options are not allowed in stateless lexers (for token '" + options.defaultType + "')")
+        }
+        if (options.fallback) {
+          throw new Error("State-switching options are not allowed on fallback tokens (for token '" + options.defaultType + "')")
+        }
+      }
+
+      // Only rules with a .match are included in the RegExp
+      if (match.length === 0) {
+        continue
+      }
+      fastAllowed = false
+
+      groups.push(options)
+
+      // Check unicode flag is used everywhere or nowhere
+      for (var j = 0; j < match.length; j++) {
+        var obj = match[j]
+        if (!isRegExp(obj)) {
+          continue
+        }
+
+        if (unicodeFlag === null) {
+          unicodeFlag = obj.unicode
+        } else if (unicodeFlag !== obj.unicode && options.fallback === false) {
+          throw new Error('If one rule is /u then all must be')
+        }
+      }
+
+      // convert to RegExp
+      var pat = reUnion(match.map(regexpOrLiteral))
+
+      // validate
+      var regexp = new RegExp(pat)
+      if (regexp.test("")) {
+        throw new Error("RegExp matches empty string: " + regexp)
+      }
+      var groupCount = reGroups(pat)
+      if (groupCount > 0) {
+        throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead")
+      }
+
+      // try and detect rules matching newlines
+      if (!options.lineBreaks && regexp.test('\n')) {
+        throw new Error('Rule should declare lineBreaks: ' + regexp)
+      }
+
+      // store regex
+      parts.push(reCapture(pat))
+    }
+
+
+    // If there's no fallback rule, use the sticky flag so we only look for
+    // matches at the current index.
+    //
+    // If we don't support the sticky flag, then fake it using an irrefutable
+    // match (i.e. an empty pattern).
+    var fallbackRule = errorRule && errorRule.fallback
+    var flags = hasSticky && !fallbackRule ? 'ym' : 'gm'
+    var suffix = hasSticky || fallbackRule ? '' : '|'
+
+    if (unicodeFlag === true) flags += "u"
+    var combined = new RegExp(reUnion(parts) + suffix, flags)
+    return {regexp: combined, groups: groups, fast: fast, error: errorRule || defaultErrorRule}
+  }
+
+  function compile(rules) {
+    var result = compileRules(toRules(rules))
+    return new Lexer({start: result}, 'start')
+  }
+
+  function checkStateGroup(g, name, map) {
+    var state = g && (g.push || g.next)
+    if (state && !map[state]) {
+      throw new Error("Missing state '" + state + "' (in token '" + g.defaultType + "' of state '" + name + "')")
+    }
+    if (g && g.pop && +g.pop !== 1) {
+      throw new Error("pop must be 1 (in token '" + g.defaultType + "' of state '" + name + "')")
+    }
+  }
+  function compileStates(states, start) {
+    var all = states.$all ? toRules(states.$all) : []
+    delete states.$all
+
+    var keys = Object.getOwnPropertyNames(states)
+    if (!start) start = keys[0]
+
+    var ruleMap = Object.create(null)
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      ruleMap[key] = toRules(states[key]).concat(all)
+    }
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      var rules = ruleMap[key]
+      var included = Object.create(null)
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j]
+        if (!rule.include) continue
+        var splice = [j, 1]
+        if (rule.include !== key && !included[rule.include]) {
+          included[rule.include] = true
+          var newRules = ruleMap[rule.include]
+          if (!newRules) {
+            throw new Error("Cannot include nonexistent state '" + rule.include + "' (in state '" + key + "')")
+          }
+          for (var k = 0; k < newRules.length; k++) {
+            var newRule = newRules[k]
+            if (rules.indexOf(newRule) !== -1) continue
+            splice.push(newRule)
+          }
+        }
+        rules.splice.apply(rules, splice)
+        j--
+      }
+    }
+
+    var map = Object.create(null)
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      map[key] = compileRules(ruleMap[key], true)
+    }
+
+    for (var i = 0; i < keys.length; i++) {
+      var name = keys[i]
+      var state = map[name]
+      var groups = state.groups
+      for (var j = 0; j < groups.length; j++) {
+        checkStateGroup(groups[j], name, map)
+      }
+      var fastKeys = Object.getOwnPropertyNames(state.fast)
+      for (var j = 0; j < fastKeys.length; j++) {
+        checkStateGroup(state.fast[fastKeys[j]], name, map)
+      }
+    }
+
+    return new Lexer(map, start)
+  }
+
+  function keywordTransform(map) {
+    var reverseMap = Object.create(null)
+    var byLength = Object.create(null)
+    var types = Object.getOwnPropertyNames(map)
+    for (var i = 0; i < types.length; i++) {
+      var tokenType = types[i]
+      var item = map[tokenType]
+      var keywordList = Array.isArray(item) ? item : [item]
+      keywordList.forEach(function(keyword) {
+        (byLength[keyword.length] = byLength[keyword.length] || []).push(keyword)
+        if (typeof keyword !== 'string') {
+          throw new Error("keyword must be string (in keyword '" + tokenType + "')")
+        }
+        reverseMap[keyword] = tokenType
+      })
+    }
+
+    // fast string lookup
+    // https://jsperf.com/string-lookups
+    function str(x) { return JSON.stringify(x) }
+    var source = ''
+    source += 'switch (value.length) {\n'
+    for (var length in byLength) {
+      var keywords = byLength[length]
+      source += 'case ' + length + ':\n'
+      source += 'switch (value) {\n'
+      keywords.forEach(function(keyword) {
+        var tokenType = reverseMap[keyword]
+        source += 'case ' + str(keyword) + ': return ' + str(tokenType) + '\n'
+      })
+      source += '}\n'
+    }
+    source += '}\n'
+    return Function('value', source) // type
+  }
+
+  /***************************************************************************/
+
+  var Lexer = function(states, state) {
+    this.startState = state
+    this.states = states
+    this.buffer = ''
+    this.stack = []
+    this.reset()
+  }
+
+  Lexer.prototype.reset = function(data, info) {
+    this.buffer = data || ''
+    this.index = 0
+    this.line = info ? info.line : 1
+    this.col = info ? info.col : 1
+    this.queuedToken = info ? info.queuedToken : null
+    this.queuedThrow = info ? info.queuedThrow : null
+    this.setState(info ? info.state : this.startState)
+    this.stack = info && info.stack ? info.stack.slice() : []
+    return this
+  }
+
+  Lexer.prototype.save = function() {
+    return {
+      line: this.line,
+      col: this.col,
+      state: this.state,
+      stack: this.stack.slice(),
+      queuedToken: this.queuedToken,
+      queuedThrow: this.queuedThrow,
+    }
+  }
+
+  Lexer.prototype.setState = function(state) {
+    if (!state || this.state === state) return
+    this.state = state
+    var info = this.states[state]
+    this.groups = info.groups
+    this.error = info.error
+    this.re = info.regexp
+    this.fast = info.fast
+  }
+
+  Lexer.prototype.popState = function() {
+    this.setState(this.stack.pop())
+  }
+
+  Lexer.prototype.pushState = function(state) {
+    this.stack.push(this.state)
+    this.setState(state)
+  }
+
+  var eat = hasSticky ? function(re, buffer) { // assume re is /y
+    return re.exec(buffer)
+  } : function(re, buffer) { // assume re is /g
+    var match = re.exec(buffer)
+    // will always match, since we used the |(?:) trick
+    if (match[0].length === 0) {
+      return null
+    }
+    return match
+  }
+
+  Lexer.prototype._getGroup = function(match) {
+    var groupCount = this.groups.length
+    for (var i = 0; i < groupCount; i++) {
+      if (match[i + 1] !== undefined) {
+        return this.groups[i]
+      }
+    }
+    throw new Error('Cannot find token type for matched text')
+  }
+
+  function tokenToString() {
+    return this.value
+  }
+
+  Lexer.prototype.next = function() {
+    var index = this.index
+
+    // If a fallback token matched, we don't need to re-run the RegExp
+    if (this.queuedGroup) {
+      var token = this._token(this.queuedGroup, this.queuedText, index)
+      this.queuedGroup = null
+      this.queuedText = ""
+      return token
+    }
+
+    var buffer = this.buffer
+    if (index === buffer.length) {
+      return // EOF
+    }
+
+    // Fast matching for single characters
+    var group = this.fast[buffer.charCodeAt(index)]
+    if (group) {
+      return this._token(group, buffer.charAt(index), index)
+    }
+
+    // Execute RegExp
+    var re = this.re
+    re.lastIndex = index
+    var match = eat(re, buffer)
+
+    // Error tokens match the remaining buffer
+    var error = this.error
+    if (match == null) {
+      return this._token(error, buffer.slice(index, buffer.length), index)
+    }
+
+    var group = this._getGroup(match)
+    var text = match[0]
+
+    if (error.fallback && match.index !== index) {
+      this.queuedGroup = group
+      this.queuedText = text
+
+      // Fallback tokens contain the unmatched portion of the buffer
+      return this._token(error, buffer.slice(index, match.index), index)
+    }
+
+    return this._token(group, text, index)
+  }
+
+  Lexer.prototype._token = function(group, text, offset) {
+    // count line breaks
+    var lineBreaks = 0
+    if (group.lineBreaks) {
+      var matchNL = /\n/g
+      var nl = 1
+      if (text === '\n') {
+        lineBreaks = 1
+      } else {
+        while (matchNL.exec(text)) { lineBreaks++; nl = matchNL.lastIndex }
+      }
+    }
+
+    var token = {
+      type: (typeof group.type === 'function' && group.type(text)) || group.defaultType,
+      value: typeof group.value === 'function' ? group.value(text) : text,
+      text: text,
+      toString: tokenToString,
+      offset: offset,
+      lineBreaks: lineBreaks,
+      line: this.line,
+      col: this.col,
+    }
+    // nb. adding more props to token object will make V8 sad!
+
+    var size = text.length
+    this.index += size
+    this.line += lineBreaks
+    if (lineBreaks !== 0) {
+      this.col = size - nl + 1
+    } else {
+      this.col += size
+    }
+
+    // throw, if no rule with {error: true}
+    if (group.shouldThrow) {
+      throw new Error(this.formatError(token, "invalid syntax"))
+    }
+
+    if (group.pop) this.popState()
+    else if (group.push) this.pushState(group.push)
+    else if (group.next) this.setState(group.next)
+
+    return token
+  }
+
+  if (typeof Symbol !== 'undefined' && Symbol.iterator) {
+    var LexerIterator = function(lexer) {
+      this.lexer = lexer
+    }
+
+    LexerIterator.prototype.next = function() {
+      var token = this.lexer.next()
+      return {value: token, done: !token}
+    }
+
+    LexerIterator.prototype[Symbol.iterator] = function() {
+      return this
+    }
+
+    Lexer.prototype[Symbol.iterator] = function() {
+      return new LexerIterator(this)
+    }
+  }
+
+  Lexer.prototype.formatError = function(token, message) {
+    if (token == null) {
+      // An undefined token indicates EOF
+      var text = this.buffer.slice(this.index)
+      var token = {
+        text: text,
+        offset: this.index,
+        lineBreaks: text.indexOf('\n') === -1 ? 0 : 1,
+        line: this.line,
+        col: this.col,
+      }
+    }
+    var start = Math.max(0, token.offset - token.col + 1)
+    var eol = token.lineBreaks ? token.text.indexOf('\n') : token.text.length
+    var firstLine = this.buffer.substring(start, token.offset + eol)
+    message += " at line " + token.line + " col " + token.col + ":\n\n"
+    message += "  " + firstLine + "\n"
+    message += "  " + Array(token.col).join(" ") + "^"
+    return message
+  }
+
+  Lexer.prototype.clone = function() {
+    return new Lexer(this.states, this.state)
+  }
+
+  Lexer.prototype.has = function(tokenType) {
+    return true
+  }
+
+
+  return {
+    compile: compile,
+    states: compileStates,
+    error: Object.freeze({error: true}),
+    fallback: Object.freeze({fallback: true}),
+    keywords: keywordTransform,
+  }
+
+}));
+
+},{}],3:[function(require,module,exports){
+(function (process,__dirname){
+(function(root, factory) {
+    if (typeof module === 'object' && module.exports) {
+        module.exports = factory(require('./nearley'));
+    } else {
+        root.Compile = factory(root.nearley);
+    }
+}(this, function(nearley) {
+
+    function Compile(structure, opts) {
+        var unique = uniquer();
+        if (!opts.alreadycompiled) {
+            opts.alreadycompiled = [];
+        }
+
+        var result = {
+            rules: [],
+            body: [], // @directives list
+            customTokens: [], // %tokens
+            config: {}, // @config value
+            macros: {},
+            start: '',
+            version: opts.version || 'unknown'
+        };
+
+        for (var i = 0; i < structure.length; i++) {
+            var productionRule = structure[i];
+            if (productionRule.body) {
+                // This isn't a rule, it's an @directive.
+                if (!opts.nojs) {
+                    result.body.push(productionRule.body);
+                }
+            } else if (productionRule.include) {
+                // Include file
+                var path;
+                if (!productionRule.builtin) {
+                    path = require('path').resolve(
+                        opts.args[0] ? require('path').dirname(opts.args[0]) : process.cwd(),
+                        productionRule.include
+                    );
+                } else {
+                    path = require('path').resolve(
+                        __dirname,
+                        '../builtin/',
+                        productionRule.include
+                    );
+                }
+                if (opts.alreadycompiled.indexOf(path) === -1) {
+                    opts.alreadycompiled.push(path);
+                    var f = require('fs').readFileSync(path).toString();
+                    var parserGrammar = nearley.Grammar.fromCompiled(require('./nearley-language-bootstrapped.js'));
+                    var parser = new nearley.Parser(parserGrammar);
+                    parser.feed(f);
+                    var c = Compile(parser.results[0], {args: [path], __proto__:opts});
+                    result.rules = result.rules.concat(c.rules);
+                    result.body  = result.body.concat(c.body);
+                    result.customTokens = result.customTokens.concat(c.customTokens);
+                    Object.keys(c.config).forEach(function(k) {
+                        result.config[k] = c.config[k];
+                    });
+                    Object.keys(c.macros).forEach(function(k) {
+                        result.macros[k] = c.macros[k];
+                    });
+                }
+            } else if (productionRule.macro) {
+                result.macros[productionRule.macro] = {
+                    'args': productionRule.args,
+                    'exprs': productionRule.exprs
+                };
+            } else if (productionRule.config) {
+                // This isn't a rule, it's an @config.
+                result.config[productionRule.config] = productionRule.value
+            } else {
+                produceRules(productionRule.name, productionRule.rules, {});
+                if (!result.start) {
+                    result.start = productionRule.name;
+                }
+            }
+        }
+
+        return result;
+
+        function produceRules(name, rules, env) {
+            for (var i = 0; i < rules.length; i++) {
+                var rule = buildRule(name, rules[i], env);
+                if (opts.nojs) {
+                    rule.postprocess = null;
+                }
+                result.rules.push(rule);
+            }
+        }
+
+        function buildRule(ruleName, rule, env) {
+            var tokens = [];
+            for (var i = 0; i < rule.tokens.length; i++) {
+                var token = buildToken(ruleName, rule.tokens[i], env);
+                if (token !== null) {
+                    tokens.push(token);
+                }
+            }
+            return new nearley.Rule(
+                ruleName,
+                tokens,
+                rule.postprocess
+            );
+        }
+
+        function buildToken(ruleName, token, env) {
+            if (typeof token === 'string') {
+                if (token === 'null') {
+                    return null;
+                }
+                return token;
+            }
+
+            if (token instanceof RegExp) {
+                return token;
+            }
+
+            if (token.literal) {
+                if (!token.literal.length) {
+                    return null;
+                }
+                if (token.literal.length === 1 || result.config.lexer) {
+                    return token;
+                }
+                return buildStringToken(ruleName, token, env);
+            }
+            if (token.token) {
+                if (result.config.lexer) {
+                    var name = token.token;
+                    if (result.customTokens.indexOf(name) === -1) {
+                        result.customTokens.push(name);
+                    }
+                    var expr = result.config.lexer + ".has(" + JSON.stringify(name) + ") ? {type: " + JSON.stringify(name) + "} : " + name;
+                    return {token: "(" + expr + ")"};
+                }
+                return token;
+            }
+
+            if (token.subexpression) {
+                return buildSubExpressionToken(ruleName, token, env);
+            }
+
+            if (token.ebnf) {
+                return buildEBNFToken(ruleName, token, env);
+            }
+
+            if (token.macrocall) {
+                return buildMacroCallToken(ruleName, token, env);
+            }
+
+            if (token.mixin) {
+                if (env[token.mixin]) {
+                    return buildToken(ruleName, env[token.mixin], env);
+                } else {
+                    throw new Error("Unbound variable: " + token.mixin);
+                }
+            }
+
+            throw new Error("unrecognized token: " + JSON.stringify(token));
+        }
+
+        function buildStringToken(ruleName, token, env) {
+            var newname = unique(ruleName + "$string");
+            produceRules(newname, [
+                {
+                    tokens: token.literal.split("").map(function charLiteral(d) {
+                        return {
+                            literal: d
+                        };
+                    }),
+                    postprocess: {builtin: "joiner"}
+                }
+            ], env);
+            return newname;
+        }
+
+        function buildSubExpressionToken(ruleName, token, env) {
+            var data = token.subexpression;
+            var name = unique(ruleName + "$subexpression");
+            //structure.push({"name": name, "rules": data});
+            produceRules(name, data, env);
+            return name;
+        }
+
+        function buildEBNFToken(ruleName, token, env) {
+            switch (token.modifier) {
+                case ":+":
+                    return buildEBNFPlus(ruleName, token, env);
+                case ":*":
+                    return buildEBNFStar(ruleName, token, env);
+                case ":?":
+                    return buildEBNFOpt(ruleName, token, env);
+            }
+        }
+
+        function buildEBNFPlus(ruleName, token, env) {
+            var name = unique(ruleName + "$ebnf");
+            /*
+            structure.push({
+                name: name,
+                rules: [{
+                    tokens: [token.ebnf],
+                }, {
+                    tokens: [token.ebnf, name],
+                    postprocess: {builtin: "arrconcat"}
+                }]
+            });
+            */
+            produceRules(name,
+                [{
+                    tokens: [token.ebnf],
+                }, {
+                    tokens: [name, token.ebnf],
+                    postprocess: {builtin: "arrpush"}
+                }],
+                env
+            );
+            return name;
+        }
+
+        function buildEBNFStar(ruleName, token, env) {
+            var name = unique(ruleName + "$ebnf");
+            /*
+            structure.push({
+                name: name,
+                rules: [{
+                    tokens: [],
+                }, {
+                    tokens: [token.ebnf, name],
+                    postprocess: {builtin: "arrconcat"}
+                }]
+            });
+            */
+            produceRules(name,
+                [{
+                    tokens: [],
+                }, {
+                    tokens: [name, token.ebnf],
+                    postprocess: {builtin: "arrpush"}
+                }],
+                env
+            );
+            return name;
+        }
+
+        function buildEBNFOpt(ruleName, token, env) {
+            var name = unique(ruleName + "$ebnf");
+            /*
+            structure.push({
+                name: name,
+                rules: [{
+                    tokens: [token.ebnf],
+                    postprocess: {builtin: "id"}
+                }, {
+                    tokens: [],
+                    postprocess: {builtin: "nuller"}
+                }]
+            });
+            */
+            produceRules(name,
+                [{
+                    tokens: [token.ebnf],
+                    postprocess: {builtin: "id"}
+                }, {
+                    tokens: [],
+                    postprocess: {builtin: "nuller"}
+                }],
+                env
+            );
+            return name;
+        }
+
+        function buildMacroCallToken(ruleName, token, env) {
+            var name = unique(ruleName + "$macrocall");
+            var macro = result.macros[token.macrocall];
+            if (!macro) {
+                throw new Error("Unkown macro: "+token.macrocall);
+            }
+            if (macro.args.length !== token.args.length) {
+                throw new Error("Argument count mismatch.");
+            }
+            var newenv = {__proto__: env};
+            for (var i=0; i<macro.args.length; i++) {
+                var argrulename = unique(ruleName + "$macrocall");
+                newenv[macro.args[i]] = argrulename;
+                produceRules(argrulename, [token.args[i]], env);
+                //structure.push({"name": argrulename, "rules":[token.args[i]]});
+                //buildRule(name, token.args[i], env);
+            }
+            produceRules(name, macro.exprs, newenv);
+            return name;
+        }
+    }
+
+    function uniquer() {
+        var uns = {};
+        return unique;
+        function unique(name) {
+            var un = uns[name] = (uns[name] || 0) + 1;
+            return name + '$' + un;
+        }
+    }
+
+    return Compile;
+
+}));
+
+}).call(this,require('_process'),"/node_modules/nearley/lib")
+},{"./nearley":6,"./nearley-language-bootstrapped.js":5,"_process":10,"fs":8,"path":9}],4:[function(require,module,exports){
+(function(root, factory) {
+    if (typeof module === 'object' && module.exports) {
+        module.exports = factory(require('./nearley'));
+    } else {
+        root.generate = factory(root.nearley);
+    }
+}(this, function(nearley) {
+
+    function serializeRules(rules, builtinPostprocessors, extraIndent) {
+        if (extraIndent == null) {
+            extraIndent = ''
+        }
+
+        return '[\n    ' + rules.map(function(rule) {
+            return serializeRule(rule, builtinPostprocessors);
+        }).join(',\n    ') + '\n' + extraIndent + ']';
+    }
+
+    function dedentFunc(func) {
+        var lines = func.toString().split(/\n/);
+
+        if (lines.length === 1) {
+            return [lines[0].replace(/^\s+|\s+$/g, '')];
+        }
+
+        var indent = null;
+        var tail = lines.slice(1);
+        for (var i = 0; i < tail.length; i++) {
+            var match = /^\s*/.exec(tail[i]);
+            if (match && match[0].length !== tail[i].length) {
+                if (indent === null ||
+                    match[0].length < indent.length) {
+                    indent = match[0];
+                }
+            }
+        }
+
+        if (indent === null) {
+            return lines;
+        }
+
+        return lines.map(function dedent(line) {
+            if (line.slice(0, indent.length) === indent) {
+                return line.slice(indent.length);
+            }
+            return line;
+        });
+    }
+
+    function tabulateString(string, indent, options) {
+        var lines;
+        if(Array.isArray(string)) {
+          lines = string;
+        } else {
+          lines = string.toString().split('\n');
+        }
+
+        options = options || {};
+        tabulated = lines.map(function addIndent(line, i) {
+            var shouldIndent = true;
+
+            if(i == 0 && !options.indentFirst) {
+              shouldIndent = false;
+            }
+
+            if(shouldIndent) {
+                return indent + line;
+            } else {
+                return line;
+            }
+        }).join('\n');
+
+        return tabulated;
+    }
+
+    function serializeSymbol(s) {
+        if (s instanceof RegExp) {
+            return s.toString();
+        } else if (s.token) {
+            return s.token;
+        } else {
+            return JSON.stringify(s);
+        }
+    }
+
+    function serializeRule(rule, builtinPostprocessors) {
+        var ret = '{';
+        ret += '"name": ' + JSON.stringify(rule.name);
+        ret += ', "symbols": [' + rule.symbols.map(serializeSymbol).join(', ') + ']';
+        if (rule.postprocess) {
+            if(rule.postprocess.builtin) {
+                rule.postprocess = builtinPostprocessors[rule.postprocess.builtin];
+            }
+            ret += ', "postprocess": ' + tabulateString(dedentFunc(rule.postprocess), '        ', {indentFirst: false});
+        }
+        ret += '}';
+        return ret;
+    }
+
+    var generate = function (parser, exportName) {
+        if(!parser.config.preprocessor) {
+            parser.config.preprocessor = "_default";
+        }
+
+        if(!generate[parser.config.preprocessor]) {
+            throw new Error("No such preprocessor: " + parser.config.preprocessor)
+        }
+
+        return generate[parser.config.preprocessor](parser, exportName);
+    };
+
+    generate.js = generate._default = generate.javascript = function (parser, exportName) {
+        var output = "// Generated automatically by nearley, version " + parser.version + "\n";
+        output +=  "// http://github.com/Hardmath123/nearley\n";
+        output += "(function () {\n";
+        output += "function id(x) { return x[0]; }\n";
+        output += parser.body.join('\n');
+        output += "var grammar = {\n";
+        output += "    Lexer: " + parser.config.lexer + ",\n";
+        output += "    ParserRules: " +
+            serializeRules(parser.rules, generate.javascript.builtinPostprocessors)
+            + "\n";
+        output += "  , ParserStart: " + JSON.stringify(parser.start) + "\n";
+        output += "}\n";
+        output += "if (typeof module !== 'undefined'"
+            + "&& typeof module.exports !== 'undefined') {\n";
+        output += "   module.exports = grammar;\n";
+        output += "} else {\n";
+        output += "   window." + exportName + " = grammar;\n";
+        output += "}\n";
+        output += "})();\n";
+        return output;
+    };
+
+    generate.javascript.builtinPostprocessors = {
+        "joiner": "function joiner(d) {return d.join('');}",
+        "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
+        "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
+        "nuller": "function(d) {return null;}",
+        "id": "id"
+    }
+
+    generate.module = generate.esmodule = function (parser, exportName) {
+        var output = "// Generated automatically by nearley, version " + parser.version + "\n";
+        output +=  "// http://github.com/Hardmath123/nearley\n";
+        output += "function id(x) { return x[0]; }\n";
+        output += parser.body.join('\n');
+        output += "let Lexer = " + parser.config.lexer + ";\n";
+        output += "let ParserRules = " + serializeRules(parser.rules, generate.javascript.builtinPostprocessors) + ";\n";
+        output += "let ParserStart = " + JSON.stringify(parser.start) + ";\n";
+        output += "export default { Lexer, ParserRules, ParserStart };\n";
+        return output;
+    };
+
+    generate.cs = generate.coffee = generate.coffeescript = function (parser, exportName) {
+        var output = "# Generated automatically by nearley, version " + parser.version + "\n";
+        output +=  "# http://github.com/Hardmath123/nearley\n";
+        output += "do ->\n";
+        output += "  id = (d) -> d[0]\n";
+        output += tabulateString(dedentFunc(parser.body.join('\n')), '  ') + '\n';
+        output += "  grammar = {\n";
+        output += "    Lexer: " + parser.config.lexer + ",\n";
+        output += "    ParserRules: " +
+            tabulateString(
+                    serializeRules(parser.rules, generate.coffeescript.builtinPostprocessors),
+                    '      ',
+                    {indentFirst: false})
+        + ",\n";
+        output += "    ParserStart: " + JSON.stringify(parser.start) + "\n";
+        output += "  }\n";
+        output += "  if typeof module != 'undefined' "
+            + "&& typeof module.exports != 'undefined'\n";
+        output += "    module.exports = grammar;\n";
+        output += "  else\n";
+        output += "    window." + exportName + " = grammar;\n";
+        return output;
+    };
+
+    generate.coffeescript.builtinPostprocessors = {
+        "joiner": "(d) -> d.join('')",
+        "arrconcat": "(d) -> [d[0]].concat(d[1])",
+        "arrpush": "(d) -> d[0].concat([d[1]])",
+        "nuller": "() -> null",
+        "id": "id"
+    };
+
+    generate.ts = generate.typescript = function (parser, exportName) {
+        var output = "// Generated automatically by nearley, version " + parser.version + "\n";
+        output +=  "// http://github.com/Hardmath123/nearley\n";
+        output +=  "// Bypasses TS6133. Allow declared but unused functions.\n";
+        output +=  "// @ts-ignore\n";
+        output += "function id(d: any[]): any { return d[0]; }\n";
+        output += parser.customTokens.map(function (token) { return "declare var " + token + ": any;\n" }).join("")
+        output += parser.body.join('\n');
+        output += "\n";
+        output += "interface NearleyToken {";
+        output += "  value: any;\n";
+        output += "  [key: string]: any;\n";
+        output += "};\n";
+        output += "\n";
+        output += "interface NearleyLexer {\n";
+        output += "  reset: (chunk: string, info: any) => void;\n";
+        output += "  next: () => NearleyToken | undefined;\n";
+        output += "  save: () => any;\n";
+        output += "  formatError: (token: NearleyToken) => string;\n";
+        output += "  has: (tokenType: string) => boolean;\n";
+        output += "};\n";
+        output += "\n";
+        output += "interface NearleyRule {\n";
+        output += "  name: string;\n";
+        output += "  symbols: NearleySymbol[];\n";
+        output += "  postprocess?: (d: any[], loc?: number, reject?: {}) => any;\n";
+        output += "};\n";
+        output += "\n";
+        output += "type NearleySymbol = string | { literal: any } | { test: (token: any) => boolean };\n";
+        output += "\n";
+        output += "interface Grammar {\n";
+        output += "  Lexer: NearleyLexer | undefined;\n";
+        output += "  ParserRules: NearleyRule[];\n";
+        output += "  ParserStart: string;\n";
+        output += "};\n";
+        output += "\n";
+        output += "const grammar: Grammar = {\n";
+        output += "  Lexer: " + parser.config.lexer + ",\n";
+        output += "  ParserRules: " + serializeRules(parser.rules, generate.typescript.builtinPostprocessors, "  ") + ",\n";
+        output += "  ParserStart: " + JSON.stringify(parser.start) + ",\n";
+        output += "};\n";
+        output += "\n";
+        output += "export default grammar;\n";
+
+        return output;
+    };
+
+    generate.typescript.builtinPostprocessors = {
+        "joiner": "(d) => d.join('')",
+        "arrconcat": "(d) => [d[0]].concat(d[1])",
+        "arrpush": "(d) => d[0].concat([d[1]])",
+        "nuller": "() => null",
+        "id": "id"
+    };
+
+    return generate;
+
+}));
+
+},{"./nearley":6}],5:[function(require,module,exports){
+// Generated automatically by nearley, version 2.17.0
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
 
-function bind(type, types = {}, conditions = []) {   
- return (data, location, reject) => {
-  // Creates a copy of the types because it is reused
-  // across multiple calls and we assign values to it.
-  let bindings = JSON.parse(JSON.stringify(types));
-
-  // Creates a copy of the input data, because it is
-  // reused across multiple calls.
-  let result = JSON.parse(JSON.stringify(data))
-  .filter((ws) => ws != null);
-  
-  // Ignores the null type.
-  let expects = conditions.filter((x) => x["@type"] != "null");
-
-  let signature = `${type}${JSON.stringify(bindings)} -> `;
-  for (let child of expects) {
-   signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
-  }
-
-  let hash = (str) => {
-   return str.split("")
-   .reduce((prevHash, currVal) =>
-           (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
-  }
-       
-  // console.log(hash(signature));
-  let namespace = hash(signature);
-
-  let children = result.filter((node) => node["@type"]);
-
-  //console.log(`Trying to bind ${signature}`);
-  //let foo = children.map((x) => {
-  //  return `${x["@type"]}${JSON.stringify(x.types)}`;
-  //}).join(" ");
-  //console.log(`To ${foo}`);
-
-  if (expects.length != children.length) {
-   // console.log("not the same length");
-   return reject;
-  }
-
-  let variables = {};
-
-  for (let i = 0; i < expects.length; i++) {
-   let expected = expects[i];
-   let child = children[i];
-   if (expected["@type"] != child["@type"]) {
-    // console.log("Children of different types");
-    return reject;
-   }
-   for (let [key, value] of Object.entries(expected.types || {})) {
-    if (typeof value == "number") {
-     if (variables[value]) {
-      if (Array.isArray(variables[value])) {
-       if (!variables[value].includes(child.types[key])) {
-        return reject;
-       }
-      } else if (typeof variables[value] == "number") {
-       // console.log("hi");
-       variables[value] = child.types[key];
-      } else if (Array.isArray(child.types[key])) {
-       if (!child.types[key].includes(variables[value])) {
-        return reject;
-       }
-       continue;
-      } else if (typeof child.types[key] == "number") {
-       // console.log("hi");
-       variables[child.types[key]] = variables[value];
-       continue;
-      } else if (variables[value] != child.types[key]) {
-       // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
-       return reject;
-      }
-     }
-     // collects variables
-     variables[value] = child.types[key];
-    } else if (typeof child.types[key] == "number") {
-     child.types[key] = value;
-    } else if (Array.isArray(child.types[key])) {
-     if (!child.types[key].includes(expected.types[key])) {
-      return reject;
-     }
-     child.types[key] = expected.types[key];
-    } else if (typeof child.types[key] == "string" &&
-               expected.types[key] != child.types[key]) {
-     if (Array.isArray(expected.types[key]) &&
-         expected.types[key].includes(child.types[key])) {
-      // variables[key] = child.types[key];
-      // console.log(key);
-      continue;
-     }
-     // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
-     return reject;
-    } else if (!child.types[key]) {
-     return reject;
-    }
-   }
-  }
-    
-  // Sets variables
-  for (let [key, value] of Object.entries(bindings)) {
-   if (typeof value == "number") {
-    // console.log(key);
-    // console.log("hello");
-    if (!variables[value]) {
-     // console.log(variables);
-     // console.log(types);
-     // console.log(variables);
-     // console.log("hi");
-     // return reject;
-     bindings[key] = namespace + value;
-    } else {
-     // console.log(`${key} = ${variables[value]}`);
-     bindings[key] = variables[value];
-    }
-   }
-  }
-
-  // console.log(JSON.stringify(types));
-
-  let n = {
-   "@type": type,
-   "types": bindings,
-   "children": result,
-  };
-
-  if (location != undefined) {
-   n["loc"] = location;
-  }
-
-  return n;
- };
+function getValue(d) {
+    return d[0].value
 }
-var grammar = {
-    Lexer: undefined,
-    ParserRules: [
-    {"name": "_$ebnf$1", "symbols": []},
-    {"name": "_$ebnf$1", "symbols": ["_$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "_", "symbols": ["_$ebnf$1"], "postprocess": function(d) {return null;}},
-    {"name": "__$ebnf$1", "symbols": ["wschar"]},
-    {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
-    {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "Sentence", "symbols": ["_", "Statement", "_"], "postprocess": 
-        bind("Sentence", {}, [
-          {"@type": "Statement", "types": {}}, 
-        ])
-        },
-    {"name": "Sentence", "symbols": ["_", "Question", "_"], "postprocess": 
-        bind("Sentence", {}, [
-          {"@type": "Question", "types": {}}, 
-        ])
-        },
-    {"name": "Statement$subexpression$1", "symbols": [{"literal":"."}], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Statement", "symbols": ["S_", "_", "Statement$subexpression$1"], "postprocess": 
-        bind("Statement", {}, [
-          {"@type": "S_", "types": {}}, 
-        ])
-        },
-    {"name": "Question$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Question$subexpression$2", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Question", "symbols": ["Question$subexpression$1", "__", "VP_", "_", "Question$subexpression$2"], "postprocess": 
-        bind("Question", {}, [
-          {"@type": "VP_", "types": {"num":1,"fin":"+","gap":"-","tp":3,"tense":4}}, 
-        ])
-        },
-    {"name": "Question$subexpression$3", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Question$subexpression$4", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Question", "symbols": ["Question$subexpression$3", "__", "AUX", "__", "NP", "__", "V", "_", "Question$subexpression$4"], "postprocess": 
-        bind("Question", {}, [
-          {"@type": "AUX", "types": {"num":1,"fin":"+","tp":2,"tense":3}}, 
-          {"@type": "NP", "types": {"num":1,"gen":4,"case":"+nom","gap":"-"}}, 
-          {"@type": "V", "types": {"num":1,"fin":"-","trans":"+"}}, 
-        ])
-        },
-    {"name": "Question$subexpression$5", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
-    {"name": "Question", "symbols": ["BE", "__", "NP", "__", "ADJ", "_", "Question$subexpression$5"], "postprocess": 
-        bind("Question", {}, [
-          {"@type": "BE", "types": {"num":1,"fin":"+","tp":2,"tense":3}}, 
-          {"@type": "NP", "types": {"num":1,"gen":4,"case":"+nom","gap":"-"}}, 
-          {"@type": "ADJ", "types": {}}, 
-        ])
-        },
-    {"name": "S_", "symbols": ["S"], "postprocess": 
-        bind("S_", {"num":1,"gap":"-","tp":2,"tense":3}, [
-          {"@type": "S", "types": {"num":1,"gap":"-","tp":2,"tense":3}}, 
-        ])
-        },
-    {"name": "S$subexpression$1", "symbols": [/[iI]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "S$subexpression$2", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "S", "symbols": ["S$subexpression$1", "__", "S", "__", "S$subexpression$2", "__", "S"], "postprocess": 
-        bind("S", {"num":1,"gap":"-","tp":2,"tense":3}, [
-          {"@type": "S", "types": {"num":1,"gap":"-","tp":2,"tense":3}}, 
-          {"@type": "S", "types": {"num":1,"gap":"-","tp":2,"tense":3}}, 
-        ])
-        },
-    {"name": "S$subexpression$3", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "S", "symbols": ["S", "__", "S$subexpression$3", "__", "S"], "postprocess": 
-        bind("S", {"num":1,"gap":"-","tp":2,"tense":3}, [
-          {"@type": "S", "types": {"num":4,"gap":"-","tp":2,"tense":3}}, 
-          {"@type": "S", "types": {"num":5,"gap":"-","tp":2,"tense":3}}, 
-        ])
-        },
-    {"name": "S$subexpression$4", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "S", "symbols": ["S", "__", "S$subexpression$4", "__", "S"], "postprocess": 
-        bind("S", {"num":1,"gap":"-","tp":2,"tense":3}, [
-          {"@type": "S", "types": {"num":4,"gap":"-","tp":2,"tense":3}}, 
-          {"@type": "S", "types": {"num":5,"gap":"-","tp":2,"tense":3}}, 
-        ])
-        },
-    {"name": "S", "symbols": ["NP", "__", "VP_"], "postprocess": 
-        bind("S", {"num":1,"gap":"-","tp":3,"tense":4}, [
-          {"@type": "NP", "types": {"num":1,"gen":2,"case":"+nom","gap":"-"}}, 
-          {"@type": "VP_", "types": {"num":1,"fin":"+","gap":"-","tp":3,"tense":4}}, 
-        ])
-        },
-    {"name": "S", "symbols": ["NP", "_", "VP_"], "postprocess": 
-        bind("S", {"num":1,"gap":"np","tp":3,"tense":4}, [
-          {"@type": "NP", "types": {"num":1,"gen":2,"case":"+nom","gap":"np"}}, 
-          {"@type": "VP_", "types": {"num":1,"fin":"+","gap":"-","tp":3,"tense":4}}, 
-        ])
-        },
-    {"name": "S", "symbols": ["NP", "__", "VP_"], "postprocess": 
-        bind("S", {"num":1,"gap":"np","tp":3,"tense":4}, [
-          {"@type": "NP", "types": {"num":1,"gen":2,"case":"+nom","gap":"-"}}, 
-          {"@type": "VP_", "types": {"num":1,"fin":"+","gap":"np","tp":3,"tense":4}}, 
-        ])
-        },
-    {"name": "VP_", "symbols": ["AUX", "__", "VP"], "postprocess": 
-        bind("VP_", {"num":1,"fin":"+","gap":2,"stat":3,"tp":4,"tense":"fut"}, [
-          {"@type": "AUX", "types": {"num":1,"fin":"+","tp":4,"tense":"fut"}}, 
-          {"@type": "VP", "types": {"num":5,"fin":"-","gap":2,"stat":3,"tp":4,"tense":"pres"}}, 
-        ])
-        },
-    {"name": "VP_$subexpression$1", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VP_", "symbols": ["AUX", "__", "VP_$subexpression$1", "__", "VP"], "postprocess": 
-        bind("VP_", {"num":1,"fin":"+","gap":2,"stat":4,"tp":5,"tense":6}, [
-          {"@type": "AUX", "types": {"num":1,"fin":"+","tp":5,"tense":6}}, 
-          {"@type": "VP", "types": {"num":3,"fin":"-","gap":2,"stat":4,"tp":5,"tense":6}}, 
-        ])
-        },
-    {"name": "VP_", "symbols": ["VP"], "postprocess": 
-        bind("VP_", {"num":1,"fin":"+","gap":2,"state":3,"tp":4,"tense":5}, [
-          {"@type": "VP", "types": {"num":1,"fin":"+","gap":2,"state":3,"tp":4,"tense":5}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["V", "__", "NP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":3,"tp":4,"tense":5}, [
-          {"@type": "V", "types": {"num":1,"fin":2,"trans":"+","stat":3,"tp":4,"tense":5}}, 
-          {"@type": "NP", "types": {"num":6,"gen":7,"case":"-nom","gap":"-"}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["V", "_", "NP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"np","tp":6,"tense":7}, [
-          {"@type": "V", "types": {"num":1,"fin":2,"trans":"+","tp":6,"tense":7}}, 
-          {"@type": "NP", "types": {"num":4,"gen":5,"case":"-nom","gap":"np"}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["V"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":3,"tp":4,"tense":5}, [
-          {"@type": "V", "types": {"num":1,"fin":2,"trans":"-","stat":3,"tp":4,"tense":5}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["HAVE", "__", "VP"], "postprocess": 
-        bind("VP", {"num":1,"fin":"+","gap":2,"stat":"+","tp":4,"tense":5}, [
-          {"@type": "HAVE", "types": {"num":1,"fin":"+","tp":4,"tense":5}}, 
-          {"@type": "VP", "types": {"num":1,"fin":"part","gap":2,"stat":6,"tp":4,"tense":5}}, 
-        ])
-        },
-    {"name": "VP$subexpression$1", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VP", "symbols": ["HAVE", "__", "VP$subexpression$1", "__", "VP"], "postprocess": 
-        bind("VP", {"num":1,"fin":"+","gap":2,"stat":"+","tp":4,"tense":5}, [
-          {"@type": "HAVE", "types": {"num":1,"fin":"+","tp":4,"tense":5}}, 
-          {"@type": "VP", "types": {"num":1,"fin":"part","gap":2,"stat":6,"tp":4,"tense":5}}, 
-        ])
-        },
-    {"name": "NP", "symbols": ["GAP"], "postprocess": 
-        bind("NP", {"num":1,"gen":2,"case":3,"gap":"np"}, [
-          {"@type": "GAP", "types": {}}, 
-        ])
-        },
-    {"name": "GAP", "symbols": [], "postprocess": 
-        bind("GAP", {}, [
-          {"@type": "null", "types": {}}, 
-        ])
-        },
-    {"name": "NP", "symbols": ["DET", "__", "N"], "postprocess": 
-        bind("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, [
-          {"@type": "DET", "types": {"num":1}}, 
-          {"@type": "N", "types": {"num":1,"gen":2}}, 
-        ])
-        },
-    {"name": "NP", "symbols": ["DET", "__", "RN"], "postprocess": 
-        bind("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, [
-          {"@type": "DET", "types": {"num":1}}, 
-          {"@type": "RN", "types": {"num":1,"gen":2}}, 
-        ])
-        },
-    {"name": "NP", "symbols": ["PN"], "postprocess": 
-        bind("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, [
-          {"@type": "PN", "types": {"num":1,"gen":2}}, 
-        ])
-        },
-    {"name": "NP", "symbols": ["PRO"], "postprocess": 
-        bind("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, [
-          {"@type": "PRO", "types": {"num":1,"gen":2,"case":3}}, 
-        ])
-        },
-    {"name": "NP$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "NP", "symbols": ["NP", "__", "NP$subexpression$1", "__", "NP"], "postprocess": 
-        bind("NP", {"num":"plur","gen":1,"case":2,"gap":"-"}, [
-          {"@type": "NP", "types": {"num":3,"gen":4,"case":2,"gap":"-"}}, 
-          {"@type": "NP", "types": {"num":5,"gen":6,"case":2,"gap":"-"}}, 
-        ])
-        },
-    {"name": "NP$subexpression$2", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "NP", "symbols": ["NP", "__", "NP$subexpression$2", "__", "NP"], "postprocess": 
-        bind("NP", {"num":3,"gen":1,"case":2,"gap":"-"}, [
-          {"@type": "NP", "types": {"num":3,"gen":4,"case":2,"gap":"-"}}, 
-          {"@type": "NP", "types": {"num":3,"gen":6,"case":2,"gap":"-"}}, 
-        ])
-        },
-    {"name": "N", "symbols": ["N", "__", "RC"], "postprocess": 
-        bind("N", {"num":1,"gen":2}, [
-          {"@type": "N", "types": {"num":1,"gen":2}}, 
-          {"@type": "RC", "types": {"num":1,"gen":2}}, 
-        ])
-        },
-    {"name": "RC", "symbols": ["RPRO", "__", "S"], "postprocess": 
-        bind("RC", {"num":1,"gen":2}, [
-          {"@type": "RPRO", "types": {"num":1,"gen":2}}, 
-          {"@type": "S", "types": {"num":1,"gap":"np"}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["BE", "__", "ADJ"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":4}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":4}}, 
-          {"@type": "ADJ", "types": {}}, 
-        ])
-        },
-    {"name": "VP$subexpression$2", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VP", "symbols": ["BE", "__", "VP$subexpression$2", "__", "ADJ"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":4}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":4}}, 
-          {"@type": "ADJ", "types": {}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["BE", "__", "PP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":4}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":4}}, 
-          {"@type": "PP", "types": {}}, 
-        ])
-        },
-    {"name": "VP$subexpression$3", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VP", "symbols": ["BE", "__", "VP$subexpression$3", "__", "PP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":4}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":4}}, 
-          {"@type": "PP", "types": {}}, 
-        ])
-        },
-    {"name": "VP", "symbols": ["BE", "__", "NP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":7}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":7}}, 
-          {"@type": "NP", "types": {"num":3,"gen":4,"case":5,"gap":"-"}}, 
-        ])
-        },
-    {"name": "VP$subexpression$4", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VP", "symbols": ["BE", "__", "VP$subexpression$4", "__", "NP"], "postprocess": 
-        bind("VP", {"num":1,"fin":2,"gap":"-","stat":"+","tp":"-past","tense":7}, [
-          {"@type": "BE", "types": {"num":1,"fin":2,"tp":"-past","tense":7}}, 
-          {"@type": "NP", "types": {"num":3,"gen":4,"case":5,"gap":"-"}}, 
-        ])
-        },
-    {"name": "DET$subexpression$1", "symbols": [/[aA]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["DET$subexpression$1"], "postprocess": 
-        bind("DET", {"num":"sing"}, [
-        ])
-        },
-    {"name": "DET$subexpression$2", "symbols": [/[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["DET$subexpression$2"], "postprocess": 
-        bind("DET", {"num":"sing"}, [
-        ])
-        },
-    {"name": "DET$subexpression$3", "symbols": [/[eE]/, /[vV]/, /[eE]/, /[rR]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["DET$subexpression$3"], "postprocess": 
-        bind("DET", {"num":"sing"}, [
-        ])
-        },
-    {"name": "DET$subexpression$4", "symbols": [/[tT]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["DET$subexpression$4"], "postprocess": 
-        bind("DET", {"num":"sing"}, [
-        ])
-        },
-    {"name": "DET$subexpression$5", "symbols": [/[sS]/, /[oO]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["DET$subexpression$5"], "postprocess": 
-        bind("DET", {"num":"sing"}, [
-        ])
-        },
-    {"name": "DET$subexpression$6", "symbols": [{"literal":"'"}, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "DET", "symbols": ["NP", "_", "DET$subexpression$6"], "postprocess": 
-        bind("DET", {"num":1}, [
-          {"@type": "NP", "types": {"num":2,"gen":3,"case":"+nom","gap":"-"}}, 
-        ])
-        },
-    {"name": "N", "symbols": ["ADJ", "__", "N"], "postprocess": 
-        bind("N", {"num":1,"gen":2}, [
-          {"@type": "ADJ", "types": {}}, 
-          {"@type": "N", "types": {"num":1,"gen":2}}, 
-        ])
-        },
-    {"name": "PRO$subexpression$1", "symbols": [/[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$1"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"male","case":"+nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$2", "symbols": [/[hH]/, /[iI]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$2"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"male","case":"-nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$3", "symbols": [/[sS]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$3"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"fem","case":"+nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$4", "symbols": [/[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$4"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"fem","case":"-nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$5", "symbols": [/[iI]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$5"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"-hum","case":["-nom","+nom"]}, [
-        ])
-        },
-    {"name": "PRO$subexpression$6", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$6"], "postprocess": 
-        bind("PRO", {"num":"plur","gen":["male","fem","-hum"],"case":"+nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$7", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$7"], "postprocess": 
-        bind("PRO", {"num":"plur","gen":["male","fem","-hum"],"case":"-nom"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$8", "symbols": [/[hH]/, /[iI]/, /[mM]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$8"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"male","case":"-nom","refl":"+"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$9", "symbols": [/[hH]/, /[eE]/, /[rR]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$9"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"fem","case":"-nom","refl":"+"}, [
-        ])
-        },
-    {"name": "PRO$subexpression$10", "symbols": [/[iI]/, /[tT]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PRO", "symbols": ["PRO$subexpression$10"], "postprocess": 
-        bind("PRO", {"num":"sing","gen":"-hum","case":"-nom","refl":"+"}, [
-        ])
-        },
-    {"name": "N", "symbols": ["N", "__", "PP"], "postprocess": 
-        bind("N", {"num":1,"gen":2}, [
-          {"@type": "N", "types": {"num":1,"gen":2}}, 
-          {"@type": "PP", "types": {}}, 
-        ])
-        },
-    {"name": "PP", "symbols": ["PREP", "__", "NP"], "postprocess": 
-        bind("PP", {}, [
-          {"@type": "PREP", "types": {}}, 
-          {"@type": "NP", "types": {"num":1,"gen":2,"case":3,"gap":"-"}}, 
-        ])
-        },
-    {"name": "PREP$subexpression$1", "symbols": [/[bB]/, /[eE]/, /[hH]/, /[iI]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$1"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$2", "symbols": [/[iI]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$2"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$3", "symbols": [/[oO]/, /[vV]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$3"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$4", "symbols": [/[uU]/, /[nN]/, /[dD]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$4"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$5", "symbols": [/[nN]/, /[eE]/, /[aA]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$5"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$6", "symbols": [/[bB]/, /[eE]/, /[fF]/, /[oO]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$6"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$7", "symbols": [/[aA]/, /[fF]/, /[tT]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$7"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$8", "symbols": [/[dD]/, /[uU]/, /[rR]/, /[iI]/, /[nN]/, /[gG]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$8"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$9", "symbols": [/[fF]/, /[rR]/, /[oO]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$9"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$10", "symbols": [/[tT]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$10"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$11", "symbols": [/[oO]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$11"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$12", "symbols": [/[aA]/, /[bB]/, /[oO]/, /[uU]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$12"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$13", "symbols": [/[bB]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$13"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$14", "symbols": [/[fF]/, /[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$14"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "PREP$subexpression$15", "symbols": [/[wW]/, /[iI]/, /[tT]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PREP", "symbols": ["PREP$subexpression$15"], "postprocess": 
-        bind("PREP", {}, [
-        ])
-        },
-    {"name": "AUX$subexpression$1", "symbols": [/[dD]/, /[oO]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$1"], "postprocess": 
-        bind("AUX", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "AUX$subexpression$2", "symbols": [/[dD]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$2"], "postprocess": 
-        bind("AUX", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "AUX$subexpression$3", "symbols": [/[dD]/, /[iI]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$3"], "postprocess": 
-        bind("AUX", {"num":1,"fin":"+","tp":"-past","tense":"past"}, [
-        ])
-        },
-    {"name": "AUX$subexpression$4", "symbols": [/[dD]/, /[iI]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$4"], "postprocess": 
-        bind("AUX", {"num":1,"fin":"+","tp":"+past","tense":"pres"}, [
-        ])
-        },
-    {"name": "AUX$subexpression$5", "symbols": [/[wW]/, /[iI]/, /[lL]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$5"], "postprocess": 
-        bind("AUX", {"num":1,"fin":"+","tp":"-past","tense":"fut"}, [
-        ])
-        },
-    {"name": "AUX$subexpression$6", "symbols": [/[wW]/, /[oO]/, /[uU]/, /[lL]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "AUX", "symbols": ["AUX$subexpression$6"], "postprocess": 
-        bind("AUX", {"num":1,"fin":"+","tp":"+past","tense":"fut"}, [
-        ])
-        },
-    {"name": "RPRO$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RPRO", "symbols": ["RPRO$subexpression$1"], "postprocess": 
-        bind("RPRO", {"num":["sing","plur"],"gen":["male","fem"]}, [
-        ])
-        },
-    {"name": "RPRO$subexpression$2", "symbols": [/[wW]/, /[hH]/, /[iI]/, /[cC]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RPRO", "symbols": ["RPRO$subexpression$2"], "postprocess": 
-        bind("RPRO", {"num":["sing","plur"],"gen":"-hum"}, [
-        ])
-        },
-    {"name": "BE$subexpression$1", "symbols": [/[iI]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$1"], "postprocess": 
-        bind("BE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "BE$subexpression$2", "symbols": [/[aA]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$2"], "postprocess": 
-        bind("BE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "BE$subexpression$3", "symbols": [/[wW]/, /[aA]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$3"], "postprocess": 
-        bind("BE", {"num":"sing","fin":"+","tp":"-past","tense":"past"}, [
-        ])
-        },
-    {"name": "BE$subexpression$4", "symbols": [/[wW]/, /[eE]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$4"], "postprocess": 
-        bind("BE", {"num":"plur","fin":"+","tp":"-past","tense":"past"}, [
-        ])
-        },
-    {"name": "BE$subexpression$5", "symbols": [/[wW]/, /[aA]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$5"], "postprocess": 
-        bind("BE", {"num":"sing","fin":"+","tp":"+past","tense":"pres"}, [
-        ])
-        },
-    {"name": "BE$subexpression$6", "symbols": [/[wW]/, /[eE]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$6"], "postprocess": 
-        bind("BE", {"num":"plur","fin":"+","tp":"+past","tense":"pres"}, [
-        ])
-        },
-    {"name": "BE$subexpression$7", "symbols": [/[bB]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$7"], "postprocess": 
-        bind("BE", {"fin":"-"}, [
-        ])
-        },
-    {"name": "BE$subexpression$8", "symbols": [/[bB]/, /[eE]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "BE", "symbols": ["BE$subexpression$8"], "postprocess": 
-        bind("BE", {"fin":"part"}, [
-        ])
-        },
-    {"name": "HAVE$subexpression$1", "symbols": [/[hH]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$1"], "postprocess": 
-        bind("HAVE", {"fin":-1}, [
-        ])
-        },
-    {"name": "HAVE$subexpression$2", "symbols": [/[hH]/, /[aA]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$2"], "postprocess": 
-        bind("HAVE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "HAVE$subexpression$3", "symbols": [/[hH]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$3"], "postprocess": 
-        bind("HAVE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, [
-        ])
-        },
-    {"name": "HAVE$subexpression$4", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$4"], "postprocess": 
-        bind("HAVE", {"num":1,"fin":"+","tp":"-past","tense":"past"}, [
-        ])
-        },
-    {"name": "HAVE$subexpression$5", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "HAVE", "symbols": ["HAVE$subexpression$5"], "postprocess": 
-        bind("HAVE", {"num":1,"fin":"+","tp":"+past","tense":["pres","past"]}, [
-        ])
-        },
-    {"name": "V", "symbols": ["VERB"], "postprocess": 
-        bind("V", {"num":1,"fin":"-","stat":"-","trans":2}, [
-          {"@type": "VERB", "types": {"trans":2,"stat":"-"}}, 
-        ])
-        },
-    {"name": "V$subexpression$1", "symbols": [/[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$1"], "postprocess": 
-        bind("V", {"num":"sing","fin":"+","stat":1,"tp":"-past","tense":"pres","trans":2}, [
-          {"@type": "VERB", "types": {"trans":2,"stat":1,"pres":"+s"}}, 
-        ])
-        },
-    {"name": "V$subexpression$2", "symbols": [/[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$2"], "postprocess": 
-        bind("V", {"num":"sing","fin":"+","stat":1,"tp":"-past","tense":"pres","trans":2}, [
-          {"@type": "VERB", "types": {"trans":2,"stat":1,"pres":"+es"}}, 
-        ])
-        },
-    {"name": "V$subexpression$3", "symbols": [/[iI]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$3"], "postprocess": 
-        bind("V", {"num":"sing","fin":"+","stat":1,"tp":"-past","tense":"pres","trans":2}, [
-          {"@type": "VERB", "types": {"trans":2,"stat":1,"pres":"+ies"}}, 
-        ])
-        },
-    {"name": "V", "symbols": ["VERB"], "postprocess": 
-        bind("V", {"num":"plur","fin":"+","stat":1,"tp":"-past","tense":"pres","trans":2}, [
-          {"@type": "VERB", "types": {"trans":2,"stat":1}}, 
-        ])
-        },
-    {"name": "V$subexpression$4", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$4"], "postprocess": 
-        bind("V", {"num":1,"fin":"part","stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+ed"}}, 
-        ])
-        },
-    {"name": "V$subexpression$5", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$5"], "postprocess": 
-        bind("V", {"num":1,"fin":"+","stat":2,"tp":"+past","tense":"past","trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+ed"}}, 
-        ])
-        },
-    {"name": "V$subexpression$6", "symbols": [/[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$6"], "postprocess": 
-        bind("V", {"num":1,"fin":"part","stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+d"}}, 
-        ])
-        },
-    {"name": "V$subexpression$7", "symbols": [/[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$7"], "postprocess": 
-        bind("V", {"num":1,"fin":"+","stat":2,"tp":"+past","tense":"past","trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+d"}}, 
-        ])
-        },
-    {"name": "V$subexpression$8", "symbols": [/[iI]/, /[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$8"], "postprocess": 
-        bind("V", {"num":1,"fin":["+","part"],"stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+ied"}}, 
-        ])
-        },
-    {"name": "V$subexpression$9", "symbols": [/[lL]/, /[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$9"], "postprocess": 
-        bind("V", {"num":1,"fin":["+","part"],"stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+led"}}, 
-        ])
-        },
-    {"name": "V$subexpression$10", "symbols": [/[rR]/, /[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "V", "symbols": ["VERB", "V$subexpression$10"], "postprocess": 
-        bind("V", {"num":1,"fin":["+","part"],"stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"+red"}}, 
-        ])
-        },
-    {"name": "V", "symbols": ["VERB"], "postprocess": 
-        bind("V", {"num":1,"fin":["+","part"],"stat":2,"tp":"-past","tense":["pres","past"],"trans":3}, [
-          {"@type": "VERB", "types": {"trans":3,"stat":2,"past":"-reg"}}, 
-        ])
-        },
-    {"name": "ADJ$subexpression$1", "symbols": [/[hH]/, /[aA]/, /[pP]/, /[pP]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$1"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$2", "symbols": [/[uU]/, /[nN]/, /[hH]/, /[aA]/, /[pP]/, /[pP]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$2"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$3", "symbols": [/[fF]/, /[oO]/, /[oO]/, /[lL]/, /[iI]/, /[sS]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$3"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$4", "symbols": [/[fF]/, /[aA]/, /[sS]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$4"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$5", "symbols": [/[bB]/, /[eE]/, /[aA]/, /[uU]/, /[tT]/, /[iI]/, /[fF]/, /[uU]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$5"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$6", "symbols": [/[mM]/, /[oO]/, /[rR]/, /[tT]/, /[aA]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$6"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "ADJ$subexpression$7", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/, /[iI]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "ADJ", "symbols": ["ADJ$subexpression$7"], "postprocess": 
-        bind("ADJ", {}, [
-        ])
-        },
-    {"name": "PN$subexpression$1", "symbols": [/[sS]/, /[oO]/, /[cC]/, /[rR]/, /[aA]/, /[tT]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$1"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "PN$subexpression$2", "symbols": [/[jJ]/, /[oO]/, /[nN]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$2"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "PN$subexpression$3", "symbols": [/[jJ]/, /[oO]/, /[hH]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$3"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "PN$subexpression$4", "symbols": [/[sS]/, /[mM]/, /[iI]/, /[tT]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$4"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "PN$subexpression$5", "symbols": [/[mM]/, /[aA]/, /[rR]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$5"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "PN$subexpression$6", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$6"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "PN$subexpression$7", "symbols": [/[uU]/, /[lL]/, /[yY]/, /[sS]/, /[sS]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "PN", "symbols": ["PN$subexpression$7"], "postprocess": 
-        bind("PN", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$1", "symbols": [/[mM]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$1"], "postprocess": 
-        bind("N", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "N$subexpression$2", "symbols": [/[wW]/, /[oO]/, /[mM]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$2"], "postprocess": 
-        bind("N", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "N$subexpression$3", "symbols": [/[gG]/, /[iI]/, /[rR]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$3"], "postprocess": 
-        bind("N", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "N$subexpression$4", "symbols": [/[bB]/, /[oO]/, /[oO]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$4"], "postprocess": 
-        bind("N", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$5", "symbols": [/[tT]/, /[eE]/, /[lL]/, /[eE]/, /[sS]/, /[cC]/, /[oO]/, /[pP]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$5"], "postprocess": 
-        bind("N", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$6", "symbols": [/[dD]/, /[oO]/, /[nN]/, /[kK]/, /[eE]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$6"], "postprocess": 
-        bind("N", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$7", "symbols": [/[hH]/, /[oO]/, /[rR]/, /[sS]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$7"], "postprocess": 
-        bind("N", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$8", "symbols": [/[pP]/, /[oO]/, /[rR]/, /[sS]/, /[cC]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$8"], "postprocess": 
-        bind("N", {"num":"sing","gen":"-hum"}, [
-        ])
-        },
-    {"name": "N$subexpression$9", "symbols": [/[eE]/, /[nN]/, /[gG]/, /[iI]/, /[nN]/, /[eE]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$9"], "postprocess": 
-        bind("N", {"num":"sing","gen":["male","fem"]}, [
-        ])
-        },
-    {"name": "N$subexpression$10", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/, /[iI]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "N", "symbols": ["N$subexpression$10"], "postprocess": 
-        bind("N", {"num":"sing","gen":1}, [
-        ])
-        },
-    {"name": "RN$subexpression$1", "symbols": [/[bB]/, /[rR]/, /[oO]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$1"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "RN$subexpression$2", "symbols": [/[fF]/, /[aA]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$2"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "RN$subexpression$3", "symbols": [/[hH]/, /[uU]/, /[sS]/, /[bB]/, /[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$3"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"male"}, [
-        ])
-        },
-    {"name": "RN$subexpression$4", "symbols": [/[sS]/, /[iI]/, /[sS]/, /[tT]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$4"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "RN$subexpression$5", "symbols": [/[mM]/, /[oO]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$5"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "RN$subexpression$6", "symbols": [/[wW]/, /[iI]/, /[fF]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "RN", "symbols": ["RN$subexpression$6"], "postprocess": 
-        bind("RN", {"num":"sing","gen":"fem"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$1", "symbols": [/[bB]/, /[eE]/, /[aA]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$1"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$2", "symbols": [/[lL]/, /[iI]/, /[sS]/, /[tT]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$2"], "postprocess": 
-        bind("VERB", {"trans":1,"stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$3", "symbols": [/[oO]/, /[wW]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$3"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$4", "symbols": [/[lL]/, /[iI]/, /[sS]/, /[tT]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$4"], "postprocess": 
-        bind("VERB", {"trans":1,"stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$5", "symbols": [/[wW]/, /[aA]/, /[lL]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$5"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$6", "symbols": [/[sS]/, /[lL]/, /[eE]/, /[eE]/, /[pP]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$6"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$7", "symbols": [/[sS]/, /[tT]/, /[iI]/, /[nN]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$7"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$8", "symbols": [/[lL]/, /[eE]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$8"], "postprocess": 
-        bind("VERB", {"trans":1,"stat":"-","pres":"+s"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$9", "symbols": [/[lL]/, /[eE]/, /[fF]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$9"], "postprocess": 
-        bind("VERB", {"trans":1,"stat":"-","past":"-reg"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$10", "symbols": [/[cC]/, /[oO]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$10"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$11", "symbols": [/[cC]/, /[aA]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$11"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","past":"-reg"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$12", "symbols": [/[kK]/, /[iI]/, /[sS]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$12"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+es","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$13", "symbols": [/[bB]/, /[oO]/, /[xX]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$13"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+es","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$14", "symbols": [/[wW]/, /[aA]/, /[tT]/, /[cC]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$14"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+es","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$15", "symbols": [/[cC]/, /[rR]/, /[aA]/, /[sS]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$15"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+es","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$16", "symbols": [/[lL]/, /[iI]/, /[kK]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$16"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$17", "symbols": [/[sS]/, /[eE]/, /[iI]/, /[zZ]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$17"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$18", "symbols": [/[tT]/, /[iI]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$18"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$19", "symbols": [/[fF]/, /[rR]/, /[eE]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$19"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$20", "symbols": [/[lL]/, /[oO]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$20"], "postprocess": 
-        bind("VERB", {"trans":1,"stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$21", "symbols": [/[sS]/, /[uU]/, /[rR]/, /[pP]/, /[rR]/, /[iI]/, /[sS]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$21"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$22", "symbols": [/[fF]/, /[aA]/, /[sS]/, /[cC]/, /[iI]/, /[nN]/, /[aA]/, /[tT]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$22"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$23", "symbols": [/[aA]/, /[dD]/, /[mM]/, /[iI]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$23"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+d"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$24", "symbols": [/[sS]/, /[kK]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$24"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$25", "symbols": [/[eE]/, /[cC]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$25"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$26", "symbols": [/[pP]/, /[lL]/, /[aA]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$26"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$27", "symbols": [/[dD]/, /[eE]/, /[cC]/, /[aA]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$27"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$28", "symbols": [/[eE]/, /[nN]/, /[jJ]/, /[oO]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$28"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+s","past":"+ed"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$29", "symbols": [/[cC]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$29"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+ies","past":"+ied"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$30", "symbols": [/[aA]/, /[pP]/, /[pP]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$30"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+ies","past":"+ied"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$31", "symbols": [/[cC]/, /[oO]/, /[pP]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$31"], "postprocess": 
-        bind("VERB", {"trans":"+","stat":"-","pres":"+ies","past":"+ied"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$32", "symbols": [/[rR]/, /[eE]/, /[pP]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$32"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+ies","past":"+ied"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$33", "symbols": [/[tT]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$33"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+ies","past":"+ied"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$34", "symbols": [/[cC]/, /[oO]/, /[mM]/, /[pP]/, /[eE]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$34"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+led"}, [
-        ])
-        },
-    {"name": "VERB$subexpression$35", "symbols": [/[dD]/, /[eE]/, /[fF]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "VERB", "symbols": ["VERB$subexpression$35"], "postprocess": 
-        bind("VERB", {"trans":"-","stat":"-","pres":"+s","past":"+red"}, [
-        ])
+
+function literals(list) {
+    var rules = {}
+    for (var lit of list) {
+        rules[lit] = {match: lit, next: 'main'}
+    }
+    return rules
+}
+
+var moo = require('moo')
+var rules = Object.assign({
+    ws: {match: /\s+/, lineBreaks: true, next: 'main'},
+    comment: /\#.*/,
+    arrow: {match: /[=-]+\>/, next: 'main'},
+    js: {
+        match: /\{\%(?:[^%]|\%[^}])*\%\}/,
+        value: x => x.slice(2, -2),
+    },
+    word: {match: /[\w\?\+]+/, next: 'afterWord'},
+    string: {
+        match: /"(?:[^\\"\n]|\\["\\/bfnrt]|\\u[a-fA-F0-9]{4})*"/,
+        value: x => JSON.parse(x),
+        next: 'main',
+    },
+    btstring: {
+        match: /`[^`]*`/,
+        value: x => x.slice(1, -1),
+        next: 'main',
+    },
+}, literals([
+    ",", "|", "$", "%", "(", ")",
+    ":?", ":*", ":+",
+    "@include", "@builtin", "@",
+    "]",
+]))
+
+var lexer = moo.states({
+    main: Object.assign({}, rules, {
+        charclass: {
+            match: /\.|\[(?:\\.|[^\\\n])+?\]/,
+            value: x => new RegExp(x),
+        },
+    }),
+    // Both macro arguments and charclasses are both enclosed in [ ].
+    // We disambiguate based on whether the previous token was a `word`.
+    afterWord: Object.assign({}, rules, {
+        "[": {match: "[", next: 'main'},
+    }),
+})
+
+function insensitive(sl) {
+    var s = sl.literal;
+    var result = [];
+    for (var i=0; i<s.length; i++) {
+        var c = s.charAt(i);
+        if (c.toUpperCase() !== c || c.toLowerCase() !== c) {
+            result.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
+            } else {
+            result.push({literal: c});
         }
+    }
+    return {subexpression: [{tokens: result, postprocess: function(d) {return d.join(""); }}]};
+}
+
+var grammar = {
+    Lexer: lexer,
+    ParserRules: [
+    {"name": "final$ebnf$1", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "final$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "final", "symbols": ["_", "prog", "_", "final$ebnf$1"], "postprocess": function(d) { return d[1]; }},
+    {"name": "prog", "symbols": ["prod"], "postprocess": function(d) { return [d[0]]; }},
+    {"name": "prog", "symbols": ["prod", "ws", "prog"], "postprocess": function(d) { return [d[0]].concat(d[2]); }},
+    {"name": "prod", "symbols": ["word", "_", (lexer.has("arrow") ? {type: "arrow"} : arrow), "_", "expression+"], "postprocess": function(d) { return {name: d[0], rules: d[4]}; }},
+    {"name": "prod", "symbols": ["word", {"literal":"["}, "wordlist", {"literal":"]"}, "_", (lexer.has("arrow") ? {type: "arrow"} : arrow), "_", "expression+"], "postprocess": function(d) {return {macro: d[0], args: d[2], exprs: d[7]}}},
+    {"name": "prod", "symbols": [{"literal":"@"}, "_", "js"], "postprocess": function(d) { return {body: d[2]}; }},
+    {"name": "prod", "symbols": [{"literal":"@"}, "word", "ws", "word"], "postprocess": function(d) { return {config: d[1], value: d[3]}; }},
+    {"name": "prod", "symbols": [{"literal":"@include"}, "_", "string"], "postprocess": function(d) {return {include: d[2].literal, builtin: false}}},
+    {"name": "prod", "symbols": [{"literal":"@builtin"}, "_", "string"], "postprocess": function(d) {return {include: d[2].literal, builtin: true }}},
+    {"name": "expression+", "symbols": ["completeexpression"]},
+    {"name": "expression+", "symbols": ["expression+", "_", {"literal":"|"}, "_", "completeexpression"], "postprocess": function(d) { return d[0].concat([d[4]]); }},
+    {"name": "expressionlist", "symbols": ["completeexpression"]},
+    {"name": "expressionlist", "symbols": ["expressionlist", "_", {"literal":","}, "_", "completeexpression"], "postprocess": function(d) { return d[0].concat([d[4]]); }},
+    {"name": "wordlist", "symbols": ["word"]},
+    {"name": "wordlist", "symbols": ["wordlist", "_", {"literal":","}, "_", "word"], "postprocess": function(d) { return d[0].concat([d[4]]); }},
+    {"name": "completeexpression", "symbols": ["expr"], "postprocess": function(d) { return {tokens: d[0]}; }},
+    {"name": "completeexpression", "symbols": ["expr", "_", "js"], "postprocess": function(d) { return {tokens: d[0], postprocess: d[2]}; }},
+    {"name": "expr_member", "symbols": ["word"], "postprocess": id},
+    {"name": "expr_member", "symbols": [{"literal":"$"}, "word"], "postprocess": function(d) {return {mixin: d[1]}}},
+    {"name": "expr_member", "symbols": ["word", {"literal":"["}, "expressionlist", {"literal":"]"}], "postprocess": function(d) {return {macrocall: d[0], args: d[2]}}},
+    {"name": "expr_member$ebnf$1", "symbols": [{"literal":"i"}], "postprocess": id},
+    {"name": "expr_member$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "expr_member", "symbols": ["string", "expr_member$ebnf$1"], "postprocess": function(d) { if (d[1]) {return insensitive(d[0]); } else {return d[0]; } }},
+    {"name": "expr_member", "symbols": [{"literal":"%"}, "word"], "postprocess": function(d) {return {token: d[1]}}},
+    {"name": "expr_member", "symbols": ["charclass"], "postprocess": id},
+    {"name": "expr_member", "symbols": [{"literal":"("}, "_", "expression+", "_", {"literal":")"}], "postprocess": function(d) {return {'subexpression': d[2]} ;}},
+    {"name": "expr_member", "symbols": ["expr_member", "_", "ebnf_modifier"], "postprocess": function(d) {return {'ebnf': d[0], 'modifier': d[2]}; }},
+    {"name": "ebnf_modifier", "symbols": [{"literal":":+"}], "postprocess": getValue},
+    {"name": "ebnf_modifier", "symbols": [{"literal":":*"}], "postprocess": getValue},
+    {"name": "ebnf_modifier", "symbols": [{"literal":":?"}], "postprocess": getValue},
+    {"name": "expr", "symbols": ["expr_member"]},
+    {"name": "expr", "symbols": ["expr", "ws", "expr_member"], "postprocess": function(d){ return d[0].concat([d[2]]); }},
+    {"name": "word", "symbols": [(lexer.has("word") ? {type: "word"} : word)], "postprocess": getValue},
+    {"name": "string", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": d => ({literal: d[0].value})},
+    {"name": "string", "symbols": [(lexer.has("btstring") ? {type: "btstring"} : btstring)], "postprocess": d => ({literal: d[0].value})},
+    {"name": "charclass", "symbols": [(lexer.has("charclass") ? {type: "charclass"} : charclass)], "postprocess": getValue},
+    {"name": "js", "symbols": [(lexer.has("js") ? {type: "js"} : js)], "postprocess": getValue},
+    {"name": "_$ebnf$1", "symbols": ["ws"], "postprocess": id},
+    {"name": "_$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "_", "symbols": ["_$ebnf$1"]},
+    {"name": "ws", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)]},
+    {"name": "ws$ebnf$1", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "ws$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "ws", "symbols": ["ws$ebnf$1", (lexer.has("comment") ? {type: "comment"} : comment), "_"]}
 ]
-  , ParserStart: "Sentence"
+  , ParserStart: "final"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;
@@ -1066,27 +1319,7 @@ if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
 }
 })();
 
-},{}],2:[function(require,module,exports){
-const nearley = require("nearley");
-const {ParserRules, ParserStart} = require("./grammar.js");
-
-// console.log(grammar);
-
-function parse(code) {
-  let parser = new nearley.Parser(ParserRules, ParserStart, {
-    keepHistory: true
-  });   
-  
-  // console.log(grammar);
-  parser.feed(code);
-  return parser.results;
-}
-
-module.exports = {
-  parse: parse,
-}
-
-},{"./grammar.js":1,"nearley":3}],3:[function(require,module,exports){
+},{"moo":2}],6:[function(require,module,exports){
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
         module.exports = factory();
@@ -1652,5 +1885,1389 @@ module.exports = {
 
 }));
 
-},{}]},{},[2])(2)
+},{}],7:[function(require,module,exports){
+const nearley = require("nearley");
+const compile = require("nearley/lib/compile");
+const generate = require("nearley/lib/generate");
+const grammar = require("nearley/lib/nearley-language-bootstrapped");
+
+class Nearley {
+ constructor({ParserRules, ParserStart}, start) {
+  const rule = start ? start : ParserStart;
+
+  this.parser = new nearley.Parser(ParserRules, rule, {
+    keepHistory: true
+  });   
+ }
+
+ feed(code) {
+  try {
+   this.parser.feed(code);
+   return this.parser.results;
+  } catch (e) {
+   throw this.reportError(e);
+  }
+ }
+
+ static compile(source, raw = false) {
+  const parser = new nearley.Parser(grammar);
+  parser.feed(source);
+  const ast = parser.results[0];
+  const info = compile(ast, {});
+  // Generate JavaScript code from the rules
+  const code = generate(info, "grammar");
+
+  if (raw) {
+    return code;
+  }
+     
+  const module = { exports: {} };
+
+  eval(code);
+
+  return module.exports;
+ }
+
+ static from(code, start) {
+  return new Nearley(Nearley.compile(code), start);
+ }
+
+ /*
+    Generates a user friendly error report given the caught error 
+    object and the Nearley parser instance.
+  */
+  reportError(e) {
+   // console.log(e.message);
+   let {parser} = this;
+   const lastColumnIndex = parser.table.length - 2;
+   const lastColumn = parser.table[lastColumnIndex];
+   const token = parser.lexer.buffer[parser.current];
+   let result = {
+    token: token, 
+    expected: [],
+    message: e.message,
+   };
+   // result.token = token;
+   // Display each state that is expecting a terminal symbol next.
+   for (let i = 0; i < lastColumn.states.length; i++) {
+    const state = lastColumn.states[i];
+    const nextSymbol = state.rule.symbols[state.dot];
+    if (nextSymbol && this.isTerminalSymbol(nextSymbol)) {
+     const symbolDisplay = this.getSymbolDisplay(nextSymbol);
+     // console.log(`    A ${symbolDisplay} based on:`);
+     let expected = {symbol: symbolDisplay, based: []};
+     result.expected.push(expected);
+     // Display the "state stack" - which shows you how this state
+     // came to be, step by step.
+     const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
+     for (let j = 0; j < stateStack.length; j++) {
+      const state = stateStack[j];
+      expected.based.push(state.rule.toString(state.dot));
+     }
+    }
+   }
+   return result;
+  }
+
+  getSymbolDisplay(symbol) {
+   const type = typeof symbol;
+   if (type === "string") {
+    return symbol;
+   } else if (type === "object" && symbol.literal) {
+    return JSON.stringify(symbol.literal);
+   } else if (type === "object" && symbol instanceof RegExp) {
+    return `character matching ${symbol}`;
+   } else {
+    throw new Error(`Unknown symbol type: ${symbol}`);
+   }
+  }
+
+  /*
+    Builds the "state stack" - which you can think of as the call stack of the
+    recursive-descent parser, which the Nearley parse algorithm simulates.
+    The state stack is represented as an array of state objects. This function
+    needs to be given a starting state identified by:
+
+    * columnIndex - the column index of the state
+    * stateIndex - the state index of the state within the column
+    
+    and it needs:
+
+    * parser - the Nearley parser instance that generated the parse.
+    
+    It returns an array of state objects. The first item of the array
+    will bet the starting state, with each successive item in the array
+    going further back into history.
+  */
+  buildStateStack(columnIndex, stateIndex, parser) {
+   const state = parser.table[columnIndex].states[stateIndex];
+   if (state.dot === 0) { // state not started
+    // Find the previous state entry in the table that predicted this state
+    const match = this.findPreviousStateWhere(
+                                              (thatState) => {
+                                               const nextSymbol = thatState.rule.symbols[thatState.dot];
+                                               return nextSymbol && 
+                                          this.isNonTerminalSymbol(nextSymbol) && 
+                                          state.rule.name === nextSymbol;
+                                         },
+                                         columnIndex,
+                                         stateIndex,
+                                         parser);
+    if (match) {
+     return [state, ...this.buildStateStack(match[0], match[1], parser)]
+      } else {
+     return [state];
+    }
+   } else {
+    // Find the previous state entry in the table that generated this state
+    // entry after consuming a token
+    const previousColumn = parser.table[state.reference];
+        const match = previousColumn.states
+         .map((state, i) => [state, i])
+         .filter(([thatState, i]) =>
+                 thatState.rule.toString() === state.rule.toString()
+                 )[0];
+        return [
+                state,
+                ...this.buildStateStack(state.reference, match[1], parser)
+                ];
+   }
+  }
+
+  /*
+    Finds the previous state within the parser table that matches a given
+    condition, given a "current" state based on:
+
+    * predicate - a function which given a state object, returns true or false
+    * columnIndex - the column index of the current state
+    * stateIndex - the state index of the current state within the column
+    * parser - the Nearley parser instance, which contains the parse table
+    
+    This returns a 3-tuple: [columnIndex, stateIndex, stateObject] of the matching
+    state, or null.
+  */
+  findPreviousStateWhere(predicate, columnIndex, stateIndex, parser) {
+   let i = columnIndex;
+   let j = stateIndex;
+   let column = parser.table[i];
+   let state;
+   while (true) {
+    j--;
+    if (j < 0) {
+     i--;
+     if (i < 0) {
+      return null;
+     }
+     column = parser.table[i];
+     j = column.states.length - 1;
+    }
+
+    state = column.states[j];
+    if (predicate(state)) {
+     return [i, j, state];
+    }
+   }
+  }
+
+  isTerminalSymbol(symbol) {
+   return typeof symbol !== "string";
+  }
+
+  isNonTerminalSymbol(symbol) {
+   return !this.isTerminalSymbol(symbol);
+  }
+}
+
+function bind(type, types = {}, conditions = []) {   
+ return (data, location, reject) => {
+  // Creates a copy of the types because it is reused
+  // across multiple calls and we assign values to it.
+  let bindings = JSON.parse(JSON.stringify(types));
+
+  // Creates a copy of the input data, because it is
+  // reused across multiple calls.
+  let result = JSON.parse(JSON.stringify(data))
+  .filter((ws) => ws != null);
+  
+  // Ignores the null type.
+  let expects = conditions.filter((x) => x["@type"] != "null");
+
+  let signature = `${type}${JSON.stringify(bindings)} -> `;
+  for (let child of expects) {
+   signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
+  }
+
+  let hash = (str) => {
+   return str.split("")
+   .reduce((prevHash, currVal) =>
+           (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+  }
+       
+  // console.log(hash(signature));
+  let namespace = hash(signature);
+
+  let children = result.filter((node) => node["@type"]);
+
+  //console.log(`Trying to bind ${signature}`);
+  //let foo = children.map((x) => {
+  //  return `${x["@type"]}${JSON.stringify(x.types)}`;
+  //}).join(" ");
+  //console.log(`To ${foo}`);
+
+  if (expects.length != children.length) {
+   // console.log("not the same length");
+   return reject;
+  }
+
+  let variables = {};
+
+  for (let i = 0; i < expects.length; i++) {
+   let expected = expects[i];
+   let child = children[i];
+   if (expected["@type"] != child["@type"]) {
+    // console.log("Children of different types");
+    return reject;
+   }
+   for (let [key, value] of Object.entries(expected.types || {})) {
+    if (typeof value == "number") {
+     if (variables[value]) {
+      if (Array.isArray(variables[value])) {
+       if (!variables[value].includes(child.types[key])) {
+        return reject;
+       }
+      } else if (typeof variables[value] == "number") {
+       // console.log("hi");
+       variables[value] = child.types[key];
+      } else if (Array.isArray(child.types[key])) {
+       if (!child.types[key].includes(variables[value])) {
+        return reject;
+       }
+       continue;
+      } else if (typeof child.types[key] == "number") {
+       // console.log("hi");
+       variables[child.types[key]] = variables[value];
+       continue;
+      } else if (variables[value] != child.types[key]) {
+       // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
+       return reject;
+      }
+     }
+     // collects variables
+     variables[value] = child.types[key];
+    } else if (typeof child.types[key] == "number") {
+     child.types[key] = value;
+    } else if (Array.isArray(child.types[key])) {
+     if (!child.types[key].includes(expected.types[key])) {
+      return reject;
+     }
+     child.types[key] = expected.types[key];
+    } else if (typeof child.types[key] == "string" &&
+               expected.types[key] != child.types[key]) {
+     if (Array.isArray(expected.types[key]) &&
+         expected.types[key].includes(child.types[key])) {
+      // variables[key] = child.types[key];
+      // console.log(key);
+      continue;
+     }
+     // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
+     return reject;
+    } else if (!child.types[key]) {
+     return reject;
+    }
+   }
+  }
+    
+  // Sets variables
+  for (let [key, value] of Object.entries(bindings)) {
+   if (typeof value == "number") {
+    // console.log(key);
+    // console.log("hello");
+    if (!variables[value]) {
+     // console.log(variables);
+     // console.log(types);
+     // console.log(variables);
+     // console.log("hi");
+     // return reject;
+     bindings[key] = namespace + value;
+    } else {
+     // console.log(`${key} = ${variables[value]}`);
+     bindings[key] = variables[value];
+    }
+   }
+  }
+
+  // console.log(JSON.stringify(types));
+
+  let n = {
+   "@type": type,
+   "types": bindings,
+   "children": result,
+  };
+
+  if (location != undefined) {
+   n["loc"] = location;
+  }
+
+  return n;
+ };
+}
+
+const RuntimeGrammar = Nearley.compile(`
+      @builtin "whitespace.ne"
+      @builtin "number.ne"
+      @builtin "string.ne"
+
+      rules -> (_ rule _ "."):+ _ {% ([rules]) => {
+        return rules.map(([ws, rule]) => rule);
+      } %}
+
+      rule -> head __ "->" __ tail {%
+        ([head, ws0, arrow, ws1, tail]) => {
+         return {
+          "head": head,
+          "tail": tail
+         }
+        }
+      %}
+
+      head -> name {% id %}
+      tail -> (term __ {% id %}):* term {%
+        ([beginning, end]) => {
+         return [...beginning, end];
+        }
+      %}
+
+      term -> name {% id %}
+      term -> string {% id %}
+
+      name -> word features:? {% 
+        ([word, features]) => {
+         return {
+          name: word,
+          types: Object.fromEntries(features || [])
+         }
+        }
+      %}
+      string -> dqstring {% ([str]) => '"' + str + '"' %}
+
+      features -> "[" props "]" {% ([p0, props, p1]) => {
+        // console.log(props);
+        return props;
+      }%}
+
+      props -> (keyvalue _ "," _ {% id %}):* keyvalue:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ word {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ int {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      keyvalue -> word _ "=" _ array {% 
+        ([key, ws0, eq, ws1, value]) => {
+         return [key, value];
+        }
+      %}
+
+      array -> "[" values "]" {% ([p0, values, p1]) => values %}
+
+      values -> (word _ "," _ {% id %}):* word:? {%
+        ([beginning, end]) => {
+         if (!end) {
+          return beginning;
+         }
+         return [...beginning, end];
+        }
+      %}
+
+      word -> [a-zA-Z_\+\-]:+ {% ([char]) => {
+        return char.join("");
+      }%}
+`);
+
+class FeaturedNearley {
+ constructor() {
+  this.parser = new Nearley(RuntimeGrammar);
+ }
+
+ feed(code) {
+  return this.parser.feed(code);
+ }
+
+ static compile(source, header, raw) {
+  let parser = new FeaturedNearley();
+  let grammar = parser.feed(source);
+
+  let result = [];
+
+  function feed(code) {
+   result.push(code);
+  }
+
+  feed(`@builtin "whitespace.ne"`);
+  feed(``);
+  feed(`@{%`);
+  feed(`${bind.toString()}`);
+  feed(`%}`);
+  feed(``);
+
+  if (header) {
+   feed(header);
+  }
+
+  // console.log(grammar[0].length);
+  
+  for (let {head, tail} of grammar[0]) {
+   // console.log("hi");
+   let term = (x) => typeof x == "string" ? `${x}i` : x.name;
+   feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+                     for (let term of tail) {
+                      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+                       continue;
+                      }
+                      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+                     }
+                     feed(`  ])`);
+        feed(`%}`);
+
+  }
+ 
+  return Nearley.compile(result.join("\n"), raw);
+ }
+}
+
+const DrtSyntax = `
+      Sentence -> _ Statement _.
+      Sentence -> _ Question _.      
+
+      Statement -> S_ _ ".".
+
+      Question ->
+          "Who" __
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4] _
+          "?"
+          .
+
+      Question ->
+          "Who" __ 
+          AUX[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          V[num=1, fin=-, trans=+] _
+          "?"
+          .
+
+      Question ->
+          BE[num=1, fin=+, tp=2, tense=3] __
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          ADJ _
+          "?"
+          .
+
+      S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          "if" __ 
+          S[num=1, gap=-, tp=2, tense=3] __ 
+          "then" __ 
+          S[num=1, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "and" __ 
+          S[num=5, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=2, tense=3] -> 
+          S[num=4, gap=-, tp=2, tense=3] __ 
+          "or" __ 
+          S[num=5, gap=-, tp=2, tense=3].
+
+      S[num=1, gap=-, tp=3, tense=4] -> 
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=np] _ 
+          VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      S[num=1, gap=np, tp=3, tense=4] ->
+          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          VP_[num=1, fin=+, gap=np, tp=3, tense=4].
+
+      VP_[num=1, fin=+, gap=2, stat=3, tp=4, tense=fut] ->
+        AUX[num=1, fin=+, tp=4, tense=fut] __ 
+        VP[num=5, fin=-, gap=2, stat=3, tp=4, tense=pres].
+
+      VP_[num=1, fin=+, gap=2, stat=4, tp=5, tense=6] ->
+        AUX[num=1, fin=+, tp=5, tense=6] __ 
+        "not" __ 
+        VP[num=3, fin=-, gap=2, stat=4, tp=5, tense=6].
+
+      VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
+          VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
+          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
+          NP[num=6, gen=7, case=-nom, gap=-].
+
+      VP[num=1, fin=2, gap=np, tp=6, tense=7] ->
+          V[num=1, fin=2, trans=+, tp=6, tense=7] _ 
+          NP[num=4, gen=5, case=-nom, gap=np].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
+        V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
+
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
+      VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
+          HAVE[num=1, fin=+, tp=4, tense=5] __
+          "not" __
+          VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
+
+      NP[num=1, gen=2, case=3, gap=np] -> GAP.
+
+      GAP -> null.
+
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
+
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ RN[num=1, gen=2].
+
+      NP[num=1, gen=2, case=3, gap=-] -> PN[num=1, gen=2].
+ 
+      NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
+
+      NP[num=plur, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "and" __ 
+        NP[num=5, gen=6, case=2, gap=-].
+
+      NP[num=3, gen=1, case=2, gap=-] -> 
+        NP[num=3, gen=4, case=2, gap=-] __ 
+        "or" __ 
+        NP[num=3, gen=6, case=2, gap=-].
+
+      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
+
+      RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
+
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ ADJ.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ "not" __ ADJ.
+
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ PP.
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
+          BE[num=1, fin=2, tp=-past, tense=4] __ "not" __ PP.
+
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
+          BE[num=1, fin=2, tp=-past, tense=7] __ 
+          NP[num=3, gen=4, case=5, gap=-].
+
+      VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
+          BE[num=1, fin=2, tp=-past, tense=7] __ 
+          "not" __ 
+          NP[num=3, gen=4, case=5, gap=-].
+
+      DET[num=sing] -> "a".
+      DET[num=sing] -> "an".
+      DET[num=sing] -> "every".
+      DET[num=sing] -> "the".
+      DET[num=sing] -> "some".
+
+      DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
+
+      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
+
+      PRO[num=sing, gen=male, case=+nom] -> "he".
+      PRO[num=sing, gen=male, case=-nom] -> "him".
+
+      PRO[num=sing, gen=fem, case=+nom] -> "she".
+      PRO[num=sing, gen=fem, case=-nom] -> "her".
+
+      PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> "it".
+
+      PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> "they".
+      PRO[num=plur, gen=[male, fem, -hum], case=-nom] -> "them".
+
+      PRO[num=sing, gen=male, case=-nom, refl=+] -> "himself".
+      PRO[num=sing, gen=fem, case=-nom, refl=+] -> "herself".
+      PRO[num=sing, gen=-hum, case=-nom, refl=+] -> "itself".
+
+      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+
+      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+
+      PREP -> "behind".
+      PREP -> "in".
+      PREP -> "over".
+      PREP -> "under".
+      PREP -> "near".
+
+      PREP -> "before".
+      PREP -> "after".
+      PREP -> "during".
+
+      PREP -> "from".
+      PREP -> "to".
+      PREP -> "of".
+      PREP -> "about".
+      PREP -> "by".
+      PREP -> "for".
+      PREP -> "with".
+
+      AUX[num=sing, fin=+, tp=-past, tense=pres] -> "does".
+      AUX[num=plur, fin=+, tp=-past, tense=pres] -> "do".
+
+      AUX[num=1, fin=+, tp=-past, tense=past] -> "did".
+      AUX[num=1, fin=+, tp=+past, tense=pres] -> "did".
+
+      AUX[num=1, fin=+, tp=-past, tense=fut] -> "will".
+      AUX[num=1, fin=+, tp=+past, tense=fut] -> "would".
+
+      RPRO[num=[sing, plur], gen=[male, fem]] -> "who".
+      RPRO[num=[sing, plur], gen=-hum] -> "which".
+
+      BE[num=sing, fin=+, tp=-past, tense=pres] -> "is".
+      BE[num=plur, fin=+, tp=-past, tense=pres] -> "are".
+
+      BE[num=sing, fin=+, tp=-past, tense=past] -> "was".
+      BE[num=plur, fin=+, tp=-past, tense=past] -> "were".
+
+      BE[num=sing, fin=+, tp=+past, tense=pres] -> "was".
+      BE[num=plur, fin=+, tp=+past, tense=pres] -> "were".
+
+      BE[fin=-] -> "be".
+      BE[fin=part] -> "been".
+
+      HAVE[fin=-1] -> "have".
+
+      HAVE[num=sing, fin=+, tp=-past, tense=pres] -> "has".
+      HAVE[num=plur, fin=+, tp=-past, tense=pres] -> "have".
+
+      HAVE[num=1, fin=+, tp=-past, tense=past] -> "had".
+      HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> "had".
+
+      V[num=1, fin=-, stat=-, trans=2] -> 
+          VERB[trans=2, stat=-].
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+s] "s".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+es] "es".
+
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1, pres=+ies] "ies".
+
+      V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
+          VERB[trans=2, stat=1].
+
+      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, past=+ed] "ed".
+
+      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
+          -> VERB[trans=3, stat=2, past=+ed] "ed".
+
+      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
+          -> VERB[trans=3, stat=2, past=+d] "d".
+
+      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
+          -> VERB[trans=3, stat=2, past=+d] "d".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+ied] "ied".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+led] "led".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=+red] "red".
+
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+         -> VERB[trans=3, stat=2, past=-reg].
+
+
+      ADJ -> "happy".
+      ADJ -> "unhappy".
+      ADJ -> "foolish".
+      ADJ -> "fast".
+      ADJ -> "beautiful".
+      ADJ -> "mortal".
+      ADJ -> "brazilian".
+
+      PN[num=sing, gen=male] -> "Socrates".
+      PN[num=sing, gen=male] -> "Jones".
+      PN[num=sing, gen=male] -> "John".
+      PN[num=sing, gen=male] -> "Smith".
+      PN[num=sing, gen=fem] -> "Mary".
+      PN[num=sing, gen=-hum] -> "Brazil".
+      PN[num=sing, gen=-hum] -> "Ulysses".
+
+      N[num=sing, gen=male] -> "man".
+      N[num=sing, gen=fem] -> "woman".
+      N[num=sing, gen=fem] -> "girl".
+      N[num=sing, gen=-hum] -> "book".
+      N[num=sing, gen=-hum] -> "telescope".
+      N[num=sing, gen=-hum] -> "donkey".
+      N[num=sing, gen=-hum] -> "horse".
+      N[num=sing, gen=-hum] -> "porsche".
+      N[num=sing, gen=[male, fem]] -> "engineer".
+      N[num=sing, gen=1] -> "brazilian".
+
+      RN[num=sing, gen=male] -> "brother".
+      RN[num=sing, gen=male] -> "father".
+      RN[num=sing, gen=male] -> "husband".
+      RN[num=sing, gen=fem] -> "sister".
+      RN[num=sing, gen=fem] -> "mother".
+      RN[num=sing, gen=fem] -> "wife".
+
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "beat".
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "own".
+
+      VERB[trans=1, stat=-, pres=+s, past=+ed] -> "listen".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "walk".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "sleep".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "stink".
+
+      VERB[trans=1, stat=-, pres=+s] -> "leave".
+      VERB[trans=1, stat=-, past=-reg] -> "left".
+
+      VERB[trans=-, stat=-, pres=+s] -> "come".
+      VERB[trans=-, stat=-, past=-reg] -> "came".
+
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
+      VERB[trans=+, stat=-, pres=+es, past=+ed] -> "crash".
+
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "like".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "seize".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "tie".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "free".
+      VERB[trans=1, stat=-, pres=+s, past=+d] -> "love".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "surprise".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "fascinate".
+      VERB[trans=+, stat=-, pres=+s, past=+d] -> "admire".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "ski".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "echo".
+
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "play".
+      VERB[trans=-, stat=-, pres=+s, past=+ed] -> "decay".
+      VERB[trans=+, stat=-, pres=+s, past=+ed] -> "enjoy".
+
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "cr".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "appl".
+      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> "cop".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "repl".
+      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> "tr".
+
+      VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
+      VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
+`;
+
+const DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+
+// console.log("hi");
+// console.log(DRTGrammar);
+
+class Parser {
+ constructor (start){
+  this.parser = new Nearley(DRTGrammar, start);
+ }
+
+ feed(code) {
+  return this.parser.feed(code);
+ }
+}
+
+let node = (type) => { 
+ return (...children) => {
+  return {"@type": type, "children": children};
+ }
+};
+
+function parse(s, start = "Statement") {
+ let parser = new Parser(start);
+ let result = parser.feed(s);
+ return result;
+}
+
+function child(node, ...path) {
+ let result = node;
+ for (let i of path) {
+  result = result.children[i];
+ }
+ return result;
+}
+
+function first(result) {
+ return preprocess(child(result[0], 0, 0));
+}
+
+function preprocess(node) {
+ if (node["@type"] == "V") {
+  // console.log(node);                                                       
+  let root = node.children[0].children[0];
+  let suffix = node.children[1] || "";
+  node.children = [root + suffix];
+  return node;
+ }
+
+ for (let child of node.children || []) {
+  preprocess(child);
+ }
+ return node;
+}
+
+module.exports = {
+ parse: parse,
+ first: first,
+ preprocess: preprocess,
+ Nearley: Nearley,
+ bind: bind,
+ FeaturedNearley: FeaturedNearley,
+ DrtSyntax: DrtSyntax,   
+ Parser: Parser,
+ nodes: {
+  "Statement": node("Statement"),
+  "Sentence": node("Sentence"),
+  "Question": node("Question"),
+  "S": node("S"),
+  "S_": node("S_"),
+  "NP": node("NP"),
+  "PN": node("PN"),
+  "VP_": node("VP_"),
+  "VP": node("VP"),
+  "V": node("V"),
+  "AUX": node("AUX"),
+  "PRO": node("PRO"),
+  "DET": node("DET"),
+  "N": node("N"),
+  "RC": node("RC"),
+  "RPRO": node("RPRO"),
+  "GAP": node("GAP"),
+  "BE": node("BE"),
+  "ADJ": node("ADJ"),
+  "PREP": node("PREP"),
+  "PP": node("PP"),
+  "VERB": node("VERB"),
+  "HAVE": node("HAVE"),
+  "RN": node("RN"),
+ }
+}
+
+},{"nearley":6,"nearley/lib/compile":3,"nearley/lib/generate":4,"nearley/lib/nearley-language-bootstrapped":5}],8:[function(require,module,exports){
+
+},{}],9:[function(require,module,exports){
+(function (process){
+// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
+// backported and transplited with Babel, with backwards-compat fixes
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  if (path.length === 0) return '.';
+  var code = path.charCodeAt(0);
+  var hasRoot = code === 47 /*/*/;
+  var end = -1;
+  var matchedSlash = true;
+  for (var i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        if (!matchedSlash) {
+          end = i;
+          break;
+        }
+      } else {
+      // We saw the first non-path separator
+      matchedSlash = false;
+    }
+  }
+
+  if (end === -1) return hasRoot ? '/' : '.';
+  if (hasRoot && end === 1) {
+    // return '//';
+    // Backwards-compat fix:
+    return '/';
+  }
+  return path.slice(0, end);
+};
+
+function basename(path) {
+  if (typeof path !== 'string') path = path + '';
+
+  var start = 0;
+  var end = -1;
+  var matchedSlash = true;
+  var i;
+
+  for (i = path.length - 1; i >= 0; --i) {
+    if (path.charCodeAt(i) === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          start = i + 1;
+          break;
+        }
+      } else if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // path component
+      matchedSlash = false;
+      end = i + 1;
+    }
+  }
+
+  if (end === -1) return '';
+  return path.slice(start, end);
+}
+
+// Uses a mixed approach for backwards-compatibility, as ext behavior changed
+// in new Node.js versions, so only basename() above is backported here
+exports.basename = function (path, ext) {
+  var f = basename(path);
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  var startDot = -1;
+  var startPart = 0;
+  var end = -1;
+  var matchedSlash = true;
+  // Track the state of characters (if any) we see before our first dot and
+  // after any path separator we find
+  var preDotState = 0;
+  for (var i = path.length - 1; i >= 0; --i) {
+    var code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          startPart = i + 1;
+          break;
+        }
+        continue;
+      }
+    if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // extension
+      matchedSlash = false;
+      end = i + 1;
+    }
+    if (code === 46 /*.*/) {
+        // If this is our first dot, mark it as the start of our extension
+        if (startDot === -1)
+          startDot = i;
+        else if (preDotState !== 1)
+          preDotState = 1;
+    } else if (startDot !== -1) {
+      // We saw a non-dot and non-path separator before our dot, so we should
+      // have a good chance at having a non-empty extension
+      preDotState = -1;
+    }
+  }
+
+  if (startDot === -1 || end === -1 ||
+      // We saw a non-dot character immediately before the dot
+      preDotState === 0 ||
+      // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+    return '';
+  }
+  return path.slice(startDot, end);
+};
+
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
+    }
+;
+
+}).call(this,require('_process'))
+},{"_process":10}],10:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}]},{},[1])(1)
 });

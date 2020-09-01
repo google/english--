@@ -1,5 +1,9 @@
 <script src="bundle.js"></script>
 <script>
-  const {parse} = module;
-  console.log(parse("Jones loves Mary."));
+  const {compile} = module;
+  async function main() {
+      let {parse} = await compile();
+      console.log(parse("Jones loves Mary."));
+  }
+  main();
 </script>
