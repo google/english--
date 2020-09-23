@@ -1909,6 +1909,40 @@ module.exports = {
 };
 
 },{}],7:[function(require,module,exports){
+const {parse} = require("./parser.js")
+const {DRS} = require("./drs.js");
+const {Rules} = require("./rules.js");
+const fs = require("fs");
+
+const files = {};
+
+if (!fs.readFileSync) {
+  fs.readFileSync = function(path) {
+      let file = path.split("/");
+      let content = files[file[file.length - 1]];
+      return content;
+  };
+}
+
+async function get(path, name, loader) {
+    let file = await loader(path + name);
+    files[name] = await file.text();
+}
+
+async function load(path = "", loader = fetch) {
+    await get(path, "string.ne", loader);
+    await get(path, "number.ne", loader);
+    await get(path, "whitespace.ne", loader);
+}
+
+module.exports = {
+  load: load,
+  DRS: DRS,
+  Rules: Rules,
+  parse: parse,
+}
+
+},{"./drs.js":8,"./parser.js":9,"./rules.js":10,"fs":11}],8:[function(require,module,exports){
 const {clone, print} = require("./base.js");
 const {parse} = require("./parser.js");
 
@@ -2033,41 +2067,7 @@ module.exports = {
  DRS: DRS,
 };
 
-},{"./base.js":6,"./parser.js":9}],8:[function(require,module,exports){
-const {parse} = require("./parser.js")
-const {DRS} = require("./drs.js");
-const {Rules} = require("./rules.js");
-const fs = require("fs");
-
-const files = {};
-
-if (!fs.readFileSync) {
-  fs.readFileSync = function(path) {
-      let file = path.split("/");
-      let content = files[file[file.length - 1]];
-      return content;
-  };
-}
-
-async function get(path, name, loader) {
-    let file = await loader(path + name);
-    files[name] = await file.text();
-}
-
-async function load(path = "", loader = fetch) {
-    await get(path, "string.ne", loader);
-    await get(path, "number.ne", loader);
-    await get(path, "whitespace.ne", loader);
-}
-
-module.exports = {
-  load: load,
-  DRS: DRS,
-  Rules: Rules,
-  parse: parse,
-}
-
-},{"./drs.js":7,"./parser.js":9,"./rules.js":10,"fs":11}],9:[function(require,module,exports){
+},{"./base.js":6,"./parser.js":9}],9:[function(require,module,exports){
 const nearley = require("nearley");
 const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
@@ -4117,7 +4117,7 @@ module.exports = {
  CRQUESTION: CRQUESTION,
 };
 
-},{"./base.js":6,"./drs.js":7,"./parser.js":9}],11:[function(require,module,exports){
+},{"./base.js":6,"./drs.js":8,"./parser.js":9}],11:[function(require,module,exports){
 
 },{}],12:[function(require,module,exports){
 (function (process){
@@ -4611,5 +4611,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[8])(8)
+},{}]},{},[7])(7)
 });
