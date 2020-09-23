@@ -1,5 +1,5 @@
 const {clone, transcribe} = require("./base.js");
-const {parse, first, nodes} = require("./nearley.js");
+const {parse, first, nodes} = require("./parser.js");
 
 class DRS {
  constructor(names, rules) {

@@ -1,5 +1,5 @@
 const {clone, transcribe, print} = require("./base.js");
-const {parse, first, nodes} = require("./nearley.js");
+const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {

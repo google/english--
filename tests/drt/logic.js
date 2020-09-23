@@ -1,7 +1,7 @@
 const Assert = require("assert");
 
 const {DRS, referent, print} = require("../../src/drt/rules.js");
-const DrtParser = require("../../src/drt/nearley.js");
+const DrtParser = require("../../src/drt/parser.js");
 const {S, VP_, VP, BE, NP, GAP} = DrtParser.nodes;
 const {preprocess} = DrtParser;
 

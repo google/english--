@@ -33,7 +33,7 @@ const {
 
 const { clone } = require("../../src/drt/base.js");
 
-let {parse, first, nodes} = require("../../src/drt/nearley.js");
+let {parse, first, nodes} = require("../../src/drt/parser.js");
 
 const {
  S, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,

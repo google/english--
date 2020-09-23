@@ -7,7 +7,7 @@ const {
   FeaturedNearley, 
   Parser, 
   nodes,
-  DrtSyntax} = require("../../src/drt/nearley.js");
+  DrtSyntax} = require("../../src/drt/parser.js");
 
 const {
   Statement,
