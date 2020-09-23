@@ -139,15 +139,15 @@ function referent(name, types, value, loc) {
   }
 }
 
-function predicate(name, children, types) {
+function predicate(name, args, types) {
   return {
    "@type": "Predicate",
     name: name,
-    children: children,
+    args: args,
     types: types,
     print() {
-      let children = this.children.map(child => print(child));
-      return `${this.name}(${children.join(", ")})`;
+      let args = this.args.map(arg => print(arg));
+      return `${this.name}(${args.join(", ")})`;
    }
   }
 }
@@ -889,15 +889,8 @@ class CRASPECT extends Rule {
   child(node, 1).children[0] = child(node, 1, 0, 1);
 
   if (stat == "-") {
-   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   // node.time = e;
-   // included(referent("@now"), e)
    return [[], [], [], []];
   } else if (stat == "+") {
-   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
-   // let s = referent(this.id("s"), {}, undefined, node.loc, true);
-   // node.time = s;
-   // included(e, s), equals(e, s)
    return [[], [], [], []];
   }
  }
@@ -922,12 +915,6 @@ class CRQUESTIONWHO extends Rule {
  }
  apply({vp_}, node, refs = []) {
   let q = drs(this.ids);
-
-  // q.head.push(...clone(refs));
-  // q.head.forEach(ref => ref.closure = true);
-  // q.head.push(ref);
-  // noun.ref = ref;
-  // console.log(noun);
 
   let u = referent(this.id(), {}, "", refs);
 
@@ -1012,7 +999,6 @@ function drs(ids) {
 }
 
 function disjunction(a, b) {
- // throw new Error("hi");
  return {
   "@type": "Disjunction",
   "a": a,
