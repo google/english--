@@ -21,7 +21,7 @@ class Nearley {
   }
  }
 
- static compile(source, raw = false) {
+ static compile(source, raw = false) {       
   const parser = new nearley.Parser(grammar);
   parser.feed(source);
   const ast = parser.results[0];
@@ -308,8 +308,6 @@ function bind(type, types = {}, conditions = []) {
    }
   }
 
-  // console.log(JSON.stringify(types));
-
   let n = {
    "@type": type,
    "types": bindings,
@@ -324,7 +322,7 @@ function bind(type, types = {}, conditions = []) {
  };
 }
 
-const RuntimeGrammar = Nearley.compile(`
+const RuntimeSyntax = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
       @builtin "string.ne"
@@ -408,11 +406,22 @@ const RuntimeGrammar = Nearley.compile(`
       word -> [a-zA-Z_\+\-]:+ {% ([char]) => {
         return char.join("");
       }%}
-`);
+`;
+
+let RuntimeGrammar;
+
+function runtimeGrammar() {
+  if (!RuntimeGrammar) {
+    RuntimeGrammar = Nearley.compile(RuntimeSyntax);
+  }
+
+  return RuntimeGrammar;
+}
+
 
 class FeaturedNearley {
  constructor() {
-  this.parser = new Nearley(RuntimeGrammar);
+  this.parser = new Nearley(runtimeGrammar());
  }
 
  feed(code) {
@@ -796,14 +805,21 @@ const DrtSyntax = `
       VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
 `;
 
-const DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+let DRTGrammar;
+
+function drtGrammar() {
+  if (!DRTGrammar) {
+    DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+  }
+  return DRTGrammar;  
+}
 
 // console.log("hi");
 // console.log(DRTGrammar);
 
 class Parser {
  constructor (start){
-  this.parser = new Nearley(DRTGrammar, start);
+   this.parser = new Nearley(drtGrammar(), start);
  }
 
  feed(code) {
@@ -857,7 +873,6 @@ module.exports = {
  Nearley: Nearley,
  bind: bind,
  FeaturedNearley: FeaturedNearley,
- DrtSyntax: DrtSyntax,   
  Parser: Parser,
  nodes: {
   "Statement": node("Statement"),
