@@ -1150,17 +1150,13 @@ class Rules {
             new CRPUNCT(ids),
         ];
         return [new CRPN(ids), rules];
-        // return new DRS(new CRPN(ids), rules);
     }
 }
 
 module.exports = {
  match: match,
  capture: capture,
- child: child,
- print: print,
  referent: referent,
- transcribe: transcribe,
  Ids: Ids,
  Rules: Rules,
  CRPN: CRPN,

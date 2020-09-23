@@ -1,5 +1,5 @@
 const {clone, transcribe} = require("./base.js");
-const {parse, first, nodes} = require("./parser.js");
+const {parse} = require("./parser.js");
 
 class DRS {
  constructor(names, rules) {
@@ -12,11 +12,10 @@ class DRS {
  feed(source) {
   let [[lines]] = parse(source, "Discourse");
   for (let s of lines) {
-   // console.log(s);
    this.push(s);
   }
  }
- 
+
  bind(node) {
   let queue = [node];
   while (queue.length > 0) {
@@ -133,93 +132,6 @@ class DRS {
  }
 }
 
-
-function disjunction(a, b) {
- // throw new Error("hi");
- return {
-  "@type": "Disjunction",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " or " + this.b.print();
-  }
- };
-}
-
-function implication(a, b) {
- return {
-   "@type": "Implication",
-   "a": a,
-   "b": b,
-   print() {
-   return this.a.print() + " => " + this.b.print();
-  }
- };
-}
-
-function negation(a) {
- return {
-   "@type": "Negation",
-   "a": a,
-   print() {
-     return "~" + this.a.print();
-   }
- };
-}
-
-function conjunction(a, b) {
- return {
-  "@type": "Conjunction",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " and " + this.b.print();
-  }
- };
-}
-
-function before(a, b) {
- return {
-  "@type": "Before",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " < " + this.b.print();
-  }
- };
-}
-
-function included(a, b) {
- return {
-  "@type": "Included",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " <> " + this.b.print();
-  }
- };
-}
-
-function equals(a, b) {
- return {
-  "@type": "Equals",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " == " + this.b.print();
-  }
- };
-}
-
-function query(drs, x) {
- return {
-   "@type": "Query",
-   "drs": drs,
-   print() {
-    return "exists(" + `${x ? x.print() : ""}` + ") " + this.drs.print() + " ?";
-   }
- };
-}
 
 module.exports = {
  DRS: DRS,
