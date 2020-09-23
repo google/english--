@@ -1,8 +1,9 @@
 <script src="bundle.js"></script>
 <script>
-  const {load, parse, drs} = module;
+  const {load, parse, DRS} = module;
   async function main() {
       await load();
+      console.log(DRS);
       console.log(parse("Jones loves Mary."));
   }
   main();

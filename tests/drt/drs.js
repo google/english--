@@ -205,8 +205,7 @@ describe("DRS", function() {
   });
 
   it("Jones does not own a porsche. He likes it.", function() {
-    let [name, rules] = Rules.from();
-    let drs = new DRS(name, rules);
+    let drs = new DRS(Rules.from());
     drs.feed("Jones does not own a porsche.");
     try {
      // "it" in "he likes it" cannot bind to anything
@@ -518,8 +517,7 @@ describe("DRS", function() {
 
   it("Every man is happy. He likes it.", function() {
     try {
-     let [name, rules] = Rules.from();
-     let drs = new DRS(name, rules);
+     let drs = new DRS(Rules.from());
      drs.feed("Every man is happy.");
      drs.feed("He likes it.");
      throw new Error("expected reference 'He' to fail");
@@ -530,8 +528,7 @@ describe("DRS", function() {
 
   it("Every man owns a book. It is happy.", function() {
     try {
-     let [name, rules] = Rules.from();
-     let drs = new DRS(name, rules);
+     let drs = new DRS(Rules.from());
      drs.feed("Every man owns a book.");
      drs.feed("It is happy.");
      throw new Error("expected reference 'It' to fail");
@@ -755,9 +752,8 @@ describe("DRS", function() {
   });
 
   it("She loves it and Mary owns a porsche.", function() {
-    let [name, rules] = Rules.from();
-    let drs = new DRS(name, rules);
-
+    let drs = new DRS(Rules.from());
+    
     try {
      drs.feed("She loves it and Mary owns a porsche.");
      throw new Error("Expected exception");
@@ -1493,8 +1489,7 @@ describe("DRS", function() {
           .join("\n");
       },
       equalsTo(y) {
-       let [names, rules] = Rules.from();     
-       let drs = new DRS(names, rules);
+       let drs = new DRS(Rules.from());
        drs.feed(x);
        Assert.deepEqual(drs.print(), this.trim(y));
       }

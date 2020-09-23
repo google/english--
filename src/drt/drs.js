@@ -2,7 +2,7 @@ const {clone, print} = require("./base.js");
 const {parse} = require("./parser.js");
 
 class DRS {
- constructor(names, rules) {
+ constructor([names, rules]) {
   this.head = [];
   this.body = [];
   this.names = names;
@@ -14,6 +14,7 @@ class DRS {
   for (let s of lines) {
    this.push(s);
   }
+  return this;
  }
 
  bind(node) {

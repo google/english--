@@ -994,8 +994,7 @@ class CRPUNCT extends CompositeRule {
 }
 
 function drs(ids) {
-    let [name, rules] = Rules.from(ids);
-    return new DRS(name, rules);
+    return new DRS(Rules.from(ids));
 }
 
 function disjunction(a, b) {

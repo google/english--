@@ -1,5 +1,6 @@
-const parser = require("./parser.js")
-const drs = require("./drs.js");
+const {parse} = require("./parser.js")
+const {DRS} = require("./drs.js");
+const {Rules} = require("./rules.js");
 const fs = require("fs");
 
 const files = {};
@@ -25,6 +26,7 @@ async function load(path = "", loader = fetch) {
 
 module.exports = {
   load: load,
-  drs: drs,
-  parser: parser,
+  DRS: DRS,
+  Rules: Rules,
+  parse: parse,
 }
