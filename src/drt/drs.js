@@ -100,10 +100,7 @@ class DRS {
   let neg = this.neg ? "~" : "";
   result.push(`${neg}drs(${args}) \{`);
 
-  // console.log(this.neg);
-     
   for (let cond of this.body) {
-   // console.log(cond);
    if (cond instanceof DRS) {
      result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
@@ -113,16 +110,7 @@ class DRS {
               cond["@type"] == "Disjunction") {
      result.push(cond.print());
    } else {
-    // console.log(cond);
-    let prefix = "";
-    let {types} = cond;
-    let {tense} = types || {};
-    if (tense == "fut") {
-     prefix = "> ";
-    } else if (tense == "past") {
-     prefix = "< ";
-    }
-    result.push(prefix + print(cond));
+    result.push(print(cond));
    }
   }
   

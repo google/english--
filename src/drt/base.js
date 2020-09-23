@@ -29,14 +29,27 @@ function print(node, refs) {
  }
 
  let time = "";
- switch (node.time) {
-  case "past": 
-   time = "< ";
-   break;
-  case "fut": 
-   time = "> ";
-   break;
+ if (node["@type"] == "S") {
+   let {types} = node;
+   let {tense} = types || {};
+   if (tense == "fut") {
+     time = "> ";
+    } else if (tense == "past") {
+     time = "< ";
+   }
  }
+    
+ //console.log(node["@type"]);
+    
+ //let time = "";
+ //switch (node.time) {
+ // case "past": 
+ //  time = "< ";
+ //  break;
+ // case "fut": 
+ //  time = "> ";
+ //  break;
+ //}
  return time + result.join(" ").trim() + suffix;
 }
 

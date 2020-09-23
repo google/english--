@@ -492,11 +492,10 @@ class CRPOSBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
  }
  apply({ref, adj}, node, refs) {
+  let s = S(adj);
   adj.ref = ref.children[0];
-  if (node.types && node.types.tense) {
-   adj.time = node.types.tense;
-  }
-  return [[], [adj], [], [node]];
+  s.types = node.types;   
+  return [[], [s], [], [node]];
  }
 }
 
@@ -522,11 +521,9 @@ class CRNEGBE extends Rule {
   let sub = drs(this.ids);
   sub.head = clone(refs);
   sub.head.forEach(ref => ref.closure = true);
-  sub.push(S(ref.children[0], VP_(VP(BE(), adj))));
-  
-  if (node.types && node.types.tense) {
-   adj.time = node.types.tense;
-  }
+  let s = S(ref.children[0], VP_(VP(BE(), adj)));
+  s.types = node.types;   
+  sub.push(s);
   
   return [[], [negation(sub)], [], [node]];
  }
@@ -541,7 +538,6 @@ class CRNBE extends Rule {
   np.ref = child(ref, 0);
 
   // Matches the DRS found in (3.57) on page 269.
-
   if (node.types && node.types.tense) {
    np.time = node.types.tense;
   }

@@ -465,7 +465,7 @@ describe("Rules", function() {
 
     new CRPN(ids).match(node);
 
-    assertThat(print(node)).equalsTo("a will not own a porsche");
+    assertThat(print(node)).equalsTo("> a will not own a porsche");
 
     let [head, body, , remove] = new CRNEG(ids).match(node, []);
 
@@ -617,7 +617,7 @@ describe("Rules", function() {
     new CRPN(ids).match(node, []);
     new CRPN(ids).match(child(node, 1, 0, 1), []);
 
-    assertThat(print(node)).equalsTo("a was happy");
+    assertThat(print(node)).equalsTo("< a was happy");
 
     // NOTE(goto): BE should be state=+ and lead to an s0
     // here instead.
@@ -1042,8 +1042,7 @@ describe("Rules", function() {
     let ids = new Ids();
     let node = first(parse("Mary will kiss Jones."), true);
     new CRWILL(ids).match(child(node, 1), []);
-    assertThat(print(node)).equalsTo("Mary kiss Jones");
-    assertThat(node.types.tense).equalsTo("fut");
+    assertThat(print(node)).equalsTo("> Mary kiss Jones");
    });
 
   it("Mary will not kiss Jones.", function() {
