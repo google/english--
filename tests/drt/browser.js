@@ -1,6 +1,6 @@
 const Assert = require("assert");
 
-const {load, parse, DRS, Rules} = require("../../src/drt/main.js");
+const {load, parse, DRS, Rules} = require("../../src/drt/browser.js");
 
 describe("Browser", function() {
     it("main", async function() {
