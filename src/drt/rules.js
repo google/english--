@@ -1,59 +1,12 @@
-const {clone} = require("./base.js");
-
+const {clone, transcribe, print} = require("./base.js");
 const {parse, first, nodes} = require("./nearley.js");
+const {DRS} = require("./drs.js");
 
 const {
  S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
   Discourse, Sentence, Statement, Question
 } = nodes;
 
-
-function transcribe(node, refs) {
- if (typeof node == "string") {
-  return node;
- } else  if (node["@type"] == "Referent") {
-  if (refs) {
-   // de-reference referents
-   return refs.find(ref => ref.name == node.name).value;
-  }
-  return node.name;
- } else if (node["@type"] == "Predicate") {
-  // console.log(node);
-  return node.print();
- } else if (node["@type"] == "V" && node.root) {
-  return node.root;
- }
- //else if (node["@type"] == "S") {
- // console.log(node);
- //}
-
- // console.log(node);
-
- let result = [];
- for (let child of node.children || []) {
-  result.push(transcribe(child, refs));
- }
-
- let suffix = node.ref ? `(${node.ref.name})` : "";
- let prefix = node.neg ? "~" : "";
-
- // prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
- //if (node.types.tense) {
- // console.log(node);
- //}
-
- // console.log(node);
- let time = "";
- switch (node.time) {
-  case "past": 
-   time = "< ";
-   break;
-  case "fut": 
-   time = "> ";
-   break;
- }
- return time + prefix + result.join(" ").trim() + suffix;
-}
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
   
@@ -155,10 +108,6 @@ class CompositeRule extends Rule {
   }
   return result;
  }
-}
-
-function print(node, refs) {
- return transcribe(node, refs);
 }
 
 function child(node, ...path) {
@@ -539,7 +488,9 @@ class CRNEG extends Rule {
   // console.log(child(node, 1));
 
   sub.push(s);
-
+  //console.log(sub.print());
+  //console.log(sub instanceof DRS);
+ 
   return [[], [sub], [], [node]];
  }
 }
@@ -1089,167 +1040,9 @@ class CRPUNCT extends CompositeRule {
 }
 
 function drs(ids) {
- return DRS.from(ids);
+    let [name, rules] = Rules.from(ids);
+    return new DRS(name, rules);
 }
-
-class DRS {
- constructor(names, rules) {
-  this.head = [];
-  this.body = [];
-  this.names = names;
-  this.rules = rules;
- }
-
- static from(ids = new Ids()) {
-  let rules = 
-   [
-    new CRASPECT(ids),
-    new CREVERY(ids),
-    new CRVPEVERY(ids),
-    new CRPP(ids),
-    new CRID(ids),
-    new CRLIN(ids),
-    new CRNRC(ids), 
-    new CRPRO(ids),
-    new CRNEG(ids),
-    new CRPOSS(ids),
-    new CRBE(ids),
-    new CRCOND(ids),
-    new CROR(ids),
-    new CRVPOR(ids),
-    new CRNPOR(ids),
-    new CRAND(ids),
-    new CRADJ(ids),
-    // new CRTENSE(ids),
-    new CRWILL(ids),
-    new CRQUESTION(ids),
-    new CRSTEM(ids),
-    new CRPUNCT(ids),
-    ];
-  return new DRS(new CRPN(ids), rules);
- }
-
- feed(source) {
-  let [[lines]] = parse(source, "Discourse");
-  for (let s of lines) {
-   // console.log(s);
-   this.push(s);
-  }
- }
- 
- bind(node) {
-  let queue = [node];
-  while (queue.length > 0) {
-   let p = queue.shift();
-   // console.log(`${p["@type"]}`);
-   // console.log(p);
-   let [refs, names] = this.names.match(p, this.head);
-   this.head.push(...refs);
-   this.body.push(...names);
-   // ... and recurse.
-   let next = (p.children || [])
-    .filter(c => typeof c != "string");
-   queue.push(...next);
-  }
- }
-
- push(node) {
-  for (let ref of this.head) {
-   // Reset all of the locations of previous
-   // referents before new phrases are processed.
-   ref.loc = 0;
-  }
-
-  // Resolve all proper names first.
-  this.bind(node);
-
-  let queue = [node];
-  this.body.push(node);
-
-  while (queue.length > 0) {
-   let p = queue.shift();
-   // breadth first search: iterate over
-   // this level first ...
-   let skip = false;
-   for (let rule of this.rules) {
-    let [head, body, drs, [remove]] = rule.match(p, this.head);
-    this.head.push(...head);
-    this.body.push(...body);
-
-    if (remove) {
-     skip = true;
-     let i = this.body.indexOf(remove);
-     if (i == -1) {
-      throw new Error("Ooops, deleting an invalid node.");
-     }
-     // console.log(remove);
-     // console.log(body);
-     this.body.splice(i, 1);
-    }
-
-    queue.push(...body.filter(c => !(c instanceof DRS)));
-
-    if (skip) {
-     break;
-    }
-   }
-
-   if (skip) {
-    continue;
-   }
-
-   // ... and recurse.
-   let next = (p && p.children || [])
-    .filter(c => typeof c != "string");
-   queue.push(...next);
-  }
-
-  return this;
- }
-
- print() {
-  let result = [];
-  let refs = [];
-  let individuals = this.head
-   .filter(ref => !ref.closure);
-   // .filter(ref => !ref.time);
-  for (let ref of individuals) {
-   refs.push(`${ref.print()}`);
-  }
-  
-  let args = refs.join(", ");
-  let neg = this.neg ? "~" : "";
-  result.push(`${neg}drs(${args}) \{`);
-  
-  for (let cond of this.body) {
-   if (cond instanceof DRS) {
-    result.push(cond.print());
-   } else if (cond["@type"] == "Implication" ||
-              cond["@type"] == "Negation" ||
-              cond["@type"] == "Query" ||
-              cond["@type"] == "Conjunction" ||
-              cond["@type"] == "Disjunction") {
-    result.push(cond.print());
-   } else {
-    // console.log(cond);
-    let prefix = "";
-    let {types} = cond;
-    let {tense} = types || {};
-    if (tense == "fut") {
-     prefix = "> ";
-    } else if (tense == "past") {
-     prefix = "< ";
-    }
-    result.push(prefix + transcribe(cond));
-   }
-  }
-  
-  result.push("}");
-  
-  return result.join("\n");
- }
-}
-
 
 function disjunction(a, b) {
  // throw new Error("hi");
@@ -1338,14 +1131,46 @@ function query(drs, x) {
  };
 }
 
+class Rules {
+    static from(ids = new Ids()) {
+        let rules = [
+            new CRASPECT(ids),
+            new CREVERY(ids),
+            new CRVPEVERY(ids),
+            new CRPP(ids),
+            new CRID(ids),
+            new CRLIN(ids),
+            new CRNRC(ids), 
+            new CRPRO(ids),
+            new CRNEG(ids),
+            new CRPOSS(ids),
+            new CRBE(ids),
+            new CRCOND(ids),
+            new CROR(ids),
+            new CRVPOR(ids),
+            new CRNPOR(ids),
+            new CRAND(ids),
+            new CRADJ(ids),
+            // new CRTENSE(ids),
+            new CRWILL(ids),
+            new CRQUESTION(ids),
+            new CRSTEM(ids),
+            new CRPUNCT(ids),
+        ];
+        return [new CRPN(ids), rules];
+        // return new DRS(new CRPN(ids), rules);
+    }
+}
+
 module.exports = {
  match: match,
  capture: capture,
  child: child,
  print: print,
  referent: referent,
+ transcribe: transcribe,
  Ids: Ids,
- DRS: DRS,
+ Rules: Rules,
  CRPN: CRPN,
  CRPRO: CRPRO,
  CRID: CRID,
