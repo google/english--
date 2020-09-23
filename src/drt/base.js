@@ -2,7 +2,7 @@ function clone(obj) {
  return JSON.parse(JSON.stringify(obj));
 }
 
-function transcribe(node, refs) {
+function print(node, refs) {
  if (typeof node == "string") {
   return node;
  } else  if (node["@type"] == "Referent") {
@@ -12,33 +12,22 @@ function transcribe(node, refs) {
   }
   return node.name;
  } else if (node["@type"] == "Predicate") {
-  // console.log(node);
   return node.print();
  } else if (node["@type"] == "V" && node.root) {
   return node.root;
  }
- //else if (node["@type"] == "S") {
- // console.log(node);
- //}
-
- // console.log(node);
 
  let result = [];
  for (let child of node.children || []) {
-  result.push(transcribe(child, refs));
+  result.push(print(child, refs));
  }
 
  let suffix = node.ref ? `(${node.ref.name})` : "";
- let prefix = node.neg ? "~" : "";
+ 
+ if (node.neg) {
+   throw new Error("?");
+ }
 
- // console.log(node.neg);
-    
- // prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
- //if (node.types.tense) {
- // console.log(node);
- //}
-
- // console.log(node);
  let time = "";
  switch (node.time) {
   case "past": 
@@ -48,11 +37,7 @@ function transcribe(node, refs) {
    time = "> ";
    break;
  }
- return time + prefix + result.join(" ").trim() + suffix;
-}
-
-function print(node, refs) {
- return transcribe(node, refs);
+ return time + result.join(" ").trim() + suffix;
 }
 
 function child(node, ...path) {
@@ -64,8 +49,7 @@ function child(node, ...path) {
 }
 
 module.exports = {
-    clone: clone,
-    transcribe: transcribe,
-    print: print,
-    child: child,
+  clone: clone,
+  print: print,
+  child: child,
 };

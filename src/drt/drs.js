@@ -1,4 +1,4 @@
-const {clone, transcribe} = require("./base.js");
+const {clone, print} = require("./base.js");
 const {parse} = require("./parser.js");
 
 class DRS {
@@ -105,13 +105,13 @@ class DRS {
   for (let cond of this.body) {
    // console.log(cond);
    if (cond instanceof DRS) {
-       result.push(cond.print());
+     result.push(cond.print());
    } else if (cond["@type"] == "Implication" ||
               cond["@type"] == "Negation" ||
               cond["@type"] == "Query" ||
               cond["@type"] == "Conjunction" ||
               cond["@type"] == "Disjunction") {
-    result.push(cond.print());
+     result.push(cond.print());
    } else {
     // console.log(cond);
     let prefix = "";
@@ -122,7 +122,7 @@ class DRS {
     } else if (tense == "past") {
      prefix = "< ";
     }
-    result.push(prefix + transcribe(cond));
+    result.push(prefix + print(cond));
    }
   }
   

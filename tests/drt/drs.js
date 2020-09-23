@@ -311,7 +311,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          Jones(a)
-         ~happy(a)
+         ~drs() {
+           happy(a)
+         }
        }
     `);
   });
@@ -1262,7 +1264,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          John(a)
-         < ~happy(a)
+         ~drs() {
+           < happy(a)
+         }
        }
     `);
   });

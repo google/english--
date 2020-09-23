@@ -522,8 +522,10 @@ describe("Rules", function() {
     assertThat(remove[0]).equalsTo(node);
 
     assertThat(body.length).equalsTo(1);
-    assertThat(print(body[0])).equalsTo(trim(`
-      ~happy(a)
+    assertThat(body[0].print()).equalsTo(trim(`
+      ~drs() {
+        happy(a)
+      }
     `));
   });
 

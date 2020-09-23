@@ -1,4 +1,4 @@
-const {clone, transcribe, print, child} = require("./base.js");
+const {clone, print, child} = require("./base.js");
 const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
@@ -519,14 +519,16 @@ class CRNEGBE extends Rule {
   super(ids, S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
  }
  apply({ref, adj}, node, refs) {
-  adj.ref = ref.children[0];
-  adj.neg = true;
-
+  let sub = drs(this.ids);
+  sub.head = clone(refs);
+  sub.head.forEach(ref => ref.closure = true);
+  sub.push(S(ref.children[0], VP_(VP(BE(), adj))));
+  
   if (node.types && node.types.tense) {
    adj.time = node.types.tense;
   }
-
-  return [[], [adj], [], [node]];
+  
+  return [[], [negation(sub)], [], [node]];
  }
 }
 
