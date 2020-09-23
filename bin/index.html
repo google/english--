@@ -1,10 +1,14 @@
 <script src="bundle.js"></script>
 <script>
-  const {load, parse, DRS} = module;
+  const {load, parse, DRS, Rules} = module;
   async function main() {
       await load();
-      console.log(DRS);
-      console.log(parse("Jones loves Mary."));
+      let drs = new DRS(Rules.from()).feed("Jones loves Mary.").print();
+      document.write("<h1>Jones loves Mary.</h1>");
+      document.write(drs);
+      document.write("<br>");
+      document.write("<h1>Jones loves Mary.</h1>");
+      document.write(JSON.stringify(parse("Jones loves Mary."), undefined, 2));
   }
   main();
 </script>
