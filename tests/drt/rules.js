@@ -31,21 +31,7 @@ const {
   referent,
 } = require("../../src/drt/rules.js");
 
-const {
-  parser, 
-  term, 
-  rule, 
-  phrase, 
-  space, 
-  clone, 
-  literal, 
-  compile, 
-  generate, 
-  expand, 
-  collect, 
-  processor, 
-  grammar,
-  clean} = require("../../src/drt/parser.js");
+const { clone } = require("../../src/drt/base.js");
 
 let {parse, first, nodes} = require("../../src/drt/nearley.js");
 
@@ -53,6 +39,22 @@ const {
  S, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,
  Discourse, Sentence
 } = nodes;
+
+function clean(node) {
+ if (Array.isArray(node)) {
+  for (let entry of node) {
+   if (entry) {
+    clean(entry);
+   }
+  }
+ } else if (typeof node == "object") {
+  delete node.types;
+  delete node.loc;
+  delete node.root;
+  clean(node.children);
+ }
+ return node;
+}
 
 describe("Rules", function() {
   it("Keeps types", function() {

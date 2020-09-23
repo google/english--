@@ -2,33 +2,34 @@
 const files = {};
 
 require("fs").readFileSync = function(path) {
-    // console.log("reading " + path);
     let file = path.split("/");
     let content = files[file[file.length - 1]];
-    // console.log(content);
-    // debugger;
     return content;
 };
 
-async function load(path) {
-    // console.log("fetching " + path);
-    let file = await fetch(path);
-    files[path] = await file.text();
-    // console.log(files[path]);
+async function load(path, name) {
+    let file = await fetch(path + name);
+    files[name] = await file.text();
 }
 
-async function compile() {
-    await load("string.ne");
-    await load("number.ne");
-    await load("whitespace.ne");
-    return require("./../src/drt/nearley.js");
+async function compile(path = "") {
+    await load(path, "string.ne");
+    await load(path, "number.ne");
+    await load(path, "whitespace.ne");
+
+    let result = {};
+
+    result = Object.assign(result, require("./../src/drt/nearley.js"));
+    result = Object.assign(result, require("./../src/drt/rules.js"));
+
+    return result;
 }
 
 module.exports = {
   compile: compile
 }
 
-},{"./../src/drt/nearley.js":7,"fs":8}],2:[function(require,module,exports){
+},{"./../src/drt/nearley.js":8,"./../src/drt/rules.js":11,"fs":12}],2:[function(require,module,exports){
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory) /* global define */
@@ -941,7 +942,7 @@ module.exports = {
 }));
 
 }).call(this,require('_process'),"/node_modules/nearley/lib")
-},{"./nearley":6,"./nearley-language-bootstrapped.js":5,"_process":10,"fs":8,"path":9}],4:[function(require,module,exports){
+},{"./nearley":6,"./nearley-language-bootstrapped.js":5,"_process":14,"fs":12,"path":13}],4:[function(require,module,exports){
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
         module.exports = factory(require('./nearley'));
@@ -1886,6 +1887,417 @@ if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
 }));
 
 },{}],7:[function(require,module,exports){
+// Generated automatically by nearley, version 2.18.0
+// http://github.com/Hardmath123/nearley
+(function () {
+function id(x) { return x[0]; }
+
+
+const reserved = ["he", "she", "it", "they", "him", "her", "them", "his", "hers", "theirs"];
+
+function name(head, tail, reject) {
+  let result = head.join("") + tail.join("");
+  if (reserved.includes(result.toLowerCase())) {
+    return reject;
+  }
+  return result;
+}
+
+
+ const {capture, match, merge, resolve, process, node} = require("./processor.js"); var grammar = {
+    Lexer: undefined,
+    ParserRules: [
+    {"name": "_$ebnf$1", "symbols": []},
+    {"name": "_$ebnf$1", "symbols": ["_$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "_", "symbols": ["_$ebnf$1"], "postprocess": function(d) {return null;}},
+    {"name": "__$ebnf$1", "symbols": ["wschar"]},
+    {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
+    {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
+    {"name": "FULLNAME$ebnf$1$subexpression$1", "symbols": ["NAME", "_"]},
+    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1$subexpression$1"]},
+    {"name": "FULLNAME$ebnf$1$subexpression$2", "symbols": ["NAME", "_"]},
+    {"name": "FULLNAME$ebnf$1", "symbols": ["FULLNAME$ebnf$1", "FULLNAME$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "FULLNAME", "symbols": ["FULLNAME$ebnf$1"], "postprocess": ([args]) => args.map(name => name[0]).join(" ")},
+    {"name": "NAME$ebnf$1", "symbols": [/[A-Z]/]},
+    {"name": "NAME$ebnf$1", "symbols": ["NAME$ebnf$1", /[A-Z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME$ebnf$2", "symbols": [/[a-z]/]},
+    {"name": "NAME$ebnf$2", "symbols": ["NAME$ebnf$2", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "NAME", "symbols": ["NAME$ebnf$1", "NAME$ebnf$2"], "postprocess": ([a, b], location, reject) => name(a, b, reject)},
+    {"name": "VAR", "symbols": [/[A-Z]/], "postprocess": ([name]) => name},
+    {"name": "WS", "symbols": ["_"], "postprocess": (data, loc, reject) => process("WS", {"gap": "-"}, [], [], loc)},
+    {"name": "WS", "symbols": ["__"], "postprocess": (data, loc, reject) => process("WS", {"gap": "sing"}, [], [], loc)},
+    {"name": "WS", "symbols": ["__"], "postprocess": (data, loc, reject) => process("WS", {"gap": "plur"}, [], [], loc)},
+    {"name": "Sentence", "symbols": ["S", "_", {"literal":"."}], "postprocess": (d, l, r) => process("Sentence", {}, d, [{"num":1,"stat":2,"tp":4,"tense":3,"gap":"-"},{},{}], l, r, undefined, undefined)},
+    {"name": "Sentence$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence$subexpression$2", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence", "symbols": ["Sentence$subexpression$1", "_", "NP", "__", "VP_", "_", "Sentence$subexpression$2"], "postprocess": (d, l, r) => process("Sentence", {}, d, [{},{},{"num":1,"gen":5,"case":"+nom","gap":"+"},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3},{},{}], l, r, undefined, undefined)},
+    {"name": "Sentence$subexpression$3", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence$subexpression$4", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence", "symbols": ["Sentence$subexpression$3", "__", "AUX", "__", "NP", "__", "VP", "_", "Sentence$subexpression$4"], "postprocess": (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","fin":"+","tp":5,"tense":4},{},{"num":1,"gen":6,"case":"+nom","gap":"-"},{},{"num":3,"fin":"+","stat":2,"gap":"+","tp":5,"tense":4},{},{}], l, r, undefined, undefined)},
+    {"name": "Sentence$subexpression$5", "symbols": [/[iI]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence$subexpression$6", "symbols": [{"literal":"?"}], "postprocess": function(d) {return d.join(""); }},
+    {"name": "Sentence", "symbols": ["Sentence$subexpression$5", "__", "NP", "__", "ADJ", "_", "Sentence$subexpression$6"], "postprocess": (d, l, r) => process("Sentence", {}, d, [{},{},{"num":"sing","gen":1,"case":"+nom","gap":"-"},{},{},{},{}], l, r, undefined, undefined)},
+    {"name": "S", "symbols": ["NP_", "__", "VP_"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":"-","tp":4,"tense":3}, d, [{"num":1,"gen":5,"case":"+nom","gap":"-"},{},{"num":1,"fin":"+","stat":2,"gap":"-","tp":4,"tense":3}], l, r, undefined, undefined)},
+    {"name": "S", "symbols": ["NP_", "WS", "VP_"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":"+","tp":5,"tense":4}, d, [{"num":1,"gen":6,"case":"+nom","gap":"+"},{"gap":"-"},{"num":1,"fin":"+","stat":2,"gap":"-","tp":5,"tense":4}], l, r, undefined, undefined)},
+    {"name": "S", "symbols": ["NP_", "WS", "VP_"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":"+","tp":5,"tense":4}, d, [{"num":3,"gen":6,"case":"+nom","gap":"+"},{"gap":"-"},{"num":1,"fin":"+","stat":2,"gap":"-","tp":5,"tense":4}], l, r, undefined, undefined)},
+    {"name": "S", "symbols": ["NP_", "__", "VP_"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":"+","tp":5,"tense":4}, d, [{"num":1,"gen":6,"case":"+nom","gap":"-"},{},{"num":1,"fin":"+","stat":2,"gap":"+","tp":5,"tense":4}], l, r, undefined, undefined)},
+    {"name": "VP_", "symbols": ["AUX", "__", "VP"], "postprocess": (d, l, r) => process("VP'", {"num":1,"fin":"+","stat":3,"gap":2,"tp":4,"tense":"fut"}, d, [{"num":1,"fin":"+","tp":4,"tense":"fut"},{},{"num":1,"fin":"-","stat":3,"gap":2,"tp":4,"tense":"pres"}], l, r, undefined, undefined)},
+    {"name": "VP_$subexpression$1", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP_", "symbols": ["AUX", "__", "VP_$subexpression$1", "__", "VP"], "postprocess": (d, l, r) => process("VP'", {"num":1,"fin":"+","stat":3,"gap":2,"tp":5,"tense":"fut"}, d, [{"num":1,"fin":"+","tp":5,"tense":"fut"},{},{},{},{"num":1,"fin":"-","stat":3,"gap":2,"tp":5,"tense":"pres"}], l, r, undefined, undefined)},
+    {"name": "VP_$subexpression$2", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP_", "symbols": ["AUX", "__", "VP_$subexpression$2", "__", "VP"], "postprocess": (d, l, r) => process("VP'", {"num":1,"fin":"+","stat":3,"gap":2,"tp":"-past","tense":"pres"}, d, [{"num":1,"fin":"+","tp":"-past","tense":"pres"},{},{},{},{"num":1,"fin":"-","stat":3,"gap":2,"tp":"-past","tense":"pres"}], l, r, undefined, undefined)},
+    {"name": "VP_$subexpression$3", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP_", "symbols": ["AUX", "__", "VP_$subexpression$3", "__", "VP"], "postprocess": (d, l, r) => process("VP'", {"num":1,"fin":"+","stat":3,"gap":2,"tp":"-past","tense":"past"}, d, [{"num":1,"fin":"+","tp":"-past","tense":"past"},{},{},{},{"num":1,"fin":"-","stat":3,"gap":2,"tp":"-past","tense":"pres"}], l, r, undefined, undefined)},
+    {"name": "VP_", "symbols": ["VP"], "postprocess": (d, l, r) => process("VP'", {"num":1,"fin":"+","stat":3,"gap":2,"tp":5,"tense":4}, d, [{"num":1,"fin":"+","stat":3,"gap":2,"tp":5,"tense":4}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["V", "WS", "NP_"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":"+","tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"trans":"+","tp":6,"tense":5},{"gap":"-"},{"num":3,"gen":7,"case":"-nom","gap":"+"}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["V", "__", "NP_"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":"-","tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"trans":"+","tp":6,"tense":5},{},{"num":3,"gen":7,"case":"-nom","gap":"-"}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["V"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":3,"gap":"-","tp":5,"tense":4}, d, [{"num":1,"fin":2,"stat":3,"trans":"-","tp":5,"tense":4}], l, r, undefined, undefined)},
+    {"name": "NP", "symbols": ["GAP"], "postprocess": (d, l, r) => process("NP", {"num":1,"gen":2,"case":3,"gap":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "NP", "symbols": ["DET", "__", "N"], "postprocess": (d, l, r) => process("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, d, [{"num":1},{},{"num":1,"gen":2}], l, r, undefined, undefined)},
+    {"name": "NP", "symbols": ["PN"], "postprocess": (d, l, r) => process("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, d, [{"num":1,"gen":2}], l, r, undefined, undefined)},
+    {"name": "NP", "symbols": ["PRO"], "postprocess": (d, l, r) => process("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, d, [{"num":1,"gen":2,"case":3,"refl":4}], l, r, undefined, undefined)},
+    {"name": "NP_$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$1", "__", "NP"], "postprocess": (d, l, r) => process("NP'", {"num":"plur","gen":"?","case":2,"gap":"-"}, d, [{"num":3,"gen":5,"case":2,"gap":"-"},{},{},{},{"num":4,"gen":6,"case":2,"gap":"-"}], l, r, (root) => { return node('NP', root.types, root.children, root.loc); }, undefined)},
+    {"name": "NP_", "symbols": ["NP"], "postprocess": (d, l, r) => process("NP'", {"num":1,"gen":2,"case":3,"gap":4}, d, [{"num":1,"gen":2,"case":3,"gap":4}], l, r, (root) => { return root.children[0]; }, undefined)},
+    {"name": "N", "symbols": ["N", "__", "RC"], "postprocess": (d, l, r) => process("N", {"num":1,"gen":2}, d, [{"num":1,"gen":2},{},{"num":1}], l, r, undefined, undefined)},
+    {"name": "RC", "symbols": ["RPRO", "__", "S"], "postprocess": (d, l, r) => process("RC", {"num":1}, d, [{"num":1},{},{"num":1,"stat":2,"gap":"+","tp":4,"tense":3}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["BE", "__", "ADJ"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":"+","gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r, undefined, undefined)},
+    {"name": "VP$subexpression$1", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP", "symbols": ["BE", "__", "VP$subexpression$1", "__", "ADJ"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":"+","gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{},{},{}], l, r, undefined, undefined)},
+    {"name": "VP$subexpression$2", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP", "symbols": ["BE", "__", "VP$subexpression$2", "__", "NP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":7,"tense":6}, d, [{"num":1,"fin":2,"tp":7,"tense":6},{},{},{},{"num":1,"gen":8,"case":5,"gap":3}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["BE", "__", "NP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":7,"tense":6}, d, [{"num":1,"fin":2,"tp":7,"tense":6},{},{"num":1,"gen":8,"case":5,"gap":3}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["BE", "__", "PP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"tp":6,"tense":5},{},{}], l, r, undefined, undefined)},
+    {"name": "N", "symbols": ["ADJ", "__", "N"], "postprocess": (d, l, r) => process("N", {"num":1,"gen":2}, d, [{},{},{"num":1,"gen":2}], l, r, undefined, undefined)},
+    {"name": "S$subexpression$1", "symbols": [/[iI]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "S$subexpression$2", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "S", "symbols": ["S$subexpression$1", "__", "S", "__", "S$subexpression$2", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{},{},{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r, undefined, undefined)},
+    {"name": "S$subexpression$3", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "S", "symbols": ["S", "__", "S$subexpression$3", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"gap":6,"tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":7,"tp":4,"tense":3}], l, r, undefined, undefined)},
+    {"name": "VP$subexpression$3", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP", "symbols": ["VP", "__", "VP$subexpression$3", "__", "VP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":4,"gap":3,"tp":6,"tense":5}], l, r, undefined, undefined)},
+    {"name": "NP_$subexpression$2", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$2", "__", "NP"], "postprocess": (d, l, r) => process("NP'", {"num":3,"gen":4,"case":2,"gap":"-"}, d, [{"num":3,"gen":4,"case":2,"gap":"-"},{},{},{},{"num":3,"gen":4,"case":2,"gap":"-"}], l, r, (root) => { return node('NP', root.types, root.children, root.loc); }, undefined)},
+    {"name": "NP_$subexpression$3", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "NP_", "symbols": ["NP", "__", "NP_$subexpression$3", "__", "NP"], "postprocess": (d, l, r) => process("NP'", {"num":3,"gen":"?","case":2,"gap":"-"}, d, [{"num":3,"gen":4,"case":2,"gap":"-"},{},{},{},{"num":3,"gen":5,"case":2,"gap":"-"}], l, r, (root) => { return node('NP', root.types, root.children, root.loc); }, undefined)},
+    {"name": "S$subexpression$4", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "S", "symbols": ["S", "__", "S$subexpression$4", "__", "S"], "postprocess": (d, l, r) => process("S", {"num":1,"stat":2,"gap":5,"tp":4,"tense":3}, d, [{"num":1,"stat":2,"gap":"-","tp":4,"tense":3},{},{},{},{"num":1,"stat":2,"gap":"-","tp":4,"tense":3}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$1", "symbols": [/[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "__", "V$subexpression$1", "__", "V"], "postprocess": (d, l, r) => process("V", {"num":1,"fin":2,"stat":4,"trans":3,"tp":6,"tense":5}, d, [{"num":1,"fin":2,"stat":7,"trans":3,"tp":6,"tense":5},{},{},{},{"num":1,"fin":2,"stat":8,"trans":3,"tp":6,"tense":5}], l, r, undefined, undefined)},
+    {"name": "NP", "symbols": ["DET", "__", "RN"], "postprocess": (d, l, r) => process("NP", {"num":1,"gen":2,"case":3,"gap":"-"}, d, [{"num":"sing","rn":"+"},{},{"num":1,"gen":2}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$1", "symbols": [{"literal":"'"}, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["PN", "DET$subexpression$1"], "postprocess": (d, l, r) => process("DET", {"num":"sing","rn":"+"}, d, [{"num":1,"gen":2},{}], l, r, undefined, undefined)},
+    {"name": "N", "symbols": ["N", "__", "PP"], "postprocess": (d, l, r) => process("N", {"num":1,"gen":2}, d, [{"num":1,"gen":2},{},{}], l, r, undefined, undefined)},
+    {"name": "PP", "symbols": ["PREP", "__", "NP"], "postprocess": (d, l, r) => process("PP", {}, d, [{},{},{"num":1,"gen":2,"case":3,"gap":"-"}], l, r, undefined, undefined)},
+    {"name": "VP", "symbols": ["HAVE", "__", "VP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":"+","stat":"+","gap":3,"tp":4,"tense":5}, d, [{"num":1,"fin":"+","tp":4,"tense":5},{},{"num":1,"fin":"part","stat":6,"gap":3,"tp":4,"tense":5}], l, r, undefined, undefined)},
+    {"name": "VP$subexpression$4", "symbols": [/[nN]/, /[oO]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "VP", "symbols": ["HAVE", "__", "VP$subexpression$4", "__", "VP"], "postprocess": (d, l, r) => process("VP", {"num":1,"fin":"+","stat":"+","gap":3,"tp":4,"tense":5}, d, [{"num":1,"fin":"+","tp":4,"tense":5},{},{},{},{"num":1,"fin":"part","stat":6,"gap":3,"tp":4,"tense":5}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$2", "symbols": [/[aA]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["DET$subexpression$2"], "postprocess": (d, l, r) => process("DET", {"num":["sing"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$3", "symbols": [/[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["DET$subexpression$3"], "postprocess": (d, l, r) => process("DET", {"num":["sing"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$4", "symbols": [/[eE]/, /[vV]/, /[eE]/, /[rR]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["DET$subexpression$4"], "postprocess": (d, l, r) => process("DET", {"num":["sing"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$5", "symbols": [/[tT]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["DET$subexpression$5"], "postprocess": (d, l, r) => process("DET", {"num":["sing"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "DET$subexpression$6", "symbols": [/[sS]/, /[oO]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "DET", "symbols": ["DET$subexpression$6"], "postprocess": (d, l, r) => process("DET", {"num":["sing"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$1", "symbols": [/[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$1"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"male","case":"+nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$2", "symbols": [/[hH]/, /[iI]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$2"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"male","case":"-nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$3", "symbols": [/[sS]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$3"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"fem","case":"+nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$4", "symbols": [/[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$4"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"fem","case":"-nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$5", "symbols": [/[iI]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$5"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"-hum","case":["-nom","+nom"],"refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$6", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$6"], "postprocess": (d, l, r) => process("PRO", {"num":"plur","gen":["male","fem","-hum"],"case":"+nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$7", "symbols": [/[tT]/, /[hH]/, /[eE]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$7"], "postprocess": (d, l, r) => process("PRO", {"num":"plur","gen":["male","fem","-hum"],"case":"-nom","refl":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$1", "symbols": [/[jJ]/, /[oO]/, /[nN]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$1"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$2", "symbols": [/[jJ]/, /[oO]/, /[hH]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$2"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$3", "symbols": [/[mM]/, /[eE]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$3"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$4", "symbols": [/[lL]/, /[eE]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$4"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$5", "symbols": [/[yY]/, /[uU]/, /[jJ]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$5"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$6", "symbols": [/[sS]/, /[mM]/, /[iI]/, /[tT]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$6"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$7", "symbols": [/[sS]/, /[oO]/, /[cC]/, /[rR]/, /[aA]/, /[tT]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$7"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$8", "symbols": [/[sS]/, /[aA]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$8"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$9", "symbols": [/[mM]/, /[aA]/, /[rR]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$9"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$10", "symbols": [/[dD]/, /[aA]/, /[nN]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$10"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$11", "symbols": [/[aA]/, /[nN]/, /[nN]/, /[aA]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$11"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$12", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$12"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$13", "symbols": [/[iI]/, /[tT]/, /[aA]/, /[lL]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$13"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN$subexpression$14", "symbols": [/[uU]/, /[lL]/, /[yY]/, /[sS]/, /[sS]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PN", "symbols": ["PN$subexpression$14"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$1", "symbols": [/[sS]/, /[tT]/, /[oO]/, /[cC]/, /[kK]/, /[bB]/, /[rR]/, /[oO]/, /[kK]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$1"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$2", "symbols": [/[mM]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$2"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$3", "symbols": [/[eE]/, /[nN]/, /[gG]/, /[iI]/, /[nN]/, /[eE]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$3"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$4", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/, /[iI]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$4"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$5", "symbols": [/[sS]/, /[tT]/, /[oO]/, /[cC]/, /[kK]/, /[bB]/, /[rR]/, /[oO]/, /[kK]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$5"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$6", "symbols": [/[wW]/, /[oO]/, /[mM]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$6"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$7", "symbols": [/[wW]/, /[iI]/, /[dD]/, /[oO]/, /[wW]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$7"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$8", "symbols": [/[eE]/, /[nN]/, /[gG]/, /[iI]/, /[nN]/, /[eE]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$8"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$9", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/, /[iI]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$9"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$10", "symbols": [/[bB]/, /[oO]/, /[oO]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$10"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$11", "symbols": [/[dD]/, /[oO]/, /[nN]/, /[kK]/, /[eE]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$11"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$12", "symbols": [/[hH]/, /[oO]/, /[rR]/, /[sS]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$12"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "N$subexpression$13", "symbols": [/[pP]/, /[oO]/, /[rR]/, /[sS]/, /[cC]/, /[hH]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "N", "symbols": ["N$subexpression$13"], "postprocess": (d, l, r) => process("N", {"num":"sing","gen":"-hum"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "AUX$subexpression$1", "symbols": [/[dD]/, /[oO]/, /[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "AUX", "symbols": ["AUX$subexpression$1"], "postprocess": (d, l, r) => process("AUX", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "AUX$subexpression$2", "symbols": [/[dD]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "AUX", "symbols": ["AUX$subexpression$2"], "postprocess": (d, l, r) => process("AUX", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "AUX$subexpression$3", "symbols": [/[dD]/, /[iI]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "AUX", "symbols": ["AUX$subexpression$3"], "postprocess": (d, l, r) => process("AUX", {"num":1,"fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "AUX$subexpression$4", "symbols": [/[dD]/, /[iI]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "AUX", "symbols": ["AUX$subexpression$4"], "postprocess": (d, l, r) => process("AUX", {"num":1,"fin":"+","tp":"+past","tense":"past"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$2", "symbols": [/[lL]/, /[iI]/, /[kK]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$2"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$3", "symbols": [/[lL]/, /[oO]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$3"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$4", "symbols": [/[aA]/, /[dD]/, /[mM]/, /[iI]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$4"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$5", "symbols": [/[kK]/, /[nN]/, /[oO]/, /[wW]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$5"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$6", "symbols": [/[oO]/, /[wW]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$6"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$7", "symbols": [/[fF]/, /[aA]/, /[sS]/, /[cC]/, /[iI]/, /[nN]/, /[aA]/, /[tT]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$7"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$8", "symbols": [/[rR]/, /[oO]/, /[tT]/, /[aA]/, /[tT]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$8"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$9", "symbols": [/[sS]/, /[uU]/, /[rR]/, /[pP]/, /[rR]/, /[iI]/, /[sS]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$9"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$10", "symbols": [/[lL]/, /[oO]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$10"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$11", "symbols": [/[sS]/, /[tT]/, /[iI]/, /[nN]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$11"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$12", "symbols": [/[sS]/, /[kK]/, /[iI]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$12"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$13", "symbols": [/[pP]/, /[lL]/, /[aA]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$13"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$14", "symbols": [/[aA]/, /[dD]/, /[oO]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$14"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$15", "symbols": [/[lL]/, /[eE]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$15"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$16", "symbols": [/[rR]/, /[eE]/, /[aA]/, /[cC]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$16"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$17", "symbols": [/[kK]/, /[iI]/, /[sS]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$17"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$18", "symbols": [/[hH]/, /[iI]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$18"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$19", "symbols": [/[sS]/, /[cC]/, /[oO]/, /[lL]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$19"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$20", "symbols": [/[bB]/, /[eE]/, /[aA]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$20"], "postprocess": (d, l, r) => process("V", {"trans":"+","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$21", "symbols": [/[lL]/, /[eE]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$21"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$22", "symbols": [/[aA]/, /[rR]/, /[rR]/, /[iI]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$22"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$23", "symbols": [/[wW]/, /[aA]/, /[lL]/, /[kK]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$23"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$24", "symbols": [/[sS]/, /[lL]/, /[eE]/, /[eE]/, /[pP]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$24"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$25", "symbols": [/[cC]/, /[oO]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$25"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V$subexpression$26", "symbols": [/[sS]/, /[hH]/, /[iI]/, /[nN]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V$subexpression$26"], "postprocess": (d, l, r) => process("V", {"trans":"-","stat":"-"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "V", "symbols": ["V"], "postprocess": (d, l, r) => process("V", {"num":1,"fin":"-","stat":3,"trans":2,"tp":4,"tense":"pres"}, d, [{"trans":2,"stat":3}], l, r, (root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc), undefined)},
+    {"name": "V$subexpression$27", "symbols": [/[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$27"], "postprocess":  (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /.*(?<!(s|x|sh|ch|z))$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V$subexpression$28", "symbols": [/[eE]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$28"], "postprocess":  (d, l, r) => process("V", {"num":"sing","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /(s|x|sh|ch|z)$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V", "symbols": ["V"], "postprocess": (d, l, r) => process("V", {"num":"plur","fin":"+","stat":2,"trans":1,"tp":"-past","tense":"pres"}, d, [{"num":"sing","fin":"-","stat":2,"trans":1,"tp":"-past","tense":"pres"}], l, r, (root) => node(root['@type'], root.types, root.children[0].children, root.loc), undefined)},
+    {"name": "V$subexpression$29", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$29"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /.*(?<![aiou])$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V$subexpression$30", "symbols": [/[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$30"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /e$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V$subexpression$31", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$31"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /[aiou]$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V$subexpression$32", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$32"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"+","stat":2,"trans":3,"tp":"+past","tense":"past"}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+           (root) => node(root['@type'], 
+                          root.types, 
+                          [root.children[0].children[0] + root.children[1]],
+                          root.loc,
+                          {"root": root.children[0].children[0]}), function(n) {
+          return /[aeiou]y$/.test(n.children[0].children[0]);
+        }) },
+    {"name": "V$subexpression$33", "symbols": [/[eE]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "V", "symbols": ["V", "V$subexpression$33"], "postprocess":  (d, l, r) => process("V", {"num":1,"fin":"part","stat":2,"trans":3,"tp":4,"tense":5}, d, [{"num":1,"fin":"-","stat":2,"trans":3,"tp":"+past","tense":"pres"},{}], l, r, 
+        (root) => node(root['@type'], 
+                       root.types, 
+                       [root.children[0].children[0] + root.children[1]],
+                       root.loc,
+                       {"root": root.children[0].children[0]}), undefined) },
+    {"name": "RPRO$subexpression$1", "symbols": [/[wW]/, /[hH]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RPRO", "symbols": ["RPRO$subexpression$1"], "postprocess": (d, l, r) => process("RPRO", {"num":["sing","plur"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RPRO$subexpression$2", "symbols": [/[wW]/, /[hH]/, /[iI]/, /[cC]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RPRO", "symbols": ["RPRO$subexpression$2"], "postprocess": (d, l, r) => process("RPRO", {"num":["sing","plur"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$8", "symbols": [/[hH]/, /[iI]/, /[mM]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$8"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"male","case":"-nom","refl":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$9", "symbols": [/[hH]/, /[eE]/, /[rR]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$9"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"fem","case":"-nom","refl":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PRO$subexpression$10", "symbols": [/[iI]/, /[tT]/, /[sS]/, /[eE]/, /[lL]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PRO", "symbols": ["PRO$subexpression$10"], "postprocess": (d, l, r) => process("PRO", {"num":"sing","gen":"-hum","case":"-nom","refl":"+"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "GAP", "symbols": [], "postprocess": (d, l, r) => process("GAP", {}, d, [], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$1", "symbols": [/[hH]/, /[aA]/, /[pP]/, /[pP]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$1"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$2", "symbols": [/[uU]/, /[nN]/, /[hH]/, /[aA]/, /[pP]/, /[pP]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$2"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$3", "symbols": [/[hH]/, /[aA]/, /[nN]/, /[dD]/, /[sS]/, /[oO]/, /[mM]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$3"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$4", "symbols": [/[bB]/, /[eE]/, /[aA]/, /[uU]/, /[tT]/, /[iI]/, /[fF]/, /[uU]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$4"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$5", "symbols": [/[fF]/, /[aA]/, /[sS]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$5"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$6", "symbols": [/[sS]/, /[lL]/, /[oO]/, /[wW]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$6"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$7", "symbols": [/[mM]/, /[oO]/, /[rR]/, /[tT]/, /[aA]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$7"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "ADJ$subexpression$8", "symbols": [/[bB]/, /[rR]/, /[aA]/, /[zZ]/, /[iI]/, /[lL]/, /[iI]/, /[aA]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "ADJ", "symbols": ["ADJ$subexpression$8"], "postprocess": (d, l, r) => process("ADJ", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "BE$subexpression$1", "symbols": [/[iI]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "BE", "symbols": ["BE$subexpression$1"], "postprocess": (d, l, r) => process("BE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "BE$subexpression$2", "symbols": [/[aA]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "BE", "symbols": ["BE$subexpression$2"], "postprocess": (d, l, r) => process("BE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "BE$subexpression$3", "symbols": [/[wW]/, /[aA]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "BE", "symbols": ["BE$subexpression$3"], "postprocess": (d, l, r) => process("BE", {"num":"sing","fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "BE$subexpression$4", "symbols": [/[wW]/, /[eE]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "BE", "symbols": ["BE$subexpression$4"], "postprocess": (d, l, r) => process("BE", {"num":"plur","fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$1", "symbols": [/[hH]/, /[uU]/, /[sS]/, /[bB]/, /[aA]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$1"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$2", "symbols": [/[fF]/, /[aA]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$2"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$3", "symbols": [/[bB]/, /[rR]/, /[oO]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$3"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"male"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$4", "symbols": [/[wW]/, /[iI]/, /[fF]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$4"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$5", "symbols": [/[mM]/, /[oO]/, /[tT]/, /[hH]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$5"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$6", "symbols": [/[sS]/, /[iI]/, /[sS]/, /[tT]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$6"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":"fem"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$7", "symbols": [/[pP]/, /[aA]/, /[rR]/, /[eE]/, /[nN]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$7"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":["male","fem"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$8", "symbols": [/[cC]/, /[hH]/, /[iI]/, /[lL]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$8"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":["male","fem"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "RN$subexpression$9", "symbols": [/[sS]/, /[iI]/, /[bB]/, /[lL]/, /[iI]/, /[nN]/, /[gG]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "RN", "symbols": ["RN$subexpression$9"], "postprocess": (d, l, r) => process("RN", {"num":"sing","gen":["male","fem"]}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$1", "symbols": [/[bB]/, /[eE]/, /[hH]/, /[iI]/, /[nN]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$1"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$2", "symbols": [/[iI]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$2"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$3", "symbols": [/[oO]/, /[vV]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$3"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$4", "symbols": [/[uU]/, /[nN]/, /[dD]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$4"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$5", "symbols": [/[nN]/, /[eE]/, /[aA]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$5"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$6", "symbols": [/[bB]/, /[eE]/, /[fF]/, /[oO]/, /[rR]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$6"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$7", "symbols": [/[aA]/, /[fF]/, /[tT]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$7"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$8", "symbols": [/[dD]/, /[uU]/, /[rR]/, /[iI]/, /[nN]/, /[gG]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$8"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$9", "symbols": [/[fF]/, /[rR]/, /[oO]/, /[mM]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$9"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$10", "symbols": [/[tT]/, /[oO]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$10"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$11", "symbols": [/[oO]/, /[fF]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$11"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$12", "symbols": [/[aA]/, /[bB]/, /[oO]/, /[uU]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$12"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$13", "symbols": [/[bB]/, /[yY]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$13"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$14", "symbols": [/[fF]/, /[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$14"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PREP$subexpression$15", "symbols": [/[wW]/, /[iI]/, /[tT]/, /[hH]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "PREP", "symbols": ["PREP$subexpression$15"], "postprocess": (d, l, r) => process("PREP", {}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN", "symbols": ["FULLNAME"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"?"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "PN", "symbols": ["VAR"], "postprocess": (d, l, r) => process("PN", {"num":"sing","gen":"?"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "AUX$subexpression$5", "symbols": [/[wW]/, /[iI]/, /[lL]/, /[lL]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "AUX", "symbols": ["AUX$subexpression$5"], "postprocess": (d, l, r) => process("AUX", {"num":1,"fin":"+","tp":"-past","tense":"fut"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "HAVE$subexpression$1", "symbols": [/[hH]/, /[aA]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "HAVE", "symbols": ["HAVE$subexpression$1"], "postprocess": (d, l, r) => process("HAVE", {"num":"sing","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "HAVE$subexpression$2", "symbols": [/[hH]/, /[aA]/, /[vV]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "HAVE", "symbols": ["HAVE$subexpression$2"], "postprocess": (d, l, r) => process("HAVE", {"num":"plur","fin":"+","tp":"-past","tense":"pres"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "HAVE$subexpression$3", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "HAVE", "symbols": ["HAVE$subexpression$3"], "postprocess": (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"-past","tense":"past"}, d, [{}], l, r, undefined, undefined)},
+    {"name": "HAVE$subexpression$4", "symbols": [/[hH]/, /[aA]/, /[dD]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "HAVE", "symbols": ["HAVE$subexpression$4"], "postprocess": (d, l, r) => process("HAVE", {"num":1,"fin":"+","tp":"+past","tense":["pres","past"]}, d, [{}], l, r, undefined, undefined)}
+]
+  , ParserStart: "Sentence"
+}
+if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
+   module.exports = grammar;
+} else {
+   window.grammar = grammar;
+}
+})();
+
+},{"./processor.js":10}],8:[function(require,module,exports){
 const nearley = require("nearley");
 const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
@@ -2775,9 +3187,2304 @@ module.exports = {
  }
 }
 
-},{"nearley":6,"nearley/lib/compile":3,"nearley/lib/generate":4,"nearley/lib/nearley-language-bootstrapped":5}],8:[function(require,module,exports){
+},{"nearley":6,"nearley/lib/compile":3,"nearley/lib/generate":4,"nearley/lib/nearley-language-bootstrapped":5}],9:[function(require,module,exports){
+const {Parser} = require("nearley");
+const {ParserRules, ParserStart} = require("./english.js");
 
-},{}],9:[function(require,module,exports){
+let rule = (head = {}, tail = [], post, pre) => { 
+ return {
+  "@type": "Rule", 
+  "head": head, 
+  "tail": tail, 
+  "post": post,
+  "pre": pre,
+ }
+};
+
+let space = (optional = false) => { return optional ? "_" : "__"};
+let term = (name, types) => { return {"@type": "Term", name: name, types: types} };
+let literal = (value) => { return {"@type": "Literal", name: value} };
+let phrase = (head, tail, prod) => { return rule(head, [tail], prod); };
+
+function clone(obj) {
+ return JSON.parse(JSON.stringify(obj));
+}
+
+const FEATURES = {
+ "gap": ["-", "sing", "plur"],
+ "num": ["sing", "plur"],
+ "case": ["+nom", "-nom"],    
+ "trans": ["+", "-"],
+ "fin": ["+", "-", "part"],
+ "stat": ["+", "-"],
+ "refl": ["+", "-"],
+ "tense": ["pres", "past", "fut"],
+ "tp": ["+past", "-past"],
+};
+
+function parse(source, start = "Sentence") {
+ const parser = new Parser(ParserRules, start, {
+   keepHistory: true
+  });
+ parser.feed(source);
+ return parser.results;
+}
+
+
+function grammar() {
+ let result = [];
+
+ // Root
+ result.push(phrase(term("Sentence"),
+                    [term("S", {"num": 1, "stat": 2, "tp": 4, "tense": 3, "gap": "-"}), 
+                     space(true),
+                     '"."']));
+
+ // Questions
+ result.push(phrase(term("Sentence"),
+                    [literal("who"),
+                     space(true),
+                     term("NP", {"num": 1, "gen": 5, "case": "+nom", "gap": "+"}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
+                     space(true),
+                     literal("?")]));
+
+ result.push(phrase(term("Sentence"),
+                    [literal("who"),
+                     space(),
+                     term("AUX", {"num": "sing", "fin": "+", "tp": 5, "tense": 4}),
+                     space(),
+                     term("NP", {"num": 1, "gen": 6, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP", {"num": 3, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                     space(true),
+                     literal("?")]));
+
+ result.push(phrase(term("Sentence"),
+                    [literal("is"),
+                     space(),
+                     term("NP", {"num": "sing", "gen": 1, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("ADJ"),
+                     space(true),
+                     literal("?")]));
+
+ // PS 1
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
+                    [term("NP'", {"num": 1, "gen": 5, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
+ 
+ // PS 2
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                    [term("NP'", {"num": 1, "gen": 6, "case": "+nom", "gap": "+"}),
+                     term("WS", {"gap": "-"}),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
+ 
+ // PS 2.5
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                    [term("NP'", {"num": 3, "gen": 6, "case": "+nom", "gap": "+"}),
+                     term("WS", {"gap": "-"}),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "-", "tp": 5, "tense": 4})]));
+
+ // PS 3
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 5, "tense": 4}),
+                    [term("NP'", {"num": 1, "gen": 6, "case": "+nom", "gap": "-"}),
+                     space(),
+                     term("VP'", {"num": 1, "fin": "+", "stat": 2, "gap": "+", "tp": 5, "tense": 4})]));
+ 
+ // PS 4a
+ // NOTE(goto): this is slightly different in that the "num" variable
+ // is tied to the same variable rather than a different one. This
+ // may be a typo in the paper.
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 4, "tense": "fut"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": 4, "tense": "fut"}),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 4, "tense": "pres"})]));
+ 
+ // PS 4b
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": "fut"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": 5, "tense": "fut"}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": 5, "tense": "pres"})]));
+ 
+ // PS 4c
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "pres"}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"})]));
+ 
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": "-past", "tense": "past"}),
+                    [term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "-", "stat": 3, "gap": 2, "tp": "-past", "tense": "pres"})]));
+ 
+ // PS 5
+ result.push(phrase(term("VP'", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": 4}),
+                    [term("VP", {"num": 1, "fin": "+", "stat": 3, "gap": 2, "tp": 5, "tense": 4})]));
+ 
+ // PS 6
+ // TODO(goto): should we limit tense to ["past", "pres"] per page 684?
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "+", "tp": 6, "tense": 5}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
+                     term("WS", {"gap": "-"}),
+                     term("NP'", {"num": 3, "gen": 7, "case": "-nom", "gap": "+"})]));
+ 
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": "-", "tp": 6, "tense": 5}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 4, "trans": "+", "tp": 6, "tense": 5}),
+                     space(),
+                     term("NP'", {"num": 3, "gen": 7, "case": "-nom", "gap": "-"})]));
+ 
+ // PS 7
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 3, "gap": "-", "tp": 5, "tense": 4}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 3, "trans": "-", "tp": 5, "tense": 4})]));
+ 
+ // PS 8
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "+"}),
+                    [term("GAP")]));
+ 
+ // page 36 makes a simplification, which we introduce back manually:
+ // The intended meaning is that the left-hand side can have either of 
+ // the case values +nom and -nom. 
+ 
+ // PS 9
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                     [term("DET", {"num": 1}), 
+                      space(),
+                      term("N", {"num": 1, "gen": 2})]));
+ 
+ // PS 10
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                    [term("PN", {"num": 1, "gen": 2})]));
+  
+ // PS 11
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                    [term("PRO", {"num": 1, "gen": 2, "case": 3, "refl": 4})]));
+
+ // PS 12
+ result.push(phrase(term("NP'", {"num": "plur", "gen": "?", "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 5,"case": 2, "gap": "-"}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("NP", {"num": 4, "gen": 6, "case": 2, "gap": "-"})], 
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
+ 
+ // PS 12.5
+ result.push(phrase(term("NP'", {"num": 1, "gen": 2, "case": 3, "gap": 4}),
+                    [term("NP", {"num": 1, "gen": 2, "case": 3, "gap": 4})], 
+                    "(root) => { return root.children[0]; }",
+                    ));
+ 
+
+ // PS 13
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                    [term("N", {"num": 1, "gen": 2}),
+                     space(),
+                     term("RC", {"num": 1})]));
+ // PS 14
+ // NOTE(goto): this is in slight disagreement with the book, because it is forcing
+ // the sentence to agree with the relative clause number feature to disallow the
+ // following example:
+ // A stockbroker who DO not love her likes him.
+ // TODO(goto): isn't "S" missing a "fin" feature?
+ result.push(phrase(term("RC", {"num": 1}),
+                     [term("RPRO", {"num": 1}),
+                      space(),
+                      term("S", {"num": 1, "stat": 2, "gap": "+", "tp": 4, "tense": 3})]));
+
+ // PS Adjectives (page 57)
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": "+", "gap": 3, "tp": 6, "tense": 5}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
+                     space(),
+                     term("ADJ")]));
+
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": "+", "gap": 3, "tp": 6, "tense": 5}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("ADJ")]));
+ 
+ // 3.6 Identity and Predication
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("NP", {"num": 1, "gen": 8, "case": 5, "gap": 3})]));
+
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 7, "tense": 6}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 7, "tense": 6}),
+                     space(),
+                     term("NP", {"num": 1, "gen": 8, "case": 5, "gap": 3})]));
+
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+                    [term("BE", {"num": 1, "fin": 2, "tp": 6, "tense": 5}),
+                     space(),
+                     term("PP")]));
+
+ // Adnominal adjectives (page 271)
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                     [term("ADJ"),
+                      space(),
+                      term("N", {"num": 1, "gen": 2})]));
+
+ // Conditionals
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
+                    [literal("if"),
+                     space(),
+                     term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
+                     space(),
+                     literal("then"),
+                     space(),
+                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
+ 
+ // Sentential Disjunctions
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
+                    [term("S", {"num": 1, "stat": 2, "gap": 6, "tp": 4, "tense": 3}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("S", {"num": 1, "stat": 2, "gap": 7, "tp": 4, "tense": 3})]));
+
+ // VP Disjunctions
+ result.push(phrase(term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+                    [term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("VP", {"num": 1, "fin": 2, "stat": 4, "gap": 3, "tp": 6, "tense": 5})]));
+
+ // NP Disjunctions
+ result.push(phrase(term("NP'", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"})], 
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
+
+ result.push(phrase(term("NP'", {"num": 3, "gen": "?", "case": 2, "gap": "-"}),
+                    [term("NP", {"num": 3, "gen": 4, "case": 2, "gap": "-"}),
+                     space(),
+                     literal("or"),
+                     space(),
+                     term("NP", {"num": 3, "gen": 5, "case": 2, "gap": "-"})], 
+                    "(root) => { return node('NP', root.types, root.children, root.loc); }"));
+ 
+ // Sentential Conjunctions
+ result.push(phrase(term("S", {"num": 1, "stat": 2, "gap": 5, "tp": 4, "tense": 3}),
+                    [term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("S", {"num": 1, "stat": 2, "gap": "-", "tp": 4, "tense": 3})]));
+
+ // V Conjunctions
+ result.push(phrase(term("V", {"num": 1, "fin": 2, "stat": 4, "trans": 3, "tp": 6, "tense": 5}),
+                    [term("V", {"num": 1, "fin": 2, "stat": 7, "trans": 3, "tp": 6, "tense": 5}),
+                     space(),
+                     literal("and"),
+                     space(),
+                     term("V", {"num": 1, "fin": 2, "stat": 8, "trans": 3, "tp": 6, "tense": 5})]));
+ 
+ // Non-pronomial possessive phrases
+ result.push(phrase(term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"}),
+                    [term("DET", {"num": "sing", "rn": "+"}), 
+                     space(),
+                     term("RN", {"num": 1, "gen": 2})]));
+
+ result.push(phrase(term("DET", {"num": "sing", "rn": "+"}),
+                    [term("PN", {"num": 1, "gen": 2}), 
+                     literal("'s")]));
+
+ // Noun Prepositional Phrases
+ result.push(phrase(term("N", {"num": 1, "gen": 2}),
+                    [term("N", {"num": 1, "gen": 2}), 
+                     space(),
+                     term("PP")]));
+
+ result.push(phrase(term("PP"),
+                    [term("PREP"),
+                     space(),
+                     term("NP", {"num": 1, "gen": 2, "case": 3, "gap": "-"})]));
+
+ // 17a
+ result.push(phrase(term("VP", {"num": 1, "fin": "+", "stat": "+", "gap": 3, "tp": 4, "tense": 5}),
+                    [term("HAVE", {"num": 1, "fin": "+", "tp": 4, "tense": 5}),
+                     space(),
+                     term("VP", {"num": 1, "fin": "part", "stat": 6, "gap": 3, "tp": 4, "tense": 5})]));
+
+ // 17b
+ result.push(phrase(term("VP", {"num": 1, "fin": "+", "stat": "+", "gap": 3, "tp": 4, "tense": 5}),
+                    [term("HAVE", {"num": 1, "fin": "+", "tp": 4, "tense": 5}),
+                     space(),
+                     literal("not"),
+                     space(),
+                     term("VP", {"num": 1, "fin": "part", "stat": 6, "gap": 3, "tp": 4, "tense": 5})]));
+
+ // LI 1
+ result.push(rule(term("DET", {"num": ["sing"]}),
+                  [[literal("a")], [literal("an")], [literal("every")], [literal("the")], [literal("some")]]));
+ 
+ // LI 2
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "+nom", "refl": "-"}),
+                  [[literal("he")]]));
+ 
+ // LI 3
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom", "refl": "-"}),
+                  [[literal("him")]]));
+ 
+ // LI 4
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "+nom", "refl": "-"}),
+                  [[literal("she")]]));
+ 
+ // LI 5
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom", "refl": "-"}),
+                  [[literal("her")]]));
+ 
+ // LI 6
+ result.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": ["-nom", "+nom"], "refl": "-"}),
+                  [[literal("it")]]));
+  
+ // LI 7
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "+nom", "refl": "-"}),
+                  [[literal("they")]]));
+ 
+ // LI 8
+ result.push(rule(term("PRO", {"num": "plur", "gen": ["male", "fem", "-hum"], "case": "-nom", "refl": "-"}),
+                  [[literal("them")]]));
+ 
+ // LI 9
+ result.push(rule(term("PN", {"num": "sing", "gen": "male"}),
+                  [[literal("Jones")], [literal("John")], [literal("Mel")], [literal("Leo")], [literal("Yuji")], [literal("Smith")], [literal("Socrates")], [literal("Sam")]]));
+ 
+ // LI 10
+ result.push(rule(term("PN", {"num": "sing", "gen": "fem"}),
+                  [[literal("Mary")], [literal("Dani")], [literal("Anna")]]));
+ 
+ // LI 11
+ result.push(rule(term("PN", {"num": "sing", "gen": "-hum"}),
+                  [[literal("Brazil")], [literal("Italy")], [literal("Ulysses")]]));
+ 
+ // LI 12
+ result.push(rule(term("N", {"num": "sing", "gen": "male"}),
+                  [[literal("stockbroker")], [literal("man")], [literal("engineer")], [literal("brazilian")]]));
+ 
+ // LI 13
+ result.push(rule(term("N", {"num": "sing", "gen": "fem"}),
+                  [[literal("stockbroker")], [literal("woman")], [literal("widow")], [literal("engineer")], [literal("brazilian")]]));
+ 
+ // LI 14
+ result.push(rule(term("N", {"num": "sing", "gen": "-hum"}),
+                  [[literal("book")], [literal("donkey")], [literal("horse")], [literal("porsche")]]));
+ 
+ // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+ // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+ // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+ 
+ // LI 15
+ result.push(rule(term("AUX", {"num": "sing", "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("does")]]));
+ 
+ // LI 16
+ result.push(rule(term("AUX", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("do")]]));
+
+ // LI 30
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                   [[literal("did")]]));
+
+ // LI 31
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "+past", "tense": "past"}),
+                   [[literal("did")]]));
+ 
+ // Stative berbs in their inifinitive form.
+ 
+ result.push(rule(term("V", {"trans": "+", "stat": "+"}),
+                  [[literal("like")],
+                   [literal("love")],
+                   [literal("admire")],
+                   [literal("know")],
+                   [literal("own")],
+                   [literal("fascinate")],
+                   [literal("rotate")],
+                   [literal("surprise")],
+                   ]));
+
+ result.push(rule(term("V", {"trans": "-", "stat": "+"}),
+                  [[literal("love")],
+                   [literal("stink")],
+                   [literal("ski")], // TODO(goto): is this a stative verb?
+                   [literal("play")], // TODO(goto): is this a stative verb?
+                   [literal("adore")]]));
+
+ // Non-stative berbs in their inifinitive form.
+ 
+ result.push(rule(term("V", {"trans": "+", "stat": "-"}),
+                  [[literal("leave")],
+                   [literal("reach")],
+                   [literal("kiss")],
+                   [literal("hit")],
+                   [literal("scold")],
+                   [literal("beat")],
+                   ]));
+
+ result.push(rule(term("V", {"trans": "-", "stat": "-"}),
+                  [[literal("leave")],
+                   [literal("arrive")],
+                   [literal("walk")],
+                   [literal("sleep")],
+                   [literal("come")],
+                   [literal("shine")],
+                   ]));
+
+ // LI 17, LI 18 are replaced by LI 48 (page 668).
+ // LI 48
+ result.push(rule(term("V", {"num": 1, "fin": "-", "stat": 3, "trans": 2, "tp": 4, "tense": "pres"}),
+                  [[term("V", {"trans": 2, "stat": 3})]],
+                  "(root) => node(root['@type'], root.types, [root.children[0].children[0]], root.loc)"));
+ 
+ // LI 19
+
+ // Manually expanding into the present / third person.
+ // > Plural nouns are, of course, usually formed by tacking an s onto the singular form
+ // > of the noun, with the familiar regular exceptions (oxen, feet, etc.) and with the proviso that
+ // > when a noun ends on an -s, -x, -sh, -ch or -z, in which case the suffix is not -s but -es.
+ // It seems like the same applies to verbs:
+ // https://parentingpatch.com/third-person-singular-simple-present-verbs/
+ // LI 49
+ function decompose() {
+  return `
+   (root) => node(root['@type'], 
+                  root.types, 
+                  [root.children[0].children[0] + root.children[1]],
+                  root.loc,
+                  {"root": root.children[0].children[0]})`;
+ }
+
+ function endsWith(regex) {
+  let result = [];
+  result.push("function(n) {");
+  result.push(`  return ${regex}.test(n.children[0].children[0]);`);
+  // for (let option of options) {
+  // result.push(`  if (${regex}.test(v)) return ${apply};`);
+  //}
+  // result.push(`  return !${apply};`);
+  result.push("}");
+  return result.join("\n");
+ }
+
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("s")]],
+                  decompose(), endsWith("/.*(?<!(s|x|sh|ch|z))$/")));
+
+ result.push(rule(term("V", {"num": "sing", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}), literal("es")]],
+                  decompose(), endsWith("/(s|x|sh|ch|z)$/")));
+
+ // LI 20
+ // Manually expanding into the present / plural.
+ // > Except for the verb be, plural verb forms we want here - i.e. the third person plural of the
+ // > present tense - are identical with the infinitival forms, which we already have (They were needed
+ // > for negation). 
+ 
+ // LI 50
+ result.push(rule(term("V", {"num": "plur", "fin": "+", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"}),
+                  [[term("V", {"num": "sing", "fin": "-", "stat": 2, "trans": 1, "tp": "-past", "tense": "pres"})]],
+                  "(root) => node(root['@type'], root.types, root.children[0].children, root.loc)"));
+
+ // Past tense
+ // LI 51
+ //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "-past", "tense": "pres"}),
+ //                 [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+ //                 undefined, 
+ //                 undefined,
+ //                 (name, types) => { 
+ //                  return "([inf, s], loc) => { inf.children[0] += s; return inf; }";
+ //                 }
+ //                 ));
+
+ // LI 52
+ // https://www.lawlessenglish.com/learn-english/grammar/simple-past-regular-verbs/
+
+ // This is the catch all ... we should probably do a bette job here being more precise.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose(), endsWith("/.*(?<![aiou])$/")));
+
+
+ // For regular verbs ending in "e", add "d". e.g. hate/hated, seize/seized, assume/assumed, tie/tied, free/freed.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("d")]],
+                  decompose(), endsWith("/e$/")));
+
+ // For regular verbs ending in "a", "i", "o" or "u", add "ed". e.g. ski/skied, echo/echoed.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose(), endsWith("/[aiou]$/")));
+
+ // For regular verbs ending in a vowel + y, e.g. play/played, decay/decayed, enjoy/enjoyed.
+ result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose(), endsWith("/[aeiou]y$/")));
+
+ // For regular verbs ending in a consonant + y, e.g. cry/cried, magnify/magnified
+ // NOTE(goto): this isn't possible to do with the current setup: "cry" + "ed" won't be matched, and to change the root
+ // to "cri" instead would be wrong/bad/hard. We need to figure out a different parsing scheme here.
+ //result.push(rule(term("V", {"num": 1, "fin": "+", "stat": 2, "trans": 3, "tp": "+past", "tense": "past"}),
+ //                 [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+ //                 decompose(), endsWith("/[bcdfghjklmnpqrstvwxys]y$/")));
+
+ // LI 54
+ result.push(rule(term("V", {"num": 1, "fin": "part", "stat": 2, "trans": 3, "tp": 4, "tense": 5}),
+                  [[term("V", {"num": 1, "fin": "-", "stat": 2, "trans": 3, "tp": "+past", "tense": "pres"}), literal("ed")]],
+                  decompose()));
+
+ // LI 21
+ // TODO(goto): here is a first example of syntax that is determined by
+ // the gender of the sentence.
+ // "gen": ["male", "fem"]
+ result.push(rule(term("RPRO", {"num": ["sing", "plur"]}),
+                  [[literal("who")]]));
+ // LI 22
+ // "gen": "-hum"
+ result.push(rule(term("RPRO", {"num": ["sing", "plur"]}),
+                   [[literal("which")]]));
+ 
+ // LI 23
+ result.push(rule(term("PRO", {"num": "sing", "gen": "male", "case": "-nom", "refl": "+"}),
+                  [[literal("himself")]]));
+
+ // LI 24
+ result.push(rule(term("PRO", {"num": "sing", "gen": "fem", "case": "-nom", "refl": "+"}),
+                  [[literal("herself")]]));
+
+ // LI 25
+ result.push(rule(term("PRO", {"num": "sing", "gen": "-hum", "case": "-nom", "refl": "+"}),
+                  [[literal("itself")]]));
+
+ // GAP
+ result.push(rule(term("GAP"),
+                  [["null"]]));
+
+ // ADJ
+ result.push(rule(term("ADJ"),
+                  [[literal("happy")], [literal("unhappy")], [literal("handsome")], [literal("beautiful")], [literal("fast")], [literal("slow")], [literal("mortal")], [literal("brazilian")]]));
+
+ // BE
+ result.push(rule(term("BE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "pres"}),
+                  [[literal("is")]]));
+
+ result.push(rule(term("BE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
+                  [[literal("are")]]));
+
+ result.push(rule(term("BE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "past"}),
+                  [[literal("was")]]));
+
+ result.push(rule(term("BE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "past"}),
+                  [[literal("were")]]));
+
+ // Relative Nouns
+ result.push(rule(term("RN", {"num": "sing", "gen": "male"}),
+                  [[literal("husband")], 
+                   [literal("father")], 
+                   [literal("brother")],
+                   ]));
+
+ result.push(rule(term("RN", {"num": "sing", "gen": "fem"}),
+                  [[literal("wife")], 
+                   [literal("mother")], 
+                   [literal("sister")]]));
+
+ result.push(rule(term("RN", {"num": "sing", "gen": ["male", "fem"]}),
+                  [[literal("parent")], 
+                   [literal("child")], 
+                   [literal("sibling")]]));
+
+ // to, of, about, at, before, after, by, behind, during, for,
+ // from, in, over, under and with.
+ // ADJ
+ result.push(rule(term("PREP"),
+                  [
+                   // location
+                   [literal("behind")],
+                   [literal("in")],
+                   [literal("over")],
+                   [literal("under")],
+                   [literal("near")],
+                   // time
+                   [literal("before")], 
+                   [literal("after")], 
+                   [literal("during")],
+                   // general
+                   [literal("from")],
+                   [literal("to")], 
+                   [literal("of")], 
+                   [literal("about")], 
+                   [literal("by")],
+                   [literal("for")],
+                   [literal("with")],
+                   ]));
+
+ // Extensible proper names.
+ result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
+                    [term("FULLNAME")]));
+
+ // Variables
+ result.push(phrase(term("PN", {"num": "sing", "gen": "?"}),
+                    [term("VAR")]));
+
+ // LI 33
+ result.push(rule(term("AUX", {"num": 1, "fin": "+", "tp": "-past", "tense": "fut"}),
+                   [[literal("will")]]));
+
+ // LI 44
+ result.push(rule(term("HAVE", {"num": "sing", "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("has")]]));
+ 
+ // LI 45
+ result.push(rule(term("HAVE", {"num": "plur", "fin": "+", "tp": "-past", "tense": "pres"}),
+                   [[literal("have")]]));
+ // LI 46
+ result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "-past", "tense": "past"}),
+                   [[literal("had")]]));
+
+ // LI 47
+ result.push(rule(term("HAVE", {"num": 1, "fin": "+", "tp": "+past", "tense": ["pres", "past"]}),
+                   [[literal("had")]]));
+ 
+ return result;
+}
+
+function node(type, ...children) {
+ return {"@type": type, "children": children} 
+}
+
+function clean(node) {
+ if (Array.isArray(node)) {
+  for (let entry of node) {
+   if (entry) {
+    clean(entry);
+   }
+  }
+ } else if (typeof node == "object") {
+  delete node.types;
+  delete node.loc;
+  delete node.root;
+  clean(node.children);
+ }
+ return node;
+}
+
+function first(results, types = false) {
+ let root = clone(results[0]).children[0];
+ return types ? root : clean(root);
+}
+
+module.exports = {
+ space: space,
+ rule: rule,
+ term: term,
+ rule: rule,
+ phrase: phrase,
+ literal: literal,
+ clone: clone,
+ parse: parse,
+ grammar: grammar,
+ first: first,
+ clean: clean,
+ nodes: {
+  S: (...children) => node("S", ...children),
+  NP: (...children) => node("NP", ...children),
+  NP_: (...children) => node("NP'", ...children),
+  PN: (...children) => node("PN", ...children),
+  VP_: (...children) => node("VP'", ...children),
+  VP: (...children) => node("VP", ...children),
+  V: (...children) => node("V", ...children),
+  BE: (...children) => node("BE", ...children),
+  HAVE: (...children) => node("HAVE", ...children),
+  DET: (...children) => node("DET", ...children),
+  N: (...children) => node("N", ...children),
+  RN: (...children) => node("RN", ...children),
+  PRO: (...children) => node("PRO", ...children),
+  AUX: (...children) => node("AUX", ...children),
+  RC: (...children) => node("RC", ...children),
+  RPRO: (...children) => node("RPRO", ...children),
+  GAP: (...children) => node("GAP", ...children),
+  ADJ: (...children) => node("ADJ", ...children),
+  PP: (...children) => node("PP", ...children),
+  PREP: (...children) => node("PREP", ...children),
+  Discourse: (...children) => node("Discourse", ...children),
+  Sentence: (...children) => node("Sentence", ...children),
+ }
+};
+
+},{"./english.js":7,"nearley":6}],10:[function(require,module,exports){
+function capture(a, b) {
+ let result = {};
+ if (Object.entries(a).length != Object.entries(b).length) {
+  return false;
+ }
+ for (let [key, value] of Object.entries(b)) {
+  if (typeof value == "number") {
+   if (a[key] == undefined) {
+    // console.log("hi");
+    return false;
+   } else {
+    result[value] = a[key];
+   }
+  } else if (typeof value == "string") {
+   if (a[key] == undefined) {
+    return false;
+   } else if (typeof a[key] == "number") {
+    // uses a different namespace for
+    // the variables from children.
+    result["@" + a[key]] = value;
+   } else if (Array.isArray(a[key])) {
+    if (!a[key].includes(value)) {
+     return false;
+    }
+   } else if (a[key] != value) {
+    return false;
+   }
+  }
+ }
+ return result;
+}
+
+function match(a, b) {
+ if (a.length != b.length) {
+  return false;
+ }
+   
+ let result = {};
+
+ for (let i = 0; i < a.length; i++) {
+  let binding = capture(a[i], b[i]);
+  if (!binding) {
+   return false;
+  }
+  // console.log(binding);
+  for (let [key, value] of Object.entries(binding)) {
+   if (result[key] == undefined) {
+    result[key] = value;
+    // console.log(value);
+   } else if (typeof value == "number") {
+    result[value] = result[key];
+   } else if (typeof result[key] == "string") {
+    // console.log(result[key]);
+    // console.log(value);
+    if (Array.isArray(value)) {
+     // console.log(key);
+     // console.log("hi");
+     if (!value.includes(result[key])) {
+      return false;
+     }
+    } else if (result[key] != value) {
+     return false;
+    }
+    // return false;
+   }
+  }
+ }
+
+ return result;
+}
+
+function merge(rule, bindings) {
+ let result = JSON.parse(JSON.stringify(rule));
+
+ //console.log(rule);
+ //console.log(bindings);
+
+ for (let [key, value] of Object.entries(rule)) {
+  if (typeof value == "number") {
+   // console.log(bindings);
+   if (bindings[value] != undefined ||
+       bindings["@" +value] != undefined) {
+    // console.log(rule);
+    // console.log(bindings);
+    result[key] = bindings[value] || bindings["@" + value];
+   }
+  }
+ }
+ return result;
+}
+  
+
+function resolve(features, children, conditions) {
+ let bindings = match(children, conditions);
+ if (!bindings) {
+  return false;
+ }
+ let result = merge(features, bindings);
+ return result;
+}
+
+function node(type, types = {}, children = [], loc = 0, extras = {}) {
+  return Object.assign({
+    "@type": type,
+    "types": types,
+    "children": children
+      .filter(child => child != null)
+      .filter(child => child["@type"] != "WS")
+      .filter(child => child != '.'),
+    "loc": loc
+  }, extras);
+}
+
+function process(type, types, data, conditions, location, reject, post = ((x) => x), pre = ((x) => true)) {
+ // console.log(type);
+ // console.log(JSON.stringify(data));
+ let children = data.map(c => c || {}).map(c => c.types || {});
+ //console.log(data);
+ // console.log(data.map(c => c || {}).map(c => c["@type"] || {}));
+ // console.log(children);
+ // console.log(JSON.stringify(data, 2, undefined));
+ // console.log(conditions);
+ // console.log("child: " + JSON.stringify(children));
+ // console.log("conds: " + JSON.stringify(conditions));
+ let result = resolve(types, children, conditions);
+ if (!result) {
+  // console.log("Rejecting");
+  return reject;
+ }
+ // console.log("yay!");
+ //console.log("types" + JSON.stringify(types));
+ //console.log("result: " + JSON.stringify(result));
+ // console.log(JSON.stringify(result, 2, undefined));
+ for (let [key, value] of Object.entries(result)) {
+  if (typeof value == "number") {
+   let rule = [];
+   rule.push(`${type}${JSON.stringify(types)}`);
+   rule.push("=>");
+   for (let i = 0; i < conditions.length; i++) {
+    rule.push(`${(data[i] || {})["@type"] || "*"}${JSON.stringify(conditions[i])}`);
+   }
+
+   let hash = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+   let namespace = hash(rule.join(" "));
+
+   result[key] = namespace + value;
+  }
+ }
+
+ let n = node(type, result, data, location);
+
+ if (!pre(n)) {
+  return reject;
+ }
+
+ return post(n);
+}
+
+module.exports = {
+ capture: capture,
+ match: match,
+ merge: merge,
+ resolve: resolve,
+ process: process,
+ node: node,
+};
+
+},{}],11:[function(require,module,exports){
+const {
+    parser, 
+    term, 
+    rule, 
+    phrase, 
+    space, 
+    clone, 
+    literal, 
+    compile, 
+    generate, 
+    expand, 
+    collect, 
+    processor, 
+    grammar,
+    clean} = require("./parser.js");
+
+const {parse, first, nodes} = require("./nearley.js");
+
+const {
+ S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
+  Discourse, Sentence, Statement, Question
+} = nodes;
+
+
+function transcribe(node, refs) {
+ if (typeof node == "string") {
+  return node;
+ } else  if (node["@type"] == "Referent") {
+  if (refs) {
+   // de-reference referents
+   return refs.find(ref => ref.name == node.name).value;
+  }
+  return node.name;
+ } else if (node["@type"] == "Predicate") {
+  // console.log(node);
+  return node.print();
+ } else if (node["@type"] == "V" && node.root) {
+  return node.root;
+ }
+ //else if (node["@type"] == "S") {
+ // console.log(node);
+ //}
+
+ // console.log(node);
+
+ let result = [];
+ for (let child of node.children || []) {
+  result.push(transcribe(child, refs));
+ }
+
+ let suffix = node.ref ? `(${node.ref.name})` : "";
+ let prefix = node.neg ? "~" : "";
+
+ // prefix = node.time ? `${node.time.print()}: ${prefix}` : prefix;
+ //if (node.types.tense) {
+ // console.log(node);
+ //}
+
+ // console.log(node);
+ let time = "";
+ switch (node.time) {
+  case "past": 
+   time = "< ";
+   break;
+  case "fut": 
+   time = "> ";
+   break;
+ }
+ return time + prefix + result.join(" ").trim() + suffix;
+}
+
+let capture = (name) => { return {"@type": "Match", "name": name} };
+  
+function match(a, b) {
+ if (!a || !b) {
+  return false;
+ }
+
+ if (a["@type"] != b["@type"]) {
+  return false;
+ }
+ 
+ let result = {};
+ 
+ for (let i = 0; i < a.children.length; i++) {
+  if (typeof a.children[i] == "string") {
+   if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
+    // console.log(a.children[i]);
+    // console.log("hi");
+    // console.log(`${a.children[i]} != ${b.children[i]}`);
+    return false;
+   }
+  } else if (a.children[i]["@type"] == "Match") {
+   result[a.children[i].name] = b;
+   continue;
+  } else {
+   //console.log(a);
+   //console.log(b);
+   let capture = match(a.children[i], b.children[i]);
+   if (!capture) {
+    return false;
+   }
+
+   result = Object.assign(result, capture);
+  }
+ }
+
+ return result;
+}
+
+class Ids {
+ constructor() {
+  this.gen = (function*() {
+    let i = 0;
+    while (true) {
+     let char = i % 26;
+     let round = Math.floor(i / 26);
+     yield `${String.fromCharCode(97 + char)}${round > 0 ? round : ""}`;
+     i++;
+    }
+   })();
+ }
+ get(prefix) {
+  if (prefix) {
+   this.id = this.id == undefined ? 0 : (this.id + 1);
+   return `${prefix}${this.id}`;
+  }
+  return this.gen.next().value;
+ }
+}
+
+class Rule {
+ constructor(ids, trigger) {
+  this.ids = ids || new Ids();
+  this.trigger = trigger;
+ }
+ 
+ match(node, refs) {
+  let result = match(this.trigger, node);
+
+  // console.log(this.trigger);
+  // console.log(node);
+
+  if (!result) {
+   return [[], [], [], []];
+  }
+
+  return this.apply(result, node, refs);
+ }
+
+ id(prefix) {
+  return this.ids.get(prefix);
+ }
+}
+
+class CompositeRule extends Rule {
+ constructor(rules) {
+  super();
+  this.rules = rules;
+ }
+ match(node, refs) {
+  let result = [[], [], [], []];
+  for (let rule of this.rules) {
+   let [head, body, drs, remove] = rule.match(node, refs);
+   result[0].push(...head);
+   result[1].push(...body);
+   result[2].push(...drs);
+   result[3].push(...remove);
+  }
+  return result;
+ }
+}
+
+function print(node, refs) {
+ return transcribe(node, refs);
+}
+
+function child(node, ...path) {
+ let result = node;
+ for (let i of path) {
+  result = result.children[i];
+ }
+ return result;
+}
+
+function find({gen, num}, refs, name, loc, exclude = []) {
+ let match = (ref) => {
+  let byName = name ? ref.value == name : true;
+  let types = ref.types || {};
+  // console.log(`I have a name=${ref.name} num=${types.num} gen=${types.gen} @${ref.loc}`);
+  if (!byName || types.num != num || ref.loc > loc) {
+   return false;
+  } else if (exclude.map(x => x.name).includes(ref.name)) {
+   return false;
+  } else if (types.gen == "?") {
+   types.gen = gen;
+   return true;
+  }
+  return types.gen == gen;
+ };
+
+ // console.log(`Trying to find a num=${num} gen=${gen} loc=${loc} excluding=${exclude.map(x => x.name).join(", ")}`);
+
+ for (let i = refs.length - 1; i >= 0; i--) {
+  if (match(refs[i])) {
+   return refs[i];
+  }
+ }
+
+ return undefined;
+}
+
+function referent(name, types, value, loc) {
+  return {
+   "@type": "Referent",
+    types: types,
+    name: name,
+    value: value,
+    loc: loc,
+    print() {
+    return `${this.name}`;
+   }
+  }
+}
+
+function predicate(name, children, neg, time) {
+  return {
+   "@type": "Predicate",
+    name: name,
+    children: children,
+    neg: neg,
+    time: time,
+    print() {
+      let children = [];
+      for (let child of this.children) {
+       children.push(print(child));
+      }
+      let n = neg ? "~" : "";
+      let e = "";
+      if (time == "past") {
+       e = "< ";
+      } else if (time == "fut") {
+       e = "> ";
+      }
+      return `${e}${n}${this.name}(${children.join(", ")})`;
+   }
+  }
+}
+
+class CRSPN extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(PN(capture("name"))), VP_()));
+ }
+
+ apply({name}, node, refs = []) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, print(name.children[0]), name.loc);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, print(name, refs), name.loc);
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+
+  node.children[0] = ref;
+
+  return [head, body, [], []];
+ }
+}
+
+class CRVPPN extends Rule {
+ constructor(ids) {
+  super(ids, VP(capture("v"), NP(PN(capture("name")))));
+ }
+ apply({name}, node, refs = []) {
+  // console.log(name);
+
+  let head = [];
+  let body = [];
+  let ref = find(name.types, refs, name.children[0], name.loc);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, name.children[0], name.loc);
+   // console.log(ref);
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+
+  node.children[1].children[0] = ref;
+
+  return [head, body, [], []];
+ }
+}
+
+class CRDETPN extends Rule {
+ constructor(ids) {
+  super(ids, DET(NP(PN(capture("name"))), "'s"));
+ }
+ apply({name}, node, refs) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, print(name));
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+  
+  node.children[0] = ref;
+
+  // console.log(node);
+
+  return [head, body, [], []];
+ }
+}
+
+class CRPPPN extends Rule {
+ constructor(ids) {
+  super(ids, PP(PREP(), NP(PN(capture("name")))));
+ }
+ apply({name}, node, refs) {
+  let head = [];
+  let body = [];
+
+  let ref = find(name.types, refs, name.children[0]);
+
+  if (!ref) {
+   ref = referent(this.id(), name.types, print(name));
+   head.push(ref);
+   let pn = name;
+   pn.ref = ref;
+   body.push(pn);
+  }
+  
+  node.children[1] = ref;
+
+  return [head, body, [], []];
+ }
+}
+
+class CRPN extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids), new CRPPPN(ids)]);
+ }
+}
+
+class CRSPRO extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(PRO(capture("pronoun"))), VP_(capture("?"))));
+ }
+
+ apply({pronoun}, node, refs) {
+  let u = find(pronoun.types, refs, undefined, pronoun.loc);
+
+  // console.log(pronoun.loc);
+  // console.log(refs);
+
+  if (!u) {
+   throw new Error("Invalid reference: " + pronoun.children[0]);
+  }
+
+  node.children[0] = u;
+
+  return [[], [], [], []];
+ }
+}
+
+class CRVPPRO extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("sub"),
+               VP_(VP(V(), NP(PRO(capture("pro")))))
+               ));
+ }
+
+ apply({sub, pro}, node, refs) {
+  // Exclude the subject if the pronoun is non-reflexive.
+  let exclude = pro.types.refl == "-" ? [child(sub, 0)] : [];
+  let ref = find(pro.types, refs, undefined, undefined, exclude);
+
+  if (!ref) {
+   throw new Error("Invalid Reference: " + pro.children[0]);
+  }
+
+  child(node, 1, 0).children[1] = ref;
+  
+  return [[], [], [], []];
+ }
+}
+
+class CRPRO extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPRO(ids), new CRVPPRO(ids)]);
+ }
+}
+
+class CRSID extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_()));
+ }
+
+ apply({det, noun}, node, refs) {
+  if (typeof det.children[0] != "string" ||
+      det.children[0].toLowerCase() != "a") {
+   return [[], [], [], []];
+  }
+
+  // console.log("hi");
+
+  let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
+  noun.ref = ref;
+  node.children[0] = ref;
+
+  return [[ref], [noun], [], []];
+ }
+}
+
+class CRVPID extends Rule {
+ constructor(ids) {
+  super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
+ }
+
+ apply({det, noun}, node, refs) {
+  if (!(det.children[0] == "a" || det.children[0] == "an")) {
+   return [[], [], [], []];
+  }
+
+  let types = clone(noun.types);
+  Object.assign(types, child(noun, 0).types);
+
+  let ref = referent(this.id(), types, print(child(node, 1), refs));
+  noun.ref = ref;
+  node.children[1] = ref;
+
+  return [[ref], [noun], [], []];
+ }
+}
+
+class CRID extends CompositeRule {
+ constructor(ids) {
+  super([new CRSID(ids), new CRVPID(ids)]);
+ }
+}
+
+class CRNLIN extends Rule {
+ constructor(ids) {
+  super(ids, N(capture("noun")));
+ }
+
+ apply({noun}, node) {
+  if (!node.ref ||
+      node.children.length != 1) {
+   return [[], [], [], []];
+  }
+
+  let pred = predicate(child(noun, 0), [node.ref], node.neg, node.time);
+  
+  return [[], [pred], [], [node]];
+ }
+}
+
+class CRPPLIN extends Rule {
+ constructor(ids) {
+  super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), capture("np"))));
+ }
+ apply({noun, prep, np}, node) {
+  if (!node.ref) {
+   return [[], [], [], []];
+  }
+
+  // console.log(node);
+
+  noun.ref = node.ref;
+  let cond = S(node.ref, VP_(VP(V(prep), child(np, 1))));
+
+  // noun.neg = node.neg;
+
+  return [[], [noun, cond], [], [node]];
+ }
+}
+
+class CRLIN extends CompositeRule {
+ constructor(ids) {
+  super([new CRNLIN(ids), new CRPPLIN(ids)]);
+ }
+}
+
+class CRNRC extends Rule {
+ constructor(ids) {
+  super(ids, N(N(), RC(capture("rc"))));
+ }
+
+ apply(m, node) {
+  let head = [];
+  let body = [];
+  let remove = [];
+  
+  let rc = node.children.pop();
+    
+  let s = rc.children[1];
+  
+  const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
+
+  if (match(g1, s)) {
+   child(s, 1, 2, 1).children[0] = node.ref;
+  }
+
+  // Binds gap to the referent.
+  let object = child(s, 1, 0, 1);
+  if (object && object.children[0]["@type"] == "GAP") {
+   object.children[0] = node.ref;
+  }
+  
+  let subject = s.children[0];
+  if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
+   s.children[0] = node.ref;
+  }
+  
+  let noun = node.children.pop();
+  noun.ref = node.ref;
+  body.push(noun);
+  remove.push(node);
+  
+  body.push(s);
+    
+  return [head, body, [], remove];
+ }
+}
+
+class CRNEG extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("np"), VP_(AUX(), "not", VP(capture("vp")))));
+ }
+
+ apply({np, vp}, node, refs) {
+  let sub = drs(this.ids);
+  sub.head = clone(refs);
+  sub.head.forEach(ref => ref.closure = true);
+  sub.neg = true;
+
+  let s = clone(node);
+  // console.log(s);
+  child(s, 1).children.splice(0, 2);
+  // console.log(child(node, 1));
+
+  sub.push(s);
+
+  return [[], [sub], [], [node]];
+ }
+}
+
+class CRPOSBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
+ }
+ apply({ref, adj}, node, refs) {
+  adj.ref = ref.children[0];
+  if (node.types && node.types.tense) {
+   adj.time = node.types.tense;
+  }
+  return [[], [adj], [], [node]];
+ }
+}
+
+class CRPREPBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE("is"), PP(PREP(capture("prep")), capture("np"))))));
+ }
+ apply({ref, prep, np}, node, refs) {
+  // console.log("hi");
+  //console.log(print(node));
+  let s = S(child(ref, 0), VP_(VP(V(child(prep, 0)), child(np, 1))));
+  // console.log(print(child(np, 1)));
+  // console.log(child(s, 1, 0, 1, 1));
+  return [[], [s], [], [node]];
+ }
+}
+
+class CRNEGBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
+ }
+ apply({ref, adj}, node, refs) {
+  adj.ref = ref.children[0];
+  adj.neg = true;
+
+  if (node.types && node.types.tense) {
+   adj.time = node.types.tense;
+  }
+
+  return [[], [adj], [], [node]];
+ }
+}
+
+class CRNBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), NP(DET(capture("det")), N(capture("noun")))))));
+ }
+ apply({ref, det, noun}, node, refs) {
+  let np = clone(noun);
+  np.ref = child(ref, 0);
+
+  // Matches the DRS found in (3.57) on page 269.
+
+  if (node.types && node.types.tense) {
+   np.time = node.types.tense;
+  }
+
+  return [[], [np], [], [node]];
+ }
+}
+
+class CRNEGNBE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("ref"), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
+ }
+ apply({ref, det, noun}, node, refs) {
+  let sub = drs(this.ids);
+
+  sub.head = clone(refs);
+  sub.head.forEach(ref => ref.closure = true);
+  // sub.neg = true;
+
+  let np = clone(noun);
+  np.ref = child(ref, 0);
+
+  // Matches the DRS found in (3.57) on page 269.
+
+  if (node.types && node.types.tense) {
+   np.time = node.types.tense;
+  }
+
+  sub.push(np);
+
+  return [[], [negation(sub)], [], [node]];
+ }
+}
+
+class CRBE extends CompositeRule {
+ constructor(ids) {
+  super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids), new CRNEGNBE(ids), new CRPREPBE(ids)]);
+ }
+}
+
+class CRCOND extends Rule {
+ constructor(ids) {
+  super(ids, S("if", capture("head"), "then", capture("tail")));
+ }
+ apply({head, tail}, node, refs) {
+  let antecedent = drs(this.ids);
+  antecedent.head.push(...clone(refs));
+  antecedent.head.forEach(ref => ref.closure = true);
+  antecedent.push(head.children[1]);
+   
+  let consequent = drs(this.ids);
+  consequent.head.push(...clone(antecedent.head));
+  consequent.head.forEach(ref => ref.closure = true);
+  consequent.push(tail.children[3]);
+   
+  return [[], [implication(antecedent, consequent)], [], [node]];
+ }
+}
+
+class CREVERY extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb"))));
+ }
+ apply({noun, verb}, node, refs) {
+  let ref = referent(this.id(), noun.types);
+  let n = drs(this.ids);
+  n.head.push(...clone(refs));
+  n.head.forEach(ref => ref.closure = true);
+  n.head.push(ref);
+  noun.ref = ref;
+  // console.log(noun);
+  n.push(noun);
+
+  let v = drs(this.ids);
+  v.head.push(...clone(n.head));
+  v.head.forEach(ref => ref.closure = true);
+
+  let s = clone(node);
+
+  // console.log(child(s, 0, 0, 0).children[0]);
+
+  s.children[0] = ref;
+  // console.log(print(s));
+  v.push(s);
+
+  let result = implication(n, v);
+   
+  return [[], [result], [], [node]];
+ }
+}
+
+class CRVPEVERY extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
+ }
+ apply({subject, noun}, node, refs) {
+  let ref = referent(this.id(), noun.types);
+  let n = drs(this.ids);
+  n.head.push(...clone(refs));
+  n.head.forEach(ref => ref.closure = true);
+  n.head.push(ref);
+  noun.ref = ref;
+  n.push(noun);
+   
+  let verb = drs(this.ids);
+  verb.head.push(...clone(n.head));
+  verb.head.forEach(ref => ref.closure = true);
+
+  let s = clone(node);
+
+  child(s, 1, 0).children[1] = ref;
+  verb.push(s);
+  
+  return [[], [implication(n, verb)], [], [node]];
+ }
+}
+
+class CROR extends Rule {
+ constructor(ids) {
+  super(ids, S(S(capture("a")), "or", S(capture("b"))));
+ }
+ apply({a, b}, node, refs) {
+  let first = drs(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(a);
+
+  let second = drs(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(b);
+  
+  return [[], [disjunction(first, second)], [], [node]];
+ }
+}
+
+class CRVPOR extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("n"), VP_(VP(VP(capture("a")), "or", VP(capture("b"))))));
+ }
+ apply({a, b, n}, node, refs) {
+  let first = drs(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(S(clone(n.children[0]), VP_(a)));
+
+  let second = drs(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(S(clone(n.children[0]), VP_(b)));
+  
+  return [[], [disjunction(first, second)], [], [node]];
+ }
+}
+
+class CRNPOR extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(NP(capture("first")), "or", NP(capture("second"))), 
+               VP_(capture("vp"))));
+ }
+ apply({first, second, vp}, node, refs) {
+  let a = drs(this.ids);
+  a.head.push(...clone(refs));
+  a.head.forEach(ref => ref.closure = true);
+  a.push(S(first, VP_(clone(vp))));
+
+  let b = drs(this.ids);
+  b.head.push(...clone(a.head));
+  b.head.forEach(ref => ref.closure = true);
+  b.push(S(second, VP_(clone(vp))));
+  
+  return [[], [disjunction(a, b)], [], [node]];
+ }
+}
+
+class CRSAND extends Rule {
+ constructor(ids) {
+  super(ids, S(S(capture("a")), "and", S(capture("b"))));
+ }
+ apply({a, b}, node, refs) {
+  let first = drs(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(a);
+
+  let second = drs(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(b);
+  
+  return [[], [conjunction(first, second)], [], [node]];
+ }
+}
+
+class CRVPAND extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("subject"), VP_(VP(V(V(capture("a")), "and", V(capture("b"))), NP(capture("object"))))));
+ }
+ apply({subject, a, b, object}, node, refs) {
+  let first = drs(this.ids);
+  first.head.push(...clone(refs));
+  first.head.forEach(ref => ref.closure = true);
+  first.push(S(clone(subject.children[0]), VP_(VP(a, clone(object)))));
+
+  let second = drs(this.ids);
+  second.head.push(...clone(first.head));
+  second.head.forEach(ref => ref.closure = true);
+  second.push(S(clone(subject.children[0]), VP_(VP(b, clone(object)))));
+  
+  return [[], [conjunction(first, second)], [], [node]];
+ }
+}
+
+class CRAND extends CompositeRule {
+ constructor(ids) {
+  super([new CRSAND(ids), new CRVPAND(ids)]);
+ }
+}
+
+// Possessive Phrases
+class CRSPOSS extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+ }
+
+ apply({name, noun, verb}, node, refs) {
+  let u = referent(this.id(), noun.types, print(child(node, 0), refs));
+  node.children[0] = u;
+  node.ref = u;
+
+  let s = S(u, VP_(VP(V(noun), name.children[0])));
+
+  return [[u], [s], [], []];
+ }
+}
+
+class CRVPPOSS extends Rule {
+ constructor(ids) {
+  super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+ }
+
+ apply({name, noun, verb}, node, refs) {
+  // console.log("hi");
+  
+  let u = referent(this.id(), noun.types, print(child(node, 1), refs));
+  node.children[1] = u;
+
+  let s = S(u, VP_(VP(V(noun), name.children[0])));
+
+  return [[u], [s], [], []];
+ }
+}
+
+class CRPOSS extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPOSS(ids), new CRVPPOSS(ids)]);
+ }
+}
+
+class CRADJ extends Rule {
+ constructor(ids) {
+  super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
+ }
+ apply({adj, noun}, node, refs) {
+  adj = clone(adj);
+  noun = clone(noun);
+  adj.ref = node.ref;
+  noun.ref = node.ref;
+  return [[], [noun, adj], [], [node]];
+ }
+}
+
+class CRSPP extends Rule {
+ constructor(ids) {
+  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), VP_()));
+ }
+ apply({noun, prep, np}, node, refs) {
+  let u = referent(this.id(), noun.types);
+  u.value = print(child(node, 0), refs);
+
+  if (child(node, 0, 0)["@type"] == "DET" &&
+      child(node, 0, 0, 0) == "Every") {
+   child(node, 0).children[1] = u;
+  } else {
+   node.children[0] = u;
+  }
+
+  noun.ref = u;
+  let cond = S(u, VP_(VP(V(prep), child(np, 1))));
+
+  return [[u], [noun, cond], [], []];
+ }
+}
+
+class CRVPPP extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("subject"), 
+               VP_(VP(V(), 
+                      NP(DET(), 
+                         N(N(capture("noun")), 
+                           PP(PREP(capture("prep")), 
+                              NP(capture("np")))))))));
+ }
+ apply({noun, prep, np}, node, refs) {
+  let u = referent(this.id(), noun.types);
+  child(node, 1, 0).children[1] = u;
+
+  noun.ref = u;
+  
+  let cond = S(u, VP_(VP(V(prep), np)));
+
+  return [[u], [noun, cond], [], []];
+ }
+}
+
+class CRPP extends CompositeRule {
+ constructor(ids) {
+  super([new CRSPP(ids), new CRVPPP(ids)]);
+ }
+}
+
+class CRWILL extends Rule {
+ constructor(ids) {
+  super(ids, VP_(AUX("will"), VP(capture("verb"))));
+ }
+ apply({verb, aux}, node, refs) {
+  let {types} = node;
+  let {tense} = types || {};
+
+  if (tense != "fut") {
+   return [[], [], [], []];
+  }
+
+  // page 541: 
+  //
+  // We face a minor technical complication in this case, 
+  // which has to do with the auxiliary will. Will makes its 
+  // semantic contribution via the feature value "fut". 
+  //
+  // Once it has made this contribution it can be discarded. 
+  // We account for this by pruning the auxiliary from the 
+  // sentence structure that remains after the first construction
+  // step, in the course of which the contribution of will is 
+  // explicitly represented, has been performed.
+  node.children.shift();
+
+  return [[], [], [], []];
+ }
+}
+
+// Construction Rule described in page 543
+class CRTENSE extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("sub"), VP_(capture("verb"))));
+ }
+ apply({verb}, node, refs) {
+ }
+}
+
+// Construction Rule described in page 589
+class CRASPECT extends Rule {
+ constructor(ids) {
+  super(ids, S(capture("sub"), VP_(VP(HAVE(), VP(capture("verb"))))));
+ }
+ apply({sub, verb}, node) {
+  let stat = (verb.types || {}).stat;
+
+  if (!stat) {
+   return [[], [], [], []];
+  }
+
+  child(node, 1).children[0] = child(node, 1, 0, 1);
+
+  if (stat == "-") {
+   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   // node.time = e;
+   // included(referent("@now"), e)
+   return [[], [], [], []];
+  } else if (stat == "+") {
+   // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+   // let s = referent(this.id("s"), {}, undefined, node.loc, true);
+   // node.time = s;
+   // included(e, s), equals(e, s)
+   return [[], [], [], []];
+  }
+ }
+}
+
+class CRQUESTIONIS extends Rule {
+ constructor(ids) {
+  super(ids, Question(BE(capture("be")), NP(capture("sub")), ADJ(capture("adj")), "?"));
+ }
+ apply({be, sub, adj}, node) {
+  let q = drs(this.ids);
+
+  q.push(S(sub, VP_(VP(be, adj))));
+
+  return [[], [query(q)], [], [node]];
+ }
+}
+
+class CRQUESTIONWHO extends Rule {
+ constructor(ids) {
+  super(ids, Question("Who", VP_(capture("vp_")), "?"));
+ }
+ apply({vp_}, node, refs = []) {
+  let q = drs(this.ids);
+
+  // q.head.push(...clone(refs));
+  // q.head.forEach(ref => ref.closure = true);
+  // q.head.push(ref);
+  // noun.ref = ref;
+  // console.log(noun);
+
+  let u = referent(this.id(), {}, "", refs);
+
+  q.head.push(u);
+
+  q.push(S(u, vp_));
+
+  return [[u], [query(q, u)], [], [node]];
+ }
+}
+
+class CRQUESTIONWHOM extends Rule {
+ constructor(ids) {
+  super(ids, Question("Who", AUX(), NP(capture("sub")), V(capture("verb")), "?"));
+ }
+ apply({sub, verb}, node, refs = []) {
+  let q = drs(this.ids);
+
+  let u = referent(this.id(), {}, "", refs);
+
+  q.head.push(u);
+
+  q.push(S(sub, VP_(VP(verb, u))));
+
+  return [[u], [query(q, u)], [], [node]];
+ }
+}
+
+class CRQUESTION extends CompositeRule {
+ constructor(ids) {
+  super([new CRQUESTIONIS(ids), 
+         new CRQUESTIONWHO(ids), 
+         new CRQUESTIONWHOM(ids)]);
+ }
+}
+
+class CRSTEM extends Rule {
+ constructor(ids) {
+  super(ids, V(VERB(capture("stem"))));
+ }
+ apply({stem}, node, refs) {
+  let root = stem.children[0];
+  
+  if (node.children.length > 1) {
+   root += node.children[1];
+  }
+
+  node.children = [root];
+
+  return [[], [], [], []];
+ }
+}
+
+class CRPUNCT1 extends Rule {
+ constructor(ids) {
+  super(ids, Sentence(Statement(S_(S(capture("s"))))));
+ }
+ apply({s}, node) {
+  return [[], [s], [], [node]];
+ }
+}
+
+class CRPUNCT2 extends Rule {
+ constructor(ids) {
+  super(ids, Sentence(Question(capture("q"))));
+ }
+ apply({q}, node) {
+  return [[], [q], [], [node]];
+ }
+}
+
+class CRPUNCT extends CompositeRule {
+ constructor(ids) {
+  super([new CRPUNCT1(ids), 
+         new CRPUNCT2(ids)]);
+ }
+}
+
+function drs(ids) {
+ return DRS.from(ids);
+}
+
+class DRS {
+ constructor(names, rules) {
+  this.head = [];
+  this.body = [];
+  this.names = names;
+  this.rules = rules;
+ }
+
+ static from(ids = new Ids()) {
+  let rules = 
+   [
+    new CRASPECT(ids),
+    new CREVERY(ids),
+    new CRVPEVERY(ids),
+    new CRPP(ids),
+    new CRID(ids),
+    new CRLIN(ids),
+    new CRNRC(ids), 
+    new CRPRO(ids),
+    new CRNEG(ids),
+    new CRPOSS(ids),
+    new CRBE(ids),
+    new CRCOND(ids),
+    new CROR(ids),
+    new CRVPOR(ids),
+    new CRNPOR(ids),
+    new CRAND(ids),
+    new CRADJ(ids),
+    // new CRTENSE(ids),
+    new CRWILL(ids),
+    new CRQUESTION(ids),
+    new CRSTEM(ids),
+    new CRPUNCT(ids),
+    ];
+  return new DRS(new CRPN(ids), rules);
+ }
+
+ feed(source) {
+  let [[lines]] = parse(source, "Discourse");
+  for (let s of lines) {
+   // console.log(s);
+   this.push(s);
+  }
+ }
+ 
+ bind(node) {
+  let queue = [node];
+  while (queue.length > 0) {
+   let p = queue.shift();
+   // console.log(`${p["@type"]}`);
+   // console.log(p);
+   let [refs, names] = this.names.match(p, this.head);
+   this.head.push(...refs);
+   this.body.push(...names);
+   // ... and recurse.
+   let next = (p.children || [])
+    .filter(c => typeof c != "string");
+   queue.push(...next);
+  }
+ }
+
+ push(node) {
+  for (let ref of this.head) {
+   // Reset all of the locations of previous
+   // referents before new phrases are processed.
+   ref.loc = 0;
+  }
+
+  // Resolve all proper names first.
+  this.bind(node);
+
+  let queue = [node];
+  this.body.push(node);
+
+  while (queue.length > 0) {
+   let p = queue.shift();
+   // breadth first search: iterate over
+   // this level first ...
+   let skip = false;
+   for (let rule of this.rules) {
+    let [head, body, drs, [remove]] = rule.match(p, this.head);
+    this.head.push(...head);
+    this.body.push(...body);
+
+    if (remove) {
+     skip = true;
+     let i = this.body.indexOf(remove);
+     if (i == -1) {
+      throw new Error("Ooops, deleting an invalid node.");
+     }
+     // console.log(remove);
+     // console.log(body);
+     this.body.splice(i, 1);
+    }
+
+    queue.push(...body.filter(c => !(c instanceof DRS)));
+
+    if (skip) {
+     break;
+    }
+   }
+
+   if (skip) {
+    continue;
+   }
+
+   // ... and recurse.
+   let next = (p && p.children || [])
+    .filter(c => typeof c != "string");
+   queue.push(...next);
+  }
+
+  return this;
+ }
+
+ print() {
+  let result = [];
+  let refs = [];
+  let individuals = this.head
+   .filter(ref => !ref.closure);
+   // .filter(ref => !ref.time);
+  for (let ref of individuals) {
+   refs.push(`${ref.print()}`);
+  }
+  
+  let args = refs.join(", ");
+  let neg = this.neg ? "~" : "";
+  result.push(`${neg}drs(${args}) \{`);
+  
+  for (let cond of this.body) {
+   if (cond instanceof DRS) {
+    result.push(cond.print());
+   } else if (cond["@type"] == "Implication" ||
+              cond["@type"] == "Negation" ||
+              cond["@type"] == "Query" ||
+              cond["@type"] == "Conjunction" ||
+              cond["@type"] == "Disjunction") {
+    result.push(cond.print());
+   } else {
+    // console.log(cond);
+    let prefix = "";
+    let {types} = cond;
+    let {tense} = types || {};
+    if (tense == "fut") {
+     prefix = "> ";
+    } else if (tense == "past") {
+     prefix = "< ";
+    }
+    result.push(prefix + transcribe(cond));
+   }
+  }
+  
+  result.push("}");
+  
+  return result.join("\n");
+ }
+}
+
+
+function disjunction(a, b) {
+ // throw new Error("hi");
+ return {
+  "@type": "Disjunction",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " or " + this.b.print();
+  }
+ };
+}
+
+function implication(a, b) {
+ return {
+   "@type": "Implication",
+   "a": a,
+   "b": b,
+   print() {
+   return this.a.print() + " => " + this.b.print();
+  }
+ };
+}
+
+function negation(a) {
+ return {
+   "@type": "Negation",
+   "a": a,
+   print() {
+   return "~" + this.a.print();
+  }
+ };
+}
+
+function conjunction(a, b) {
+ return {
+  "@type": "Conjunction",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " and " + this.b.print();
+  }
+ };
+}
+
+function before(a, b) {
+ return {
+  "@type": "Before",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " < " + this.b.print();
+  }
+ };
+}
+
+function included(a, b) {
+ return {
+  "@type": "Included",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " <> " + this.b.print();
+  }
+ };
+}
+
+function equals(a, b) {
+ return {
+  "@type": "Equals",
+  "a": a,
+  "b": b,
+  print() {
+   return this.a.print() + " == " + this.b.print();
+  }
+ };
+}
+
+function query(drs, x) {
+ return {
+   "@type": "Query",
+   "drs": drs,
+   print() {
+    return "exists(" + `${x ? x.print() : ""}` + ") " + this.drs.print() + " ?";
+   }
+ };
+}
+
+module.exports = {
+ match: match,
+ capture: capture,
+ child: child,
+ print: print,
+ referent: referent,
+ Ids: Ids,
+ DRS: DRS,
+ CRPN: CRPN,
+ CRPRO: CRPRO,
+ CRID: CRID,
+ CRLIN: CRLIN,
+ CRNRC: CRNRC,
+ CRNEG: CRNEG,
+ CRBE: CRBE,
+ CRCOND: CRCOND,
+ CREVERY: CREVERY,
+ CRVPEVERY: CRVPEVERY,
+ CROR: CROR,
+ CRVPOR: CRVPOR,
+ CRNPOR: CRNPOR,
+ CRAND: CRAND,
+ CRPOSS: CRPOSS,
+ CRADJ: CRADJ,
+ CRPP: CRPP,
+ CRTENSE: CRTENSE,
+ CRASPECT: CRASPECT,
+ CRWILL: CRWILL,
+ CRQUESTION: CRQUESTION,
+};
+
+},{"./nearley.js":8,"./parser.js":9}],12:[function(require,module,exports){
+
+},{}],13:[function(require,module,exports){
 (function (process){
 // .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
 // backported and transplited with Babel, with backwards-compat fixes
@@ -3083,7 +5790,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":10}],10:[function(require,module,exports){
+},{"_process":14}],14:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 

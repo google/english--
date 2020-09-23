@@ -1,18 +1,4 @@
-const {
-    parser, 
-    term, 
-    rule, 
-    phrase, 
-    space, 
-    clone, 
-    literal, 
-    compile, 
-    generate, 
-    expand, 
-    collect, 
-    processor, 
-    grammar,
-    clean} = require("./parser.js");
+const {clone} = require("./base.js");
 
 const {parse, first, nodes} = require("./nearley.js");
 

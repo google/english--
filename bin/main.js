@@ -6,16 +6,22 @@ require("fs").readFileSync = function(path) {
     return content;
 };
 
-async function load(path) {
-    let file = await fetch(path);
-    files[path] = await file.text();
+async function load(path, name) {
+    let file = await fetch(path + name);
+    files[name] = await file.text();
 }
 
-async function compile() {
-    await load("string.ne");
-    await load("number.ne");
-    await load("whitespace.ne");
-    return require("./../src/drt/nearley.js");
+async function compile(path = "") {
+    await load(path, "string.ne");
+    await load(path, "number.ne");
+    await load(path, "whitespace.ne");
+
+    let result = {};
+
+    result = Object.assign(result, require("./../src/drt/nearley.js"));
+    result = Object.assign(result, require("./../src/drt/rules.js"));
+
+    return result;
 }
 
 module.exports = {

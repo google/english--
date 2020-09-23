@@ -19,21 +19,7 @@ const {
  CROR,
 } = require("../../src/drt/rules.js");
 
-const {
-  parser, 
-  term, 
-  rule, 
-  phrase, 
-  space, 
-  clone, 
-  literal, 
-  compile, 
-  generate, 
-  expand, 
-  collect, 
-  processor, 
-  grammar,
-  clean} = require("../../src/drt/parser.js");
+const {clone} = require("../../src/drt/base.js");
 
 let {parse, first, nodes} = require("../../src/drt/nearley.js");
 

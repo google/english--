@@ -5,26 +5,25 @@ const DrtParser = require("../../src/drt/nearley.js");
 const {S, VP_, VP, BE, NP, GAP} = DrtParser.nodes;
 const {preprocess} = DrtParser;
 
-const {Parser, Rule} = require("../../src/logic/parser.js");
 const {Forward, normalize, stringify, equals, explain, toString} = require("../../src/logic/forward.js");
 const {Reasoner} = require("../../src/logic/fol.js");
 const {rewrite} = require("../../src/logic/unify.js");
 
-const {
-  program, 
-  forall, 
-  exists, 
-  quantifier,
-  implies, 
-  predicate, 
-  func,
-  binary, 
-  literal, 
-  constant, 
-  and, 
-  or, 
-  negation,
-  argument} = Parser;
+//const {
+//  program, 
+//  forall, 
+//  exists, 
+//  quantifier,
+//  implies, 
+//  predicate, 
+//  func,
+//  binary, 
+//  literal, 
+//  constant, 
+//  and, 
+//  or, 
+//  negation,
+//  argument} = Parser;
 
 describe.skip("Logic", function() {
 
