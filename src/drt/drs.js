@@ -61,8 +61,6 @@ class DRS {
      if (i == -1) {
       throw new Error("Ooops, deleting an invalid node.");
      }
-     // console.log(remove);
-     // console.log(body);
      this.body.splice(i, 1);
     }
 
@@ -91,7 +89,6 @@ class DRS {
   let refs = [];
   let individuals = this.head
    .filter(ref => !ref.closure);
-   // .filter(ref => !ref.time);
   for (let ref of individuals) {
    refs.push(`${ref.print()}`);
   }
@@ -101,16 +98,15 @@ class DRS {
   result.push(`${neg}drs(${args}) \{`);
 
   for (let cond of this.body) {
-   if (cond instanceof DRS) {
-     result.push(cond.print());
-   } else if (cond["@type"] == "Implication" ||
-              cond["@type"] == "Negation" ||
-              cond["@type"] == "Query" ||
-              cond["@type"] == "Conjunction" ||
-              cond["@type"] == "Disjunction") {
+    if (cond instanceof DRS ||
+        cond["@type"] == "Implication" ||
+        cond["@type"] == "Negation" ||
+        cond["@type"] == "Query" ||
+        cond["@type"] == "Conjunction" ||
+        cond["@type"] == "Disjunction") {
      result.push(cond.print());
    } else {
-    result.push(print(cond));
+     result.push(print(cond));
    }
   }
   

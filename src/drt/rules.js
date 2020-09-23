@@ -24,17 +24,12 @@ function match(a, b) {
  for (let i = 0; i < a.children.length; i++) {
   if (typeof a.children[i] == "string") {
    if (a.children[i].toLowerCase() != String(b.children[i]).toLowerCase()) {
-    // console.log(a.children[i]);
-    // console.log("hi");
-    // console.log(`${a.children[i]} != ${b.children[i]}`);
     return false;
    }
   } else if (a.children[i]["@type"] == "Match") {
    result[a.children[i].name] = b;
    continue;
   } else {
-   //console.log(a);
-   //console.log(b);
    let capture = match(a.children[i], b.children[i]);
    if (!capture) {
     return false;
@@ -77,9 +72,6 @@ class Rule {
  match(node, refs) {
   let result = match(this.trigger, node);
 
-  // console.log(this.trigger);
-  // console.log(node);
-
   if (!result) {
    return [[], [], [], []];
   }
@@ -114,7 +106,6 @@ function find({gen, num}, refs, name, loc, exclude = []) {
  let match = (ref) => {
   let byName = name ? ref.value == name : true;
   let types = ref.types || {};
-  // console.log(`I have a name=${ref.name} num=${types.num} gen=${types.gen} @${ref.loc}`);
   if (!byName || types.num != num || ref.loc > loc) {
    return false;
   } else if (exclude.map(x => x.name).includes(ref.name)) {
@@ -125,8 +116,6 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   }
   return types.gen == gen;
  };
-
- // console.log(`Trying to find a num=${num} gen=${gen} loc=${loc} excluding=${exclude.map(x => x.name).join(", ")}`);
 
  for (let i = refs.length - 1; i >= 0; i--) {
   if (match(refs[i])) {
@@ -150,26 +139,15 @@ function referent(name, types, value, loc) {
   }
 }
 
-function predicate(name, children, neg, time) {
+function predicate(name, children, types) {
   return {
    "@type": "Predicate",
     name: name,
     children: children,
-    neg: neg,
-    time: time,
+    types: types,
     print() {
-      let children = [];
-      for (let child of this.children) {
-       children.push(print(child));
-      }
-      let n = neg ? "~" : "";
-      let e = "";
-      if (time == "past") {
-       e = "< ";
-      } else if (time == "fut") {
-       e = "> ";
-      }
-      return `${e}${n}${this.name}(${children.join(", ")})`;
+      let children = this.children.map(child => print(child));
+      return `${this.name}(${children.join(", ")})`;
    }
   }
 }
@@ -388,8 +366,8 @@ class CRNLIN extends Rule {
       node.children.length != 1) {
    return [[], [], [], []];
   }
-
-  let pred = predicate(child(noun, 0), [node.ref], node.neg, node.time);
+     
+  let pred = predicate(child(noun, 0), [node.ref], node.types);
   
   return [[], [pred], [], [node]];
  }
@@ -539,7 +517,8 @@ class CRNBE extends Rule {
 
   // Matches the DRS found in (3.57) on page 269.
   if (node.types && node.types.tense) {
-   np.time = node.types.tense;
+      np.types.tense = node.types.tense;
+      // console.log(np);
   }
 
   return [[], [np], [], [node]];
@@ -555,15 +534,13 @@ class CRNEGNBE extends Rule {
 
   sub.head = clone(refs);
   sub.head.forEach(ref => ref.closure = true);
-  // sub.neg = true;
-
+  
   let np = clone(noun);
   np.ref = child(ref, 0);
 
   // Matches the DRS found in (3.57) on page 269.
-
   if (node.types && node.types.tense) {
-   np.time = node.types.tense;
+   np.types.tense = node.types.tense;
   }
 
   sub.push(np);
