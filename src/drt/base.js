@@ -55,8 +55,17 @@ function print(node, refs) {
  return transcribe(node, refs);
 }
 
+function child(node, ...path) {
+ let result = node;
+ for (let i of path) {
+  result = result.children[i];
+ }
+ return result;
+}
+
 module.exports = {
     clone: clone,
     transcribe: transcribe,
     print: print,
+    child: child,
 };

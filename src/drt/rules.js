@@ -1,4 +1,4 @@
-const {clone, transcribe, print} = require("./base.js");
+const {clone, transcribe, print, child} = require("./base.js");
 const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
@@ -108,14 +108,6 @@ class CompositeRule extends Rule {
   }
   return result;
  }
-}
-
-function child(node, ...path) {
- let result = node;
- for (let i of path) {
-  result = result.children[i];
- }
- return result;
 }
 
 function find({gen, num}, refs, name, loc, exclude = []) {

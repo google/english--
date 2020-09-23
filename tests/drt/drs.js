@@ -1,36 +1,7 @@
 const Assert = require("assert");
 
-const {
- match,
- capture,
- print,
- child,
- Ids,
- CRPN,
- CRPRO,
- CRID,
- CRLIN,
- CRNRC,
- CRNEG,
- CRBE,
- CRCOND,
- CREVERY,
- CROR,
- Rules,
-} = require("../../src/drt/rules.js");
-
-const {
- DRS,
-} = require("../../src/drt/drs.js");
-
-const {clone} = require("../../src/drt/base.js");
-
-let {parse, first, nodes} = require("../../src/drt/parser.js");
-
-const {
- S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ,
- Discourse, Sentence
-} = nodes;
+const {Rules} = require("../../src/drt/rules.js");
+const {DRS} = require("../../src/drt/drs.js");
 
 describe("DRS", function() {
 

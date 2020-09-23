@@ -1,12 +1,11 @@
 const Assert = require("assert");
 
+const {clone, child, print} = require("../../src/drt/base.js");
+
 const {
   match,
   capture,
-  print,
-  child,
   Ids,
-  DRS,
   CRPN,
   CRPRO,
   CRID,
@@ -30,8 +29,6 @@ const {
   CRQUESTION,
   referent,
 } = require("../../src/drt/rules.js");
-
-const { clone } = require("../../src/drt/base.js");
 
 let {parse, first, nodes} = require("../../src/drt/parser.js");
 

@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {child} = require("../../src/drt/rules.js");
+const {child} = require("../../src/drt/base.js");
 
 const {
   Nearley, 
@@ -34,7 +34,7 @@ const {
   HAVE,
   RN} = nodes;
 
-describe("Nearley", function() {
+describe("Parser", function() {
   it("Basic", function() {
     let parser = Nearley.from(`
       main -> (statement):+
