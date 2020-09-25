@@ -15,7 +15,41 @@ describe.only("Term Logic", function() {
       %}
   
       sentence -> judgment _ "." {% id %}
+      sentence -> question _ "?" {% id %}
     
+      question -> statement {%
+        ([[s, copula, p]]) => {
+          return {
+            "@type": "Question",  
+            "s": s, 
+            "op": copula, 
+            "p": p, 
+          }
+        }
+      %}
+
+      question -> "?" __ copula __ term {%
+        ([arg, ws1, copula, ws2, term]) => {
+          return {
+            "@type": "Question",  
+            "s": "?", 
+            "op": copula, 
+            "p": term, 
+          }
+        }
+      %}
+
+      question -> term __ copula __ "?" {%
+        ([term, ws1, copula, ws2, arg]) => {
+          return {
+            "@type": "Question",  
+            "s": term, 
+            "op": copula, 
+            "p": "?", 
+          }
+        }
+      %}
+
       judgment -> statement _ truthvalue:? {%
         ([[s, copula, p], ws, truthvalue]) => {
           let [f, c] = truthvalue || [0, 0];
@@ -75,7 +109,20 @@ describe.only("Term Logic", function() {
       }
     }
   }
-    
+
+  function is(s) {
+    return {
+      a(p, f = 0, c = 0) {
+        return {
+            "@type": "Question",
+            "s": s,
+            "op": "->",
+            "p": p
+        };
+      }
+    }
+  }
+
   it("Many", function() {
      let parser = Nearley.from(grammar);
      assertThat(parser.feed(`
@@ -93,6 +140,24 @@ describe.only("Term Logic", function() {
      let parser = Nearley.from(grammar);
       assertThat(parser.feed("foo -> bar <0.1, 2>."))
           .equalsTo([[a("foo").typeOf("bar", 0.1, 2)]]);
+  });
+
+  it("Is Foo a Bar?", function() {
+     let parser = Nearley.from(grammar);
+      assertThat(parser.feed("foo -> bar?"))
+          .equalsTo([[is("foo").a("bar")]]);
+  });
+
+  it("Which ? is a Bar?", function() {
+     let parser = Nearley.from(grammar);
+      assertThat(parser.feed("? -> bar?"))
+          .equalsTo([[is("?").a("bar")]]);
+  });
+
+  it("Is Foo a ??", function() {
+     let parser = Nearley.from(grammar);
+      assertThat(parser.feed("foo -> ??"))
+          .equalsTo([[is("foo").a("?")]]);
   });
 
   function assertThat(x) {
