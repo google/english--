@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Term Logic", function() {
+describe("Term Logic", function() {
 
   // https://cis.temple.edu/~pwang/Writing/NAL-Specification.pdf
   const grammar = `
@@ -205,6 +205,7 @@ describe.only("Term Logic", function() {
                   } else if (s == q.p) {
                       let abd = this.is({s: q.s, p: p}, next);
                       if (abd) {
+                          // console.log("hi");
                           // abduction.
                           return abduction({f: f, c: c}, abd);
                       }
@@ -382,6 +383,22 @@ describe.only("Term Logic", function() {
      // induction
      assertThat(given(program).is(q)).evalsTo({f: 0.64, c: 0.13});
   });
+
+  it.skip("P -> M. M -> S. S -> P?", function() {
+     // TODO(goto): this returns an proof, but unclear to me
+     // from what happen. we should save the path and verify
+     // what it did. we will probably have multiple ways to
+     // prove the same thing and will probably have to make a
+     // determination of what's the right one to pick.
+     let [program] = parse(`
+       P -> M <0.8, 0.9>.
+       M -> S <0.8, 0.9>.
+     `);
+     let [[q]] = parse("S -> P?");
+     // exemplification
+     assertThat(given(program).is(q)).evalsTo({f: 0.64, c: 0.13});
+  });
+
 
   function assertThat(x) {
     return {
