@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe("Term Logic", function() {
+describe("Non Axiomatic Logic", function() {
 
   // https://cis.temple.edu/~pwang/Writing/NAL-Specification.pdf
   const grammar = `
