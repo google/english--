@@ -92,19 +92,28 @@ describe("Term Logic", function() {
       }
     }
 
-    // console.log(quantifier);
-    // cosole.log("hi");
     if (profiles[quantifier].left == "upward") {
-      // console.log("hi");
       for (let major of kb) {
         if (major[0] == quantifier && question[3] == major[2]) {
           for (let minor of kb) {
-            // console.log(minor[2]);
             if (minor[0] == "all" &&
                 minor[1] == major[1] &&
                 minor[2] == question[2]) {
               // left-side upward monotone
               yield "left-up";
+            }
+          }
+        }
+      }
+    } else if (profiles[quantifier].left == "downward") {
+      for (let major of kb) {
+        if (major[0] == quantifier && question[3] == major[2]) {
+          for (let minor of kb) {
+            if (minor[0] == "all" &&
+                minor[1] == question[2] &&
+                minor[2] == major[1]) {
+              // left-side downward monotone
+              yield "left-down";
             }
           }
         }
@@ -124,6 +133,7 @@ describe("Term Logic", function() {
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "right-up"});
+    assertThat(result.next()).equalsTo({done: false, value: "left-down"});
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
@@ -169,6 +179,21 @@ describe("Term Logic", function() {
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "left-up"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("no reptiles are mammals. all snakes are reptiles. are no snakes mammals?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        no reptiles are mammals. 
+        all snakes are reptiles. 
+        are no snakes mammals?
+    `);
+
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-down"});
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
