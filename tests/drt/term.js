@@ -12,13 +12,22 @@ describe("Term Logic", function() {
                 } 
       %}
 
-      sentence -> copula _ term _ "are" _ term _ "." {%
+      sentence -> proposition _ "." {% id %}
+      sentence -> question _ "?" {% id %}
+
+      question -> "are" _ term _ term {%
+        ([are, ws1, term1, ws2, term2]) => {
+            return ["question", term1, term2];
+        } 
+      %}
+
+      proposition -> copula _ term _ "are" _ term {%
         ([copula, ws1, term1, ws2, are, ws3, term2]) => {
             return [copula, term1, term2];
         } 
       %}
 
-      sentence -> "some" _ term _ "are" _ "not" _ term _ "." {%
+      proposition -> "some" _ term _ "are" _ "not" _ term {%
         ([some, ws1, term1, ws2, are, ws3, not, ws4, term2]) => {
             return ["some-arent", term1, term2];
         } 
@@ -32,6 +41,7 @@ describe("Term Logic", function() {
 
       word -> [a-zA-Z]:+ {% ([args]) => args.join("") %}
       `;
+
   it("Basic", function() {
      let parser = Nearley.from(grammar);
     
@@ -40,11 +50,13 @@ describe("Term Logic", function() {
       some men are philosophers.
       no philosophers are rich.
       some men are not philosophers.
+      are men mortal?
     `)).equalsTo([[
       ["all", "men", "mortal"],
       ["some", "men", "philosophers"],
       ["no", "philosophers", "rich"],
       ["some-arent", "men", "philosophers"],
+      ["question", "men", "mortal"],
     ]]);
   });
 
