@@ -203,6 +203,38 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
+  it("all mammals are animals. no plants are animals. are no plants mammals?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all mammals are animals. 
+        no plants are animals. 
+        are no plants mammals?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "right-down"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it.only("all humans are mortals. some humans are rich. are some mortals rich?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all humans are mortals. 
+        some humans are rich. 
+        are some mortals rich?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-up"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
   function assertThat(x) {
     return {
       equalsTo(y) {
