@@ -56,10 +56,10 @@ describe.only("Term Logic", function() {
   });
 
   const profiles = {
-    "all": {left: "downward", right: "upward"},
-    "some": {left: "upward", right: "upward"},
-    "no": {left: "downward", right: "downward"},
-    "not-all": {left: "upward", right: "downward"},
+    "all": {left: "downward", right: "upward", symmetric: false},
+    "some": {left: "upward", right: "upward", symmetric: true},
+    "no": {left: "downward", right: "downward", symmetric: true},
+    "not-all": {left: "upward", right: "downward", symmetric: false},
   };
   
   function *reason(kb, question) {
@@ -117,6 +117,30 @@ describe.only("Term Logic", function() {
               yield "left-down";
             }
           }
+        }
+      }
+    }
+
+    // Symmetry
+    if (profiles[quantifier].symmetric) {
+      for (let [op, major, minor] of kb) {
+        if (op == quantifier &&
+            question[1] == minor &&
+            question[2] === major) {
+          // symmetry
+          yield "symmetry";
+        }
+      }
+    }
+
+    // Existential Import
+    if (question[0] == "some") {
+      for (let [op, major, minor] of kb) {
+        if (op == "all" &&
+            question[1] == major &&
+            question[2] === minor) {
+          // existential import
+          yield "existential import";
         }
       }
     }
@@ -219,7 +243,7 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
-  it.only("all humans are mortals. some humans are rich. are some mortals rich?", function() {
+  it("all humans are mortals. some humans are rich. are some mortals rich?", function() {
     let parser = Nearley.from(grammar);
 
     let [[first, second, question]] = parser.feed(`
@@ -234,8 +258,83 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: false, value: "left-up"});
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
+  
+  it("no animals are plants. are no plants animals?", function() {
+    let parser = Nearley.from(grammar);
 
-  function assertThat(x) {
+    let [[first, question]] = parser.feed(`
+        no animals are plants.
+        are no plants animals?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "symmetry"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("some birds are fliers. are some fliers birds?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+        some birds are fliers.
+        are some fliers birds?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "symmetry"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+  
+  it("not all birds are fliers. are not all fliers birds?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+        not all birds are fliers.
+        are not all fliers birds?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    // TODO: not-all doesn't seem to be symmetric. sanity check?
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+  
+  it("all men are mortals. are all mortals men?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+        all men are mortals.
+        are all mortals men?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    // TODO: all doesn't seem to be symmetric. sanity check?
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("all men are mortals. are some men mortals?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+        all men are mortals.
+        are some men mortals?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "existential import"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+function assertThat(x) {
     return {
       equalsTo(y) {
        Assert.deepEqual(x, y);
