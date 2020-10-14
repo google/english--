@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe("Term Logic", function() {
+describe.only("Term Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -63,7 +63,8 @@ describe("Term Logic", function() {
   };
   
   function *reason(kb, question) {
-    let [type, quantifier, a, c] = question;
+    let [quantifier, a, c] = question;
+    // console.log(question);
     if (profiles[quantifier].right == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
@@ -94,11 +95,11 @@ describe("Term Logic", function() {
 
     if (profiles[quantifier].left == "upward") {
       for (let major of kb) {
-        if (major[0] == quantifier && question[3] == major[2]) {
+        if (major[0] == quantifier && question[2] == major[2]) {
           for (let minor of kb) {
             if (minor[0] == "all" &&
                 minor[1] == major[1] &&
-                minor[2] == question[2]) {
+                minor[2] == question[1]) {
               // left-side upward monotone
               yield "left-up";
             }
@@ -107,10 +108,10 @@ describe("Term Logic", function() {
       }
     } else if (profiles[quantifier].left == "downward") {
       for (let major of kb) {
-        if (major[0] == quantifier && question[3] == major[2]) {
+        if (major[0] == quantifier && question[2] == major[2]) {
           for (let minor of kb) {
             if (minor[0] == "all" &&
-                minor[1] == question[2] &&
+                minor[1] == question[1] &&
                 minor[2] == major[1]) {
               // left-side downward monotone
               yield "left-down";
@@ -121,15 +122,16 @@ describe("Term Logic", function() {
     }
   }
 
-  it("all humans are mortal. all greeks are humans. are all greeks mortal?", function() {
+  it("all humans are mortals. all greeks are humans. are all greeks mortals?", function() {
     let parser = Nearley.from(grammar);
 
     let [[first, second, question]] = parser.feed(`
-      all humans are mortal.
+      all humans are mortals.
       all greeks are humans.
-      are all greeks mortal?
+      are all greeks mortals?
     `);
 
+    question.shift();
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "right-up"});
@@ -146,6 +148,7 @@ describe("Term Logic", function() {
       are no penguins seaguls?
     `);
 
+    question.shift();
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "right-down"});
@@ -161,6 +164,7 @@ describe("Term Logic", function() {
       are not all birds seaguls?
     `);
 
+    question.shift();
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "right-down"});
@@ -176,6 +180,7 @@ describe("Term Logic", function() {
       are some greeks rich?
     `);
 
+    question.shift();
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "left-up"});
@@ -191,6 +196,7 @@ describe("Term Logic", function() {
         are no snakes mammals?
     `);
 
+    question.shift();
     let result = reason([first, second], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "left-down"});
