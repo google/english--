@@ -27,10 +27,11 @@ describe.only("Term Logic", function() {
         } 
       %}
 
-      copula -> "all" {% id %} 
-              | "some" {% id %}
-              | "no" {% id %}
-              | "not" _ "all" {% () => "not-all" %}
+      copula -> "all" {% () => ["all"] %} 
+              | "some" {% () => ["some"] %}
+              | "no" {% () => ["no"] %}
+              | "not" _ "all" {% () => ["not-all"] %}
+              | "at" _ "most" _ unsigned_int {% () => ["at-most"] %}
  
       term -> word {% id %}
 
@@ -45,13 +46,15 @@ describe.only("Term Logic", function() {
       some men are philosophers.
       no philosophers are rich.
       not all men are philosophers.
+      at most 3 men are philosophers.
       are all men mortal?
     `)).equalsTo([[
-      ["all", "men", "mortal"],
-      ["some", "men", "philosophers"],
-      ["no", "philosophers", "rich"],
-      ["not-all", "men", "philosophers"],
-      ["question", "all", "men", "mortal"],
+      [["all"], "men", "mortal"],
+      [["some"], "men", "philosophers"],
+      [["no"], "philosophers", "rich"],
+      [["not-all"], "men", "philosophers"],
+      [["at-most"], "men", "philosophers"],
+      ["question", ["all"], "men", "mortal"],
     ]]);
   });
 
@@ -63,26 +66,24 @@ describe.only("Term Logic", function() {
   };
   
   function *reason(kb, question, path = []) {
-    let [quantifier, a, c] = question;
+    let [[quantifier], a, c] = question;
     // console.log(question);
     // console.log(`${question}? from: ${path}`);
     
-    if (path.find(([op, p, q]) =>
-                  question[0] == op &&
+    if (path.find(([[op], p, q]) =>
+                  question[0][0] == op &&
                   question[1] == p &&
                   question[2] == q)) {
-      // console.log("cycle!");
       return false;
     }
     
     for (let sentence of kb) {
-      if (sentence[0] == question[0] &&
+      if (sentence[0][0] == question[0][0] &&
           sentence[1] == question[1] &&
           sentence[2] === question[2]) {
         return true;
       }
     }
-
 
     function query(q) {
       path.push(question);
@@ -94,7 +95,7 @@ describe.only("Term Logic", function() {
     if (profiles[quantifier].right == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
-          if (query(["all", major[2], c])) {
+          if (query([["all"], major[2], c])) {
             // right-side upward monotone
             yield "right-up";
           }
@@ -103,7 +104,7 @@ describe.only("Term Logic", function() {
     } else if (profiles[quantifier].right == "downward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
-          if (query(["all", c, major[2]])) {
+          if (query([["all"], c, major[2]])) {
             // right-side downward monotone
             yield "right-down";
           }
@@ -114,7 +115,7 @@ describe.only("Term Logic", function() {
     if (profiles[quantifier].left == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && question[2] == major[2]) {
-          if (query(["all", major[1], question[1]])) {
+          if (query([["all"], major[1], question[1]])) {
             // right-side downward monotone
             yield "left-up";
           }
@@ -123,7 +124,7 @@ describe.only("Term Logic", function() {
     } else if (profiles[quantifier].left == "downward") {
       for (let major of kb) {
         if (major[0] == quantifier && question[2] == major[2]) {
-          if (query(["all", question[1], major[1]])) {
+          if (query([["all"], question[1], major[1]])) {
             // left-side downward monotone
             yield "left-down";
           }
@@ -139,9 +140,9 @@ describe.only("Term Logic", function() {
     }
 
     // Existential Import
-    if (question[0] == "some") {
+    if (question[0][0] == "some") {
       for (let [op, major, minor] of kb) {
-        if (query(["all", question[1], question[2]])) {
+        if (query([["all"], question[1], question[2]])) {
           yield "existential import";
         }
       }
