@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Term Logic", function() {
+describe("Term Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -136,11 +136,9 @@ describe.only("Term Logic", function() {
 
     // Existential Import
     if (op == "some") {
-      //for (let [op, major, minor] of kb) {
       if (query([["all"], major, minor])) {
         yield "existential import";
       }
-      // }
     }
   }
 
