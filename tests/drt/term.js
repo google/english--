@@ -62,9 +62,27 @@ describe.only("Term Logic", function() {
     "not-all": {left: "upward", right: "downward", symmetric: false},
   };
   
-  function *reason(kb, question) {
+  function *reason(kb, question, path = []) {
     let [quantifier, a, c] = question;
     // console.log(question);
+    // console.log(`${question}? from: ${path}`);
+    
+    if (path.find(([op, p, q]) =>
+                  question[0] == op &&
+                  question[1] == p &&
+                  question[2] == q)) {
+      // console.log("hi");
+      return false;
+    }
+    
+    for (let sentence of kb) {
+      if (sentence[0] == question[0] &&
+          sentence[1] == question[1] &&
+          sentence[2] === question[2]) {
+        return true;
+      }
+    }
+
     if (profiles[quantifier].right == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
@@ -121,15 +139,25 @@ describe.only("Term Logic", function() {
       }
     }
 
+    function query(kb, question, path) {
+      let {done, value} = reason(kb, question, path)
+          .next();
+      return value;
+    }
+    
     // Symmetry
     if (profiles[quantifier].symmetric) {
-      for (let [op, major, minor] of kb) {
-        if (op == quantifier &&
-            question[1] == minor &&
-            question[2] === major) {
-          // symmetry
-          yield "symmetry";
-        }
+      // console.log("hi");
+      // console.log(question);
+      path.push(question);
+      let value = query(kb, [question[0], question[2], question[1]], path);
+      path.pop();
+      if (value) {
+        // symmetry
+        // console.log("yes!");
+        // console.log(value);
+        // console.log(question);
+        yield "symmetry";
       }
     }
 
@@ -146,6 +174,36 @@ describe.only("Term Logic", function() {
     }
   }
 
+  it("all As are Bs. are all As Bs?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+      all As are Bs.
+      are all As Bs?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: true, value: true});
+  });
+
+  it("no As are Bs. are no Bs As?", function() {
+    // Symmetry
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+      no As are Bs.
+      are no Bs As?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "symmetry"});    
+    assertThat(result.next()).equalsTo({done: true, value: undefined});    
+  });
+  
   it("all humans are mortals. all greeks are humans. are all greeks mortals?", function() {
     let parser = Nearley.from(grammar);
 
@@ -319,6 +377,13 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
+  it("cycle", function() {
+    let result = reason([],
+                        ["all", "men", "mortals"],
+                        [["all", "men", "mortals"]]);
+    assertThat(result.next()).equalsTo({done: true, value: false});
+  });
+  
   it("all men are mortals. are some men mortals?", function() {
     let parser = Nearley.from(grammar);
 
