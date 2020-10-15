@@ -71,7 +71,7 @@ describe.only("Term Logic", function() {
                   question[0] == op &&
                   question[1] == p &&
                   question[2] == q)) {
-      // console.log("hi");
+      // console.log("cycle!");
       return false;
     }
     
@@ -83,29 +83,29 @@ describe.only("Term Logic", function() {
       }
     }
 
+
+    function query(q) {
+      path.push(question);
+      let {done, value} = reason(kb, q, path).next();
+      path.pop();
+      return value;
+    }
+
     if (profiles[quantifier].right == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
-          for (let minor of kb) {
-            if (minor[0] == "all" &&
-                minor[1] == major[2] &&
-                minor[2] == c) {
-              // right-side upward monotone
-              yield "right-up";
-            }
+          if (query(["all", major[2], c])) {
+            // right-side upward monotone
+            yield "right-up";
           }
         }
       }
     } else if (profiles[quantifier].right == "downward") {
       for (let major of kb) {
         if (major[0] == quantifier && a == major[1]) {
-          for (let minor of kb) {
-            if (minor[0] == "all" &&
-                minor[1] == c &&
-                minor[2] == major[2]) {
-              // right-side downward monotone
-              yield "right-down";
-            }
+          if (query(["all", c, major[2]])) {
+            // right-side downward monotone
+            yield "right-down";
           }
         }
       }
@@ -114,49 +114,26 @@ describe.only("Term Logic", function() {
     if (profiles[quantifier].left == "upward") {
       for (let major of kb) {
         if (major[0] == quantifier && question[2] == major[2]) {
-          for (let minor of kb) {
-            if (minor[0] == "all" &&
-                minor[1] == major[1] &&
-                minor[2] == question[1]) {
-              // left-side upward monotone
-              yield "left-up";
-            }
+          if (query(["all", major[1], question[1]])) {
+            // right-side downward monotone
+            yield "left-up";
           }
         }
       }
     } else if (profiles[quantifier].left == "downward") {
       for (let major of kb) {
         if (major[0] == quantifier && question[2] == major[2]) {
-          for (let minor of kb) {
-            if (minor[0] == "all" &&
-                minor[1] == question[1] &&
-                minor[2] == major[1]) {
-              // left-side downward monotone
-              yield "left-down";
-            }
+          if (query(["all", question[1], major[1]])) {
+            // left-side downward monotone
+            yield "left-down";
           }
         }
       }
     }
-
-    function query(kb, question, path) {
-      let {done, value} = reason(kb, question, path)
-          .next();
-      return value;
-    }
     
     // Symmetry
     if (profiles[quantifier].symmetric) {
-      // console.log("hi");
-      // console.log(question);
-      path.push(question);
-      let value = query(kb, [question[0], question[2], question[1]], path);
-      path.pop();
-      if (value) {
-        // symmetry
-        // console.log("yes!");
-        // console.log(value);
-        // console.log(question);
+      if (query([question[0], question[2], question[1]])) {
         yield "symmetry";
       }
     }
@@ -164,17 +141,14 @@ describe.only("Term Logic", function() {
     // Existential Import
     if (question[0] == "some") {
       for (let [op, major, minor] of kb) {
-        if (op == "all" &&
-            question[1] == major &&
-            question[2] === minor) {
-          // existential import
+        if (query(["all", question[1], question[2]])) {
           yield "existential import";
         }
       }
     }
   }
 
-  it("all As are Bs. are all As Bs?", function() {
+  it("Trivial: all As are Bs. are all As Bs?", function() {
     let parser = Nearley.from(grammar);
 
     let [[first, question]] = parser.feed(`
@@ -188,7 +162,7 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: true, value: true});
   });
 
-  it("no As are Bs. are no Bs As?", function() {
+  it("Symmetry: no As are Bs. are no Bs As?", function() {
     // Symmetry
     let parser = Nearley.from(grammar);
 
@@ -201,6 +175,22 @@ describe.only("Term Logic", function() {
     let result = reason([first], question);
 
     assertThat(result.next()).equalsTo({done: false, value: "symmetry"});    
+    assertThat(result.next()).equalsTo({done: true, value: undefined});    
+  });
+
+  it("Existential Import: all As are Bs. are some As Bs?", function() {
+    // Existential Import
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+      all As are Bs.
+      are some As Bs?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "existential import"});    
     assertThat(result.next()).equalsTo({done: true, value: undefined});    
   });
   
