@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe("Term Logic", function() {
+describe.only("Term Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -31,7 +31,16 @@ describe("Term Logic", function() {
               | "some" {% () => ["some"] %}
               | "no" {% () => ["no"] %}
               | "not" _ "all" {% () => ["not-all"] %}
-              | "at" _ "most" _ unsigned_int {% () => ["at-most"] %}
+              | "at" _ "most" _ unsigned_int {% 
+               ([at, ws1, most, ws2, num]) => ["at-most", num] %}
+              | "at" _ "least" _ unsigned_int {% 
+               ([at, ws1, most, ws2, num]) => ["at-least", num] %}
+              | "fewer" _ "than" _ unsigned_int {% 
+               ([fewer, ws1, than, ws2, num]) => ["fewer-than", num] %}
+              | "more" _ "than" _ unsigned_int {% 
+               ([more, ws1, than, ws2, num]) => ["more-than", num] %}
+              | unsigned_int {% 
+               ([num]) => ["exactly", num] %}
  
       term -> word {% id %}
 
@@ -46,14 +55,22 @@ describe("Term Logic", function() {
       some men are philosophers.
       no philosophers are rich.
       not all men are philosophers.
-      at most 3 men are philosophers.
+      at most 1 men are philosophers.
+      at least 2 men are philosophers.
+      fewer than 3 men are philosophers.
+      more than 4 men are philosophers.
+      5 men are philosophers.
       are all men mortal?
     `)).equalsTo([[
       [["all"], "men", "mortal"],
       [["some"], "men", "philosophers"],
       [["no"], "philosophers", "rich"],
       [["not-all"], "men", "philosophers"],
-      [["at-most"], "men", "philosophers"],
+      [["at-most", 1], "men", "philosophers"],
+      [["at-least", 2], "men", "philosophers"],
+      [["fewer-than", 3], "men", "philosophers"],
+      [["more-than", 4], "men", "philosophers"],
+      [["exactly", 5], "men", "philosophers"],
       ["question", ["all"], "men", "mortal"],
     ]]);
   });
@@ -63,13 +80,20 @@ describe("Term Logic", function() {
     "some": {left: "upward", right: "upward", symmetric: true},
     "no": {left: "downward", right: "downward", symmetric: true},
     "not-all": {left: "upward", right: "downward", symmetric: false},
+    "at-most": {left: "downward", right: "downward", symmetric: false},
+    "at-least": {left: "upward", right: "upward", symmetric: true},
+    "fewer-than": {left: "downward", right: "downward", symmetric: false},
+    "more-than": {left: "upward", right: "upward", symmetric: true},
+    "exactly": {left: false, right: false, symmetric: true},
   };
   
-  function *reason(kb, [[op], major, minor], path = []) {
+  function *reason(kb, [[op, num], major, minor], path = []) {
     // console.log(`${op} ${major} ${minor}? from: ${path}`);
     
-    function same([[r], p, q]) {
-      return r == op && p == major && q === minor; 
+    function same([[r, s], p, q]) {
+      return r == op &&
+        p == major &&
+        q === minor; 
     }
 
     if (path.find(same)) {
@@ -89,7 +113,7 @@ describe("Term Logic", function() {
 
     if (profiles[op].right == "upward") {
       for (let s of kb) {
-        if (s[0][0] == op & major == s[1]) {
+        if (s[0][0] == op && s[0][1] == num & major == s[1]) {
           if (query([["all"], s[2], minor])) {
             // right-side upward monotone
             yield "right-up";
@@ -98,7 +122,7 @@ describe("Term Logic", function() {
       }
     } else if (profiles[op].right == "downward") {
       for (let s of kb) {
-        if (s[0][0] == op && major == s[1]) {
+        if (s[0][0] == op && s[0][1] == num && major == s[1]) {
           if (query([["all"], minor, s[2]])) {
             // right-side downward monotone
             yield "right-down";
@@ -109,7 +133,7 @@ describe("Term Logic", function() {
 
     if (profiles[op].left == "upward") {
       for (let s of kb) {
-        if (s[0][0] == op && minor == s[2]) {
+        if (s[0][0] == op && s[0][1] == num && minor == s[2]) {
           if (query([["all"], s[1], major])) {
             // right-side downward monotone
             yield "left-up";
@@ -118,7 +142,8 @@ describe("Term Logic", function() {
       }
     } else if (profiles[op].left == "downward") {
       for (let s of kb) {
-        if (s[0][0] == op && minor == s[2]) {
+        // console.log(num);
+        if (s[0][0] == op && s[0][1] == num && minor == s[2]) {
           if (query([["all"], major, s[1]])) {
             // left-side downward monotone
             yield "left-down";
@@ -300,7 +325,86 @@ describe("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: false, value: "left-up"});
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
-  
+
+  it("all engineers are employees. at most 3 employees are promoted. are at most 3 engineers promoted?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all engineers are employees. 
+        at most 3 employees are promoted. 
+        are at most 3 engineers promoted?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-down"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("at least 3 employees are millionaires. all employees are engineers. are at least 3 engineers millionaires?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all employees are engineers. 
+        at least 3 employees are millionaires. 
+        are at least 3 engineers millionaires?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-up"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("all engineers are employees. fewer than 3 employees are promoted. are fewer than 3 engineers promoted?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all engineers are employees. 
+        fewer than 3 employees are promoted. 
+        are fewer than 3 engineers promoted?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-down"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("more than 3 employees are millionaires. all employees are engineers. are more than 3 engineers millionaires?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+        all employees are engineers. 
+        more than 3 employees are millionaires. 
+        are more than 3 engineers millionaires?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-up"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
+  it("2 players are brazilians. are 2 brazilians players?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, question]] = parser.feed(`
+        2 players are brazilians. 
+        are 2 brazilians players?
+    `);
+
+    question.shift();
+    let result = reason([first], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "symmetry"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+
   it("no animals are plants. are no plants animals?", function() {
     let parser = Nearley.from(grammar);
 
