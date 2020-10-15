@@ -65,46 +65,41 @@ describe.only("Term Logic", function() {
     "not-all": {left: "upward", right: "downward", symmetric: false},
   };
   
-  function *reason(kb, question, path = []) {
-    let [[quantifier], a, c] = question;
-    // console.log(question);
-    // console.log(`${question}? from: ${path}`);
+  function *reason(kb, [[op], major, minor], path = []) {
+    // console.log(`${op} ${major} ${minor}? from: ${path}`);
     
-    if (path.find(([[op], p, q]) =>
-                  question[0][0] == op &&
-                  question[1] == p &&
-                  question[2] == q)) {
-      return false;
-    }
-    
-    for (let sentence of kb) {
-      if (sentence[0][0] == question[0][0] &&
-          sentence[1] == question[1] &&
-          sentence[2] === question[2]) {
-        return true;
-      }
+    function same([[r], p, q]) {
+      return r == op && p == major && q === minor; 
     }
 
+    if (path.find(same)) {
+      return false;
+    }
+
+    if (kb.find(same)) {
+      return true;
+    }
+    
     function query(q) {
-      path.push(question);
+      path.push([[op], major, minor]);
       let {done, value} = reason(kb, q, path).next();
       path.pop();
       return value;
     }
 
-    if (profiles[quantifier].right == "upward") {
-      for (let major of kb) {
-        if (major[0] == quantifier && a == major[1]) {
-          if (query([["all"], major[2], c])) {
+    if (profiles[op].right == "upward") {
+      for (let s of kb) {
+        if (s[0][0] == op & major == s[1]) {
+          if (query([["all"], s[2], minor])) {
             // right-side upward monotone
             yield "right-up";
           }
         }
       }
-    } else if (profiles[quantifier].right == "downward") {
-      for (let major of kb) {
-        if (major[0] == quantifier && a == major[1]) {
-          if (query([["all"], c, major[2]])) {
+    } else if (profiles[op].right == "downward") {
+      for (let s of kb) {
+        if (s[0][0] == op && major == s[1]) {
+          if (query([["all"], minor, s[2]])) {
             // right-side downward monotone
             yield "right-down";
           }
@@ -112,19 +107,19 @@ describe.only("Term Logic", function() {
       }
     }
 
-    if (profiles[quantifier].left == "upward") {
-      for (let major of kb) {
-        if (major[0] == quantifier && question[2] == major[2]) {
-          if (query([["all"], major[1], question[1]])) {
+    if (profiles[op].left == "upward") {
+      for (let s of kb) {
+        if (s[0][0] == op && minor == s[2]) {
+          if (query([["all"], s[1], major])) {
             // right-side downward monotone
             yield "left-up";
           }
         }
       }
-    } else if (profiles[quantifier].left == "downward") {
-      for (let major of kb) {
-        if (major[0] == quantifier && question[2] == major[2]) {
-          if (query([["all"], question[1], major[1]])) {
+    } else if (profiles[op].left == "downward") {
+      for (let s of kb) {
+        if (s[0][0] == op && minor == s[2]) {
+          if (query([["all"], major, s[1]])) {
             // left-side downward monotone
             yield "left-down";
           }
@@ -133,19 +128,19 @@ describe.only("Term Logic", function() {
     }
     
     // Symmetry
-    if (profiles[quantifier].symmetric) {
-      if (query([question[0], question[2], question[1]])) {
+    if (profiles[op].symmetric) {
+      if (query([[op], minor, major])) {
         yield "symmetry";
       }
     }
 
     // Existential Import
-    if (question[0][0] == "some") {
-      for (let [op, major, minor] of kb) {
-        if (query([["all"], question[1], question[2]])) {
-          yield "existential import";
-        }
+    if (op == "some") {
+      //for (let [op, major, minor] of kb) {
+      if (query([["all"], major, minor])) {
+        yield "existential import";
       }
+      // }
     }
   }
 
