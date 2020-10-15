@@ -31,6 +31,7 @@ describe.only("Term Logic", function() {
               | "some" {% () => ["some"] %}
               | "no" {% () => ["no"] %}
               | "not" _ "all" {% () => ["not-all"] %}
+              | "only" {% () => ["only"] %}
               | "at" _ "most" _ unsigned_int {% 
                ([at, ws1, most, ws2, num]) => ["at-most", num] %}
               | "at" _ "least" _ unsigned_int {% 
@@ -60,6 +61,7 @@ describe.only("Term Logic", function() {
       fewer than 3 men are philosophers.
       more than 4 men are philosophers.
       5 men are philosophers.
+      only citizens are voters.
       are all men mortal?
     `)).equalsTo([[
       [["all"], "men", "mortal"],
@@ -71,6 +73,7 @@ describe.only("Term Logic", function() {
       [["fewer-than", 3], "men", "philosophers"],
       [["more-than", 4], "men", "philosophers"],
       [["exactly", 5], "men", "philosophers"],
+      [["only"], "citizens", "voters"],
       ["question", ["all"], "men", "mortal"],
     ]]);
   });
@@ -80,6 +83,7 @@ describe.only("Term Logic", function() {
     "some": {left: "upward", right: "upward", symmetric: true},
     "no": {left: "downward", right: "downward", symmetric: true},
     "not-all": {left: "upward", right: "downward", symmetric: false},
+    "only": {left: "upward", right: "downward", symmetric: false},
     "at-most": {left: "downward", right: "downward", symmetric: false},
     "at-least": {left: "upward", right: "upward", symmetric: true},
     "fewer-than": {left: "downward", right: "downward", symmetric: false},
@@ -487,7 +491,23 @@ describe.only("Term Logic", function() {
     assertThat(result.next()).equalsTo({done: true, value: undefined});
   });
 
-function assertThat(x) {
+  it("only philosophers are wise. all philosophers are greeks. are only greeks wise?", function() {
+    let parser = Nearley.from(grammar);
+
+    let [[first, second, question]] = parser.feed(`
+      only philosophers are wise.
+      all philosophers are greeks.
+      are only greeks wise?
+    `);
+
+    question.shift();
+    let result = reason([first, second], question);
+
+    assertThat(result.next()).equalsTo({done: false, value: "left-up"});
+    assertThat(result.next()).equalsTo({done: true, value: undefined});
+  });
+  
+  function assertThat(x) {
     return {
       equalsTo(y) {
        Assert.deepEqual(x, y);
