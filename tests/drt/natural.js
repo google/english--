@@ -41,6 +41,8 @@ describe.only("Natural Logic", function() {
       expression -> predicate {% id %}
       # expression -> "(" _ expression _ ")" {% ([p1, ws1, expression]) => expression %}
       expression -> block {% id %}
+      # the expression below is ambiguous. we need to figure out
+      # how to break out of this
       expression -> expression _ "and" _ expression {%
         ([exp1, ws1, and, ws2, exp2]) => ["and", exp1, exp2]
       %}
@@ -170,23 +172,31 @@ describe.only("Natural Logic", function() {
 
   it("Every man is mortal. Socrates is a man.", function() {
     assertThat(parse(`
-      main(let u) {
-        every (let x: man(x)) mortal(x).
-        Socrates(u).
+      main() {
+        every (let x: man(x)) 
+          mortal(x).
+        let u: Socrates(u).
+        man(u).
       }
-    `)).equalsTo(drs(letty(["u"]), [
+    `)).equalsTo(drs([], [
       every(letty(["x"], pred("man", ["x"])), [pred("mortal", ["x"])]),
-      pred("Socrates", ["u"]),
+      letty(["u"], pred("Socrates", ["u"])),
+      pred("man", ["u"]),
     ]));
   });
 
   it("If Mary likes John then John likes Mary.", function() {
     assertThat(parse(`
       main() {
-        if ({Mary(x).}) then likes(y, x).
+        if (let x, y: {Mary(x). John(y). likes(x, y).}) then { 
+          likes(y, x).
+        }
       }
     `)).equalsTo(drs([], [
-      iffy([pred("Mary", ["x"])], [pred("likes", ["y", "x"])]),
+      iffy(letty(["x", "y"], [pred("Mary", ["x"]),
+                              pred("John", ["y"]),
+                              pred("likes", ["x", "y"])]),
+           [pred("likes", ["y", "x"])]),
     ]));
   });
 
