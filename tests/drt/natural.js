@@ -15,13 +15,6 @@ describe.only("Natural Logic", function() {
       head -> "(" _ ")" {% () => [] %}
       head -> "(" _ expression _ ")" {% ([p1, ws1, expression]) => expression %}
       head -> "(" _ declaration _ ")" {% ([p1, ws1, declaration]) => declaration %}
-      #head -> "(" _ referent _ (":" _ expression _):? ("," _ referent _):* ")" {% 
-      #  ([p1, ws1, ref, ws2, conds, list, p2]) => {
-      #    let [col, ws, conds1] = conds || [false, false, []];
-      #    return [[ref, conds1]].concat(list.map(([comma, ws, ref]) => [ref, []]));
-      #  } 
-      #%}
-      
       referent -> word {% id %}
 
       block -> expression _ "." {% 
@@ -71,6 +64,10 @@ describe.only("Natural Logic", function() {
         ([iffy, ws1, head, ws2, then, ws3, block]) => ["if", head, block] 
       %}
 
+      statement -> "not" _ head _ block {%
+        ([not, ws1, head, ws2, block]) => ["not", head, block] 
+      %}
+
       statement -> "if" _ expression _ "then" _ block {%
         ([iffy, ws1, expression, ws2, then, ws3, block]) => ["if", expression, block] 
       %}
@@ -98,7 +95,8 @@ describe.only("Natural Logic", function() {
   let every = (args = [], block = []) => quant("every", args, block); 
   let some = (args = [], block = []) => quant("some", args, block); 
   let and = (a, b) => ["and", a, b]; 
-  let iffy = (a, b) => ["if", a, b]; 
+  let iffy = (head, block) => ["if", head, block]; 
+  let not = (head, block) => ["not", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
   let parse = (code) => Nearley.from(grammar).feed(code);
 
@@ -170,11 +168,101 @@ describe.only("Natural Logic", function() {
       .equalsTo(drs([], [iffy(letty(["x"], pred("P", ["x"])), [pred("Q", ["x"])])]));
   });
 
+  it("Not", function() {
+    assertThat(parse("main() { not () { P(a). } }"))
+      .equalsTo(drs([], [not([], [pred("P", ["a"])])]));
+  });
+
+  it("Jones likes Mary.", function() {
+    assertThat(parse(`
+      main() {
+        let u: Jones(u).
+        let v: Mary(v).
+        likes(u, v).
+      }
+    `)).equalsTo(drs([], [
+      letty(["u"], pred("Jones", ["u"])),
+      letty(["v"], pred("Mary", ["v"])),
+      pred("likes", ["u", "v"]),
+    ]));
+  });
+
+  it("Jones owns Ulysses. It fascinates him.", function() {
+    assertThat(parse(`
+      main() {
+        let u: Jones(u).
+        let v: Ulysses(v).
+        owns(u, v).
+        fascinates(v, u).
+      }
+    `)).equalsTo(drs([], [
+      letty(["u"], pred("Jones", ["u"])),
+      letty(["v"], pred("Ulysses", ["v"])),
+      pred("owns", ["u", "v"]),
+      pred("fascinates", ["v", "u"]),
+    ]));
+  });
+
+  it("Jones does not like Mary.", function() {
+    assertThat(parse(`
+      main() {
+        let u: Jones(u).
+        let v: Mary(v).
+        not() { 
+          like(u, v). 
+        }
+      }
+    `)).equalsTo(drs([], [
+      letty(["u"], pred("Jones", ["u"])),
+      letty(["v"], pred("Mary", ["v"])),
+      not([], [pred("like", ["u", "v"])]),
+    ]));
+  });
+
+  it("Every man owns a book about Brazil.", function() {
+    assertThat(parse(`
+      main() {
+        let a: Brazil(a).
+        every (let x: man(x)) {
+          let c: book(c).
+          owns(x, c).
+          about(c, a).
+        }
+      }
+    `)).equalsTo(drs([], [
+      letty(["a"], pred("Brazil", ["a"])),
+      every(letty(["x"], pred("man", ["x"])), [
+        letty(["c"], pred("book", ["c"])),
+        pred("owns", ["x", "c"]),
+        pred("about", ["c", "a"]),
+      ]),
+    ]));
+  });
+
+  it("Every man who likes Smith loves Mary.", function() {
+    assertThat(parse(`
+      main() {
+        let a: Smith(a).
+        let b: Mary(b).
+        every (let x: {man(x). likes(x, a).}) {
+          loves(x, b).
+        }
+      }
+    `)).equalsTo(drs([], [
+      letty(["a"], pred("Smith", ["a"])),
+      letty(["b"], pred("Mary", ["b"])),
+      every(letty(["x"], [pred("man", ["x"]), pred("likes", ["x", "a"])]), [
+        pred("loves", ["x", "b"]),
+      ]),
+    ]));
+  });
+
   it("Every man is mortal. Socrates is a man.", function() {
     assertThat(parse(`
       main() {
-        every (let x: man(x)) 
+        every (let x: man(x)) {
           mortal(x).
+        }
         let u: Socrates(u).
         man(u).
       }
