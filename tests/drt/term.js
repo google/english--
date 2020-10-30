@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Term Logic", function() {
+describe("Term Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
