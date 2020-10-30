@@ -36,8 +36,14 @@ describe.only("Natural Logic", function() {
       expression -> block {% id %}
       # the expression below is ambiguous. we need to figure out
       # how to break out of this
-      expression -> expression _ "and" _ expression {%
-        ([exp1, ws1, and, ws2, exp2]) => ["and", exp1, exp2]
+      expression -> expression (_ "," _ expression):* _ "and" _ expression {%
+        ([exp1, exp2, ws3, and, ws4, expr3]) => {
+          let result = ["and", exp1, expr3];
+          // result = result.concat();
+          // console.log(expr3);
+          result.splice(2, 0, ...exp2.map(([ws1, and, ws2, expr]) => expr));
+          return result;
+        }
       %}
       predicate -> word _ args {% ([pred, ws, args]) => [pred, args] %}
       args -> "(" _ ")" {% () => [] %}
@@ -94,10 +100,11 @@ describe.only("Natural Logic", function() {
   let quant = (name, args = [], block = []) => [name, args, block]; 
   let every = (args = [], block = []) => quant("every", args, block); 
   let some = (args = [], block = []) => quant("some", args, block); 
-  let and = (a, b) => ["and", a, b]; 
+  let and = (...args) => ["and", ...args]; 
   let iffy = (head, block) => ["if", head, block]; 
   let not = (head, block) => ["not", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
+
   let parse = (code) => Nearley.from(grammar).feed(code);
 
   it("Basic", function() {
@@ -135,7 +142,7 @@ describe.only("Natural Logic", function() {
       .equalsTo(drs([], [and(pred("P"), pred("Q"))]));
   });
 
-  it("Every", function() {
+  it("Quantifiers", function() {
     assertThat(parse("main() { every () {} }"))
       .equalsTo(drs([], [every()]));
     assertThat(parse("main() { every (let x) P(x). }"))
@@ -168,9 +175,19 @@ describe.only("Natural Logic", function() {
       .equalsTo(drs([], [iffy(letty(["x"], pred("P", ["x"])), [pred("Q", ["x"])])]));
   });
 
-  it("Not", function() {
+  it("not", function() {
     assertThat(parse("main() { not () { P(a). } }"))
       .equalsTo(drs([], [not([], [pred("P", ["a"])])]));
+  });
+
+  it("and", function() {
+    assertThat(parse("main() { P(a) and Q(a). }"))
+      .equalsTo(drs([], [and(pred("P", ["a"]), pred("Q", ["a"]))]));
+    assertThat(parse("main() { P(a), Q(a) and R(a). }"))
+      .equalsTo(drs([], [and(pred("P", ["a"]),
+                             pred("Q", ["a"]),
+                             pred("R", ["a"]),
+                            )]));
   });
 
   it("Jones likes Mary.", function() {
@@ -244,15 +261,35 @@ describe.only("Natural Logic", function() {
       main() {
         let a: Smith(a).
         let b: Mary(b).
-        every (let x: {man(x). likes(x, a).}) {
+        every (let x: man(x) and likes(x, a)) {
           loves(x, b).
         }
       }
     `)).equalsTo(drs([], [
       letty(["a"], pred("Smith", ["a"])),
       letty(["b"], pred("Mary", ["b"])),
-      every(letty(["x"], [pred("man", ["x"]), pred("likes", ["x", "a"])]), [
+      every(letty(["x"], and(pred("man", ["x"]), pred("likes", ["x", "a"]))), [
         pred("loves", ["x", "b"]),
+      ]),
+    ]));
+  });
+  
+  it("Every man loves every woman from Brazil.", function() {
+    assertThat(parse(`
+      main() {
+        let a: Brazil(a).
+        every (let x: man(x)) {
+          every (let y: woman(y) and from(y, a)) {
+            loves(x, y).
+          }
+        }
+      }
+    `)).equalsTo(drs([], [
+      letty(["a"], pred("Brazil", ["a"])),
+      every(letty(["x"], pred("man", ["x"])), [
+        every(letty(["y"], and(pred("woman", ["y"]), pred("from", ["y", "a"]))), [
+          pred("loves", ["x", "y"]),
+        ]),
       ]),
     ]));
   });
@@ -276,14 +313,14 @@ describe.only("Natural Logic", function() {
   it("If Mary likes John then John likes Mary.", function() {
     assertThat(parse(`
       main() {
-        if (let x, y: {Mary(x). John(y). likes(x, y).}) then { 
+        if (let x, y: Mary(x), John(y) and likes(x, y)) then { 
           likes(y, x).
         }
       }
     `)).equalsTo(drs([], [
-      iffy(letty(["x", "y"], [pred("Mary", ["x"]),
-                              pred("John", ["y"]),
-                              pred("likes", ["x", "y"])]),
+      iffy(letty(["x", "y"], and(pred("Mary", ["x"]),
+                                 pred("John", ["y"]),
+                                 pred("likes", ["x", "y"]))),
            [pred("likes", ["y", "x"])]),
     ]));
   });
