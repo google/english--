@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Natural Logic", function() {
+describe("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -56,6 +56,10 @@ describe.only("Natural Logic", function() {
 
       statement -> copula _ head _ block {%
         ([copula, ws1, head, ws2, block]) => [copula, head, block] 
+      %}
+
+      statement -> block _ copula _ block {%
+        ([block1, ws1, copula, ws2, block2]) => [copula, block1, block2] 
       %}
 
       statement -> "if" _ head _ "then" _ block {%
@@ -158,6 +162,11 @@ describe.only("Natural Logic", function() {
   it("not", function() {
     assertThat(parse("main() { not () { P(a). } }"))
       .equalsTo(drs([], [not([], [pred("P", ["a"])])]));
+  });
+
+  it("or", function() {
+    assertThat(parse("main() { { P(a). } or { Q(a). } }"))
+      .equalsTo(drs([], [or([pred("P", ["a"])], [pred("Q", ["a"])])]));
   });
 
   it("and", function() {
@@ -311,15 +320,17 @@ describe.only("Natural Logic", function() {
         let p: Jones(p).
         let q: Mary(q).
         let r: Smith(r).
-        or (likes(p, q)) {
+        {
+          likes(p, q). 
+        } or {
           loves(p, r).
-        } 
+        }
       }
     `)).equalsTo(drs([], [
       letty(["p"], pred("Jones", ["p"])),
       letty(["q"], pred("Mary", ["q"])),
       letty(["r"], pred("Smith", ["r"])),
-      or(pred("likes", ["p", "q"]), [
+      or([pred("likes", ["p", "q"])], [
         pred("loves", ["p", "r"])
       ]),
     ]));
