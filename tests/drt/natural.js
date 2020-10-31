@@ -6,16 +6,13 @@ describe.only("Natural Logic", function() {
       @builtin "whitespace.ne"
       @builtin "number.ne"
 
-      main -> _ drs _ {% ([ws1, drs, ws2]) => drs %}
-
-      drs -> "main" _ head _ block {%
-        ([drs, ws1, head, ws2, block]) => [head, block] 
+      main -> _ "main" _ head _ block _ {%
+        ([ws0, drs, ws1, head, ws2, block]) => [head, block] 
       %}
 
       head -> "(" _ ")" {% () => [] %}
       head -> "(" _ expression _ ")" {% ([p1, ws1, expression]) => expression %}
       head -> "(" _ declaration _ ")" {% ([p1, ws1, declaration]) => declaration %}
-      referent -> word {% id %}
 
       block -> expression _ "." {% 
         ([statement]) => {
@@ -31,23 +28,19 @@ describe.only("Natural Logic", function() {
   
       statement -> expression _ "." {% id %}
       statement -> declaration _ "." {% id %}
+
       expression -> predicate {% id %}
-      # expression -> "(" _ expression _ ")" {% ([p1, ws1, expression]) => expression %}
-      expression -> block {% id %}
-      # the expression below is ambiguous. we need to figure out
-      # how to break out of this
       expression -> expression (_ "," _ expression):* _ "and" _ expression {%
         ([exp1, exp2, ws3, and, ws4, expr3]) => {
           let result = ["and", exp1, expr3];
-          // result = result.concat();
-          // console.log(expr3);
           result.splice(2, 0, ...exp2.map(([ws1, and, ws2, expr]) => expr));
           return result;
         }
       %}
+
       predicate -> word _ args {% ([pred, ws, args]) => [pred, args] %}
       args -> "(" _ ")" {% () => [] %}
-      args -> "(" _ referent _ ("," _ referent _):* ")" {% 
+      args -> "(" _ word _ ("," _ word _):* ")" {% 
         ([p1, ws1, ref, ws2, list, p2]) => {
           return [ref].concat(list.map(([comma, ws, ref]) => ref));
         } 
@@ -56,40 +49,27 @@ describe.only("Natural Logic", function() {
       declaration -> "let" _ word (_ "," _ word):* (_ ":" _ expression):? {% 
         ([letty, ws1, ref, refs, expr]) => {
           let [ws4, col, ws5, block] = expr || [];
-          // console.log(value);
           let vars = [ref].concat(refs.map(([ws2, comma, ws3, ref]) => ref));
           return ["let", vars, block];
         } 
       %}
 
-      statement -> quantifier _ head _ block {%
-        ([quantifier, ws1, head, ws2, block]) => [quantifier, head, block] 
+      statement -> copula _ head _ block {%
+        ([copula, ws1, head, ws2, block]) => [copula, head, block] 
       %}
 
       statement -> "if" _ head _ "then" _ block {%
         ([iffy, ws1, head, ws2, then, ws3, block]) => ["if", head, block] 
       %}
 
-      statement -> "not" _ head _ block {%
-        ([not, ws1, head, ws2, block]) => ["not", head, block] 
-      %}
-
       statement -> "if" _ expression _ "then" _ block {%
         ([iffy, ws1, expression, ws2, then, ws3, block]) => ["if", expression, block] 
       %}
 
-      quantifier -> "every" {% id %}
-                 |  "some" {% id %}
-
-      statement -> term __ copula __ term {% 
-        ([a, ws1, copula, ws2, b]) => {
-            return [a, copula, b];
-        } 
-      %}
-
-      copula -> "->" {% id %}
-
-      term -> word {% id %}
+      copula -> "every" {% id %}
+             |  "some" {% id %}
+             |  "not" {% id %}
+             |  "or" {% id %}
 
       word -> [a-zA-Z]:+ {% ([args]) => args.join("") %}
     `;
@@ -103,6 +83,7 @@ describe.only("Natural Logic", function() {
   let and = (...args) => ["and", ...args]; 
   let iffy = (head, block) => ["if", head, block]; 
   let not = (head, block) => ["not", head, block]; 
+  let or = (head, block) => ["or", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
 
   let parse = (code) => Nearley.from(grammar).feed(code);
@@ -120,8 +101,6 @@ describe.only("Natural Logic", function() {
       .equalsTo(drs([], [letty(["a"], and(pred("P", ["a"]), pred("Q", ["a"])))]));
     assertThat(parse("main() { let a, b: P(a, b). }"))
       .equalsTo(drs([], [letty(["a", "b"], pred("P", ["a", "b"]))]));
-    assertThat(parse("main() { let a, b: {P(a, b).}. }"))
-      .equalsTo(drs([], [letty(["a", "b"], [pred("P", ["a", "b"])])]));
     assertThat(parse("main(let a: P(a)) { Q(a). }"))
       .equalsTo(drs(letty(["a"], pred("P", ["a"])), [pred("Q", ["a"])]));
   });
@@ -157,9 +136,6 @@ describe.only("Natural Logic", function() {
     assertThat(parse("main() { every (let x: A(x) and B(x)) C(x). }"))
       .equalsTo(drs([], [every(letty(["x"], and(pred("A", ["x"]), pred("B", ["x"]))),
                                [pred("C", ["x"])])]));
-    assertThat(parse("main() { every (let x: {A(x).}) B(x). }"))
-      .equalsTo(drs([], [every(letty(["x"], [pred("A", ["x"])]),
-                               [pred("B", ["x"])])]));
   });
 
   it("If", function() {
@@ -167,12 +143,16 @@ describe.only("Natural Logic", function() {
       .equalsTo(drs([], [iffy(pred("P", ["a"]), [pred("Q", ["a"])])]));
     assertThat(parse("main() { if P(a) and Q(a) then R(a). }"))
       .equalsTo(drs([], [iffy(and(pred("P", ["a"]), pred("Q", ["a"])), [pred("R", ["a"])])]));
-    assertThat(parse("main() { if ({P(a). Q(a).}) then R(a). }"))
-      .equalsTo(drs([], [iffy([pred("P", ["a"]), pred("Q", ["a"])], [pred("R", ["a"])])]));
+    assertThat(parse("main() { if (P(a), Q(a) and R(a)) then S(a). }"))
+      .equalsTo(drs([], [iffy(and(pred("P", ["a"]), pred("Q", ["a"]), pred("R", ["a"])), [pred("S", ["a"])])]));
     assertThat(parse("main() { if (let x: P(x)) then Q(x). }"))
       .equalsTo(drs([], [iffy(letty(["x"], pred("P", ["x"])), [pred("Q", ["x"])])]));
     assertThat(parse("main() { if (let x: P(x)) then { Q(x). } }"))
       .equalsTo(drs([], [iffy(letty(["x"], pred("P", ["x"])), [pred("Q", ["x"])])]));
+    assertThat(parse("main() { if (let x: P(x) and R(x)) then { Q(x). } }"))
+      .equalsTo(drs([], [iffy(letty(["x"], and(pred("P", ["x"]),
+                                               pred("R", ["x"]))),
+                              [pred("Q", ["x"])])]));
   });
 
   it("not", function() {
@@ -322,6 +302,26 @@ describe.only("Natural Logic", function() {
                                  pred("John", ["y"]),
                                  pred("likes", ["x", "y"]))),
            [pred("likes", ["y", "x"])]),
+    ]));
+  });
+
+  it("Jones likes Mary or loves Smith.", function() {
+    assertThat(parse(`
+      main() {
+        let p: Jones(p).
+        let q: Mary(q).
+        let r: Smith(r).
+        or (likes(p, q)) {
+          loves(p, r).
+        } 
+      }
+    `)).equalsTo(drs([], [
+      letty(["p"], pred("Jones", ["p"])),
+      letty(["q"], pred("Mary", ["q"])),
+      letty(["r"], pred("Smith", ["r"])),
+      or(pred("likes", ["p", "q"]), [
+        pred("loves", ["p", "r"])
+      ]),
     ]));
   });
 
