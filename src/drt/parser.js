@@ -439,6 +439,7 @@ class FeaturedNearley {
   }
 
   feed(`@builtin "whitespace.ne"`);
+  feed(`@builtin "number.ne"`);
   feed(``);
   feed(`@{%`);
   feed(`${bind.toString()}`);
@@ -449,15 +450,15 @@ class FeaturedNearley {
    feed(header);
   }
 
-  // console.log(grammar[0].length);
-  
   for (let {head, tail} of grammar[0]) {
-   // console.log("hi");
    let term = (x) => typeof x == "string" ? `${x}i` : x.name;
    feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
                      for (let term of tail) {
-                      if (term.name == "_" || term.name == "__" || typeof term == "string") {
+                       if (term.name == "_" ||
+                           term.name == "__" ||
+                           term.name == "unsigned_int" ||
+                           typeof term == "string") {
                        continue;
                       }
                       feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
@@ -466,7 +467,9 @@ class FeaturedNearley {
         feed(`%}`);
 
   }
- 
+
+   // console.log(result.join("\n"));
+   
   return Nearley.compile(result.join("\n"), raw);
  }
 }
@@ -620,6 +623,12 @@ const DrtSyntax = `
       DET[num=plur] -> "not" _ "all".
       DET[num=plur] -> "the" _ "majority" _ "of".
       DET[num=plur] -> "the" _ "minority" _ "of".
+      DET[num=plur] -> "at" _ "least" _ unsigned_int.
+      DET[num=plur] -> "at" _ "most" _ unsigned_int.
+      DET[num=plur] -> "more" _ "than" _ unsigned_int.
+      DET[num=plur] -> "fewer" _ "than" _ unsigned_int.
+      DET[num=plur] -> "exactly" _ unsigned_int.
+      DET[num=plur] -> unsigned_int.
       
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
 
@@ -821,6 +830,7 @@ let DRTGrammar;
 function drtGrammar() {
   if (!DRTGrammar) {
     DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+    // console.log(DrtSyntax);
   }
   return DRTGrammar;  
 }

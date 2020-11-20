@@ -578,6 +578,17 @@ describe("Binding", function() {
       }]
     });
   });
+
+  it("Numbers", function() {
+    let parser = Nearley.from(`
+      @builtin "number.ne"
+      @builtin "whitespace.ne"
+      main -> "foo" _ unsigned_int _ "bar"
+    `);
+
+    let result = parser.feed("foo 1 bar");
+    assertThat(result).equalsTo([["foo", null, 1, null, "bar"]]);
+  });  
 });
 
 describe("FeaturedNearley", function() {
@@ -640,7 +651,24 @@ describe("FeaturedNearley", function() {
                          node("V", "likes"), 
                          node("NP", node("PN", "Dani"))))
                );
-   });
+  });
+
+  it("Numbers", function() {
+    let grammar = FeaturedNearley.compile(`
+      main -> "foo" _ unsigned_int _ "bar".
+    `);
+
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("foo 1 bar");
+    
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": ["foo", 1, "bar"],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
 
   it("Nearley features", function() {
     let parser = new FeaturedNearley();
@@ -1346,6 +1374,42 @@ describe("Generalized Quantifiers", function() {
   it("The minority of men are mortal.", function() {
     assertThat(parse("The minority of men are mortal."))
       .equalsTo(S(NP(DET("The", "minority", "of"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("At least 5 men are mortal.", function() {
+    assertThat(parse("At least 5 men are mortal."))
+      .equalsTo(S(NP(DET("At", "least", 5), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("At most 5 men are mortal.", function() {
+    assertThat(parse("At most 5 men are mortal."))
+      .equalsTo(S(NP(DET("At", "most", 5), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("More than 5 men are mortal.", function() {
+    assertThat(parse("More than 5 men are mortal."))
+      .equalsTo(S(NP(DET("More", "than", 5), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Fewer than 5 men are mortal.", function() {
+    assertThat(parse("Fewer than 5 men are mortal."))
+      .equalsTo(S(NP(DET("Fewer", "than", 5), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Exactly 5 men are mortal.", function() {
+    assertThat(parse("Exactly 5 men are mortal."))
+      .equalsTo(S(NP(DET("Exactly", 5), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("5 men are mortal.", function() {
+    assertThat(parse("5 men are mortal."))
+      .equalsTo(S(NP(DET(5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 });
