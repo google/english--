@@ -1288,6 +1288,68 @@ describe("Questions", function() {
   });
 });
 
+describe("Generalized Quantifiers", function() {
+  it("Every man is happy.", function() {
+    assertThat(parse("Every man is happy."))
+      .equalsTo(S(NP(DET("Every"), N("man")),
+                  VP_(VP(BE("is"), ADJ("happy")))));
+  });
+
+  it("All men are mortal.", function() {
+    assertThat(parse("All men are mortal."))
+      .equalsTo(S(NP(DET("All"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("No engineer is happy.", function() {
+    assertThat(parse("No engineer is happy."))
+      .equalsTo(S(NP(DET("No"), N("engineer")),
+                  VP_(VP(BE("is"), ADJ("happy")))));
+  });
+
+  it("Most men are mortal.", function() {
+    assertThat(parse("Most men are mortal."))
+      .equalsTo(S(NP(DET("Most"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Some men are mortal.", function() {
+    assertThat(parse("Some men are mortal."))
+      .equalsTo(S(NP(DET("Some"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Not all men are mortal.", function() {
+    assertThat(parse("Not all men are mortal."))
+      .equalsTo(S(NP(DET("Not", "all"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Many men are mortal.", function() {
+    assertThat(parse("Many men are mortal."))
+      .equalsTo(S(NP(DET("Many"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Only men are mortal.", function() {
+    assertThat(parse("Only men are mortal."))
+      .equalsTo(S(NP(DET("Only"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("The majority of men are mortal.", function() {
+    assertThat(parse("The majority of men are mortal."))
+      .equalsTo(S(NP(DET("The", "majority", "of"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("The minority of men are mortal.", function() {
+    assertThat(parse("The minority of men are mortal."))
+      .equalsTo(S(NP(DET("The", "minority", "of"), N("men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+});
+
 describe("DRT Verbs", function() {
   it("Verbs", function() {
     // https://parentingpatch.com/third-person-singular-simple-present-verbs/
@@ -2141,7 +2203,6 @@ describe("Backwards compatibility", function() {
                  VP_(VP(BE("was"), "not",
                         NP(DET("an"), N("engineer"))))));
   });
-
 });
 
 function assertThat(x) {

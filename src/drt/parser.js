@@ -610,7 +610,17 @@ const DrtSyntax = `
       DET[num=sing] -> "every".
       DET[num=sing] -> "the".
       DET[num=sing] -> "some".
+      DET[num=sing] -> "no".
 
+      DET[num=plur] -> "all".
+      DET[num=plur] -> "some".
+      DET[num=plur] -> "most".
+      DET[num=plur] -> "many".
+      DET[num=plur] -> "only".
+      DET[num=plur] -> "not" _ "all".
+      DET[num=plur] -> "the" _ "majority" _ "of".
+      DET[num=plur] -> "the" _ "minority" _ "of".
+      
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
 
       N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
@@ -741,6 +751,7 @@ const DrtSyntax = `
       PN[num=sing, gen=-hum] -> "Ulysses".
 
       N[num=sing, gen=male] -> "man".
+      N[num=plur, gen=male] -> "men".
       N[num=sing, gen=fem] -> "woman".
       N[num=sing, gen=fem] -> "girl".
       N[num=sing, gen=-hum] -> "book".
