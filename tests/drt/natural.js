@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe("Natural Logic", function() {
+describe.only("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -41,22 +41,45 @@ describe("Natural Logic", function() {
       statement -> expression _ "." {% id %}
       statement -> declaration _ "." {% id %}
 
-      expression -> predicate {% id %}
+      # expression -> predicate {% id %}
 
-      expression -> expression (_ "," _ expression):* _ "and" _ expression {%
-        ([exp1, exp2, ws3, and, ws4, expr3]) => {
-          let result = ["and", exp1, expr3];
-          result.splice(2, 0, ...exp2.map(([ws1, and, ws2, expr]) => expr));
-          return result;
-        }
-      %}
+      #expression -> expression (_ "," _ expression):* _ "and" _ expression {%
+      #  ([exp1, exp2, ws3, and, ws4, expr3]) => {
+      #    let result = ["and", exp1, expr3];
+      #    result.splice(2, 0, ...exp2.map(([ws1, and, ws2, expr]) => expr));
+      #    return result;
+      #  }
+      #%}
 
-      expression -> expression _ "or" _ expression {%
-        ([exp1, ws1, or, ws2, expr2]) => {
-          return ["or", exp1, expr2];
-        }
-      %}
+      #expression -> expression _ operator _ expression {%
+      #  ([exp1, ws1, operator, ws2, expr2]) => {
+      #    return [operator, exp1, expr2];
+      #  }
+      #%}
 
+      #operator -> "or" {% id %}
+      #         |  "and" {% id %}
+       
+      expression -> negation {% id %}
+      negation -> "not" conjunction {%
+          ([not, ws1, expr]) => {
+            return ["not", expr];
+          }
+        %}
+               | conjunction {% id %}
+      conjunction -> conjunction _ "and" _ disjunction {%
+          ([exp1, ws1, operator, ws2, expr2]) => {
+            return [operator, exp1, expr2];
+          }
+        %}
+                  | disjunction {% id %}
+      disjunction -> disjunction _ "or" _ predicate {%
+          ([exp1, ws1, operator, ws2, expr2]) => {
+            return [operator, exp1, expr2];
+          }
+        %}
+                  | predicate {% id %}         
+      
       #expression -> "not" _ expression {%
       #  ([not, ws1, expr]) => {
       #    return ["not", expr];
@@ -145,13 +168,37 @@ describe("Natural Logic", function() {
       .equalsTo([[pred("P", ["a"]), pred("Q", ["b"])]]);
   });
 
+  it("not P(a).", function() {
+    assertThat(parse("not P(a)."))
+      .equalsTo([[not(pred("P", ["a"]))]]);
+  });
+
   it("P(a) and Q(b).", function() {
     assertThat(parse("P(a) and Q(b)."))
       .equalsTo([[and(pred("P", ["a"]), pred("Q", ["b"]))]]);
   });
 
-  it.skip("P(a) or Q(b).", function() {
+  it("P(a) or Q(b).", function() {
     assertThat(parse("P(a) or Q(b)."))
+      .equalsTo([[or(pred("P", ["a"]), pred("Q", ["b"]))]]);
+  });
+
+
+  it("P(a) and Q(b) and R(c).", function() {
+    assertThat(parse("P(a) and Q(b) and R(c)."))
+      .equalsTo([[
+        and(and(pred("P", ["a"]), pred("Q", ["b"])), pred("R", ["c"]))
+      ]]);
+  });
+
+  it("P(a) or Q(b) and R(c).", function() {
+    assertThat(parse("P(a) or Q(b) and R(c)."))
+      .equalsTo([[and(or(pred("P", ["a"]), pred("Q", ["b"])),
+                      pred("R", ["c"]))]]);
+  });
+
+  it.skip("P(a) or not Q(b).", function() {
+    assertThat(parse("P(a) or not Q(b)."))
       .equalsTo([[or(pred("P", ["a"]), pred("Q", ["b"]))]]);
   });
 
@@ -228,10 +275,10 @@ describe("Natural Logic", function() {
                        pred("R", ["a"]))]]);
   });
 
-  it("if (P(a), Q(a) and R(a)) then S(a).", function() {
-    assertThat(parse("if (P(a), Q(a) and R(a)) then S(a)."))
-      .equalsTo([[iffy(and(pred("P", ["a"]),
-                           pred("Q", ["a"]),
+  it("if (P(a) and Q(a) and R(a)) then S(a).", function() {
+    assertThat(parse("if (P(a) and Q(a) and R(a)) then S(a)."))
+      .equalsTo([[iffy(and(and(pred("P", ["a"]),
+                               pred("Q", ["a"])),
                            pred("R", ["a"])),
                        pred("S", ["a"]))]]);
   });
@@ -260,11 +307,6 @@ describe("Natural Logic", function() {
       .equalsTo([[not([pred("P", ["a"])])]]);
   });
 
-  it("not P(a).", function() {
-    assertThat(parse("not P(a)."))
-      .equalsTo([[not(pred("P", ["a"]))]]);
-  });
-
   it("not P(a) and Q(a).", function() {
     assertThat(parse("not P(a) and Q(a)."))
       .equalsTo([[not(and(pred("P", ["a"]),
@@ -287,11 +329,11 @@ describe("Natural Logic", function() {
       .equalsTo([[and(pred("P", ["a"]), pred("Q", ["a"]))]]);
   });
 
-  it("P(a), Q(a) and R(a).", function() {
-    assertThat(parse("P(a), Q(a) and R(a)."))
-      .equalsTo([[and(pred("P", ["a"]),
-                             pred("Q", ["a"]),
-                             pred("R", ["a"]),
+  it("P(a) and Q(a) and R(a).", function() {
+    assertThat(parse("P(a) and Q(a) and R(a)."))
+      .equalsTo([[and(and(pred("P", ["a"]),
+                          pred("Q", ["a"])),
+                      pred("R", ["a"]),
                      )]]);
   });
 
@@ -413,12 +455,12 @@ describe("Natural Logic", function() {
 
   it("If Mary likes John then John likes Mary.", function() {
     assertThat(parse(`
-      if (let x, y: Mary(x), John(y) and likes(x, y)) then { 
+      if (let x, y: Mary(x) and John(y) and likes(x, y)) then { 
         likes(y, x).
       }
     `)).equalsTo([[
-      iffy(letty(["x", "y"], and(pred("Mary", ["x"]),
-                                 pred("John", ["y"]),
+      iffy(letty(["x", "y"], and(and(pred("Mary", ["x"]),
+                                     pred("John", ["y"])),
                                  pred("likes", ["x", "y"]))),
            [pred("likes", ["y", "x"])]),
     ]]);
