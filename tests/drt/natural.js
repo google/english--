@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Natural Logic", function() {
+describe("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -42,6 +42,7 @@ describe.only("Natural Logic", function() {
       statement -> declaration _ "." {% id %}
 
       expression -> predicate {% id %}
+
       expression -> expression (_ "," _ expression):* _ "and" _ expression {%
         ([exp1, exp2, ws3, and, ws4, expr3]) => {
           let result = ["and", exp1, expr3];
@@ -49,6 +50,18 @@ describe.only("Natural Logic", function() {
           return result;
         }
       %}
+
+      expression -> expression _ "or" _ expression {%
+        ([exp1, ws1, or, ws2, expr2]) => {
+          return ["or", exp1, expr2];
+        }
+      %}
+
+      #expression -> "not" _ expression {%
+      #  ([not, ws1, expr]) => {
+      #    return ["not", expr];
+      #  }
+      #%}
 
       predicate -> word _ args {% ([pred, ws, args]) => [pred, args] %}
       args -> "(" _ ")" {% () => [] %}
@@ -70,6 +83,10 @@ describe.only("Natural Logic", function() {
         ([copula, ws1, head, ws2, statement]) => [copula, head, statement] 
       %}
 
+      statement -> "not" _ statement {%
+        ([not, ws1, statement]) => ["not", statement] 
+      %}
+
       statement -> statement _ copula _ statement {%
         ([block1, ws1, copula, ws2, block2]) => [copula, block1, block2] 
       %}
@@ -84,9 +101,8 @@ describe.only("Natural Logic", function() {
 
       copula -> "every" {% id %}
              |  "some" {% id %}
-             |  "not" {% id %}
              |  "or" {% id %}
-
+     
       word -> [a-zA-Z]:+ {% ([args]) => args.join("") %}
     `;
 
@@ -98,7 +114,7 @@ describe.only("Natural Logic", function() {
   let some = (args = [], block = []) => quant("some", args, block); 
   let and = (...args) => ["and", ...args]; 
   let iffy = (head, block) => ["if", head, block]; 
-  let not = (head, block) => ["not", head, block]; 
+  let not = (block) => ["not", block]; 
   let or = (head, block) => ["or", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
 
@@ -239,9 +255,21 @@ describe.only("Natural Logic", function() {
                        [pred("Q", ["x"])])]]);
   });
 
-  it("not () { P(a). }", function() {
-    assertThat(parse("not () { P(a). }"))
-      .equalsTo([[not([], [pred("P", ["a"])])]]);
+  it("not { P(a). }", function() {
+    assertThat(parse("not { P(a). }"))
+      .equalsTo([[not([pred("P", ["a"])])]]);
+  });
+
+  it("not P(a).", function() {
+    assertThat(parse("not P(a)."))
+      .equalsTo([[not(pred("P", ["a"]))]]);
+  });
+
+  it("not P(a) and Q(a).", function() {
+    assertThat(parse("not P(a) and Q(a)."))
+      .equalsTo([[not(and(pred("P", ["a"]),
+                          pred("Q", ["a"])
+                         ))]]);
   });
 
   it("{ P(a). } or { Q(a). }", function() {
@@ -249,9 +277,9 @@ describe.only("Natural Logic", function() {
       .equalsTo([[or([pred("P", ["a"])], [pred("Q", ["a"])])]]);
   });
 
-  it.skip("P(a) or Q(a).", function() {
+  it("P(a) or Q(a).", function() {
     assertThat(parse("P(a) or Q(a)."))
-      .equalsTo([[or([pred("P", ["a"])], [pred("Q", ["a"])])]]);
+      .equalsTo([[or(pred("P", ["a"]), pred("Q", ["a"]))]]);
   });
 
   it("P(a) and Q(a).", function() {
@@ -307,13 +335,13 @@ describe.only("Natural Logic", function() {
     assertThat(parse(`
       let u: Jones(u).
       let v: Mary(v).
-      not() { 
+      not { 
         like(u, v). 
       }
     `)).equalsTo([[
       letty(["u"], pred("Jones", ["u"])),
       letty(["v"], pred("Mary", ["v"])),
-      not([], [pred("like", ["u", "v"])]),
+      not([pred("like", ["u", "v"])]),
     ]]);
   });
 
