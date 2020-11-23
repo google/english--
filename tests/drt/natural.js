@@ -60,25 +60,26 @@ describe.only("Natural Logic", function() {
       #operator -> "or" {% id %}
       #         |  "and" {% id %}
        
-      expression -> negation {% id %}
-      negation -> "not" conjunction {%
-          ([not, ws1, expr]) => {
-            return ["not", expr];
-          }
-        %}
-               | conjunction {% id %}
+      expression -> conjunction {% id %}
       conjunction -> conjunction _ "and" _ disjunction {%
           ([exp1, ws1, operator, ws2, expr2]) => {
             return [operator, exp1, expr2];
           }
         %}
                   | disjunction {% id %}
-      disjunction -> disjunction _ "or" _ predicate {%
+      disjunction -> disjunction _ "or" _ negation {%
           ([exp1, ws1, operator, ws2, expr2]) => {
             return [operator, exp1, expr2];
           }
         %}
-                  | predicate {% id %}         
+                  | negation {% id %}         
+      
+        negation -> "not" _ predicate {%
+          ([not, ws1, expr]) => {
+            return ["not", expr];
+          }
+        %}
+               | predicate {% id %}
       
       #expression -> "not" _ expression {%
       #  ([not, ws1, expr]) => {
@@ -106,9 +107,9 @@ describe.only("Natural Logic", function() {
         ([copula, ws1, head, ws2, statement]) => [copula, head, statement] 
       %}
 
-      statement -> "not" _ statement {%
-        ([not, ws1, statement]) => ["not", statement] 
-      %}
+      #statement -> "not" _ statement {%
+      #  ([not, ws1, statement]) => ["not", statement] 
+      #%}
 
       statement -> statement _ copula _ statement {%
         ([block1, ws1, copula, ws2, block2]) => [copula, block1, block2] 
@@ -197,9 +198,9 @@ describe.only("Natural Logic", function() {
                       pred("R", ["c"]))]]);
   });
 
-  it.skip("P(a) or not Q(b).", function() {
+  it("P(a) or not Q(b).", function() {
     assertThat(parse("P(a) or not Q(b)."))
-      .equalsTo([[or(pred("P", ["a"]), pred("Q", ["b"]))]]);
+      .equalsTo([[or(pred("P", ["a"]), not(pred("Q", ["b"])))]]);
   });
 
   it("let a.", function() {
@@ -302,16 +303,17 @@ describe.only("Natural Logic", function() {
                        [pred("Q", ["x"])])]]);
   });
 
-  it("not { P(a). }", function() {
-    assertThat(parse("not { P(a). }"))
-      .equalsTo([[not([pred("P", ["a"])])]]);
+  it("not P(a).", function() {
+    assertThat(parse("not P(a)."))
+      .equalsTo([[not(pred("P", ["a"]))]]);
   });
 
   it("not P(a) and Q(a).", function() {
     assertThat(parse("not P(a) and Q(a)."))
-      .equalsTo([[not(and(pred("P", ["a"]),
-                          pred("Q", ["a"])
-                         ))]]);
+      .equalsTo([[and(
+        not(pred("P", ["a"])),
+        pred("Q", ["a"])
+      )]]);
   });
 
   it("{ P(a). } or { Q(a). }", function() {
@@ -377,13 +379,11 @@ describe.only("Natural Logic", function() {
     assertThat(parse(`
       let u: Jones(u).
       let v: Mary(v).
-      not { 
-        like(u, v). 
-      }
+      not like(u, v). 
     `)).equalsTo([[
       letty(["u"], pred("Jones", ["u"])),
       letty(["v"], pred("Mary", ["v"])),
-      not([pred("like", ["u", "v"])]),
+      not(pred("like", ["u", "v"])),
     ]]);
   });
 
