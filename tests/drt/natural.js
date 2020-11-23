@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe("Natural Logic", function() {
+describe.only("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -323,7 +323,8 @@ describe("Natural Logic", function() {
     ]]);
   });
   
-  it("Jones likes Mary.", function() {
+  it("let u: Jones(u). let v: Mary(v). likes(u, v).", function() {
+    // Jones likes Mary
     assertThat(parse(`
       let u: Jones(u).
       let v: Mary(v).
@@ -335,8 +336,10 @@ describe("Natural Logic", function() {
     ]]);
   });
 
-  it("Jones owns Ulysses. It fascinates him.", function() {
-    assertThat(parse(`
+  it("let u: Jones(u). let v: Ulysses(v). owns(u, v). fascinates(v, u).",
+     function() {
+       // Jones owns Ulysses. It fascinates him.
+       assertThat(parse(`
       let u: Jones(u).
       let v: Ulysses(v).
       owns(u, v).
@@ -349,11 +352,12 @@ describe("Natural Logic", function() {
     ]]);
   });
 
-  it("Jones does not like Mary.", function() {
+  it("let u: Jones(u). let v: Mary(v). not like(u, v).", function() {
+     // Jones does not like Mary.
     assertThat(parse(`
-      let u: Jones(u).
-      let v: Mary(v).
-      not like(u, v). 
+       let u: Jones(u). 
+       let v: Mary(v). 
+       not like(u, v).
     `)).equalsTo([[
       letty(["u"], pred("Jones", ["u"])),
       letty(["v"], pred("Mary", ["v"])),
