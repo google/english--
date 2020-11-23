@@ -19,6 +19,7 @@ describe("Natural Logic", function() {
   
       sentence -> statement {% id %}
                | question {% id %}
+               | command {% id %}
       
       statement -> block {% id %}
       statement -> expression _ "." {% id %}
@@ -36,6 +37,10 @@ describe("Natural Logic", function() {
       %}
       question -> "for" _ head _ block _ "?" {%
         ([select, ws1, head, ws2, statement]) => ["question", head, statement] 
+      %}
+
+      command -> "do" _ head _ block {%
+        ([command, ws1, head, ws2, statement]) => ["command", head, statement] 
       %}
 
       expression -> conjunction {% id %}
@@ -116,6 +121,7 @@ describe("Natural Logic", function() {
   let or = (head, block) => ["or", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
   let question = (head = [], block = []) => ["question", head, block]; 
+  let command = (head = [], block = []) => ["command", head, block]; 
 
   let parse = (code) => Nearley.from(grammar).feed(code);
 
@@ -502,6 +508,22 @@ describe("Natural Logic", function() {
         pred("likes", ["x", "y"]),
         pred("woman", ["y"]),
       ])
+    ]]);
+  });
+
+  it("let v: Mary(v). do (let u) { make(u). reservation(u). for(u, v). }", function() {
+    // Make a reservation for Mary.
+    assertThat(parse(`
+      let v: Mary(v).
+      do (let u: reservation(u)) {
+        make(u). 
+        for(u, v).
+      }
+    `)).equalsTo([[
+      letty(["v"], pred("Mary", ["v"])),
+      command(letty(["u"], pred("reservation", ["u"])),
+              [pred("make", ["u"]),
+               pred("for", ["u", "v"])]),
     ]]);
   });
 
