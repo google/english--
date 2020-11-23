@@ -21,8 +21,10 @@ describe("Natural Logic", function() {
                | question {% id %}
                | command {% id %}
       
-      statement -> block {% id %}
-      statement -> expression _ "." {% id %}
+      statement -> (word _ ":" _):? block {% ([label, block]) => block %}
+      statement -> (word _ ":" _):? expression _ "." {% 
+        ([label, block]) => block 
+      %}
       statement -> declaration _ "." {% id %}
 
       block -> "{" _ (statement _):* "}" {% 
@@ -106,7 +108,11 @@ describe("Natural Logic", function() {
         ([iffy, ws1, expr, ws2, then, ws3, block]) => ["if", expr, block] 
       %}
 
-      word -> [a-zA-Z]:+ {% ([args]) => args.join("") %}
+      word -> [a-zA-Z] [a-zA-Z0-9]:* {% ([head, tail]) => {
+        // names need to start with a letter.
+        return head + tail.join(""); 
+        }
+      %}
     `;
 
   let drs = (head = [], block = []) => [[head, block]];
@@ -524,6 +530,21 @@ describe("Natural Logic", function() {
       command(letty(["u"], pred("reservation", ["u"])),
               [pred("make", ["u"]),
                pred("for", ["u", "v"])]),
+    ]]);
+  });
+
+  it("let u: Jones(u). let v: Mary(v). e1: kiss(u, v).", function() {
+    // Jones kissed Mary passionately.
+    assertThat(parse(`
+      let u: Jones(u).
+      let v: Mary(v).
+      e1: { kiss(u, v). passionately(). }
+      e2: loved(u, v).
+    `)).equalsTo([[
+      letty(["u"], pred("Jones", ["u"])),
+      letty(["v"], pred("Mary", ["v"])),
+      [pred("kiss", ["u", "v"]), pred("passionately")],
+      pred("loved", ["u", "v"]),
     ]]);
   });
 
