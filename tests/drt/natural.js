@@ -1,30 +1,42 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Natural Logic", function() {
+describe("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
 
-      main -> _ statements _ {%
-        ([ws0, statements, ws1]) => statements 
+      main -> _ sentences _ {%
+        ([ws0, sentences, ws1]) => sentences 
       %}
 
-      statements -> statement (_ statement):* {% 
-        ([statement, statements = []]) => {
-          let others = statements.map(([ws, statement]) => statement);
-          return [statement].concat(others);
+      sentences -> sentence (_ sentence):* {% 
+        ([sentence, sentences = []]) => {
+          let others = sentences.map(([ws, sentence]) => sentence);
+          return [sentence].concat(others);
         } 
       %}
+  
+      sentence -> statement {% id %}
+               | question {% id %}
+      
+      statement -> block {% id %}
+      statement -> expression _ "." {% id %}
+      statement -> declaration _ "." {% id %}
 
-      statement -> "{" _ (statement _):* "}" {% 
+      block -> "{" _ (statement _):* "}" {% 
         ([p1, ws, statements]) => {
           return statements.map(([statement]) => statement);
         } 
       %}
-  
-      statement -> expression _ "." {% id %}
-      statement -> declaration _ "." {% id %}
+
+      question -> expression _ "?" {% ([expr]) => ["question", [], expr] %}
+      question -> "for" _ head _ expression _ "?" {%
+        ([select, ws1, head, ws2, statement]) => ["question", head, statement] 
+      %}
+      question -> "for" _ head _ block _ "?" {%
+        ([select, ws1, head, ws2, statement]) => ["question", head, statement] 
+      %}
 
       expression -> conjunction {% id %}
 
@@ -103,10 +115,16 @@ describe.only("Natural Logic", function() {
   let not = (block) => ["not", block]; 
   let or = (head, block) => ["or", head, block]; 
   let letty = (a, b) => ["let", a, b]; 
+  let question = (head = [], block = []) => ["question", head, block]; 
 
   let parse = (code) => Nearley.from(grammar).feed(code);
 
   it("P().", function() {
+    assertThat(parse("P()."))
+      .equalsTo([[pred("P")]]);
+  });
+
+  it("P()?", function() {
     assertThat(parse("P()."))
       .equalsTo([[pred("P")]]);
   });
@@ -417,17 +435,19 @@ describe.only("Natural Logic", function() {
     ]]);
   });
 
-  it("Every man is mortal. Socrates is a man.", function() {
+  it("Every man is mortal. Socrates is a man. Is Socrates mortal?", function() {
     assertThat(parse(`
       every (let x: man(x)) {
         mortal(x).
       }
       let u: Socrates(u).
       man(u).
+      mortal(u)?
     `)).equalsTo([[
       every(letty(["x"], pred("man", ["x"])), [pred("mortal", ["x"])]),
       letty(["u"], pred("Socrates", ["u"])),
       pred("man", ["u"]),
+      question([], pred("mortal", ["u"]))
     ]]);
   });
 
@@ -457,6 +477,31 @@ describe.only("Natural Logic", function() {
       or(pred("likes", ["p", "q"]), 
          pred("loves", ["p", "r"])
         ),
+    ]]);
+  });
+
+  it("let u: Jones(u). let v: Mary(v). likes(u, v). for (let x) likes(x, v)?", function() {
+    // Jones likes Mary.
+    // Who likes Mary?
+    // Who likes a woman?
+    assertThat(parse(`
+      let u: Jones(u).
+      let v: Mary(v).
+      likes(u, v).
+      for (let x) likes(x, v)?
+      for (let x, y) { 
+        likes(x, y).
+        woman(y).
+      } ?
+    `)).equalsTo([[
+      letty(["u"], pred("Jones", ["u"])),
+      letty(["v"], pred("Mary", ["v"])),
+      pred("likes", ["u", "v"]),
+      question(letty(["x"]), pred("likes", ["x", "v"])),
+      question(letty(["x", "y"]), [
+        pred("likes", ["x", "y"]),
+        pred("woman", ["y"]),
+      ])
     ]]);
   });
 
