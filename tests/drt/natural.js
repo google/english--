@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley} = require("../../src/drt/parser.js");
 
-describe.only("Natural Logic", function() {
+describe("Natural Logic", function() {
   const grammar = `
       @builtin "whitespace.ne"
       @builtin "number.ne"
@@ -10,26 +10,9 @@ describe.only("Natural Logic", function() {
         ([ws0, statements, ws1]) => statements 
       %}
 
-      # main -> _ "main" _ head _ block _ {%
-      #   ([ws0, drs, ws1, head, ws2, block]) => [head, block] 
-      # %}
-
-      head -> "(" _ ")" {% () => [] %}
-      # head -> "(" _ expression _ ")" {% ([p1, ws1, expression]) => expression %}
-      head -> expression {% ([expression]) => expression %}
-  
-      head -> "(" _ declaration _ ")" {% ([p1, ws1, declaration]) => declaration %}
-
-      #block -> expression _ "." {% 
-      #  ([statement]) => {
-      #    return [statement];
-      #  } 
-      #%}
-
       statements -> statement (_ statement):* {% 
         ([statement, statements = []]) => {
           let others = statements.map(([ws, statement]) => statement);
-          // console.log(others);
           return [statement].concat(others);
         } 
       %}
@@ -43,25 +26,6 @@ describe.only("Natural Logic", function() {
       statement -> expression _ "." {% id %}
       statement -> declaration _ "." {% id %}
 
-      # expression -> predicate {% id %}
-
-      #expression -> expression (_ "," _ expression):* _ "and" _ expression {%
-      #  ([exp1, exp2, ws3, and, ws4, expr3]) => {
-      #    let result = ["and", exp1, expr3];
-      #    result.splice(2, 0, ...exp2.map(([ws1, and, ws2, expr]) => expr));
-      #    return result;
-      #  }
-      #%}
-
-      #expression -> expression _ operator _ expression {%
-      #  ([exp1, ws1, operator, ws2, expr2]) => {
-      #    return [operator, exp1, expr2];
-      #  }
-      #%}
-
-      #operator -> "or" {% id %}
-      #         |  "and" {% id %}
-       
       expression -> conjunction {% id %}
 
       conjunction -> conjunction _ "and" _ disjunction {%
@@ -111,22 +75,20 @@ describe.only("Natural Logic", function() {
         ([copula, ws1, head, ws2, statement]) => [copula, head, statement] 
       %}
 
-      #statement -> statement _ copula _ statement {%
-      #  ([block1, ws1, copula, ws2, block2]) => [copula, block1, block2] 
-      #%}
+      head -> "(" _ ")" {% () => [] %}
+      head -> "(" _ declaration _ ")" {% ([p1, ws1, declaration]) => declaration %}
 
+      copula -> "every" {% id %}
+             |  "some" {% id %}
+     
       statement -> "if" _ head _ "then" _ statement {%
         ([iffy, ws1, head, ws2, then, ws3, block]) => ["if", head, block] 
       %}
 
-      #statement -> "if" _ expression _ "then" _ statement {%
-      #  ([iffy, ws1, expression, ws2, then, ws3, block]) => ["if", expression, block] 
-      #%}
+      statement -> "if" _ expression _ "then" _ statement {%
+        ([iffy, ws1, expr, ws2, then, ws3, block]) => ["if", expr, block] 
+      %}
 
-      copula -> "every" {% id %}
-             |  "some" {% id %}
-             |  "or" {% id %}
-     
       word -> [a-zA-Z]:+ {% ([args]) => args.join("") %}
     `;
 
@@ -478,23 +440,19 @@ describe.only("Natural Logic", function() {
     ]]);
   });
 
-  it.skip("Jones likes Mary or loves Smith.", function() {
+  it("Jones likes Mary or loves Smith.", function() {
     assertThat(parse(`
       let p: Jones(p).
       let q: Mary(q).
       let r: Smith(r).
-      {
-        likes(p, q). 
-      } or {
-        loves(p, r).
-      }
+      likes(p, q) or loves(p, r).
     `)).equalsTo([[
       letty(["p"], pred("Jones", ["p"])),
       letty(["q"], pred("Mary", ["q"])),
       letty(["r"], pred("Smith", ["r"])),
-      or([pred("likes", ["p", "q"])], [
-        pred("loves", ["p", "r"])
-      ]),
+      or(pred("likes", ["p", "q"]), 
+         pred("loves", ["p", "r"])
+        ),
     ]]);
   });
 
