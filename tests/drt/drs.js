@@ -418,7 +418,7 @@ describe("DRS", function() {
          drs(b) {
            book(b)
            owns(a, b)
-         } => drs() {
+         } if () drs() {
            likes(a, b)
          }
        }
@@ -436,7 +436,7 @@ describe("DRS", function() {
          drs(c) {
            book(c)
            owns(a, c)
-         } => drs(d) {
+         } if () drs(d) {
            porsche(d)
            owns(b, d)
          }
@@ -454,7 +454,7 @@ describe("DRS", function() {
          drs(c) {
            book(c)
            likes(b, c)
-         } => drs() {
+         } if () drs() {
            likes(a, c)
          }
        }
@@ -481,7 +481,7 @@ describe("DRS", function() {
          drs(c) {
            a like c
            man(c)
-         } => drs() {
+         } every (c) drs() {
            b like b
          }
        }
@@ -495,7 +495,7 @@ describe("DRS", function() {
          Jones(a)
          drs(b) {
            man(b)
-         } => drs() {
+         } every (b) drs() {
            loves(b, a)
          }
        }
@@ -508,7 +508,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            man(a)
-         } => drs() {
+         } every (a) drs() {
            happy(a)
          }
        }
@@ -544,7 +544,7 @@ describe("DRS", function() {
          Jones(a)
          drs(b) {
            man(b)
-         } => drs() {
+         } every (b) drs() {
            loves(a, b)
          }
        }
@@ -693,7 +693,7 @@ describe("DRS", function() {
          drs(c) {
            woman(c)
            loves(b, c)
-         } => drs() {
+         } every (c) drs() {
            likes(a, c)
          }
        }
@@ -713,7 +713,7 @@ describe("DRS", function() {
            drs(d) {
              c love d
              woman(d)
-           } => drs() {
+           } every (d) drs() {
              a like d
            }
          }
@@ -904,7 +904,7 @@ describe("DRS", function() {
          drs(b) {
            fast(b)
            porsche(b)
-         } => drs() {
+         } every (b) drs() {
            owns(a, b)
          }
        }
@@ -919,7 +919,7 @@ describe("DRS", function() {
          drs(b) {
            beautiful(b)
            woman(b)
-         } => drs() {
+         } every (b) drs() {
            loves(b, a)
          }
        }
@@ -1014,7 +1014,7 @@ describe("DRS", function() {
            woman(b)
            donkey(c)
            with(b, c)
-         } => drs() {
+         } every (b) drs() {
            loves(b, a)
          }
        }
@@ -1030,7 +1030,7 @@ describe("DRS", function() {
          drs(c) {
            man(c)
            from(c, b)
-         } => drs() {
+         } every (c) drs() {
            loves(c, a)
          }
        }
@@ -1056,7 +1056,7 @@ describe("DRS", function() {
        drs(b) {
          drs(a) {
            man(a)
-         } => drs() {
+         } every (a) drs() {
            mortal(a)
          }
          Socrates(b)
@@ -1419,7 +1419,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilian(a)
-         } => drs() {
+         } every (a) drs() {
            < happy(a)
          }
        }
@@ -1512,7 +1512,7 @@ describe("DRS", function() {
          drs(a) {
            engineer(a)
            < brazilian(a)
-         } => drs() {
+         } every (a) drs() {
            < happy(a)
          }
        }

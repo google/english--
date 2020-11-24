@@ -646,7 +646,7 @@ describe("Rules", function() {
         Jones(a)
         book(b)
         owns(a, b)
-      } => drs() {
+      } if () drs() {
         likes(a, b)
       }
     `));
@@ -662,7 +662,7 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a) {
         man(a)
-      } => drs(b) {
+      } every (a) drs(b) {
         Jones(b)
         loves(a, b)
       }
@@ -679,7 +679,7 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a) {
         man(a)
-      } => drs(b) {
+      } every (a) drs(b) {
         Jones(b)
         loves(b, a)
       }
@@ -698,7 +698,7 @@ describe("Rules", function() {
          Smith(b)
          woman(a)
          loves(b, a)
-       } => drs(c) {
+       } every (a) drs(c) {
          Jones(c)
          likes(c, a)
        }
@@ -976,7 +976,7 @@ describe("Rules", function() {
         woman(b)
         donkey(c)
         with(b, c)
-      } => drs() {
+      } every (b) drs() {
         loves(b, a)
       }
     `));

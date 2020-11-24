@@ -575,13 +575,16 @@ class CRCOND extends Rule {
     antecedent.head.push(...clone(refs));
     antecedent.head.forEach(ref => ref.closure = true);
     antecedent.push(head.children[1]);
+
+    // let ref = head.children[1];
+    // console.log(ref);
     
     let consequent = drs(this.ids);
     consequent.head.push(...clone(antecedent.head));
     consequent.head.forEach(ref => ref.closure = true);
     consequent.push(tail.children[3]);
     
-    return [[], [implication("every", antecedent, consequent)], [], [node]];
+    return [[], [quantifier("if", antecedent, consequent)], [], [node]];
   }
 }
 
@@ -593,8 +596,6 @@ class CREVERY extends Rule {
     if (!det.types.quantifier) {
       return [[], [], [], []];
     }
-
-    let quantifier = det.children.join("-").toLowerCase();
     
     let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
@@ -616,7 +617,8 @@ class CREVERY extends Rule {
     v.push(s);
 
     // console.log(n);
-    let result = implication(quantifier, n, v, ref);
+    let q = det.children.join("-").toLowerCase();
+    let result = quantifier(q, n, v, ref);
     
     return [[], [result], [], [node]];
   }
@@ -644,7 +646,7 @@ class CRVPEVERY extends Rule {
     child(s, 1, 0).children[1] = ref;
     verb.push(s);
   
-    return [[], [implication("every", n, verb)], [], [node]];
+    return [[], [quantifier("every", n, verb, ref)], [], [node]];
   }
 }
 
@@ -1065,7 +1067,7 @@ function disjunction(a, b) {
  };
 }
 
-function implication(q, a, b, ref) {
+function quantifier(q, a, b, ref) {
  return {
    "@type": "Quantifier",
    "q": q,
@@ -1073,9 +1075,7 @@ function implication(q, a, b, ref) {
    "b": b,
    "ref": ref,
    print() {
-     return this.a.print()
-       + (q == "every" ? " => " : ` ${q} (${ref.name}) `)
-       + this.b.print();
+     return this.a.print() + ` ${q} (${ref ? ref.name : ""}) ` + this.b.print();
    }
  };
 }
