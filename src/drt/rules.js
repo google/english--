@@ -590,7 +590,6 @@ class CREVERY extends Rule {
    super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
  }
   apply({det, noun, verb}, node, refs) {
-    // console.log();
     if (!det.types.quantifier) {
       return [[], [], [], []];
     }
@@ -604,6 +603,8 @@ class CREVERY extends Rule {
     n.head.push(ref);
     noun.ref = ref;
     n.push(noun);
+
+    // console.log(ref);
     
     let v = drs(this.ids);
     v.head.push(...clone(n.head));
@@ -613,8 +614,9 @@ class CREVERY extends Rule {
     
     s.children[0] = ref;
     v.push(s);
-    
-    let result = implication(quantifier, n, v);
+
+    // console.log(n);
+    let result = implication(quantifier, n, v, ref);
     
     return [[], [result], [], [node]];
   }
@@ -1063,15 +1065,16 @@ function disjunction(a, b) {
  };
 }
 
-function implication(q, a, b) {
+function implication(q, a, b, ref) {
  return {
    "@type": "Quantifier",
    "q": q,
    "a": a,
    "b": b,
+   "ref": ref,
    print() {
      return this.a.print()
-       + (q == "every" ? " => " : ` ${q} `)
+       + (q == "every" ? " => " : ` ${q} (${ref.name}) `)
        + this.b.print();
    }
  };

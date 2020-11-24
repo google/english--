@@ -1432,7 +1432,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } all drs() {
+         } all (a) drs() {
            happy(a)
          }
        }
@@ -1445,7 +1445,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } most drs() {
+         } most (a) drs() {
            happy(a)
          }
        }
@@ -1458,7 +1458,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } many drs() {
+         } many (a) drs() {
            happy(a)
          }
        }
@@ -1471,7 +1471,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } 3 drs() {
+         } 3 (a) drs() {
            happy(a)
          }
        }
@@ -1484,7 +1484,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } only drs() {
+         } only (a) drs() {
            happy(a)
          }
        }
@@ -1497,7 +1497,7 @@ describe("DRS", function() {
        drs() {
          drs(a) {
            brazilians(a)
-         } the-majority-of drs() {
+         } the-majority-of (a) drs() {
            happy(a)
          }
        }
