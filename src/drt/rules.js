@@ -146,6 +146,7 @@ function predicate(name, args, types) {
     args: args,
     types: types,
     print() {
+      // console.log(this.args);
       let args = this.args.map(arg => print(arg));
       return `${this.name}(${args.join(", ")})`;
    }
@@ -197,7 +198,7 @@ class CRVPPN extends Rule {
    body.push(pn);
   }
 
-  node.children[1].children[0] = ref;
+  node.children[1] = ref;
 
   return [head, body, [], []];
  }
@@ -246,7 +247,8 @@ class CRPPPN extends Rule {
    pn.ref = ref;
    body.push(pn);
   }
-  
+
+  // console.log("hi");
   node.children[1] = ref;
 
   return [head, body, [], []];
@@ -346,6 +348,8 @@ class CRVPID extends Rule {
   noun.ref = ref;
   node.children[1] = ref;
 
+  // console.log(node);
+   
   return [[ref], [noun], [], []];
  }
 }
@@ -385,7 +389,7 @@ class CRPPLIN extends Rule {
   // console.log(node);
 
   noun.ref = node.ref;
-  let cond = S(node.ref, VP_(VP(V(prep), child(np, 1))));
+  let cond = S(node.ref, VP_(VP(V(child(prep, 0)), child(np, 1))));
 
   // noun.neg = node.neg;
 
@@ -400,45 +404,52 @@ class CRLIN extends CompositeRule {
 }
 
 class CRNRC extends Rule {
- constructor(ids) {
-  super(ids, N(N(), RC(capture("rc"))));
- }
-
- apply(m, node) {
-  let head = [];
-  let body = [];
-  let remove = [];
+  constructor(ids) {
+    super(ids, N(N(), RC(capture("rc"))));
+  }
   
-  let rc = node.children.pop();
+  apply(m, node) {
+    let head = [];
+    let body = [];
+    let remove = [];
     
-  let s = rc.children[1];
-  
-  const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
-
-  if (match(g1, s)) {
-   child(s, 1, 2, 1).children[0] = node.ref;
-  }
-
-  // Binds gap to the referent.
-  let object = child(s, 1, 0, 1);
-  if (object && object.children[0]["@type"] == "GAP") {
-   object.children[0] = node.ref;
-  }
-  
-  let subject = s.children[0];
-  if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
-   s.children[0] = node.ref;
-  }
-  
-  let noun = node.children.pop();
-  noun.ref = node.ref;
-  body.push(noun);
-  remove.push(node);
-  
-  body.push(s);
+    let rc = node.children.pop();
     
-  return [head, body, [], remove];
- }
+    let s = rc.children[1];
+    
+    // console.log(child(s, 1, 0));
+    
+    const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
+    
+    if (match(g1, s)) {
+      // console.log(child(s, 1, 2, 1));
+      child(s, 1, 2).children[1] = node.ref;
+    }
+    
+    // Binds gap to the referent.
+    let object = child(s, 1, 0, 1);
+    if (object && object.children && object.children[0]["@type"] == "GAP") {
+      child(s, 1, 0).children[1] = node.ref;
+    }
+    
+    let subject = s.children[0];
+    if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
+      s.children[0] = node.ref;
+    }
+    
+    let noun = node.children.pop();
+    noun.ref = node.ref;
+    body.push(noun);
+    remove.push(node);
+    
+    body.push(s);
+
+    // console.log(child(s, 1, 2, 1));
+    
+    // console.log(child(s, 1, 0, 1));
+    
+    return [head, body, [], remove];
+  }
 }
 
 class CRNEG extends Rule {
@@ -748,8 +759,10 @@ class CRSPOSS extends Rule {
   node.children[0] = u;
   node.ref = u;
 
-  let s = S(u, VP_(VP(V(noun), name.children[0])));
+  let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
 
+  // console.log(child(s, 1, 0, 0));
+   
   return [[u], [s], [], []];
  }
 }
@@ -765,7 +778,7 @@ class CRVPPOSS extends Rule {
   let u = referent(this.id(), noun.types, print(child(node, 1), refs));
   node.children[1] = u;
 
-  let s = S(u, VP_(VP(V(noun), name.children[0])));
+  let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
 
   return [[u], [s], [], []];
  }
@@ -806,7 +819,8 @@ class CRSPP extends Rule {
     }
 
     noun.ref = u;
-    let cond = S(u, VP_(VP(V(prep), child(np, 1))));
+    // console.log(prep);
+    let cond = S(u, VP_(VP(V(child(prep, 0)), child(np, 1))));
     
     return [[u], [noun, cond], [], []];
   }
@@ -826,8 +840,9 @@ class CRVPPP extends Rule {
   child(node, 1, 0).children[1] = u;
 
   noun.ref = u;
-  
-  let cond = S(u, VP_(VP(V(prep), np)));
+
+  //console.log(prep);
+  let cond = S(u, VP_(VP(V(child(prep, 0)), np)));
 
   return [[u], [noun, cond], [], []];
  }
@@ -1015,16 +1030,21 @@ class CRPUNCT extends CompositeRule {
 
 class CRPRED extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject")));
+    super(ids, S(capture("subject"), VP_(VP(V(capture("verb"))))));
   }
 
-  apply({subject, verb, object}, node, refs = []) {
-    // console.log("hi");
-    // console.log(child(node, 1, 0, 1));
-    // let sub = child(node, 0);
-    // console.log(sub);
-    // console.log(object);
-    return [[], [], [], []];
+  apply({verb}, node, refs = []) {
+    let sub = child(node, 0);
+    let obj = child(node, 1, 0, 1);
+    let args = [sub.name];
+    if (obj) {
+      // console.log(obj);
+      args.push(obj.name);
+    }
+    let name = verb.children.join("");
+    let pred = predicate(name, args, node.types);
+  
+    return [[], [pred], [], [node]];
   }
 }
 
@@ -1147,7 +1167,7 @@ class Rules {
       new CRSTEM(ids),
       new CRPUNCT(ids),
     ];
-    return [new CRPN(ids), rules, [new CRPRED(ids)]];
+    return [[new CRPN(ids)], rules, [new CRPRED(ids)]];
   }
 }
 

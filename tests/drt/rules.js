@@ -456,8 +456,8 @@ describe("Rules", function() {
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
       ~drs(b) {
-        a own b
         porsche(b)
+        own(a, b)
       }
     `));
   });
@@ -479,8 +479,8 @@ describe("Rules", function() {
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
       ~drs(b) {
-        > a own b
         porsche(b)
+        > own(a, b)
       }
     `));
   });
@@ -644,10 +644,10 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
         Jones(a)
-        a owns b
         book(b)
+        owns(a, b)
       } => drs() {
-        a likes b
+        likes(a, b)
       }
     `));
   });
@@ -664,7 +664,7 @@ describe("Rules", function() {
         man(a)
       } => drs(b) {
         Jones(b)
-        a loves b
+        loves(a, b)
       }
     `));
   });
@@ -681,7 +681,7 @@ describe("Rules", function() {
         man(a)
       } => drs(b) {
         Jones(b)
-        b loves a
+        loves(b, a)
       }
     `));
   });
@@ -696,11 +696,11 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
          Smith(b)
-         b loves a
          woman(a)
+         loves(b, a)
        } => drs(c) {
          Jones(c)
-         c likes a
+         likes(c, a)
        }
     `));
   });
@@ -716,10 +716,10 @@ describe("Rules", function() {
       drs(a, b) {
         Jones(a)
         Mary(b)
-        a loves b
+        loves(a, b)
       } or drs(c) {
         Smith(c)
-        c loves b
+        loves(c, b)
       }
     `));
   });
@@ -735,10 +735,10 @@ describe("Rules", function() {
       drs(a, b) {
         Mary(a)
         Jones(b)
-        a love b
+        love(a, b)
       } or drs(c) {
         Smith(c)
-        a like c
+        like(a, c)
       }
     `));
   });
@@ -773,9 +773,9 @@ describe("Rules", function() {
       drs(a, b) {
         Smith(a)
         Mary(b)
-        a likes b
+        likes(a, b)
       } and drs() {
-        b loves a
+        loves(b, a)
       }
     `));
   });
@@ -799,11 +799,11 @@ describe("Rules", function() {
     assertThat(sub.print()).equalsTo(trim(`
       drs(a, b) {
         Mary(a)
-        a own b
         porsche(b)
+        own(a, b)
       } and drs(c) {
-        a love c
         porsche(c)
+        love(a, c)
       }
     `));
   });
@@ -819,9 +819,9 @@ describe("Rules", function() {
       drs(a, b) {
         Mary(a)
         Jones(b)
-        a like b
+        like(a, b)
       } and drs() {
-        a love b
+        love(a, b)
       }
     `));
   });
@@ -973,11 +973,11 @@ describe("Rules", function() {
 
     assertThat(implication.print()).equalsTo(trim(`
       drs(b, c) {
-        b with c
         woman(b)
         donkey(c)
+        with(b, c)
       } => drs() {
-        b loves a
+        loves(b, a)
       }
     `));
 
@@ -1059,7 +1059,7 @@ describe("Rules", function() {
       ~drs(a, b) {
         Mary(a)
         Jones(b)
-        > a kiss b
+        > kiss(a, b)
       }`
     ));
 
@@ -1149,7 +1149,7 @@ describe("Rules", function() {
     assertThat(q.print()).equalsTo(trim(`
       exists(a) drs(a, b) {
         Jones(b)
-        a likes b
+        likes(a, b)
       } ?
     `));
 
@@ -1165,7 +1165,7 @@ describe("Rules", function() {
     assertThat(q.print()).equalsTo(trim(`
       exists(a) drs(a, b) {
         Jones(b)
-        b like a
+        like(b, a)
       } ?
     `));
   });

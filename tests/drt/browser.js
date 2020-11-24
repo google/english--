@@ -14,7 +14,7 @@ describe("Browser", function() {
         assertThat(parse("John likes Mary.").length).equalsTo(1);
         let drs = new DRS(Rules.from());
         assertThat(drs.feed("John likes Mary.").print())
-          .equalsTo("drs(a, b) {\nJohn(a)\nMary(b)\na likes b\n}");
+          .equalsTo("drs(a, b) {\nJohn(a)\nMary(b)\nlikes(a, b)\n}");
     });
 
     it("compiled", async function() {

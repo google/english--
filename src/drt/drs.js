@@ -2,11 +2,12 @@ const {clone, print} = require("./base.js");
 const {parse} = require("./parser.js");
 
 class DRS {
-  constructor([names, rules]) {
+  constructor([before, rules, after = []]) {
     this.head = [];
     this.body = [];
-    this.names = names;
+    this.before = before;
     this.rules = rules;
+    this.after = after;
   }
 
   feed(source) {
@@ -31,8 +32,8 @@ class DRS {
     }
   }
 
-  process(node, rules = []) {
-    let queue = [node];
+  process(nodes, rules = []) {
+    let queue = [...nodes];
 
     while (queue.length > 0) {
       let p = queue.shift();
@@ -81,11 +82,17 @@ class DRS {
     }
     
     // Resolve all proper names first.
-    this.process(node, [this.names]);
+    this.process([node], this.before);
  
     this.body.push(node);
 
-    return this.process(node, this.rules);
+    let result = this.process([node], this.rules);
+
+    // console.log(this.body);
+
+    this.process(this.body, this.after);
+
+    return result;
   }
   
   print() {

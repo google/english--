@@ -9,9 +9,9 @@ describe("DRS", function() {
     assertThat("A man admires a woman.")
      .equalsTo(`
        drs(a, b) {
-         a admires b
          man(a)
          woman(b)
+         admires(a, b)
        }
     `);
   });
@@ -20,10 +20,10 @@ describe("DRS", function() {
     assertThat("A man admires a woman. She likes him.")
      .equalsTo(`
        drs(a, b) {
-         a admires b
          man(a)
          woman(b)
-         b likes a
+         admires(a, b)
+         likes(b, a)
        }
     `);
   });
@@ -33,9 +33,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a admires b
-         b likes a
          woman(b)
+         admires(a, b)
+         likes(b, a)
        }
     `);
   });
@@ -46,7 +46,7 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         a loves b
+         loves(a, b)
        }
     `);
   });
@@ -56,8 +56,8 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Mary(a)
-         b loves a
          man(b)
+         loves(b, a)
        }
      `);
   });
@@ -67,8 +67,8 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Mary(a)
-         a loves b
          man(b)
+         loves(a, b)
        }
      `);
   });
@@ -79,9 +79,9 @@ describe("DRS", function() {
        drs(a, b, c) {
          Smith(a)
          Mary(b)
-         c fascinates a
-         c loves b
          man(c)
+         fascinates(c, a)
+         loves(c, b)
        }
      `);
   });
@@ -92,9 +92,9 @@ describe("DRS", function() {
        drs(a, b, c) {
          Jones(a)
          Smith(b)
-         a loves c
-         c fascinates b
          book(c)
+         loves(a, c)
+         fascinates(c, b)
        }
      `);
   });
@@ -105,9 +105,9 @@ describe("DRS", function() {
        drs(a, b, c) {
          Jones(a)
          Smith(b)
-         a owns c
-         b loves c
          book(c)
+         owns(a, c)
+         loves(b, c)
        }
      `);
   });
@@ -117,9 +117,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
-         b fascinates a
          book(b)
+         owns(a, b)
+         fascinates(b, a)
        }
      `);
   });
@@ -130,11 +130,11 @@ describe("DRS", function() {
        drs(a, b, c, d) {
          Mary(a)
          Smith(b)
-         c loves d
-         c fascinates a
          man(c)
-         d fascinates b
          book(d)
+         loves(c, d)
+         fascinates(c, a)
+         fascinates(d, b)
        }
      `);
   });
@@ -145,8 +145,8 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Ulysses(b)
-         a owns b
-         b fascinates a
+         owns(a, b)
+         fascinates(b, a)
        }
      `);
   });
@@ -156,9 +156,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
          book(b)
-         b fascinates a
+         owns(a, b)
+         fascinates(b, a)
        }
      `);
   });
@@ -168,11 +168,11 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b, c) {
          Jones(a)
-         a owns b
          book(b)
-         b fascinates a
+         owns(a, b)
+         fascinates(b, a)
          Mary(c)
-         c loves a
+         loves(c, a)
        }
      `);
   });
@@ -183,8 +183,8 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          ~drs(b) {
-           a own b
            porsche(b)
+           own(a, b)
          }
        }
      `);
@@ -195,10 +195,10 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
          porsche(b)
+         owns(a, b)
          ~drs() {
-           a like b
+           like(a, b)
          }
        }
      `);
@@ -238,14 +238,14 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a loves b
          woman(b)
          ~drs() {
-           b love a
+           love(b, a)
          }
+         loves(a, b)
          ~drs(c) {
-           b love c
            man(c)
+           love(b, c)
          }
        }
      `);
@@ -256,7 +256,7 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          ~drs() {
-           a stink
+           stink(a)
          }
          porsche(a)
        }
@@ -269,11 +269,11 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          ~drs(b) {
-           a own b
            porsche(b)
            ~drs() {
-             b fascinate a
+             fascinate(b, a)
            }
+           own(a, b)
          }
        }
      `);
@@ -285,11 +285,11 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          ~drs(b) {
-           a like b
            porsche(b)
            ~drs() {
-             a own b
+             own(a, b)
            }
+           like(a, b)
          }
        }
      `);
@@ -354,9 +354,9 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         a loves b
          happy(a)
          man(a)
+         loves(a, b)
        }
     `);
   });
@@ -369,7 +369,7 @@ describe("DRS", function() {
          man(a)
          happy(a)
          Mary(b)
-         a loves b
+         loves(a, b)
        }
     `);
   });
@@ -379,9 +379,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a loves b
          woman(b)
          happy(b)
+         loves(a, b)
        }
     `);
   });
@@ -391,9 +391,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         b loves a
          woman(b)
          happy(b)
+         loves(b, a)
        }
     `);
   });
@@ -403,8 +403,8 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
          porsche(b)
+         owns(a, b)
          happy(a)
        }
     `);
@@ -416,10 +416,10 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          drs(b) {
-           a owns b
            book(b)
+           owns(a, b)
          } => drs() {
-           a likes b
+           likes(a, b)
          }
        }
     `);
@@ -434,11 +434,11 @@ describe("DRS", function() {
          Jones(a)
          Smith(b)
          drs(c) {
-           a owns c
            book(c)
+           owns(a, c)
          } => drs(d) {
-           b owns d
            porsche(d)
+           owns(b, d)
          }
        }
     `);
@@ -450,12 +450,12 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         a likes b
+         likes(a, b)
          drs(c) {
-           b likes c
            book(c)
+           likes(b, c)
          } => drs() {
-           a likes c
+           likes(a, c)
          }
        }
     `);
@@ -496,7 +496,7 @@ describe("DRS", function() {
          drs(b) {
            man(b)
          } => drs() {
-           b loves a
+           loves(b, a)
          }
        }
     `);
@@ -545,7 +545,7 @@ describe("DRS", function() {
          drs(b) {
            man(b)
          } => drs() {
-           a loves b
+           loves(a, b)
          }
        }
     `);
@@ -559,9 +559,9 @@ describe("DRS", function() {
          Smith(b)
          Mary(c)
          drs() {
-           a loves c
+           loves(a, c)
          } or drs() {
-           b loves c
+           loves(b, c)
          }
        }
     `);
@@ -691,10 +691,10 @@ describe("DRS", function() {
          Jones(a)
          Smith(b)
          drs(c) {
-           b loves c
            woman(c)
+           loves(b, c)
          } => drs() {
-           a likes c
+           likes(a, c)
          }
        }
      `);
@@ -728,9 +728,9 @@ describe("DRS", function() {
          Mary(a)
          Smith(b)
          drs() {
-           a loves b
+           loves(a, b)
          } and drs() {
-           b loves a
+           loves(b, a)
          }
        }
     `);
@@ -742,10 +742,10 @@ describe("DRS", function() {
        drs(a) {
          Mary(a)
          drs(b) {
-           a owns b
            porsche(b)
+           owns(a, b)
          } and drs() {
-           a loves b
+           loves(a, b)
          }
        }
     `);
@@ -822,8 +822,8 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         b wife a
          happy(b)
+         wife(b, a)
        }
     `);
   });
@@ -833,10 +833,10 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b, c) {
          Jones(a)
-         b wife a
          happy(b)
+         wife(b, a)
          Smith(c)
-         b likes c
+         likes(b, c)
        }
     `);
   });
@@ -847,8 +847,8 @@ describe("DRS", function() {
        drs(a, b, c) {
          Smith(a)
          Jones(b)
-         a likes c
-         c wife b
+         likes(a, c)
+         wife(c, b)
        }
     `);
   });
@@ -877,9 +877,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
          unhappy(b)
          donkey(b)
+         owns(a, b)
        }
     `);
   });
@@ -889,9 +889,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Jones(a)
-         a owns b
          fast(b)
          porsche(b)
+         owns(a, b)
        }
     `);
   });
@@ -905,7 +905,7 @@ describe("DRS", function() {
            fast(b)
            porsche(b)
          } => drs() {
-           a owns b
+           owns(a, b)
          }
        }
     `);
@@ -920,7 +920,7 @@ describe("DRS", function() {
            beautiful(b)
            woman(b)
          } => drs() {
-           b loves a
+           loves(b, a)
          }
        }
     `);
@@ -932,11 +932,11 @@ describe("DRS", function() {
        drs(a, b, c) {
          Smith(a)
          Jones(b)
-         a loves c
          woman(c)
          ~drs() {
-           c like b
+           like(c, b)
          }
+         loves(a, c)
        }
     `);
   });
@@ -947,9 +947,9 @@ describe("DRS", function() {
        drs(a, b, c) {
          Jones(a)
          Smith(b)
-         a likes c
-         c likes b
          woman(c)
+         likes(a, c)
+         likes(c, b)
        }
     `);
   });
@@ -959,10 +959,10 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b, c) {
          Jones(a)
-         a loves b
-         b with c
          woman(b)
          donkey(c)
+         loves(a, b)
+         with(b, c)
        }
     `);
   });
@@ -972,10 +972,10 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b, c) {
          Jones(a)
-         b loves a
-         b with c
          woman(b)
          donkey(c)
+         loves(b, a)
+         with(b, c)
        }
     `);
   });
@@ -1011,11 +1011,11 @@ describe("DRS", function() {
        drs(a) {
          Jones(a)
          drs(b, c) {
-           b with c
            woman(b)
            donkey(c)
+           with(b, c)
          } => drs() {
-           b loves a
+           loves(b, a)
          }
        }
     `);
@@ -1028,10 +1028,10 @@ describe("DRS", function() {
          Mary(a)
          Brazil(b)
          drs(c) {
-           c from b
            man(c)
+           from(c, b)
          } => drs() {
-           c loves a
+           loves(c, a)
          }
        }
     `);
@@ -1043,9 +1043,9 @@ describe("DRS", function() {
        drs(a, b, c) {
          Jones(a)
          Mary(b)
-         a loves b
+         loves(a, b)
          Smith(c)
-         a likes c
+         likes(a, c)
        }
     `);
   });
@@ -1120,7 +1120,7 @@ describe("DRS", function() {
          Jones(a)
          Mary(b)
          a is c
-         c husband b
+         husband(c, b)
        }
     `);
   });
@@ -1132,8 +1132,8 @@ describe("DRS", function() {
          Jones(a)
          Mary(b)
          c is d(c)
-         c father a
-         d husband b
+         father(c, a)
+         husband(d, b)
        }
     `);
   });
@@ -1143,9 +1143,9 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a, b) {
          Mary(a)
-         b father a
          brazilian(b)
          engineer(b)
+         father(b, a)
        }
     `);
   });
@@ -1156,7 +1156,7 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Brazil(b)
-         a from b
+         from(a, b)
        }
     `);
   });
@@ -1167,7 +1167,7 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         a behind b
+         behind(a, b)
        }
     `);
   });
@@ -1179,9 +1179,9 @@ describe("DRS", function() {
        drs(a, b, c, d) {
          Jones(a)
          Mary(b)
-         c wife a
-         c behind d
-         d sister b
+         wife(c, a)
+         behind(c, d)
+         sister(d, b)
        }
     `);
   });
@@ -1193,7 +1193,7 @@ describe("DRS", function() {
          Jones(a)
          Mary(b)
          c is b(c)
-         c wife a
+         wife(c, a)
        }
     `);
   });
@@ -1205,7 +1205,7 @@ describe("DRS", function() {
          Mary(a)
          Jones(b)
          a is c
-         c wife b
+         wife(c, b)
        }
     `);
   });
@@ -1217,9 +1217,9 @@ describe("DRS", function() {
          Jones(a)
          Smith(b)
          a is c
-         c brother b
+         brother(c, b)
          Brazil(d)
-         c likes d
+         likes(c, d)
        }
     `);
   });
@@ -1229,7 +1229,7 @@ describe("DRS", function() {
      .equalsTo(`
        drs(a) {
          Jones(a)
-         a loves a
+         loves(a, a)
        }
     `);
   });
@@ -1240,7 +1240,7 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          Mary(b)
-         < a kissed b
+         < kissed(a, b)
        }
     `);
   });
@@ -1273,7 +1273,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Mary(b)
-         a likes b
+         likes(a, b)
        }
     `);
   });
@@ -1285,7 +1285,7 @@ describe("DRS", function() {
          John(a)
          Mary(b)
          ~drs() {
-           > a kiss b
+           > kiss(a, b)
          }
        }
     `);
@@ -1310,7 +1310,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Mary(b)
-         a likes b
+         likes(a, b)
        }
     `);
   });
@@ -1325,7 +1325,7 @@ describe("DRS", function() {
          John(a)
          Mary(b)
          ~drs() {
-           a like b
+           like(a, b)
          }
        }
     `);
@@ -1337,7 +1337,7 @@ describe("DRS", function() {
        drs(a, b) {
          John(a)
          Mary(b)
-         a kissed b
+         kissed(a, b)
        }
     `);
   });
@@ -1357,9 +1357,9 @@ describe("DRS", function() {
     assertThat("John has owned a porsche.")
      .equalsTo(`
        drs(a, b) {
-        John(a)
-         a owned b
+         John(a)
          porsche(b)
+         owned(a, b)
        }
     `);
   });
@@ -1405,8 +1405,8 @@ describe("DRS", function() {
         John(a)
         Brazil(b)
         ~drs() {
-          a from b
           engineer(a)
+          from(a, b)
         }
        }
     `);
@@ -1539,7 +1539,7 @@ describe("DRS", function() {
        drs(a, b) {
          Jones(a)
          exists(b) drs(b) {
-           b loves a
+           loves(b, a)
          } ?
        }
     `);
@@ -1551,7 +1551,7 @@ describe("DRS", function() {
        drs(a) {
          exists(a) drs(a, b) {
            Jones(b)
-           b love a
+           love(b, a)
          } ?
        }
     `);
