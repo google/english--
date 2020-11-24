@@ -1426,7 +1426,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Every brazilian is happy.", function() {
+  it.skip("All brazilians are happy.", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
        drs() {

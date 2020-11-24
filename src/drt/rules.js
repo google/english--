@@ -556,22 +556,22 @@ class CRBE extends CompositeRule {
 }
 
 class CRCOND extends Rule {
- constructor(ids) {
-  super(ids, S("if", capture("head"), "then", capture("tail")));
- }
- apply({head, tail}, node, refs) {
-  let antecedent = drs(this.ids);
-  antecedent.head.push(...clone(refs));
-  antecedent.head.forEach(ref => ref.closure = true);
-  antecedent.push(head.children[1]);
-   
-  let consequent = drs(this.ids);
-  consequent.head.push(...clone(antecedent.head));
-  consequent.head.forEach(ref => ref.closure = true);
-  consequent.push(tail.children[3]);
-   
-  return [[], [implication(antecedent, consequent)], [], [node]];
- }
+  constructor(ids) {
+    super(ids, S("if", capture("head"), "then", capture("tail")));
+  }
+  apply({head, tail}, node, refs) {
+    let antecedent = drs(this.ids);
+    antecedent.head.push(...clone(refs));
+    antecedent.head.forEach(ref => ref.closure = true);
+    antecedent.push(head.children[1]);
+    
+    let consequent = drs(this.ids);
+    consequent.head.push(...clone(antecedent.head));
+    consequent.head.forEach(ref => ref.closure = true);
+    consequent.push(tail.children[3]);
+    
+    return [[], [implication("every", antecedent, consequent)], [], [node]];
+  }
 }
 
 class CREVERY extends Rule {
@@ -585,7 +585,6 @@ class CREVERY extends Rule {
   n.head.forEach(ref => ref.closure = true);
   n.head.push(ref);
   noun.ref = ref;
-  // console.log(noun);
   n.push(noun);
 
   let v = drs(this.ids);
@@ -594,42 +593,39 @@ class CREVERY extends Rule {
 
   let s = clone(node);
 
-  // console.log(child(s, 0, 0, 0).children[0]);
-
   s.children[0] = ref;
-  // console.log(print(s));
   v.push(s);
 
-  let result = implication(n, v);
+  let result = implication("every", n, v);
    
   return [[], [result], [], [node]];
  }
 }
 
 class CRVPEVERY extends Rule {
- constructor(ids) {
-  super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
- }
- apply({subject, noun}, node, refs) {
-  let ref = referent(this.id(), noun.types);
-  let n = drs(this.ids);
-  n.head.push(...clone(refs));
-  n.head.forEach(ref => ref.closure = true);
-  n.head.push(ref);
-  noun.ref = ref;
-  n.push(noun);
-   
-  let verb = drs(this.ids);
-  verb.head.push(...clone(n.head));
-  verb.head.forEach(ref => ref.closure = true);
+  constructor(ids) {
+    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
+  }
+  apply({subject, noun}, node, refs) {
+    let ref = referent(this.id(), noun.types);
+    let n = drs(this.ids);
+    n.head.push(...clone(refs));
+    n.head.forEach(ref => ref.closure = true);
+    n.head.push(ref);
+    noun.ref = ref;
+    n.push(noun);
+    
+    let verb = drs(this.ids);
+    verb.head.push(...clone(n.head));
+    verb.head.forEach(ref => ref.closure = true);
 
-  let s = clone(node);
+    let s = clone(node);
 
-  child(s, 1, 0).children[1] = ref;
-  verb.push(s);
+    child(s, 1, 0).children[1] = ref;
+    verb.push(s);
   
-  return [[], [implication(n, verb)], [], [node]];
- }
+    return [[], [implication("every", n, verb)], [], [node]];
+  }
 }
 
 class CROR extends Rule {
@@ -788,25 +784,25 @@ class CRADJ extends Rule {
 }
 
 class CRSPP extends Rule {
- constructor(ids) {
-  super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), VP_()));
- }
- apply({noun, prep, np}, node, refs) {
-  let u = referent(this.id(), noun.types);
-  u.value = print(child(node, 0), refs);
-
-  if (child(node, 0, 0)["@type"] == "DET" &&
-      child(node, 0, 0, 0) == "Every") {
-   child(node, 0).children[1] = u;
-  } else {
-   node.children[0] = u;
+  constructor(ids) {
+    super(ids, S(NP(DET(), N(N(capture("noun")), PP(PREP(capture("prep")), capture("np")))), VP_()));
   }
+  apply({noun, prep, np}, node, refs) {
+    let u = referent(this.id(), noun.types);
+    u.value = print(child(node, 0), refs);
 
-  noun.ref = u;
-  let cond = S(u, VP_(VP(V(prep), child(np, 1))));
+    if (child(node, 0, 0)["@type"] == "DET" &&
+        child(node, 0, 0, 0) == "Every") {
+      child(node, 0).children[1] = u;
+    } else {
+      node.children[0] = u;
+    }
 
-  return [[u], [noun, cond], [], []];
- }
+    noun.ref = u;
+    let cond = S(u, VP_(VP(V(prep), child(np, 1))));
+    
+    return [[u], [noun, cond], [], []];
+  }
 }
 
 class CRVPPP extends Rule {
@@ -1008,9 +1004,10 @@ function disjunction(a, b) {
  };
 }
 
-function implication(a, b) {
+function implication(q, a, b) {
  return {
-   "@type": "Implication",
+   "@type": "Quantifier",
+   "q": q,
    "a": a,
    "b": b,
    print() {

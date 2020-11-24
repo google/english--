@@ -100,7 +100,7 @@ class DRS {
 
   for (let cond of this.body) {
     if (cond instanceof DRS ||
-        cond["@type"] == "Implication" ||
+        cond["@type"] == "Quantifier" ||
         cond["@type"] == "Negation" ||
         cond["@type"] == "Query" ||
         cond["@type"] == "Conjunction" ||
