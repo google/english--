@@ -1013,6 +1013,21 @@ class CRPUNCT extends CompositeRule {
  }
 }
 
+class CRPRED extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("subject")));
+  }
+
+  apply({subject, verb, object}, node, refs = []) {
+    // console.log("hi");
+    // console.log(child(node, 1, 0, 1));
+    // let sub = child(node, 0);
+    // console.log(sub);
+    // console.log(object);
+    return [[], [], [], []];
+  }
+}
+
 function drs(ids) {
     return new DRS(Rules.from(ids));
 }
@@ -1107,34 +1122,33 @@ function query(drs, x) {
 }
 
 class Rules {
-    static from(ids = new Ids()) {
-        let rules = [
-            new CRASPECT(ids),
-            new CREVERY(ids),
-            new CRVPEVERY(ids),
-            new CRPP(ids),
-            new CRID(ids),
-            new CRLIN(ids),
-            new CRNRC(ids), 
-            new CRPRO(ids),
-            new CRNEG(ids),
-            new CRPOSS(ids),
-            new CRBE(ids),
-            new CRCOND(ids),
-            new CROR(ids),
-            new CRVPOR(ids),
-            new CRNPOR(ids),
-            new CRAND(ids),
-            new CRADJ(ids),
-            // new CRTENSE(ids),
-            new CRWILL(ids),
-            new CRQUESTION(ids),
-            new CRPLURAL(ids),
-            new CRSTEM(ids),
-            new CRPUNCT(ids),
-        ];
-        return [new CRPN(ids), rules];
-    }
+  static from(ids = new Ids()) {
+    let rules = [
+      new CRASPECT(ids),
+      new CREVERY(ids),
+      new CRVPEVERY(ids),
+      new CRPP(ids),
+      new CRID(ids),
+      new CRLIN(ids),
+      new CRNRC(ids), 
+      new CRPRO(ids),
+      new CRNEG(ids),
+      new CRPOSS(ids),
+      new CRBE(ids),
+      new CRCOND(ids),
+      new CROR(ids),
+      new CRVPOR(ids),
+      new CRNPOR(ids),
+      new CRAND(ids),
+      new CRADJ(ids),
+      new CRWILL(ids),
+      new CRQUESTION(ids),
+      new CRPLURAL(ids),
+      new CRSTEM(ids),
+      new CRPUNCT(ids),
+    ];
+    return [new CRPN(ids), rules, [new CRPRED(ids)]];
+  }
 }
 
 module.exports = {
