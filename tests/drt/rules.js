@@ -74,10 +74,10 @@ describe("Rules", function() {
     
     let root = first(parse("Jones owns a book."), true);
     assertThat(child(root, 1, 0, 1, 1).types)
-     .equalsTo({"num": "sing", "gen": "-hum"});
+      .equalsTo({"num": "sing", "gen": "-hum", "plur": "s"});
 
     assertThat(child(first(parse("Jones loves a woman."), true), 1, 0, 1, 1).types)
-     .equalsTo({"num": "sing", "gen": "fem"});
+      .equalsTo({"num": "sing", "gen": "fem"});
   });
 
   it("match", function() {
@@ -278,7 +278,11 @@ describe("Rules", function() {
     assertThat(head.length).equalsTo(1);
     assertThat(head[0].name).equalsTo("a");
     assertThat(head[0].value).equalsTo("a porsche");
-    assertThat(head[0].types).equalsTo({num: "sing", "gen": "-hum"});
+    assertThat(head[0].types).equalsTo({
+      "num": "sing",
+      "gen": "-hum",
+      "plur": "s"
+    });
 
     // Two new conditions added to the body.
     assertThat(body.length).equalsTo(1);

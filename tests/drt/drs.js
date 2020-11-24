@@ -1426,6 +1426,19 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Every brazilian is happy.", function() {
+    assertThat("All brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilian(a)
+         } => drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
   it.skip("Every engineer who was brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("Every engineer who was brazilian was happy.")

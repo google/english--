@@ -99,6 +99,11 @@ describe("Natural Logic", function() {
 
       copula -> "every" {% id %}
              |  "some" {% id %}
+             |  "most" {% id %}
+             |  "many" {% id %}
+             |  "few" {% id %}
+             |  "all" {% id %}
+             |  "no" {% id %}
      
       statement -> "if" _ head _ "then" _ statement {%
         ([iffy, ws1, head, ws2, then, ws3, block]) => ["if", head, block] 

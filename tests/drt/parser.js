@@ -721,18 +721,13 @@ function clear(root) {
 }
 
 function parse(s, start = "Discourse", raw = false, skip = true) {
- // console.log(start);
  let parser = new Parser(start);
  let results = parser.feed(s);
-
- // console.log(results[0][0][0]);
 
  if (raw) {
   return results[0];
  }
 
- // console.log(results);
- //console.log(skip);
  if (skip) {
   let result = clear(results[0][0][0]);
   return child(result, 0, 0, 0);
@@ -1411,6 +1406,21 @@ describe("Generalized Quantifiers", function() {
     assertThat(parse("5 men are mortal."))
       .equalsTo(S(NP(DET(5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+});
+
+describe("Plural Morphology", function() {
+  it("Plural", function() {
+    assertThat(parse("brazilians", "N", false, false))
+      .equalsTo(N(N("brazilian"), "s"));
+    assertThat(parse("engineers", "N", false, false))
+      .equalsTo(N(N("engineer"), "s"));
+    assertThat(parse("cats", "N", false, false))
+      .equalsTo(N(N("cat"), "s"));
+    assertThat(parse("witches", "N", false, false))
+      .equalsTo(N(N("witch"), "es"));
+    assertThat(parse("dishes", "N", false, false))
+      .equalsTo(N(N("dish"), "es"));
   });
 });
 

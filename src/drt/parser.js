@@ -742,6 +742,8 @@ const DrtSyntax = `
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=-reg].
 
+      N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] "s".
+      N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] "es".
 
       ADJ -> "happy".
       ADJ -> "unhappy".
@@ -762,15 +764,20 @@ const DrtSyntax = `
       N[num=sing, gen=male] -> "man".
       N[num=plur, gen=male] -> "men".
       N[num=sing, gen=fem] -> "woman".
-      N[num=sing, gen=fem] -> "girl".
-      N[num=sing, gen=-hum] -> "book".
-      N[num=sing, gen=-hum] -> "telescope".
-      N[num=sing, gen=-hum] -> "donkey".
-      N[num=sing, gen=-hum] -> "horse".
-      N[num=sing, gen=-hum] -> "porsche".
-      N[num=sing, gen=[male, fem]] -> "engineer".
-      N[num=sing, gen=1] -> "brazilian".
-
+      N[num=plur, gen=fem] -> "weman".
+      N[num=sing, gen=fem, plur=s] -> "girl".
+      N[num=sing, gen=-hum, plur=s] -> "book".
+      N[num=sing, gen=-hum, plur=s] -> "telescope".
+      N[num=sing, gen=-hum, plur=s] -> "donkey".
+      N[num=sing, gen=-hum, plur=s] -> "horse".
+      N[num=sing, gen=-hum, plur=s] -> "cat".
+      N[num=sing, gen=-hum, plur=s] -> "porsche".
+      N[num=sing, gen=[male, fem], plur=s] -> "engineer".
+      N[num=sing, gen=1, plur=s] -> "brazilian".
+      N[num=sing, gen=1, plur=es] -> "dish".
+      N[num=sing, gen=1, plur=es] -> "witch".
+      N[num=sing, gen=1, plur=es] -> "judge".
+      
       RN[num=sing, gen=male] -> "brother".
       RN[num=sing, gen=male] -> "father".
       RN[num=sing, gen=male] -> "husband".
