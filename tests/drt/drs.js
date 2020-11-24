@@ -1426,13 +1426,78 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("All brazilians are happy.", function() {
+  it("All brazilians are happy.", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
        drs() {
          drs(a) {
-           brazilian(a)
-         } => drs() {
+           brazilians(a)
+         } all drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
+  it("Most brazilians are happy.", function() {
+    assertThat("Most brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilians(a)
+         } most drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
+  it("Many brazilians are happy.", function() {
+    assertThat("Many brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilians(a)
+         } many drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
+  it("3 brazilians are happy.", function() {
+    assertThat("3 brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilians(a)
+         } 3 drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+  
+  it("Only brazilians are happy.", function() {
+    assertThat("Only brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilians(a)
+         } only drs() {
+           happy(a)
+         }
+       }
+    `);
+  });
+
+  it("The majority of brazilians are happy.", function() {
+    assertThat("The majority of brazilians are happy.")
+     .equalsTo(`
+       drs() {
+         drs(a) {
+           brazilians(a)
+         } the-majority-of drs() {
            happy(a)
          }
        }

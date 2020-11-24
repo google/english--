@@ -610,25 +610,25 @@ const DrtSyntax = `
 
       DET[num=sing] -> "a".
       DET[num=sing] -> "an".
-      DET[num=sing] -> "every".
-      DET[num=sing] -> "the".
-      DET[num=sing] -> "some".
-      DET[num=sing] -> "no".
+      DET[num=sing, quantifier=true] -> "every".
+      DET[num=sing, quantifier=true] -> "the".
+      DET[num=sing, quantifier=true] -> "some".
+      DET[num=sing, quantifier=true] -> "no".
 
-      DET[num=plur] -> "all".
-      DET[num=plur] -> "some".
-      DET[num=plur] -> "most".
-      DET[num=plur] -> "many".
-      DET[num=plur] -> "only".
-      DET[num=plur] -> "not" _ "all".
-      DET[num=plur] -> "the" _ "majority" _ "of".
-      DET[num=plur] -> "the" _ "minority" _ "of".
-      DET[num=plur] -> "at" _ "least" _ unsigned_int.
-      DET[num=plur] -> "at" _ "most" _ unsigned_int.
-      DET[num=plur] -> "more" _ "than" _ unsigned_int.
-      DET[num=plur] -> "fewer" _ "than" _ unsigned_int.
-      DET[num=plur] -> "exactly" _ unsigned_int.
-      DET[num=plur] -> unsigned_int.
+      DET[num=plur, quantifier=true] -> "all".
+      DET[num=plur, quantifier=true] -> "some".
+      DET[num=plur, quantifier=true] -> "most".
+      DET[num=plur, quantifier=true] -> "many".
+      DET[num=plur, quantifier=true] -> "only".
+      DET[num=plur, quantifier=true] -> "not" _ "all".
+      DET[num=plur, quantifier=true] -> "the" _ "majority" _ "of".
+      DET[num=plur, quantifier=true] -> "the" _ "minority" _ "of".
+      DET[num=plur, quantifier=true] -> "at" _ "least" _ unsigned_int.
+      DET[num=plur, quantifier=true] -> "at" _ "most" _ unsigned_int.
+      DET[num=plur, quantifier=true] -> "more" _ "than" _ unsigned_int.
+      DET[num=plur, quantifier=true] -> "fewer" _ "than" _ unsigned_int.
+      DET[num=plur, quantifier=true] -> "exactly" _ unsigned_int.
+      DET[num=plur, quantifier=true] -> unsigned_int.
       
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ "'s".
 

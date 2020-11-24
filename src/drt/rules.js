@@ -576,30 +576,37 @@ class CRCOND extends Rule {
 
 class CREVERY extends Rule {
  constructor(ids) {
-  super(ids, S(NP(DET("every"), N(capture("noun"))), VP_(capture("verb"))));
+   super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
  }
- apply({noun, verb}, node, refs) {
-  let ref = referent(this.id(), noun.types);
-  let n = drs(this.ids);
-  n.head.push(...clone(refs));
-  n.head.forEach(ref => ref.closure = true);
-  n.head.push(ref);
-  noun.ref = ref;
-  n.push(noun);
+  apply({det, noun, verb}, node, refs) {
+    // console.log();
+    if (!det.types.quantifier) {
+      return [[], [], [], []];
+    }
 
-  let v = drs(this.ids);
-  v.head.push(...clone(n.head));
-  v.head.forEach(ref => ref.closure = true);
+    let quantifier = det.children.join("-").toLowerCase();
+    
+    let ref = referent(this.id(), noun.types);
+    let n = drs(this.ids);
+    n.head.push(...clone(refs));
+    n.head.forEach(ref => ref.closure = true);
+    n.head.push(ref);
+    noun.ref = ref;
+    n.push(noun);
+    
+    let v = drs(this.ids);
+    v.head.push(...clone(n.head));
+    v.head.forEach(ref => ref.closure = true);
 
-  let s = clone(node);
-
-  s.children[0] = ref;
-  v.push(s);
-
-  let result = implication("every", n, v);
-   
-  return [[], [result], [], [node]];
- }
+    let s = clone(node);
+    
+    s.children[0] = ref;
+    v.push(s);
+    
+    let result = implication(quantifier, n, v);
+    
+    return [[], [result], [], [node]];
+  }
 }
 
 class CRVPEVERY extends Rule {
@@ -964,6 +971,23 @@ class CRSTEM extends Rule {
  }
 }
 
+class CRPLURAL extends Rule {
+ constructor(ids) {
+  super(ids, N(N(capture("stem"))));
+ }
+ apply({stem}, node, refs) {
+  let root = stem.children[0];
+  
+  if (node.children.length > 1) {
+   root += node.children[1];
+  }
+
+  node.children = [root];
+
+  return [[], [], [], []];
+ }
+}
+
 class CRPUNCT1 extends Rule {
  constructor(ids) {
   super(ids, Sentence(Statement(S_(S(capture("s"))))));
@@ -1011,8 +1035,10 @@ function implication(q, a, b) {
    "a": a,
    "b": b,
    print() {
-   return this.a.print() + " => " + this.b.print();
-  }
+     return this.a.print()
+       + (q == "every" ? " => " : ` ${q} `)
+       + this.b.print();
+   }
  };
 }
 
@@ -1103,6 +1129,7 @@ class Rules {
             // new CRTENSE(ids),
             new CRWILL(ids),
             new CRQUESTION(ids),
+            new CRPLURAL(ids),
             new CRSTEM(ids),
             new CRPUNCT(ids),
         ];
