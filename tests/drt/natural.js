@@ -553,6 +553,21 @@ describe("Natural Logic", function() {
     ]]);
   });
 
+  it("let u: Jones(u). let v: Mary(v). likes(u, v).", function() {
+    // Jones likes Mary
+    assertThat(parse(`
+      let u, v. 
+      Jones(u).
+      Mary(v).
+      likes(u, v).
+    `)).equalsTo([[
+      letty(["u", "v"]),
+      pred("Jones", ["u"]),
+      pred("Mary", ["v"]),
+      pred("likes", ["u", "v"]),
+    ]]);
+  });
+
   function assertThat(x) {
     return {
       equalsTo(y) {
