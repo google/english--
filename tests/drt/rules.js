@@ -455,7 +455,8 @@ describe("Rules", function() {
 
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
-      ~drs(b) {
+      not {
+        let b
         porsche(b)
         own(a, b)
       }
@@ -478,7 +479,8 @@ describe("Rules", function() {
 
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
-      ~drs(b) {
+      not {
+        let b
         porsche(b)
         > own(a, b)
       }
@@ -527,7 +529,7 @@ describe("Rules", function() {
 
     assertThat(body.length).equalsTo(1);
     assertThat(body[0].print()).equalsTo(trim(`
-      ~drs() {
+      not {
         happy(a)
       }
     `));
@@ -642,11 +644,12 @@ describe("Rules", function() {
     let [, [sub]] = new CRCOND(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+      if ({
+        let a, b
         Jones(a)
         book(b)
         owns(a, b)
-      } if () drs() {
+      }) {
         likes(a, b)
       }
     `));
@@ -660,9 +663,10 @@ describe("Rules", function() {
     let [, [sub]] = new CREVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a) {
+      every (a: {
         man(a)
-      } every (a) drs(b) {
+      }) {
+        let b
         Jones(b)
         loves(a, b)
       }
@@ -677,9 +681,10 @@ describe("Rules", function() {
     let [, [sub]] = new CRVPEVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a) {
+      every (a: {
         man(a)
-      } every (a) drs(b) {
+      }) {
+        let b
         Jones(b)
         loves(b, a)
       }
@@ -694,11 +699,13 @@ describe("Rules", function() {
     let [, [sub]] = new CRVPEVERY(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+       every (a: {
+         let b
          Smith(b)
          woman(a)
          loves(b, a)
-       } every (a) drs(c) {
+       }) {
+         let c
          Jones(c)
          likes(c, a)
        }
@@ -713,11 +720,13 @@ describe("Rules", function() {
     let [, [sub]] = new CROR(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+      {
+        let a, b
         Jones(a)
         Mary(b)
         loves(a, b)
-      } or drs(c) {
+      } or {
+        let c
         Smith(c)
         loves(c, b)
       }
@@ -751,11 +760,13 @@ describe("Rules", function() {
     let [, [sub]] = new CRNPOR(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+      {
+        let a, b
         Jones(a)
         Mary(b)
         a loves b
-      } or drs(c) {
+      } or {
+        let c
         Smith(c)
         c loves b
       }
@@ -770,11 +781,12 @@ describe("Rules", function() {
     let [, [sub]] = new CRAND(ids).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+      {
+        let a, b
         Smith(a)
         Mary(b)
         likes(a, b)
-      } and drs() {
+      } and {
         loves(b, a)
       }
     `));
@@ -816,11 +828,12 @@ describe("Rules", function() {
     let [, [sub]] = new CRAND(new Ids()).match(node, []);
 
     assertThat(sub.print()).equalsTo(trim(`
-      drs(a, b) {
+      let a, b
+      {
         Mary(a)
         Jones(b)
         like(a, b)
-      } and drs() {
+      } and {
         love(a, b)
       }
     `));
@@ -972,11 +985,12 @@ describe("Rules", function() {
     let [[], [implication]] = new CREVERY(ids).match(node, []);
 
     assertThat(implication.print()).equalsTo(trim(`
-      drs(b, c) {
+      every (b: {
+        let c
         woman(b)
         donkey(c)
         with(b, c)
-      } every (b) drs() {
+      }) {
         loves(b, a)
       }
     `));
@@ -1056,7 +1070,8 @@ describe("Rules", function() {
     let [head, [s], , remove] = new CRNEG(ids).match(node, []);
 
     assertThat(s.print()).equalsTo(trim(`
-      ~drs(a, b) {
+      not {
+        let a, b
         Mary(a)
         Jones(b)
         > kiss(a, b)
@@ -1131,7 +1146,8 @@ describe("Rules", function() {
     let [[], [q]] = new CRQUESTION(ids).match(node);
 
     assertThat(q.print()).equalsTo(trim(`
-      exists() drs(a) {
+      for () {
+        let a
         Mary(a)
         happy(a)
       } ?
@@ -1147,7 +1163,8 @@ describe("Rules", function() {
     let [[], [q]] = new CRQUESTION(ids).match(node);
 
     assertThat(q.print()).equalsTo(trim(`
-      exists(a) drs(a, b) {
+      for (a) {
+        let a, b
         Jones(b)
         likes(a, b)
       } ?
@@ -1163,7 +1180,8 @@ describe("Rules", function() {
     let [[], [q]] = new CRQUESTION(ids).match(node);
 
     assertThat(q.print()).equalsTo(trim(`
-      exists(a) drs(a, b) {
+      for (a) {
+        let a, b
         Jones(b)
         like(b, a)
       } ?

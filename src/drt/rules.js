@@ -461,7 +461,7 @@ class CRNEG extends Rule {
   let sub = drs(this.ids);
   sub.head = clone(refs);
   sub.head.forEach(ref => ref.closure = true);
-  sub.neg = true;
+  // sub.neg = true;
 
   let s = clone(node);
   // console.log(s);
@@ -472,7 +472,7 @@ class CRNEG extends Rule {
   //console.log(sub.print());
   //console.log(sub instanceof DRS);
  
-  return [[], [sub], [], [node]];
+   return [[], [negation(sub)], [], [node]];
  }
 }
 
@@ -601,7 +601,7 @@ class CREVERY extends Rule {
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
-    n.head.push(ref);
+    // n.head.push(ref);
     noun.ref = ref;
     n.push(noun);
 
@@ -633,7 +633,7 @@ class CRVPEVERY extends Rule {
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
-    n.head.push(ref);
+    // n.head.push(ref);
     noun.ref = ref;
     n.push(noun);
     
@@ -1062,7 +1062,13 @@ function disjunction(a, b) {
   "a": a,
   "b": b,
   print() {
-   return this.a.print() + " or " + this.b.print();
+    let result = [];
+    result.push("{");
+    result.push(this.a.print());
+    result.push("} or {");
+    result.push(this.b.print());
+    result.push("}");
+    return result.join("\n");
   }
  };
 }
@@ -1075,7 +1081,13 @@ function quantifier(q, a, b, ref) {
    "b": b,
    "ref": ref,
    print() {
-     return this.a.print() + ` ${q} (${ref ? ref.name : ""}) ` + this.b.print();
+     let result = [];
+     result.push(`${q} (${ref ? (ref.name + ": {") : "{"}`);
+     result.push(this.a.print());
+     result.push("}) {");
+     result.push(this.b.print());
+     result.push("}");
+     return result.join("\n");
    }
  };
 }
@@ -1085,20 +1097,30 @@ function negation(a) {
    "@type": "Negation",
    "a": a,
    print() {
-   return "~" + this.a.print();
-  }
+     let result = [];
+     result.push("not {");
+     result.push(this.a.print());
+     result.push("}");
+     return result.join("\n");
+   }
  };
 }
 
 function conjunction(a, b) {
- return {
-  "@type": "Conjunction",
-  "a": a,
-  "b": b,
-  print() {
-   return this.a.print() + " and " + this.b.print();
-  }
- };
+  return {
+    "@type": "Conjunction",
+    "a": a,
+    "b": b,
+    print() {
+      let result = [];
+      result.push("{");
+      result.push(this.a.print());
+      result.push("} and {");
+      result.push(this.b.print());
+      result.push("}");
+      return result.join("\n");
+    }
+  };
 }
 
 function before(a, b) {
@@ -1139,7 +1161,11 @@ function query(drs, x) {
    "@type": "Query",
    "drs": drs,
    print() {
-    return "exists(" + `${x ? x.print() : ""}` + ") " + this.drs.print() + " ?";
+     let result = [];
+     result.push("for (" + `${x ? x.print() : ""}` + ") {");
+     result.push(this.drs.print());;
+     result.push("} ?");
+     return result.join("\n");
    }
  };
 }

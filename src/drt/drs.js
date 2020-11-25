@@ -106,7 +106,12 @@ class DRS {
     
     let args = refs.join(", ");
     let neg = this.neg ? "~" : "";
-    result.push(`${neg}drs(${args}) \{`);
+    // result.push(`${neg}drs(${args}) \{`);
+    // result.push(`{`);
+    // console.log(this.neg);
+    if (refs.length > 0) {
+      result.push(`let ${refs.join(", ")}`);
+    }
     
     for (let cond of this.body) {
       if (cond instanceof DRS ||
@@ -121,7 +126,7 @@ class DRS {
       }
     }
     
-    result.push("}");
+    // result.push("}");
     
     return result.join("\n");
   }

@@ -8,184 +8,170 @@ describe("DRS", function() {
   it("A man admires a woman.", function() {
     assertThat("A man admires a woman.")
      .equalsTo(`
-       drs(a, b) {
-         man(a)
-         woman(b)
-         admires(a, b)
-       }
+       let a, b
+       man(a)
+       woman(b)
+       admires(a, b)
     `);
   });
 
   it("A man admires a woman. She likes him.", function() {
     assertThat("A man admires a woman. She likes him.")
      .equalsTo(`
-       drs(a, b) {
-         man(a)
-         woman(b)
-         admires(a, b)
-         likes(b, a)
-       }
+       let a, b
+       man(a)
+       woman(b)
+       admires(a, b)
+       likes(b, a)
     `);
   });
 
   it("Jones admires a woman who likes him.", function() {
     assertThat("Jones admires a woman who likes him.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         woman(b)
-         admires(a, b)
-         likes(b, a)
-       }
+       let a, b
+       Jones(a)
+       woman(b)
+       admires(a, b)
+       likes(b, a)
     `);
   });
 
   it("Jones loves Mary.", function() {
     assertThat("Jones loves Mary.", true)
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Mary(b)
-         loves(a, b)
-       }
+       let a, b
+       Jones(a)
+       Mary(b)
+       loves(a, b)
     `);
   });
 
   it("A man loves Mary.", function() {
     assertThat("A man loves Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         man(b)
-         loves(b, a)
-       }
+       let a, b
+       Mary(a)
+       man(b)
+       loves(b, a)
      `);
   });
 
   it("Mary loves a man.", function() {
     assertThat("Mary loves a man.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         man(b)
-         loves(a, b)
-       }
+       let a, b
+       Mary(a)
+       man(b)
+       loves(a, b)
      `);
   });
 
   it("A man who loves Mary fascinates Smith.", function() {
     assertThat("A man who loves Mary fascinates Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Smith(a)
-         Mary(b)
-         man(c)
-         fascinates(c, a)
-         loves(c, b)
-       }
+       let a, b, c
+       Smith(a)
+       Mary(b)
+       man(c)
+       fascinates(c, a)
+       loves(c, b)
      `);
   });
 
   it("Jones loves a book which fascinates Smith.", function() {
     assertThat("Jones loves a book which fascinates Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Smith(b)
-         book(c)
-         loves(a, c)
-         fascinates(c, b)
-       }
+       let a, b, c
+       Jones(a)
+       Smith(b)
+       book(c)
+       loves(a, c)
+       fascinates(c, b)
      `);
   });
 
   it("Jones owns a book which Smith loves.", function() {
     assertThat("Jones owns a book which Smith loves.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Smith(b)
-         book(c)
-         owns(a, c)
-         loves(b, c)
-       }
+       let a, b, c
+       Jones(a)
+       Smith(b)
+       book(c)
+       owns(a, c)
+       loves(b, c)
      `);
   });
 
   it("Jones owns a book which fascinates him.", function() {
     assertThat("Jones owns a book which fascinates him.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         book(b)
-         owns(a, b)
-         fascinates(b, a)
-       }
+       let a, b
+       Jones(a)
+       book(b)
+       owns(a, b)
+       fascinates(b, a)
      `);
   });
 
   it("A man who fascinates Mary loves a book which fascinates Smith.", function() {
     assertThat("A man who fascinates Mary loves a book which fascinates Smith.")
      .equalsTo(`
-       drs(a, b, c, d) {
-         Mary(a)
-         Smith(b)
-         man(c)
-         book(d)
-         loves(c, d)
-         fascinates(c, a)
-         fascinates(d, b)
-       }
+       let a, b, c, d
+       Mary(a)
+       Smith(b)
+       man(c)
+       book(d)
+       loves(c, d)
+       fascinates(c, a)
+       fascinates(d, b)
      `);
   });
 
   it("Jones owns Ulysses. It fascinates him.", function() {
     assertThat("Jones owns Ulysses. It fascinates him.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Ulysses(b)
-         owns(a, b)
-         fascinates(b, a)
-       }
+       let a, b
+       Jones(a)
+       Ulysses(b)
+       owns(a, b)
+       fascinates(b, a)
      `);
   });
 
   it("Jones owns a book.", function() {
     assertThat("Jones owns a book. It fascinates him.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         book(b)
-         owns(a, b)
-         fascinates(b, a)
-       }
+       let a, b
+       Jones(a)
+       book(b)
+       owns(a, b)
+       fascinates(b, a)
      `);
   });
 
   it("Jones owns a book. It fascinates him. Mary loves him.", function() {
     assertThat("Jones owns a book. It fascinates him. Mary loves him.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         book(b)
-         owns(a, b)
-         fascinates(b, a)
-         Mary(c)
-         loves(c, a)
-       }
+       let a, b, c
+       Jones(a)
+       book(b)
+       owns(a, b)
+       fascinates(b, a)
+       Mary(c)
+       loves(c, a)
      `);
   });
 
   it("Jones does not own a porsche.", function() {
     assertThat("Jones does not own a porsche.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         ~drs(b) {
-           porsche(b)
-           own(a, b)
-         }
+       let a
+       Jones(a)
+       not {
+         let b
+         porsche(b)
+         own(a, b)
        }
      `);
   });
@@ -193,13 +179,12 @@ describe("DRS", function() {
   it("Jones owns a porsche. He does not like it.", function() {
     assertThat("Jones owns a porsche. He does not like it.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         porsche(b)
-         owns(a, b)
-         ~drs() {
-           like(a, b)
-         }
+       let a, b
+       Jones(a)
+       porsche(b)
+       owns(a, b)
+       not {
+         like(a, b)
        }
      `);
   });
@@ -236,17 +221,17 @@ describe("DRS", function() {
   it("Jones loves a woman who does not admire him.", function() {
     assertThat("Jones loves a woman who does not love him. She does not love a man.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         woman(b)
-         ~drs() {
-           love(b, a)
-         }
-         loves(a, b)
-         ~drs(c) {
-           man(c)
-           love(b, c)
-         }
+       let a, b
+       Jones(a)
+       woman(b)
+       not {
+         love(b, a)
+       }
+       loves(a, b)
+       not {
+         let c
+         man(c)
+         love(b, c)
        }
      `);
   });
@@ -254,27 +239,26 @@ describe("DRS", function() {
   it("A porsche does not stink", function() {
     assertThat("A porsche does not stink.")
      .equalsTo(`
-       drs(a) {
-         ~drs() {
-           stink(a)
-         }
-         porsche(a)
+       let a
+       not {
+         stink(a)
        }
+       porsche(a)
      `);
   });
 
   it("Jones does not own a porsche which does not fascinate him", function() {
     assertThat("Jones does not own a porsche which does not fascinate him.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         ~drs(b) {
-           porsche(b)
-           ~drs() {
-             fascinate(b, a)
-           }
-           own(a, b)
+       let a
+       Jones(a)
+       not {
+         let b
+         porsche(b)
+         not {
+           fascinate(b, a)
          }
+         own(a, b)
        }
      `);
   });
@@ -282,15 +266,15 @@ describe("DRS", function() {
   it("Jones does not like a porsche which he does not own.", function() {
     assertThat("Jones does not like a porsche which he does not own.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         ~drs(b) {
-           porsche(b)
-           ~drs() {
-             own(a, b)
-           }
-           like(a, b)
+       let a
+       Jones(a)
+       not {
+         let b
+         porsche(b)
+         not {
+           own(a, b)
          }
+         like(a, b)
        }
      `);
   });
@@ -298,21 +282,19 @@ describe("DRS", function() {
   it("Jones is happy.", function() {
     assertThat("Jones is happy.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         happy(a)
-       }
+       let a
+       Jones(a)
+       happy(a)
     `);
   });
 
   it("Jones is not happy.", function() {
     assertThat("Jones is not happy.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         ~drs() {
-           happy(a)
-         }
+       let a
+       Jones(a)
+       not {
+         happy(a)
        }
     `);
   });
@@ -320,107 +302,99 @@ describe("DRS", function() {
   it("A man is happy.", function() {
     assertThat("A man is happy.")
      .equalsTo(`
-       drs(a) {
-         happy(a)
-         man(a)
-       }
+       let a
+       happy(a)
+       man(a)
     `);
   });
 
   it("Jones is a man.", function() {
     assertThat("Jones is a man.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         man(a)
-       }
+       let a
+       Jones(a)
+       man(a)
     `);
   });
 
   it("Jones is a happy man.", function() {
     assertThat("Jones is a happy man.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         happy(a)
-         man(a)
-       }
+       let a
+       Jones(a)
+       happy(a)
+       man(a)
     `);
   });
 
   it("Jones is a happy man who loves Mary.", function() {
     assertThat("Jones is a happy man who loves Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Mary(b)
-         happy(a)
-         man(a)
-         loves(a, b)
-       }
+       let a, b
+       Jones(a)
+       Mary(b)
+       happy(a)
+       man(a)
+       loves(a, b)
     `);
   });
 
   it("Jones is a man. He is happy. He loves Mary.", function() {
     assertThat("Jones is a man. He is happy. He loves Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         man(a)
-         happy(a)
-         Mary(b)
-         loves(a, b)
-       }
+       let a, b
+       Jones(a)
+       man(a)
+       happy(a)
+       Mary(b)
+       loves(a, b)
     `);
   });
 
   it("Jones loves a woman who is happy.", function() {
     assertThat("Jones loves a woman who is happy.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         woman(b)
-         happy(b)
-         loves(a, b)
-       }
+       let a, b
+       Jones(a)
+       woman(b)
+       happy(b)
+       loves(a, b)
     `);
   });
 
   it("A woman who is happy loves Jones.", function() {
     assertThat("A woman who is happy loves Jones.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         woman(b)
-         happy(b)
-         loves(b, a)
-       }
+       let a, b
+       Jones(a)
+       woman(b)
+       happy(b)
+       loves(b, a)
     `);
   });
 
   it("Jones owns a porsche. He is happy.", function() {
     assertThat("Jones owns a porsche. He is happy.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         porsche(b)
-         owns(a, b)
-         happy(a)
-       }
+       let a, b
+       Jones(a)
+       porsche(b)
+       owns(a, b)
+       happy(a)
     `);
   });
 
   it("If Jones owns a book then he likes it.", function() {
     assertThat("If Jones owns a book then he likes it.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b) {
-           book(b)
-           owns(a, b)
-         } if () drs() {
-           likes(a, b)
-         }
+       let a
+       Jones(a)
+       if ({
+         let b
+         book(b)
+         owns(a, b)
+       }) {
+         likes(a, b)
        }
     `);
   });
@@ -430,16 +404,17 @@ describe("DRS", function() {
     // promote proper names to the global DRS.
     assertThat("If Jones owns a book then Smith owns a porsche.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Smith(b)
-         drs(c) {
-           book(c)
-           owns(a, c)
-         } if () drs(d) {
-           porsche(d)
-           owns(b, d)
-         }
+       let a, b
+       Jones(a)
+       Smith(b)
+       if ({
+         let c
+         book(c)
+         owns(a, c)
+       }) {
+         let d
+         porsche(d)
+         owns(b, d)
        }
     `);
   });
@@ -447,16 +422,16 @@ describe("DRS", function() {
   it("Jones likes Mary. If she likes a book then he likes it.", function() {
     assertThat("Jones likes Mary. If she likes a book then he likes it.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Mary(b)
-         likes(a, b)
-         drs(c) {
-           book(c)
-           likes(b, c)
-         } if () drs() {
-           likes(a, c)
-         }
+       let a, b
+       Jones(a)
+       Mary(b)
+       likes(a, b)
+       if ({
+         let c
+         book(c)
+         likes(b, c)
+       }) {
+         likes(a, c)
        }
     `);
   });
@@ -491,13 +466,12 @@ describe("DRS", function() {
   it("Every man loves Jones.", function() {
     assertThat("Every man loves Jones.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b) {
-           man(b)
-         } every (b) drs() {
-           loves(b, a)
-         }
+       let a
+       Jones(a)
+       every (b: {
+         man(b)
+       }) {
+         loves(b, a)
        }
     `);
   });
@@ -505,12 +479,10 @@ describe("DRS", function() {
   it("Every man is happy.", function() {
     assertThat("Every man is happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
-           man(a)
-         } every (a) drs() {
-           happy(a)
-         }
+       every (a: {
+         man(a)
+       }) {
+         happy(a)
        }
     `);
   });
@@ -540,29 +512,27 @@ describe("DRS", function() {
   it("Jones loves every man.", function() {
     assertThat("Jones loves every man.")
      .equalsTo(`
-       drs(a) {
+         let a
          Jones(a)
-         drs(b) {
+         every (b: {
            man(b)
-         } every (b) drs() {
+         }) {
            loves(a, b)
          }
-       }
     `);
   });
 
   it("Jones loves Mary or Smith loves her.", function() {
     assertThat("Jones loves Mary or Smith loves her.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Smith(b)
-         Mary(c)
-         drs() {
-           loves(a, c)
-         } or drs() {
-           loves(b, c)
-         }
+       let a, b, c
+       Jones(a)
+       Smith(b)
+       Mary(c)
+       {
+         loves(a, c)
+       } or {
+         loves(b, c)
        }
     `);
   });
@@ -603,15 +573,16 @@ describe("DRS", function() {
     // Mary is bound to different referents.
     assertThat("Jones or Smith loves Mary.")
      .equalsTo(`
-       drs(a) {
-         Mary(a)
-         drs(b) {
-           Jones(b)
-           b loves a
-         } or drs(c) {
-           Smith(c)
-           c loves a
-         }
+       let a
+       Mary(a)
+       {
+         let b
+         Jones(b)
+         b loves a
+       } or {
+         let c
+         Smith(c)
+         c loves a
        }
     `);
   });
@@ -619,16 +590,17 @@ describe("DRS", function() {
   it("Mary is happy. Jones or Smith loves her.", function() {
     assertThat("Mary is happy. Jones or Smith loves her.")
      .equalsTo(`
-       drs(a) {
-         Mary(a)
-         happy(a)
-         drs(b) {
-           Jones(b)
-           b loves a
-         } or drs(c) {
-           Smith(c)
-           c loves a
-         }
+       let a
+       Mary(a)
+       happy(a)
+       {
+         let b
+         Jones(b)
+         b loves a
+       } or {
+         let c
+         Smith(c)
+         c loves a
        }
     `);
   });
@@ -687,15 +659,14 @@ describe("DRS", function() {
   it("Jones likes every woman who Smith loves.", function() {
     assertThat("Jones likes every woman who Smith loves.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Smith(b)
-         drs(c) {
-           woman(c)
-           loves(b, c)
-         } every (c) drs() {
-           likes(a, c)
-         }
+       let a, b
+       Jones(a)
+       Smith(b)
+       every (c: {
+         woman(c)
+         loves(b, c)
+       }) {
+         likes(a, c)
        }
      `);
   });
@@ -724,14 +695,13 @@ describe("DRS", function() {
   it("Mary loves Smith and he lovers her.", function() {
     assertThat("Mary loves Smith and he loves her.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         Smith(b)
-         drs() {
-           loves(a, b)
-         } and drs() {
-           loves(b, a)
-         }
+       let a, b
+       Mary(a)
+       Smith(b)
+       {
+         loves(a, b) 
+       } and {
+         loves(b, a)
        }
     `);
   });
@@ -739,14 +709,14 @@ describe("DRS", function() {
   it("Mary owns a porsche and she loves it.", function() {
     assertThat("Mary owns a porsche and she loves it.")
      .equalsTo(`
-       drs(a) {
-         Mary(a)
-         drs(b) {
-           porsche(b)
-           owns(a, b)
-         } and drs() {
-           loves(a, b)
-         }
+       let a
+       Mary(a)
+       {
+         let b
+         porsche(b)
+         owns(a, b) 
+       } and { 
+         loves(a, b)
        }
     `);
   });
@@ -820,36 +790,33 @@ describe("DRS", function() {
   it("Jones's wife is happy.", function() {
     assertThat("Jones's wife is happy.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         happy(b)
-         wife(b, a)
-       }
+       let a, b
+       Jones(a)
+       happy(b)
+       wife(b, a)
     `);
   });
 
   it("Jones's wife is happy. She likes Smith.", function() {
     assertThat("Jones's wife is happy. She likes Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         happy(b)
-         wife(b, a)
-         Smith(c)
-         likes(b, c)
-       }
+       let a, b, c
+       Jones(a)
+       happy(b)
+       wife(b, a)
+       Smith(c)
+       likes(b, c)
     `);
   });
 
   it("Smith likes Jones's wife.", function() {
     assertThat("Smith likes Jones's wife.")
      .equalsTo(`
-       drs(a, b, c) {
-         Smith(a)
-         Jones(b)
-         likes(a, c)
-         wife(c, b)
-       }
+       let a, b, c
+       Smith(a)
+       Jones(b)
+       likes(a, c)
+       wife(c, b)
     `);
   });
 
@@ -875,38 +842,35 @@ describe("DRS", function() {
   it("Jones owns an unhappy donkey.", function() {
     assertThat("Jones owns an unhappy donkey.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         unhappy(b)
-         donkey(b)
-         owns(a, b)
-       }
+       let a, b
+       Jones(a)
+       unhappy(b)
+       donkey(b)
+       owns(a, b)
     `);
   });
 
   it("Jones owns a fast porsche.", function() {
     assertThat("Jones owns a fast porsche.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         fast(b)
-         porsche(b)
-         owns(a, b)
-       }
+       let a, b
+       Jones(a)
+       fast(b)
+       porsche(b)
+       owns(a, b)
     `);
   });
 
   it("Jones owns every fast porsche.", function() {
     assertThat("Jones owns every fast porsche.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b) {
-           fast(b)
-           porsche(b)
-         } every (b) drs() {
-           owns(a, b)
-         }
+       let a
+       Jones(a)
+       every (b: {
+         fast(b)
+         porsche(b)
+       }) {
+         owns(a, b)
        }
     `);
   });
@@ -914,14 +878,13 @@ describe("DRS", function() {
   it("Every beautiful woman loves Jones.", function() {
     assertThat("Every beautiful woman loves Jones.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b) {
-           beautiful(b)
-           woman(b)
-         } every (b) drs() {
-           loves(b, a)
-         }
+       let a
+       Jones(a)
+       every (b: {
+         beautiful(b)
+         woman(b)
+       }) {
+         loves(b, a)
        }
     `);
   });
@@ -929,54 +892,50 @@ describe("DRS", function() {
   it("Smith loves a woman who does not like Jones.", function() {
     assertThat("Smith loves a woman who does not like Jones.")
      .equalsTo(`
-       drs(a, b, c) {
-         Smith(a)
-         Jones(b)
-         woman(c)
-         ~drs() {
-           like(c, b)
-         }
-         loves(a, c)
+       let a, b, c
+       Smith(a)
+       Jones(b)
+       woman(c)
+       not {
+         like(c, b)
        }
+       loves(a, c)
     `);
   });
 
   it("Jones likes a woman who likes Smith.", function() {
     assertThat("Jones likes a woman who likes Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Smith(b)
-         woman(c)
-         likes(a, c)
-         likes(c, b)
-       }
+       let a, b, c
+       Jones(a)
+       Smith(b)
+       woman(c)
+       likes(a, c)
+       likes(c, b)
     `);
   });
 
   it("Jones loves a woman with a donkey.", function() {
     assertThat("Jones loves a woman with a donkey.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         woman(b)
-         donkey(c)
-         loves(a, b)
-         with(b, c)
-       }
+       let a, b, c
+       Jones(a)
+       woman(b)
+       donkey(c)
+       loves(a, b)
+       with(b, c)
     `);
   });
 
   it("A woman with a donkey loves Jones.", function() {
     assertThat("A woman with a donkey loves Jones.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         woman(b)
-         donkey(c)
-         loves(b, a)
-         with(b, c)
-       }
+       let a, b, c
+       Jones(a)
+       woman(b)
+       donkey(c)
+       loves(b, a)
+       with(b, c)
     `);
   });
 
@@ -1008,15 +967,15 @@ describe("DRS", function() {
   it("Every woman with a donkey loves Jones.", function() {
     assertThat("Every woman with a donkey loves Jones.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b, c) {
-           woman(b)
-           donkey(c)
-           with(b, c)
-         } every (b) drs() {
-           loves(b, a)
-         }
+       let a
+       Jones(a)
+       every (b: {
+         let c
+         woman(b)
+         donkey(c)
+         with(b, c)
+       }) {
+         loves(b, a)
        }
     `);
   });
@@ -1024,15 +983,14 @@ describe("DRS", function() {
   it("Every man from Brazil loves Mary.", function() {
     assertThat("Every man from Brazil loves Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         Brazil(b)
-         drs(c) {
-           man(c)
-           from(c, b)
-         } every (c) drs() {
-           loves(c, a)
-         }
+       let a, b
+       Mary(a)
+       Brazil(b)
+       every (c: {
+         man(c)
+         from(c, b)
+       }) {
+         loves(c, a)
        }
     `);
   });
@@ -1040,28 +998,26 @@ describe("DRS", function() {
   it("Jones loves Mary. Jones likes Smith.", function() {
     assertThat("Jones loves Mary. Jones likes Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Mary(b)
-         loves(a, b)
-         Smith(c)
-         likes(a, c)
-       }
+       let a, b, c
+       Jones(a)
+       Mary(b)
+       loves(a, b)
+       Smith(c)
+       likes(a, c)
     `);
   });
 
   it("Every man is mortal. Socrates is a man.", function() {
     assertThat("Every man is mortal. Socrates is a man.")
      .equalsTo(`
-       drs(b) {
-         drs(a) {
-           man(a)
-         } every (a) drs() {
-           mortal(a)
-         }
-         Socrates(b)
-         man(b)
+       let b
+       every (a: {
+         man(a)
+       }) {
+         mortal(a)
        }
+       Socrates(b)
+       man(b)
     `);
   });
 
@@ -1116,59 +1072,54 @@ describe("DRS", function() {
   it("Jones is Mary's husband.", function() {
     assertThat("Jones is Mary's husband.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Mary(b)
-         a is c
-         husband(c, b)
-       }
+       let a, b, c
+       Jones(a)
+       Mary(b)
+       a is c
+       husband(c, b)
     `);
   });
 
   it("Jones's father is Mary's husband.", function() {
     assertThat("Jones's father is Mary's husband.")
      .equalsTo(`
-       drs(a, b, c, d) {
-         Jones(a)
-         Mary(b)
-         c is d(c)
-         father(c, a)
-         husband(d, b)
-       }
+       let a, b, c, d
+       Jones(a)
+       Mary(b)
+       c is d(c)
+       father(c, a)
+       husband(d, b)
     `);
   });
 
   it("Mary's father is a brazilian engineer.", function() {
     assertThat("Mary's father is a brazilian engineer.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         brazilian(b)
-         engineer(b)
-         father(b, a)
-       }
+       let a, b
+       Mary(a)
+       brazilian(b)
+       engineer(b)
+       father(b, a)
     `);
   });
 
   it("Jones is from Brazil", function() {
     assertThat("Jones is from Brazil.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Brazil(b)
-         from(a, b)
-       }
+       let a, b
+       Jones(a)
+       Brazil(b)
+       from(a, b)
     `);
   });
 
   it("Jones is behind Mary", function() {
     assertThat("Jones is behind Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Mary(b)
-         behind(a, b)
-       }
+       let a, b
+       Jones(a)
+       Mary(b)
+       behind(a, b)
     `);
   });
 
@@ -1176,93 +1127,85 @@ describe("DRS", function() {
     // assertThat("Jones's wife is behind Mary's sister.")
     assertThat("Jones's wife is behind Mary's sister.")
      .equalsTo(`
-       drs(a, b, c, d) {
-         Jones(a)
-         Mary(b)
-         wife(c, a)
-         behind(c, d)
-         sister(d, b)
-       }
+       let a, b, c, d
+       Jones(a)
+       Mary(b)
+       wife(c, a)
+       behind(c, d)
+       sister(d, b)
     `);
   });
 
   it("Jones's wife is Mary.", function() {
     assertThat("Jones's wife is Mary.")
      .equalsTo(`
-       drs(a, b, c) {
-         Jones(a)
-         Mary(b)
-         c is b(c)
-         wife(c, a)
-       }
+       let a, b, c
+       Jones(a)
+       Mary(b)
+       c is b(c)
+       wife(c, a)
     `);
   });
 
   it("Mary is Jones's wife.", function() {
     assertThat("Mary is Jones's wife.")
      .equalsTo(`
-       drs(a, b, c) {
-         Mary(a)
-         Jones(b)
-         a is c
-         wife(c, b)
-       }
+       let a, b, c
+       Mary(a)
+       Jones(b)
+       a is c
+       wife(c, b)
     `);
   });
 
   it("Jones is Smith's brother. He likes Brazil.", function() {
     assertThat("Jones is Smith's brother. He likes Brazil.")
      .equalsTo(`
-       drs(a, b, c, d) {
-         Jones(a)
-         Smith(b)
-         a is c
-         brother(c, b)
-         Brazil(d)
-         likes(c, d)
-       }
+       let a, b, c, d
+       Jones(a)
+       Smith(b)
+       a is c
+       brother(c, b)
+       Brazil(d)
+       likes(c, d)
     `);
   });
 
   it("Jones loves himself.", function() {
     assertThat("Jones loves himself.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         loves(a, a)
-       }
+       let a
+       Jones(a)
+       loves(a, a)
     `);
   });
 
   it("Jones kissed Mary.", function() {
     assertThat("Jones kissed Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Mary(b)
-         < kissed(a, b)
-       }
+       let a, b
+       Jones(a)
+       Mary(b)
+       < kissed(a, b)
     `);
   });
 
   it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
-       drs(a) {
-         John(a)
-         < happy(a)
-       }
+       let a
+       John(a)
+       < happy(a)
     `);
   });
 
   it("John was not happy.", function() {
     assertThat("John was not happy.")
      .equalsTo(`
-       drs(a) {
-         John(a)
-         ~drs() {
-           < happy(a)
-         }
+       let a
+       John(a)
+       not {
+         < happy(a)
        }
     `);
   });
@@ -1270,23 +1213,21 @@ describe("DRS", function() {
   it("John likes Mary.", function() {
     assertThat("John likes Mary.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Mary(b)
-         likes(a, b)
-       }
+       let a, b
+       John(a)
+       Mary(b)
+       likes(a, b)
     `);
   });
 
   it("John will not kiss Mary.", function() {
     assertThat("John will not kiss Mary.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Mary(b)
-         ~drs() {
-           > kiss(a, b)
-         }
+       let a, b
+       John(a)
+       Mary(b)
+       not {
+         > kiss(a, b)
        }
     `);
   });
@@ -1307,11 +1248,10 @@ describe("DRS", function() {
   it("John likes Mary.", function() {
     assertThat("John likes Mary.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Mary(b)
-         likes(a, b)
-       }
+       let a, b
+       John(a)
+       Mary(b)
+       likes(a, b)
     `);
   });
 
@@ -1321,12 +1261,11 @@ describe("DRS", function() {
     // referents.
     assertThat("John does not like Mary.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Mary(b)
-         ~drs() {
-           like(a, b)
-         }
+       let a, b
+       John(a)
+       Mary(b)
+       not {
+         like(a, b)
        }
     `);
   });
@@ -1334,11 +1273,10 @@ describe("DRS", function() {
   it("John has kissed Mary.", function() {
     assertThat("John has kissed Mary.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         Mary(b)
-         kissed(a, b)
-       }
+       let a, b
+       John(a)
+       Mary(b)
+       kissed(a, b)
     `);
   });
 
@@ -1356,21 +1294,19 @@ describe("DRS", function() {
   it("John has owned a porsche.", function() {
     assertThat("John has owned a porsche.")
      .equalsTo(`
-       drs(a, b) {
-         John(a)
-         porsche(b)
-         owned(a, b)
-       }
+       let a, b
+       John(a)
+       porsche(b)
+       owned(a, b)
     `);
   });
 
   it("John was happy.", function() {
     assertThat("John was happy.")
      .equalsTo(`
-       drs(a) {
-        John(a)
-        < happy(a)
-       }
+       let a
+       John(a)
+       < happy(a)
     `);
   });
 
@@ -1378,10 +1314,9 @@ describe("DRS", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("John was an engineer.")
      .equalsTo(`
-       drs(a) {
-        John(a)
-        < engineer(a)
-       }
+       let a
+       John(a)
+       < engineer(a)
     `);
   });
 
@@ -1389,11 +1324,10 @@ describe("DRS", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("John was not an engineer.")
      .equalsTo(`
-       drs(a) {
-         John(a)
-         ~drs() {
-           < engineer(a)
-         }
+       let a
+       John(a)
+       not {
+         < engineer(a)
        }
     `);
   });
@@ -1401,14 +1335,13 @@ describe("DRS", function() {
   it("John was not an engineer from Brazil.", function() {
     assertThat("John was not an engineer from Brazil.")
      .equalsTo(`
-      drs(a, b) {
-        John(a)
-        Brazil(b)
-        ~drs() {
-          engineer(a)
-          from(a, b)
-        }
-       }
+      let a, b
+      John(a)
+      Brazil(b)
+      not {
+        engineer(a)
+        from(a, b)
+      }
     `);
   });
 
@@ -1416,51 +1349,43 @@ describe("DRS", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("Every brazilian was happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         every (a: {
            brazilian(a)
-         } every (a) drs() {
+         }) {
            < happy(a)
          }
-       }
     `);
   });
 
   it("All brazilians are happy.", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         all (a: {
            brazilians(a)
-         } all (a) drs() {
+         }) {
            happy(a)
          }
-       }
     `);
   });
 
   it("Most brazilians are happy.", function() {
     assertThat("Most brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         most (a: {
            brazilians(a)
-         } most (a) drs() {
+         }) {
            happy(a)
          }
-       }
     `);
   });
 
   it("Many brazilians are happy.", function() {
     assertThat("Many brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
-           brazilians(a)
-         } many (a) drs() {
-           happy(a)
-         }
+       many (a: {
+         brazilians(a)
+       }) {
+         happy(a)
        }
     `);
   });
@@ -1468,39 +1393,33 @@ describe("DRS", function() {
   it("3 brazilians are happy.", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         3 (a: {
            brazilians(a)
-         } 3 (a) drs() {
+         }) {
            happy(a)
          }
-       }
     `);
   });
   
   it("Only brazilians are happy.", function() {
     assertThat("Only brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         only (a: {
            brazilians(a)
-         } only (a) drs() {
+         }) {
            happy(a)
          }
-       }
     `);
   });
 
   it("The majority of brazilians are happy.", function() {
     assertThat("The majority of brazilians are happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
+         the-majority-of (a: {
            brazilians(a)
-         } the-majority-of (a) drs() {
+         }) {
            happy(a)
          }
-       }
     `);
   });
 
@@ -1522,12 +1441,11 @@ describe("DRS", function() {
   it("Is Jones happy?", function() {
     assertThat("Is Jones happy?")
      .equalsTo(`
-       drs() {
-         exists() drs(a) {
-           Jones(a) 
-           happy(a)
-         } ?
-       }
+       for () {
+         let a
+         Jones(a) 
+         happy(a)
+       } ?
     `);
   });
 
@@ -1536,24 +1454,24 @@ describe("DRS", function() {
     // variable b scoped to the question.
     assertThat("Who loves Jones?")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         exists(b) drs(b) {
-           loves(b, a)
-         } ?
-       }
+       let a, b
+       Jones(a)
+       for (b) {
+         let b
+         loves(b, a)
+       } ?
     `);
   });
 
   it("Who does Jones love?", function() { 
     assertThat("Who does Jones love?")
      .equalsTo(`
-       drs(a) {
-         exists(a) drs(a, b) {
-           Jones(b)
-           love(b, a)
-         } ?
-       }
+       let a
+       for (a) {
+         let a, b
+         Jones(b)
+         love(b, a)
+       } ?
     `);
   });
 
