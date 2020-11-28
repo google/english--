@@ -626,9 +626,15 @@ class CREVERY extends Rule {
 
 class CRVPEVERY extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET("every"), N(capture("noun")))))));
+    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N(capture("noun")))))));
   }
-  apply({subject, noun}, node, refs) {
+  apply({det, subject, noun}, node, refs) {
+    // console.log(det);
+
+    if (!det.types.quantifier) {
+      return [[], [], [], []];
+    }
+
     let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
@@ -643,10 +649,12 @@ class CRVPEVERY extends Rule {
 
     let s = clone(node);
 
+    // console.log("hello");
     child(s, 1, 0).children[1] = ref;
     verb.push(s);
   
-    return [[], [quantifier("every", n, verb, ref)], [], [node]];
+    let q = det.children.join("-").toLowerCase();
+    return [[], [quantifier(q, n, verb, ref)], [], [node]];
   }
 }
 

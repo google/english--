@@ -1438,6 +1438,37 @@ describe("DRS", function() {
     `);
   });
 
+  it("Most brazilians like most porsches.", function() {
+    assertThat("Most brazilians like most porsches.")
+     .equalsTo(`
+         most (a: {
+           brazilians(a)
+         }) {
+           most (b: {
+             porsches(b)
+           }) {
+             like(a, b)
+           }
+         }
+    `);
+  });
+  
+  it("Most brazilians love a porsche which Smith likes.", function() {
+    assertThat("Most brazilians love a porsche which Smith likes.")
+     .equalsTo(`
+         let a
+         Smith(a)
+         most (b: {
+           brazilians(b)
+         }) {
+           let c
+           porsche(c)
+           love(b, c)
+           likes(a, c)
+         }
+    `);
+  });
+
   it("Is Jones happy?", function() {
     assertThat("Is Jones happy?")
      .equalsTo(`
