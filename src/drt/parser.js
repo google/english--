@@ -563,6 +563,10 @@ const DrtSyntax = `
           "not" __
           VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
 
+      V[num=1, fin=2, trans=3, tp=4, tense=5] -> 
+        V[num=1, fin=2, trans=3, tp=4, tense=5] __
+        PP.  
+
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
       GAP -> null.

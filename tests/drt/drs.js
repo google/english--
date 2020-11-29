@@ -1527,13 +1527,45 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones gave to Mary a porsche.", function() { 
+  // Adverbs
+  it("Jones gave to Mary a porsche.", function() { 
+    // These aren't a correct representation of adverbs
+    // because they aren't using the eventuality
+    // but it is a reasonable starting point.
     assertThat("Jones gave to Mary a porsche.")
      .equalsTo(`
-       let a, b
+       let a, b, c
        Jones(a)
-       porsche(b)
-       < gave(a, b)
+       Mary(b)
+       porsche(c)
+       < gave(a, c)
+       < gave-to(a, b)
+     `);
+  });
+
+  it("Jones kissed in Brazil Mary.", function() { 
+    assertThat("Jones kissed in Brazil Mary.")
+     .equalsTo(`
+       let a, b, c
+       Jones(a)
+       Mary(b)
+       Brazil(c)
+       < kissed(a, b)
+       < kiss-ined(a, c)
+     `);
+  });
+
+  it.skip("Jones came from Brazil to Italy.", function() { 
+    // We need to allow repeated prepositional phrases
+    // as adverbs
+    assertThat("Jones came from Brazil to Italy.")
+     .equalsTo(`
+       let a, b, c
+       Jones(a)
+       Mary(b)
+       Brazil(c)
+       < kissed(a, b)
+       < kiss-ined(a, c)
      `);
   });
 

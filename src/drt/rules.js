@@ -404,6 +404,24 @@ class CRLIN extends CompositeRule {
   }
 }
 
+class CRADV extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("subject"),
+                 VP_(VP(V(V(capture("verb")),
+                          PP(PREP(capture("prep")), capture("np")))
+                       ))));
+  }
+  apply({subject, verb, prep, np}, node) {
+    child(node, 1, 0).children[0] = verb;
+    let sub = child(node, 0);
+    let v = clone(verb);
+    child(v, 0).children[0] += "-" + child(prep, 0);
+    let cond = S(sub, VP_(VP(v, child(np, 1))));
+    cond.types = node.types;
+    return [[], [cond], [], []];
+  }
+}
+
 class CRNRC extends Rule {
   constructor(ids) {
     super(ids, N(N(), RC(capture("rc"))));
@@ -1048,12 +1066,17 @@ class CRPUNCT extends CompositeRule {
 
 class CRPRED extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"), VP_(VP(V(capture("verb"))))));
+    super(ids, S(capture("subject"),
+                 VP_(VP(V(capture("verb")),
+                        capture("object")))));
   }
   
-  apply({verb}, node, refs = []) {
+  apply({verb, object}, node, refs = []) {
+    // console.log("hi");
     let sub = child(node, 0);
     let obj = child(node, 1, 0, 1);
+    // console.log(object);
+    // console.log(child(node, 1, 0).children.length);
     if (sub["@type"] != "Referent") {
       throw new Error("Expected referent, got " + sub["@type"] + ".");
     }
@@ -1196,6 +1219,7 @@ class Rules {
       new CRPP(ids),
       new CRID(ids),
       new CRLIN(ids),
+      new CRADV(ids),
       new CRNRC(ids), 
       new CRPRO(ids),
       new CRNEG(ids),
