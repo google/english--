@@ -1527,8 +1527,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones gave a porsche.", function() { 
-    assertThat("Jones gave a porsche.")
+  it.skip("Jones gave to Mary a porsche.", function() { 
+    assertThat("Jones gave to Mary a porsche.")
      .equalsTo(`
        let a, b
        Jones(a)
