@@ -610,8 +610,9 @@ const DrtSyntax = `
 
       DET[num=sing] -> "a".
       DET[num=sing] -> "an".
+      DET[num=sing] -> "the".
+      
       DET[num=sing, quantifier=true] -> "every".
-      DET[num=sing, quantifier=true] -> "the".
       DET[num=sing, quantifier=true] -> "some".
       DET[num=sing, quantifier=true] -> "no".
 

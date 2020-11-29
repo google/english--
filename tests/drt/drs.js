@@ -383,7 +383,19 @@ describe("DRS", function() {
        happy(a)
     `);
   });
+  
+  it.skip("If the man loves Mary then Smith likes the woman.", function() {
+    assertThat("If the man loves Mary then Smith likes the woman.")
+     .equalsTo(`
+    `);
+  });
 
+  it.only("The man loves Mary.", function() {
+    assertThat("Smith loves Brazil. The man loves Mary.")
+     .equalsTo(`
+    `);
+  });
+  
   it("If Jones owns a book then he likes it.", function() {
     assertThat("If Jones owns a book then he likes it.")
      .equalsTo(`
