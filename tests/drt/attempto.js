@@ -46,7 +46,9 @@ var grammar = {
         },
     {"name": "comment$ebnf$1", "symbols": []},
     {"name": "comment$ebnf$1", "symbols": ["comment$ebnf$1", /[^\n]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "comment", "symbols": [{"literal":"%"}, "comment$ebnf$1", {"literal":"\n"}], "postprocess": ([per, words, nl]) => ["%", words.join("")]},
+    {"name": "comment$ebnf$2", "symbols": [{"literal":"\n"}]},
+    {"name": "comment$ebnf$2", "symbols": ["comment$ebnf$2", {"literal":"\n"}], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "comment", "symbols": [{"literal":"%"}, "comment$ebnf$1", "comment$ebnf$2"], "postprocess": ([per, words, nl]) => ["%", words.join("")]},
     {"name": "statement$ebnf$1", "symbols": []},
     {"name": "statement$ebnf$1$subexpression$1", "symbols": ["_", {"literal":","}, "_", "arg"]},
     {"name": "statement$ebnf$1", "symbols": ["statement$ebnf$1", "statement$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
@@ -57,9 +59,10 @@ var grammar = {
           ]
           },
     {"name": "arg", "symbols": ["dqstring"], "postprocess": id},
+    {"name": "arg", "symbols": ["sqstring"], "postprocess": id},
     {"name": "arg", "symbols": ["word"], "postprocess": id},
-    {"name": "word$ebnf$1", "symbols": [/[a-z]/]},
-    {"name": "word$ebnf$1", "symbols": ["word$ebnf$1", /[a-z]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "word$ebnf$1", "symbols": [/[a-z_]/]},
+    {"name": "word$ebnf$1", "symbols": ["word$ebnf$1", /[a-z_]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "word", "symbols": ["word$ebnf$1"], "postprocess": ([chars]) => chars.join("")}
 ]
   , ParserStart: "main"

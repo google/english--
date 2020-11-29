@@ -5,7 +5,7 @@ main -> _ (comment | statement):* _ {%
   ([ws1, body, ws2]) => body.map(([a]) => a)
   %}
 
-comment -> "%" [^\n]:* "\n" {% ([per, words, nl]) => ["%", words.join("")] %}
+comment -> "%" [^\n]:* "\n":+ {% ([per, words, nl]) => ["%", words.join("")] %}
 
 statement -> word "(" arg (_ "," _ arg):* ")" "." "\n" {%
     ([name, paren1, first, args]) => [
@@ -15,6 +15,7 @@ statement -> word "(" arg (_ "," _ arg):* ")" "." "\n" {%
   %}
 
 arg -> dqstring {% id %}
+    | sqstring {% id %}
     | word {% id %}
 
-word -> [a-z]:+ {% ([chars]) => chars.join("") %}
+word -> [a-z_]:+ {% ([chars]) => chars.join("") %}
