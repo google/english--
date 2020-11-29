@@ -371,7 +371,7 @@ class CRNLIN extends Rule {
         node.children.length != 1) {
       return [[], [], [], []];
     }
-    
+    // console.log("hi");
     let pred = predicate(child(noun, 0), [node.ref], node.types);
     
     return [[], [pred], [], [node]];
@@ -1054,11 +1054,14 @@ class CRPRED extends Rule {
   apply({verb}, node, refs = []) {
     let sub = child(node, 0);
     let obj = child(node, 1, 0, 1);
+    if (sub["@type"] != "Referent") {
+      throw new Error("Expected referent, got " + sub["@type"] + ".");
+    }
     let args = [sub.name];
     if (obj) {
-      // console.log(obj);
       args.push(obj.name);
     }
+    // console.log(sub.name);
     let name = verb.children.join("");
     let pred = predicate(name, args, node.types);
     

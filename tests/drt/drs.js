@@ -390,8 +390,8 @@ describe("DRS", function() {
     `);
   });
 
-  it.only("The man loves Mary.", function() {
-    assertThat("Smith loves Brazil. The man loves Mary.")
+  it.skip("The man loves Mary.", function() {
+    assertThat("The man loves Mary.")
      .equalsTo(`
     `);
   });
