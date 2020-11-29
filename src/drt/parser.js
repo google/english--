@@ -740,7 +740,7 @@ const DrtSyntax = `
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=+red] "red".
 
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
+      V[num=1, fin=[+, part], stat=2, tp=-past, tense=past, trans=3] 
          -> VERB[trans=3, stat=2, past=-reg].
 
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] "s".
@@ -753,6 +753,7 @@ const DrtSyntax = `
       ADJ -> "beautiful".
       ADJ -> "mortal".
       ADJ -> "brazilian".
+      ADJ -> "married".
 
       PN[num=sing, gen=male] -> "Socrates".
       PN[num=sing, gen=male] -> "Jones".
@@ -802,6 +803,9 @@ const DrtSyntax = `
       VERB[trans=-, stat=-, pres=+s] -> "come".
       VERB[trans=-, stat=-, past=-reg] -> "came".
 
+      VERB[trans=+, stat=-, pres=+s] -> "give".
+      VERB[trans=+, stat=-, past=-reg] -> "gave".
+
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "kiss".
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "box".
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> "watch".
@@ -831,6 +835,7 @@ const DrtSyntax = `
 
       VERB[trans=-, stat=-, pres=+s, past=+led] -> "compel".
       VERB[trans=-, stat=-, pres=+s, past=+red] -> "defer".
+      
 `;
 
 let DRTGrammar;

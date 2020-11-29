@@ -1344,6 +1344,15 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("John was married to Mary.", function() {
+    assertThat("John was married to Mary.")
+     .equalsTo(`
+       let a
+       John(a)
+       < married(a)
+    `);
+  });
+
   it("John was not an engineer from Brazil.", function() {
     assertThat("John was not an engineer from Brazil.")
      .equalsTo(`
@@ -1516,6 +1525,16 @@ describe("DRS", function() {
          love(b, a)
        } ?
     `);
+  });
+
+  it("Jones gave a porsche.", function() { 
+    assertThat("Jones gave a porsche.")
+     .equalsTo(`
+       let a, b
+       Jones(a)
+       porsche(b)
+       < gave(a, b)
+     `);
   });
 
   function assertThat(x) { 
