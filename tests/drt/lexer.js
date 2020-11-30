@@ -5,34 +5,59 @@ const grammar = require("./attempto.js");
 const {Nearley} = require("../../src/drt/parser.js");
 const utf8 = require("utf8");
 
-describe("Lexer", function() {
-  it("Custom lexer", async function() {
+describe.only("Lexer", function() {
+  class Lexer {
+    next() {
+      if (this.eat(" ")) {
+        return {type: "WS", value: " "};
+      } else if (this.eat("foo")) {
+        return {type: "word", value: "foo"};
+      }
+      return undefined;
+    }
+    eat(word) {
+      if (!this.buffer.startsWith(word)) {
+        return false;
+      }
+      this.buffer = this.buffer.substring(word.length);
+      return word;
+    }
+    save() {
+      return {};
+    }
+    reset(chunk, info) {
+      this.buffer = chunk;
+    }
+    formatError(token) {
+    }
+    has(name) {
+      return true;
+    }
+  }
+
+  it.only("Lexer", () => {
+    let lexer = new Lexer();
+    lexer.reset("foofoo foo");
+    assertThat(lexer.next()).equalsTo({type: "word", value: "foo"});
+    assertThat(lexer.next()).equalsTo({type: "word", value: "foo"});
+    assertThat(lexer.next()).equalsTo({type: "WS", value: " "});
+    assertThat(lexer.next()).equalsTo({type: "word", value: "foo"});
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+  
+  it.only("Custom lexer", () => {
     let parser = Nearley.from(`
-       @{%
-        const lexer = {
-          next() {
-            if (this.parsed) {
-              return undefined;
-            }
-            this.parsed = true;
-            return {type: "foo", value: "foo"};
-          },
-          save() {
-            return {};
-          },
-          reset(chunk, info) {
-          },
-          formatError(token) {
-          },
-          has(name) {
-            return true;
-          },
-        };
-       %}
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer();
+      %}
       @lexer lexer
-      main -> %foo
+      main -> %word:+
     `);
-    parser.feed("foo");
+    let result = parser.feed("foo");
+    assertThat(result).equalsTo([[[
+      {type: "word", value: "foo"}
+    ]]]);
   });
     
   it.skip("Moo", async function() {
