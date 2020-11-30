@@ -4,10 +4,13 @@ const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 
 class Nearley {
- constructor({ParserRules, ParserStart}, start) {
-  const rule = start ? start : ParserStart;
-
-  this.parser = new nearley.Parser(ParserRules, rule, {
+  constructor(compiled, start) {
+  // const {ParserRules, ParserStart} = compiled;  
+  // const rule = start ? start : ParserStart;
+  if (start) {
+    compiled.ParserStart = start;  
+  }
+  this.parser = new nearley.Parser(nearley.Grammar.fromCompiled(compiled), {
     keepHistory: true
   });   
  }
