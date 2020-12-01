@@ -291,9 +291,9 @@ describe("Lexer", function() {
     return root;
   }
   
-  function parse(s, start = "S", header) {
+  function parse(s, start = "S", header, footer) {
     const {Parser} = DRT;
-    let parser = new Parser(start, header);
+    let parser = new Parser(start, header, footer);
     let results = parser.feed(s);
     console.log(results);
     return clear(results[0]);
@@ -313,8 +313,14 @@ describe("Lexer", function() {
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
+      _ -> %WS:+
+      __ -> %WS:*
     `;
-    assertThat(parse("Jones loves Mary", "S", header))
+    let footer = `
+      PN[] -> %PN.
+      V[] -> %V.
+    `;
+    assertThat(parse("Jones", "NP", header, footer))
       .equalsTo(NP(PN("Jones")));
   });
 

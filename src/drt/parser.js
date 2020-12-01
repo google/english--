@@ -436,9 +436,10 @@ class FeaturedNearley {
     return this.parser.feed(code);
   }
 
-  static compile(source, header, raw) {
+  static compile(source, header = "", footer = "", raw) {
     let parser = new FeaturedNearley();
-    let grammar = parser.feed(source);
+    let grammar = parser.feed(source + footer);
+    // console.log(source + footer);
     
     let result = [];
 
@@ -866,9 +867,9 @@ const DrtSyntax = `
 
 let DRTGrammar;
 
-function drtGrammar(header = `Discourse -> Sentence:+`) {
+function drtGrammar(header = `Discourse -> Sentence:+`, footer = "") {
   if (!DRTGrammar) {
-    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header);
+    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header, footer);
     // console.log(DrtSyntax);
   }
   return DRTGrammar;  
@@ -878,8 +879,8 @@ function drtGrammar(header = `Discourse -> Sentence:+`) {
 // console.log(DRTGrammar);
 
 class Parser {
-  constructor (start, header){
-    this.parser = new Nearley(drtGrammar(header), start);
+  constructor (start, header, footer){
+    this.parser = new Nearley(drtGrammar(header, footer), start);
   }
 
   feed(code) {
