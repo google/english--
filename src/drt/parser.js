@@ -20,7 +20,7 @@ class Nearley {
    this.parser.feed(code);
    return this.parser.results;
   } catch (e) {
-   throw this.reportError(e);
+    throw this.reportError(e);
   }
  }
 
@@ -85,16 +85,19 @@ class Nearley {
   }
 
   getSymbolDisplay(symbol) {
-   const type = typeof symbol;
-   if (type === "string") {
-    return symbol;
-   } else if (type === "object" && symbol.literal) {
-    return JSON.stringify(symbol.literal);
-   } else if (type === "object" && symbol instanceof RegExp) {
-    return `character matching ${symbol}`;
-   } else {
-    throw new Error(`Unknown symbol type: ${symbol}`);
-   }
+    const type = typeof symbol;
+    if (type === "string") {
+      return symbol;
+    } else if (type === "object" && symbol.literal) {
+      return JSON.stringify(symbol.literal);
+    } else if (type === "object" && symbol instanceof RegExp) {
+      return `character matching ${symbol}`;
+    } else if (type === "object" && symbol.type) {
+      return symbol.type;
+    } else {
+      // console.log(symbol);
+      throw new Error(`Unknown symbol type: ${symbol}`);
+    }
   }
 
   /*

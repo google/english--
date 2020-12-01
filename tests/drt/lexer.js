@@ -52,6 +52,7 @@ describe("Lexer", function() {
             }
           }
           this.eat(word);
+          value["value"] = word;
           return value;
         }
       }
@@ -80,6 +81,8 @@ describe("Lexer", function() {
       this.buffer += chunk;
     }
     formatError(token) {
+      // throw new Error("Unexpected method call: " + token);
+      return token;
     }
     has(name) {
       return true;
@@ -218,6 +221,35 @@ describe("Lexer", function() {
      .equalsTo([]);
     assertThat(parser.feed("ball"))
      .equalsTo([[{type: "WORD", value: "football"}]]);
+  });
+
+  it("Jones loves Mary.", () => {
+    const tokens = [
+      [" ", {type: "WS"}],
+      [".", {}],
+      ["Jones", {type: "PN"}],
+      ["loves", {type: "V"}],
+      ["Mary", {type: "PN"}],
+    ];
+
+    let parser = Nearley.from(`
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+      @lexer lexer
+      main -> __ S __ {% ([ws1, s, ws2]) => s %}
+      S -> NP _ VP _ "." {% ([np, ws, vp]) => [np, vp]%}
+      NP -> %PN {% id %}
+      VP -> %V _ NP {% ([v, ws, np]) => [v, np] %}
+      _ -> %WS:+ {% id %}
+      __ -> %WS:* {% id %}
+    `);
+    assertThat(parser.feed("Jones  loves  Mary ."))
+      .equalsTo([[
+        {type: "PN", value: "Jones"},
+        [{type: "V", value: "loves"}, {type: "PN", value: "Mary"},]
+      ]]);
   });
 
   it.skip("Moo", async function() {
