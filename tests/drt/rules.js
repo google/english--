@@ -194,10 +194,10 @@ describe("Rules", function() {
     assertThat(print(wife)).equalsTo("b husband Mary");
    });
 
-  it("Jones owns Ulysses. It fascinates him.", function() {
+  it("Jones owns Ulysses. it fascinates him.", function() {
     let ids = new Ids();
     let sentence = first(parse("Jones owns Ulysses."), true);
-    let node = first(parse("It fascinates him."), true);
+    let node = first(parse("it fascinates him."), true);
 
     let crpn = new CRPN(ids);
     let [[u], [jones]] = crpn.match(sentence);
@@ -216,11 +216,11 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("b fascinates a");
   });
 
-  it("Jones loves Mary. She fascinates him.", function() {
+  it("Jones loves Mary. she fascinates him.", function() {
     let ids = new Ids();
 
     let sentence = first(parse("Jones loves Mary."), true);
-    let node = first(parse("She fascinates him."), true);
+    let node = first(parse("she fascinates him."), true);
     
     let crpn = new CRPN(ids);
     let [[u], [mel]] = crpn.match(sentence);
@@ -240,7 +240,7 @@ describe("Rules", function() {
     let ids = new Ids();
 
     let sentence = first(parse("Jones owns Ulysses."), true);
-    let node = first(parse("It fascinates him."), true);
+    let node = first(parse("it fascinates him."), true);
 
     let [[u], [jones]] = new CRPN(ids).match(sentence);
     let [[v], [ulysses]] = new CRPN(ids).match(child(sentence, 1, 0));
@@ -302,7 +302,7 @@ describe("Rules", function() {
   it("CR.ID", function() {
     let ids = new Ids();
 
-    let node = first(parse("A woman likes Jones."), true);
+    let node = first(parse("a woman likes Jones."), true);
 
     let rule = new CRID(ids);
     
@@ -310,7 +310,7 @@ describe("Rules", function() {
 
     assertThat(print(node)).equalsTo("a likes Jones");
     assertThat(name).equalsTo("a");
-    assertThat(value).equalsTo("A woman");
+    assertThat(value).equalsTo("a woman");
     assertThat(types).equalsTo({"num": "sing", "gen": "fem"});
 
     new CRLIN(ids).match(id);
@@ -322,10 +322,10 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a likes b");
   });
 
-  it("A man admires a woman.", function() {
+  it("a man admires a woman.", function() {
     let ids = new Ids();
 
-    let node = first(parse("A man admires a woman."), true);
+    let node = first(parse("a man admires a woman."), true);
 
     let rule = new CRID(ids);
     
@@ -375,10 +375,10 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a owns b");
    });
 
-  it("A man who likes Smith owns a book", function() {
+  it("a man who likes Smith owns a book", function() {
     let ids = new Ids();
 
-    let node = first(parse("A man who likes Smith owns a book."), true);
+    let node = first(parse("a man who likes Smith owns a book."), true);
 
     let [d, [id]] = new CRID(ids).match(node);
 
@@ -636,10 +636,10 @@ describe("Rules", function() {
     assertThat(print(from)).equalsTo("< happy(a)");
   });
 
-  it("If Jones owns a book then he likes it.", function() {
+  it("if Jones owns a book then he likes it.", function() {
     let ids = new Ids();
 
-    let node = first(parse("If Jones owns a book then he likes it."), true);
+    let node = first(parse("if Jones owns a book then he likes it."), true);
 
     let [, [sub]] = new CRCOND(ids).match(node, []);
 
@@ -655,10 +655,10 @@ describe("Rules", function() {
     `));
   });
 
-  it("Every man loves Jones.", function() {
+  it("every man loves Jones.", function() {
     let ids = new Ids();
 
-    let node = first(parse("Every man loves Jones."), true);
+    let node = first(parse("every man loves Jones."), true);
 
     let [, [sub]] = new CREVERY(ids).match(node, []);
 
@@ -792,14 +792,14 @@ describe("Rules", function() {
     `));
   });
 
-  it("She loves him and Mary likes Smith.", function() {
+  it("she loves him and Mary likes Smith.", function() {
     // She can't be bound to Mary because Mary hasn't been processed
     // yet.
-    let node = first(parse("She loves him and Mary likes Smith."), true);
+    let node = first(parse("she loves him and Mary likes Smith."), true);
     try {
      new CRAND(new Ids()).match(node, []);
     } catch (e) {
-     Assert.deepEqual(e.message, "Invalid reference: She");
+     Assert.deepEqual(e.message, "Invalid reference: she");
     }
   });
 
@@ -925,15 +925,15 @@ describe("Rules", function() {
     assertThat(print(donkey)).equalsTo("donkey(c)");
   });
 
-  it("A woman with a donkey loves Jones.", function() {
+  it("a woman with a donkey loves Jones.", function() {
     let ids = new Ids();
 
-    let node = first(parse("A woman with a donkey loves Jones."), true);
+    let node = first(parse("a woman with a donkey loves Jones."), true);
     
     let [a, [jones]] = new CRPN(ids).match(child(node, 1, 0));
 
     assertThat(print(jones)).equalsTo("Jones(a)");
-    assertThat(print(node)).equalsTo("A woman with a donkey loves a");
+    assertThat(print(node)).equalsTo("a woman with a donkey loves a");
 
     let [[b], [woman, prep], [], []] = new CRPP(ids).match(node);
 
@@ -946,38 +946,38 @@ describe("Rules", function() {
     assertThat(print(donkey)).equalsTo("donkey(c)");
   });
 
-  it("A man from Brazil loves Mary", function() {
+  it("a man from Brazil loves Mary", function() {
     let ids = new Ids();
 
-    let node = first(parse("A man from Brazil loves Mary."), true);
+    let node = first(parse("a man from Brazil loves Mary."), true);
     
     let [[a], [jones]] = new CRPN(ids).match(child(node, 1, 0));
 
     assertThat(print(jones)).equalsTo("Mary(a)");
-    assertThat(print(node)).equalsTo("A man from Brazil loves a");
+    assertThat(print(node)).equalsTo("a man from Brazil loves a");
 
     let [[b], [brazil]] = new CRPN(ids).match(child(node, 0, 1, 1), []);
 
     assertThat(print(brazil)).equalsTo("Brazil(b)");
-    assertThat(print(node)).equalsTo("A man from b loves a");
+    assertThat(print(node)).equalsTo("a man from b loves a");
 
     let [[c], [man, prep], [], []] = new CRPP(ids).match(node, [b]);
 
     assertThat(print(node)).equalsTo("c loves a");
     assertThat(print(man)).equalsTo("man(c)");
     assertThat(print(prep)).equalsTo("c from b");
-    assertThat(c.value).equalsTo("A man from Brazil");
+    assertThat(c.value).equalsTo("a man from Brazil");
   });
 
-  it("Every woman with a donkey loves Jones.", function() {
+  it("every woman with a donkey loves Jones.", function() {
     let ids = new Ids();
 
-    let node = first(parse("Every woman with a donkey loves Jones."), true);
+    let node = first(parse("every woman with a donkey loves Jones."), true);
 
     let [a, [jones]] = new CRPN(ids).match(child(node, 1, 0));
 
     assertThat(print(jones)).equalsTo("Jones(a)");
-    assertThat(print(node)).equalsTo("Every woman with a donkey loves a");
+    assertThat(print(node)).equalsTo("every woman with a donkey loves a");
     
     // console.log(node);
     // return;
@@ -1015,10 +1015,10 @@ describe("Rules", function() {
     assertThat(print(donkey)).equalsTo("donkey(b)");
   });
 
-  it("A woman with a donkey loves Jones.", function() {
+  it("a woman with a donkey loves Jones.", function() {
     let ids = new Ids();
 
-    let node = first(parse("A woman with a donkey loves Jones."), true);
+    let node = first(parse("a woman with a donkey loves Jones."), true);
     
     let [[a], [woman, prep]] = new CRPP(ids).match(node);
 
@@ -1138,10 +1138,10 @@ describe("Rules", function() {
     assertThat(print(node)).equalsTo("a owned b");
    });
 
-  it("Is Mary happy?", function() {
+  it("is Mary happy?", function() {
     let ids = new Ids();
 
-    let node = parse("Is Mary happy?", "Question")[0];
+    let node = parse("is Mary happy?", "Question")[0];
 
     let [[], [q]] = new CRQUESTION(ids).match(node);
 
@@ -1155,10 +1155,10 @@ describe("Rules", function() {
 
   });
 
-  it("Who likes Jones?", function() {
+  it("who likes Jones?", function() {
     let ids = new Ids();
 
-    let node = parse("Who likes Jones?", "Question")[0];
+    let node = parse("who likes Jones?", "Question")[0];
 
     let [[], [q]] = new CRQUESTION(ids).match(node);
 
@@ -1172,10 +1172,10 @@ describe("Rules", function() {
 
   });
 
-  it("Who does Jones like?", function() {
+  it("who does Jones like?", function() {
     let ids = new Ids();
 
-    let node = parse("Who does Jones like?", "Question")[0];
+    let node = parse("who does Jones like?", "Question")[0];
 
     let [[], [q]] = new CRQUESTION(ids).match(node);
 

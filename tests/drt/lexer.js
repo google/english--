@@ -43,10 +43,18 @@ describe("Lexer", function() {
         }
         return 0;
       });
+      this.tokens.map(([key, value]) => {
+        // value["@type"] = "Token";
+        value["value"] = key;
+        // value["types"] = {"type": value.type ? value.type : key};
+      });
+      // console.log(tokens);
     }
     
     next() {
       // console.log(this.tokens);
+      //console.log("next");
+      //console.log(this.buffer);
       let p = 0;
       let q = this.tokens.length - 1;
       while (p <= q) {
@@ -77,8 +85,8 @@ describe("Lexer", function() {
             }
           }
           this.eat(word);
-          value["value"] = word;
-          // console.log(value);
+          //console.log("eat: ");
+          //console.log(value);
           return value;
         }
       }
@@ -101,6 +109,7 @@ describe("Lexer", function() {
       return true;
     }
     save() {
+      // console.log("saving");
       return {};
     }
     reset(chunk, info) {
@@ -108,10 +117,12 @@ describe("Lexer", function() {
       this.buffer += chunk;
     }
     formatError(token) {
+      // console.log("formatError");
       // throw new Error("Unexpected method call: " + token);
       return token;
     }
     has(name) {
+      // console.log("has: " + name);
       return true;
     }
   }
@@ -265,69 +276,152 @@ describe("Lexer", function() {
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
-      main -> __ S __ {% ([ws1, s, ws2]) => s %}
-      S -> NP _ VP _ "." {% ([np, ws, vp]) => [np, vp]%}
+      main -> _ S _ {% ([ws1, s, ws2]) => s %}
+      S -> NP __ VP _ "." {% ([np, ws, vp]) => [np, vp]%}
       NP -> %PN {% id %}
-      VP -> %V _ NP {% ([v, ws, np]) => [v, np] %}
-      _ -> %WS:+ {% id %}
-      __ -> %WS:* {% id %}
+      VP -> %V __ NP {% ([v, ws, np]) => [v, np] %}
+      _ -> %WS:* {% id %}
+      __ -> %WS:+ {% id %}
     `);
 
-    assertThat(parser.feed("Jones  loves  Mary ."))
+    assertThat(parser.feed("Jones loves Mary ."))
       .equalsTo([[
         {type: "PN", value: "Jones"},
         [{type: "V", value: "loves"}, {type: "PN", value: "Mary"},]
       ]]);
   });
 
-
   function clear(root) {
     delete root.types;
     delete root.loc;
-    for (let child of root.children || []) {
+    // console.log(root);
+    for (let i = 0; i < (root.children || []).length; i++) {
+      let child = root.children[i];
+      if (child["value"]) {
+        //  delete child.value.kind;
+        // console.log(child.value);
+        root.children[i] = child.value;
+        continue;
+      }
       clear(child);
     }
     return root;
   }
-  
-  function parse(s, start = "S", header, footer) {
+
+  function create(start = "Statement", header, footer, body) {
     const {Parser} = DRT;
-    let parser = new Parser(start, header, footer);
+    let parser = new Parser(start, header, footer, body);
+    return (s) => {
+      let results = parser.feed(s);
+      return clear(results[0].children[0].children[0]);
+    }
+  }
+  
+  function parse(s, start = "Statement", header, footer, body, all) {
+    const {Parser} = DRT;
+    let parser = new Parser(start, header, footer, body);
     let results = parser.feed(s);
-    console.log(results);
+    if (start == "Statement") {
+      // console.log(results);
+      return clear(results[0].children[0].children[0]);
+    }
+    // console.log(results);
     return clear(results[0]);
   }
 
-  it.skip("Jones loves Mary", function() {
-    const tokens = [
-      [" ", {type: "WS"}],
-      [".", {}],
-      ["Jones", {type: "PN"}],
-      ["loves", {type: "V"}],
-      ["Mary", {type: "PN"}],
-    ];
-    let header = `
+  const dict = [
+    [" ", {type: "WS"}],
+    [".", {}],
+    ["s", {}],
+    ["a", {}],
+    ["Jones", {type: "PN"}],
+    ["love", {type: "V"}],
+    ["happy", {type: "ADJ"}],
+    ["Mary", {type: "PN"}],
+    ["Peter", {type: "PN"}],
+    ["dog", {type: "N"}],
+  ];
+
+  const header = `
       @{%
         ${Lexer.toString()}
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        const lexer = new Lexer(${JSON.stringify(dict)});
+        // NOTE(goto): this only gets called once per test
+        // so gets reused. We need to figure out why and fix it.
+        // console.log("new lexer");
+        // throw new Error("foobar");
       %}
       @lexer lexer
-      _ -> %WS:+
-      __ -> %WS:*
+      _ -> %WS:* {% function(d) {return null;} %}
+      __ -> %WS:+ {% function(d) {return null;} %}
     `;
-    let footer = `
-      PN[] -> %PN.
-      V[] -> %V.
+
+  const footer = `
+      PN[num=sing, gen=male] -> %PN.
+      ADJ -> %ADJ.
+      ADJ -> "bar".
+      N[num=sing, gen=male] -> %N.
+      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> %V.
     `;
-    assertThat(parse("Jones", "NP", header, footer))
-      .equalsTo(NP(PN("Jones")));
+  
+  it.skip("foo", () => {
+    const header = `
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer(${JSON.stringify([
+           ["foo", {value: "foo"}],
+         ])});
+      %}
+      @lexer lexer
+    `;
+    assertThat(parse("foo", "MAIN", header, ``, `MAIN -> "foo".`))
+      .equalsTo({"@type": "MAIN", children: ["foo"]});
+  });
+  
+  it.skip("Peter", function() {
+    assertThat(parse("Peter", "NP", header, footer))
+      .equalsTo(NP(PN("Peter")));
   });
 
-  it("Jones likes Mary", function() {
-    assertThat(parse("Jones likes Mary"))
+  it("a", function() {
+    assertThat(parse("a", "DET", header, footer))
+      .equalsTo(DET("a"));
+  });
+
+  it("Jones loves Mary", function() {
+    assertThat(parse("Jones loves Mary.", "Statement", header, ""))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("like"), "s"),
-                         NP(PN("Mary"))))));
+                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+  });
+
+  it.skip("Jones loves a dog", function() {
+    assertThat(parse("Jones loves a dog.", "Statement", header, footer))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("love"), "s"), NP(DET("a"), N("dog"))))));
+  });
+
+  it("Jones loves a dog.", () => {
+    const lexer = new Lexer([
+      [" ", {type: "WS"}],
+      [".", {}],
+      ["a", {}],
+      ["Jones", {type: "PN"}],
+      ["loves", {type: "V"}],
+      ["happy", {type: "ADJ"}],
+      ["bar", {type: "ADJ"}],
+      ["Mary", {type: "PN"}],
+      ["dog", {type: "N"}],
+    ]);
+    lexer.reset("Jones loves a dog.");
+    assertThat(lexer.next()).equalsTo({"type": "PN", "value": "Jones"});
+    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
+    assertThat(lexer.next()).equalsTo({"type": "V", "value": "loves"});
+    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
+    assertThat(lexer.next()).equalsTo({"value": "a"});
+    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
+    assertThat(lexer.next()).equalsTo({"type": "N", "value": "dog"});
+    assertThat(lexer.next()).equalsTo({"value": "."});
+    assertThat(lexer.next()).equalsTo(undefined);
   });
   
   it.skip("Moo", async function() {
@@ -365,15 +459,15 @@ describe("Lexer", function() {
       }
     }
 
-    console.log(Object.keys(parts));
+    // console.log(Object.keys(parts));
     parts["WS"] = /[ \t]+/;
     for (let adv of parts["adv"]) {
       console.log(adv);
     }
     let lexer = moo.compile(parts);
-    console.log("done compiling");
+    // console.log("done compiling");
     lexer.reset("clip-on cast-off awkwardly ");
-    console.log("done reseting");
+    // console.log("done reseting");
     assertThat(lexer.next().type).equalsTo("adj_itr");
     assertThat(lexer.next().type).equalsTo("WS");
     assertThat(lexer.next().type).equalsTo("adj_itr");

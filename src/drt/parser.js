@@ -53,7 +53,7 @@ class Nearley {
     object and the Nearley parser instance.
   */
   reportError(e) {
-   console.log(e.message);
+   // console.log(e.message);
    let {parser} = this;
    const lastColumnIndex = parser.table.length - 2;
    const lastColumn = parser.table[lastColumnIndex];
@@ -199,7 +199,9 @@ class Nearley {
 
 function bind(type, types = {}, conditions = []) {   
  return (data, location, reject) => {
-  // Creates a copy of the types because it is reused
+   //console.log("hi");
+   // console.log(data);
+   // Creates a copy of the types because it is reused
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
 
@@ -207,7 +209,9 @@ function bind(type, types = {}, conditions = []) {
   // reused across multiple calls.
   let result = JSON.parse(JSON.stringify(data))
   .filter((ws) => ws != null);
-  
+
+   // console.log(data);
+   
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
 
@@ -225,19 +229,23 @@ function bind(type, types = {}, conditions = []) {
   // console.log(hash(signature));
   let namespace = hash(signature);
 
+  // console.log(data);
+   
   let children = result.filter((node) => node["@type"]);
 
-  //console.log(`Trying to bind ${signature}`);
-  //let foo = children.map((x) => {
-  //  return `${x["@type"]}${JSON.stringify(x.types)}`;
-  //}).join(" ");
-  //console.log(`To ${foo}`);
+   //console.log(`Trying to bind ${signature}`);
+   //let foo = children.map((x) => {
+   //  return `${x["@type"]}${JSON.stringify(x.types)}`;
+   //}).join(" ");
+   //console.log(`To ${foo}`);
 
   if (expects.length != children.length) {
-   // console.log("not the same length");
-   return reject;
+    // console.log("not the same length");
+    return reject;
   }
 
+  // console.log(children);
+   
   let variables = {};
 
   for (let i = 0; i < expects.length; i++) {
@@ -447,8 +455,8 @@ class FeaturedNearley {
       result.push(code);
     }
 
-    feed(`@builtin "whitespace.ne"`);
-    feed(`@builtin "number.ne"`);
+    // feed(`@builtin "whitespace.ne"`);
+    // feed(`@builtin "number.ne"`);
     feed(``);
     feed(`@{%`);
     feed(`${bind.toString()}`);
@@ -468,23 +476,38 @@ class FeaturedNearley {
           if (x.startsWith("%")) {
             return x;
           } else {
-            return `${x}i`;
+            //  return `${x}i`;
+            return `${x}`;
           }
         } else {
           return x.name;
         }
       }
       feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+      // console.log(tail);
       feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
       for (let term of tail) {
         // console.log(term);
         if (term.name == "_" ||
             term.name == "__" ||
-            term.name == "unsigned_int" ||
-            typeof term == "string") {
+            // typeof term == "string" ||
+            term.name == "unsigned_int") {
+          // console.log(term);
           continue;
+        } else if (typeof term == "string") {
+          let name = "";
+          if (term.startsWith("%")) {
+            name = term.substring(1);
+          } else {
+            name = term.substring(1, term.length - 1);
+          }
+          // console.log(name);
+          // feed(`    {"@type": "Token", "types": {"type": "${name}"}}, `);
+          // continue;
+          // console.log(term);
+        } else {
+          feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
         }
-        feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
       }
       feed(`  ])`);
       feed(`%}`);
@@ -504,13 +527,13 @@ const DrtSyntax = `
       Statement -> S_ _ ".".
 
       Question ->
-          "Who" __
+          "who" __
           VP_[num=1, fin=+, gap=-, tp=3, tense=4] _
           "?"
           .
 
       Question ->
-          "Who" __ 
+          "who" __ 
           AUX[num=1, fin=+, tp=2, tense=3] __
           NP[num=1, gen=4, case=+nom, gap=-] __
           V[num=1, fin=-, trans=+] _
@@ -867,10 +890,17 @@ const DrtSyntax = `
 
 let DRTGrammar;
 
-function drtGrammar(header = `Discourse -> Sentence:+`, footer = "") {
+function drtGrammar(header = `
+                      @builtin "whitespace.ne"
+                      @builtin "number.ne"
+                      Discourse -> Sentence:+
+                    `,
+                    footer = "",
+                    body = DrtSyntax) {
+  // feed(`@builtin "whitespace.ne"`);
+  // feed(`@builtin "number.ne"`);
   if (!DRTGrammar) {
-    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header, footer);
-    // console.log(DrtSyntax);
+    DRTGrammar = FeaturedNearley.compile(body, header, footer);
   }
   return DRTGrammar;  
 }
@@ -879,8 +909,8 @@ function drtGrammar(header = `Discourse -> Sentence:+`, footer = "") {
 // console.log(DRTGrammar);
 
 class Parser {
-  constructor (start, header, footer){
-    this.parser = new Nearley(drtGrammar(header, footer), start);
+  constructor (start, header, footer, body){
+    this.parser = new Nearley(drtGrammar(header, footer, body), start);
   }
 
   feed(code) {
