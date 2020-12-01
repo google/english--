@@ -38,6 +38,7 @@ class Nearley {
      
   const module = { exports: {} };
 
+  // console.log(code);
   eval(code);
 
   return module.exports;
@@ -52,7 +53,7 @@ class Nearley {
     object and the Nearley parser instance.
   */
   reportError(e) {
-   // console.log(e.message);
+   console.log(e.message);
    let {parser} = this;
    const lastColumnIndex = parser.table.length - 2;
    const lastColumn = parser.table[lastColumnIndex];
@@ -355,6 +356,7 @@ const RuntimeSyntax = `
 
       term -> name {% id %}
       term -> string {% id %}
+      term -> "%" word {% ([tok, word]) =>  tok + word %}
 
       name -> word features:? {% 
         ([word, features]) => {
@@ -426,60 +428,72 @@ function runtimeGrammar() {
 
 
 class FeaturedNearley {
- constructor() {
-  this.parser = new Nearley(runtimeGrammar());
- }
-
- feed(code) {
-  return this.parser.feed(code);
- }
-
- static compile(source, header, raw) {
-  let parser = new FeaturedNearley();
-  let grammar = parser.feed(source);
-
-  let result = [];
-
-  function feed(code) {
-   result.push(code);
+  constructor() {
+    this.parser = new Nearley(runtimeGrammar());
   }
 
-  feed(`@builtin "whitespace.ne"`);
-  feed(`@builtin "number.ne"`);
-  feed(``);
-  feed(`@{%`);
-  feed(`${bind.toString()}`);
-  feed(`%}`);
-  feed(``);
-
-  // console.log(header);
-
-  if (header) {
-   feed(header);
+  feed(code) {
+    return this.parser.feed(code);
   }
 
-  for (let {head, tail} of grammar[0]) {
-   let term = (x) => typeof x == "string" ? `${x}i` : x.name;
-   feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
-        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-                     for (let term of tail) {
-                       if (term.name == "_" ||
-                           term.name == "__" ||
-                           term.name == "unsigned_int" ||
-                           typeof term == "string") {
-                       continue;
-                      }
-                      feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
-                     }
-                     feed(`  ])`);
-        feed(`%}`);
+  static compile(source, header, raw) {
+    let parser = new FeaturedNearley();
+    let grammar = parser.feed(source);
+    
+    let result = [];
 
-  }
+    function feed(code) {
+      result.push(code);
+    }
 
-   // console.log(result.join("\n"));
+    feed(`@builtin "whitespace.ne"`);
+    feed(`@builtin "number.ne"`);
+    feed(``);
+    feed(`@{%`);
+    feed(`${bind.toString()}`);
+    feed(`%}`);
+    feed(``);
+
+    // console.log(header);
+
+    if (header) {
+      feed(header);
+    }
+
+    for (let {head, tail} of grammar[0]) {
+      // let term = (x) => typeof x == "string" ? `${x}i` : x.name;
+      function term(x) {
+        if (typeof x == "string") {
+          if (x.startsWith("%")) {
+            return x;
+          } else {
+            return `${x}i`;
+          }
+        } else {
+          return x.name;
+        }
+      }
+      feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+      feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+      for (let term of tail) {
+        // console.log(term);
+        if (term.name == "_" ||
+            term.name == "__" ||
+            term.name == "unsigned_int" ||
+            typeof term == "string") {
+          continue;
+        }
+        feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+      }
+      feed(`  ])`);
+      feed(`%}`);
+      
+    }
+
+    // console.log(result.join("\n"));
    
-  return Nearley.compile(result.join("\n"), raw);
- }
+    return Nearley.compile(result.join("\n"), raw);
+  }
 }
 
 const DrtSyntax = `
