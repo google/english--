@@ -3,7 +3,6 @@ const moo = require("moo");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
 const {Nearley} = require("../../src/drt/parser.js");
-const utf8 = require("utf8");
 const DRT = require("../../src/drt/parser.js");
 const {
   Statement,
