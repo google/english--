@@ -452,6 +452,8 @@ class FeaturedNearley {
   feed(`%}`);
   feed(``);
 
+  // console.log(header);
+
   if (header) {
    feed(header);
   }
@@ -850,9 +852,9 @@ const DrtSyntax = `
 
 let DRTGrammar;
 
-function drtGrammar() {
+function drtGrammar(header = `Discourse -> Sentence:+`) {
   if (!DRTGrammar) {
-    DRTGrammar = FeaturedNearley.compile(DrtSyntax, `Discourse -> Sentence:+`);
+    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header);
     // console.log(DrtSyntax);
   }
   return DRTGrammar;  
@@ -862,13 +864,13 @@ function drtGrammar() {
 // console.log(DRTGrammar);
 
 class Parser {
- constructor (start){
-   this.parser = new Nearley(drtGrammar(), start);
- }
+  constructor (start, header){
+    this.parser = new Nearley(drtGrammar(header), start);
+  }
 
- feed(code) {
-  return this.parser.feed(code);
- }
+  feed(code) {
+    return this.parser.feed(code);
+  }
 }
 
 let node = (type) => { 

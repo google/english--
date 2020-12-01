@@ -4,6 +4,31 @@ const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
 const {Nearley} = require("../../src/drt/parser.js");
 const utf8 = require("utf8");
+const DRT = require("../../src/drt/parser.js");
+const {
+  Statement,
+  Question,
+  S,
+  S_,
+  NP,
+  PN,
+  VP_,
+  VP,
+  V,
+  AUX,
+  PRO,
+  DET,
+  N,
+  RC,
+  RPRO,
+  GAP,
+  BE,
+  ADJ,
+  PREP,
+  PP,
+  VERB,
+  HAVE,
+  RN} = DRT.nodes;
 
 describe("Lexer", function() {
   class Lexer {
@@ -22,6 +47,7 @@ describe("Lexer", function() {
     }
     
     next() {
+      // console.log(this.tokens);
       let p = 0;
       let q = this.tokens.length - 1;
       while (p <= q) {
@@ -53,6 +79,7 @@ describe("Lexer", function() {
           }
           this.eat(word);
           value["value"] = word;
+          // console.log(value);
           return value;
         }
       }
@@ -78,6 +105,7 @@ describe("Lexer", function() {
       return {};
     }
     reset(chunk, info) {
+      // console.log("reset: " + chunk);
       this.buffer += chunk;
     }
     formatError(token) {
@@ -245,6 +273,7 @@ describe("Lexer", function() {
       _ -> %WS:+ {% id %}
       __ -> %WS:* {% id %}
     `);
+
     assertThat(parser.feed("Jones  loves  Mary ."))
       .equalsTo([[
         {type: "PN", value: "Jones"},
@@ -252,6 +281,50 @@ describe("Lexer", function() {
       ]]);
   });
 
+
+  function clear(root) {
+    delete root.types;
+    delete root.loc;
+    for (let child of root.children || []) {
+      clear(child);
+    }
+    return root;
+  }
+  
+  function parse(s, start = "S", header) {
+    const {Parser} = DRT;
+    let parser = new Parser(start, header);
+    let results = parser.feed(s);
+    console.log(results);
+    return clear(results[0]);
+  }
+
+  it.skip("Jones loves Mary", function() {
+    const tokens = [
+      [" ", {type: "WS"}],
+      [".", {}],
+      ["Jones", {type: "PN"}],
+      ["loves", {type: "V"}],
+      ["Mary", {type: "PN"}],
+    ];
+    let header = `
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+      @lexer lexer
+    `;
+    assertThat(parse("Jones loves Mary", "S", header))
+      .equalsTo(NP(PN("Jones")));
+  });
+
+  it("Jones likes Mary", function() {
+    assertThat(parse("Jones likes Mary"))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("like"), "s"),
+                         NP(PN("Mary"))))));
+  });
+  
   it.skip("Moo", async function() {
     this.timeout(500000);
     const fs = require("fs");
