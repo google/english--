@@ -3,6 +3,7 @@ const moo = require("moo");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
 const {Nearley} = require("../../src/drt/parser.js");
+const {Lexer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const {
   Statement,
@@ -43,12 +44,10 @@ describe("Lexer", function() {
         }
         return 0;
       });
+
       this.tokens.map(([key, value]) => {
-        // value["@type"] = "Token";
         value["value"] = key;
-        // value["types"] = {"type": value.type ? value.type : key};
       });
-      // console.log(tokens);
     }
     
     next() {
@@ -86,10 +85,11 @@ describe("Lexer", function() {
           }
           this.eat(word);
           //console.log("eat: ");
-          //console.log(value);
+          ///console.log(value);
           return value;
         }
       }
+      // console.log("eat: oops, need more food!");
       return undefined;
     }
     match(word) {
@@ -122,8 +122,12 @@ describe("Lexer", function() {
       return token;
     }
     has(name) {
-      // console.log("has: " + name);
-      return true;
+      for (let [key, {type}] of this.tokens) {
+        if (name == type) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 
@@ -392,6 +396,105 @@ describe("Lexer", function() {
     assertThat(parse("Jones loves Mary.", "Statement", header, ""))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+  });
+
+  it.only("Jones loves Mary", function() {
+    const keywords = [
+      "a","an", "the", "every", "some", "no", "all", "most", "many",
+      "only", "not", "majority", "of", "minority", "at", "least",
+      "more", "than", "fewer", "exactly",
+      "then", "who", "and", "or", "he", "him", "she", "her",
+      "they", "them", "himself", "herself", "itself", "does", "did",
+      "will", "would", "which", "is", "are", "was", "were", "be", "been",
+      "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
+      "behind", "over", "under", "near", "during", "from", "to", "about",
+      "by",
+      "happy", "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
+      "married",
+      "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
+      "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
+      "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
+      "brother", "father", "husband", "sister", "mother", "wife",
+      "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
+      "come", "came", "give", "gave", "kiss", "box", "watch", "crash",
+      "like", "seize", "tie", "free", "love", "surprise", "fascinate",
+      "admire", "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
+      "cop", "repl", "tr", "compel", "defer", 
+    ].map((keyword) => [keyword, {type: keyword}]);
+
+    const dict = [
+      [" ", {type: "WS"}],
+      [".", {type: "PERIOD"}],
+      ["?", {type: "QUESTION"}],
+      ["'s", {type: "POSS"}],
+      
+      ["if", {type: "__if__"}],
+      ["do", {type: "__do__"}],
+      ["in", {type: "__in__"}],
+      ["with", {type: "__with__"}],
+      ["of", {type: "__of__"}],
+      ["for", {type: "__for__"}],
+      
+      // ["s", {type: "s"}],
+      ///["Jones", {type: "PN"}],
+      //["love", {type: "V"}],
+      // ["Mary", {type: "PN"}],
+      ["Peter", {type: "PN"}],
+      ["dog", {type: "N"}],
+      // ["man", {type: "N"}],
+    ];
+    
+    const header = `
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer(${JSON.stringify(dict.concat(keywords))});
+        // NOTE(goto): this only gets called once per test
+        // so gets reused. We need to figure out why and fix it.
+        // console.log("new lexer");
+        // throw new Error("foobar");
+      %}
+      @lexer lexer
+      _ -> %WS:* {% function(d) {return null;} %}
+      __ -> %WS:+ {% function(d) {return null;} %}
+    `;
+
+    const footer = `
+    `;
+        
+    assertThat(parse("every man loves Mary.", "Statement", header, footer))
+      .equalsTo(S(NP(DET("every"), N("man")),
+                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+    
+    assertThat(parse("some man loves Mary.", "Statement", header, footer))
+      .equalsTo(S(NP(DET("some"), N("man")),
+                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+
+    assertThat(parse("he loves her.", "Statement", header, footer))
+      .equalsTo(S(NP(PRO("he")),
+                  VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))));
+  
+    assertThat(parse("she loves herself.", "Statement", header, footer))
+      .equalsTo(S(NP(PRO("she")),
+                  VP_(VP(V(VERB("love"), "s"), NP(PRO("herself"))))));
+
+    assertThat(parse("she loves a man.", "Statement", header, footer))
+      .equalsTo(S(NP(PRO("she")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(DET("a"), N("man"))))));
+
+    // return;
+    
+  
+    assertThat(parse("she loves a man who loves her.", "Statement", header, footer))
+      .equalsTo(S(NP(PRO("she")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(DET("a"),
+                            N(N("man"), RC(RPRO("who"),
+                                           S(NP(GAP()),
+                                             VP_(VP(V(VERB("love"), "s"),
+                                                    NP(PRO("her")))
+                                                 ))
+                                          )))))));
   });
 
   it.skip("Jones loves a dog", function() {
