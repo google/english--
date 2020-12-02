@@ -707,24 +707,8 @@ const DrtSyntax = `
 
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
 
-      PREP -> %behind.
-      PREP -> %__in__.
-      PREP -> %over.
-      PREP -> %under.
-      PREP -> %near.
-
-      PREP -> %before.
-      PREP -> %after.
-      PREP -> %during.
-
-      PREP -> %from.
-      PREP -> %to.
-      PREP -> %__of__.
-      PREP -> %about.
-      PREP -> %by.
-      PREP -> %__for__.
-      PREP -> %__with__.
-
+      PREP -> %PREP.
+      
       AUX[num=sing, fin=+, tp=-past, tense=pres] -> %does.
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.
 
@@ -892,8 +876,6 @@ const keywords = [
   "they", "them", "himself", "herself", "it", "itself", "does", "did",
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
-  "behind", "over", "under", "near", "before", "after", "during",
-  "from", "to", "about", "by",
   "brazilian",
   "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
   "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
@@ -911,14 +893,7 @@ const dict = [
   [".", {type: "PERIOD"}],
   ["?", {type: "QUESTION"}],
   ["'s", {type: "POSS"}],
-  
-  ["if", {type: "__if__"}],
-  ["do", {type: "__do__"}],
-  ["in", {type: "__in__"}],
-  ["with", {type: "__with__"}],
-  ["of", {type: "__of__"}],
-  ["for", {type: "__for__"}],
-      
+
   // ["s", {type: "s"}],
   ///["Jones", {type: "PN"}],
   //["love", {type: "V"}],
@@ -926,6 +901,26 @@ const dict = [
   ["Peter", {type: "PN"}],
   ["dog", {type: "N"}],
   // ["man", {type: "N"}],
+  
+  ["if", {type: "__if__"}],
+  ["do", {type: "__do__"}],
+  
+  ["behind", {type: "PREP"}],
+  ["in", {type: "PREP"}],
+  ["with", {type: "PREP"}],
+  ["for", {type: "PREP"}],
+  ["of", {type: "PREP"}],
+  ["over", {type: "PREP"}],
+  ["under", {type: "PREP"}],
+  ["near", {type: "PREP"}],
+  ["before", {type: "PREP"}],
+  ["after", {type: "PREP"}],
+  ["during", {type: "PREP"}],
+  ["from", {type: "PREP"}],
+  ["to", {type: "PREP"}],
+  ["about", {type: "PREP"}],
+  ["by", {type: "PREP"}],  
+  
   ["happy", {type: "ADJ"}],
   ["unhappy", {type: "ADJ"}],
   ["foolish", {type: "ADJ"}],  
