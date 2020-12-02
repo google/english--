@@ -799,7 +799,7 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
-      ADJ -> %happy.
+      ADJ -> %ADJ.
       ADJ -> %unhappy.
       ADJ -> %foolish.
       ADJ -> %fast.
@@ -901,7 +901,7 @@ const keywords = [
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "behind", "over", "under", "near", "before", "after", "during",
   "from", "to", "about", "by",
-  "happy", "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
+  "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
   "married",
   "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
   "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
@@ -934,6 +934,7 @@ const dict = [
   ["Peter", {type: "PN"}],
   ["dog", {type: "N"}],
   // ["man", {type: "N"}],
+  ["happy", {type: "ADJ"}],
 ];
 
 let DRTGrammar;

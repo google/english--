@@ -2,6 +2,7 @@ class Lexer {
   constructor(tokens) {
     this.buffer = "";
     this.tokens = tokens;
+    // console.log(tokens);
     
     this.tokens.sort(([a], [b]) => {
       if (a < b) {
@@ -30,7 +31,8 @@ class Lexer {
       } else if (result == 1) {
         q = m - 1;
       } else {
-        // console.log("found a match!");
+        ///console.log("found a match!");
+        //console.log(this.tokens[m]);
         let n = m + 1;
         while (n < this.tokens.length) {
           let [next] = this.tokens[n];
@@ -85,8 +87,9 @@ class Lexer {
     this.buffer += chunk;
   }
   formatError(token) {
-    // console.log("formatError");
-    // throw new Error("Unexpected method call: " + token);
+    //console.log("formatError");
+    //console.log(token);
+    throw new Error("Unexpected method call: " + token);
     return token;
   }
   has(name) {
