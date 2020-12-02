@@ -781,26 +781,9 @@ const DrtSyntax = `
       
       
       RN[num=1, gen=2] -> %RN.
+
+      VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.
   
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> %beat.
-      VERB[trans=1, stat=-, pres=+s, past=+ed] -> %listen.
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> %own.
-
-      VERB[trans=1, stat=-, pres=+s, past=+ed] -> %listen.
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %walk.
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %sleep.
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %stink.
-
-      VERB[trans=1, stat=-, pres=+s] -> %leave.
-      VERB[trans=1, stat=-, past=-reg] -> %left.
-
-      VERB[trans=-, stat=-, pres=+s] -> %come.
-      VERB[trans=-, stat=-, past=-reg] -> %came.
-
-      VERB[trans=+, stat=-, pres=+s] -> %give.
-      VERB[trans=+, stat=-, past=-reg] -> %gave.
-
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> %kiss.
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> %box.
       VERB[trans=+, stat=-, pres=+es, past=+ed] -> %watch.
@@ -844,8 +827,13 @@ const keywords = [
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
   "engineer",
-  "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
-  "come", "came", "give", "gave", "kiss", "box", "watch", "crash",
+  // "beat",
+  // "listen", "own",
+  // "walk", "sleep", "stink",
+  //"leave", "left",
+  //"come", "came",
+  //"give", "gave",
+  "kiss", "box", "watch", "crash",
   "like", "seize", "tie", "free", "love", "surprise", "fascinate",
   "admire", "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
   "cop", "repl", "tr", "compel", "defer", 
@@ -909,6 +897,47 @@ const dict = [
   ["sister", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
   ["mother", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
   ["wife", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
+
+  // verbs
+  ["beat", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["listen", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["own", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["walk", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["sleep", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["stink", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+
+  ["leave", {type: "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s"}}],
+  ["left", {type: "VERB", types: {
+    "trans": 1, "stat": "-", "past": "-reg"}}],
+  //VERB[trans=1, stat=-, pres=+s] -> %leave.
+  // VERB[trans=1, stat=-, past=-reg] -> %left.
+
+  ["come", {type: "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s"}}],
+  ["came", {type: "VERB", types: {
+    "trans": 1, "stat": "-", "past": "-reg"}}],
+  //VERB[trans=-, stat=-, pres=+s] -> %come.
+  //VERB[trans=-, stat=-, past=-reg] -> %came.
+
+  ["give", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s"}}],
+  ["gave", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "past": "-reg"}}],
+  //VERB[trans=+, stat=-, pres=+s] -> %give.
+  //VERB[trans=+, stat=-, past=-reg] -> %gave.
+
+  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %walk.
+  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %sleep.
+  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %stink.
+
+      
   
   // prepositions
   ["behind", {type: "PREP"}],
