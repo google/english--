@@ -649,8 +649,7 @@ const DrtSyntax = `
           %not __ 
           NP[num=3, gen=4, case=5, gap=-].
 
-      DET[num=sing] -> %a.
-      DET[num=sing] -> %an.
+      DET[num=sing] -> %DET.
       DET[num=sing] -> %the.
       
       DET[num=sing, quantifier=true] -> %every.
@@ -857,7 +856,8 @@ const DrtSyntax = `
 `;
 
 const keywords = [
-  "a","an", "the", "every", "some", "no", "all", "most", "many",
+  "the",
+  "every", "some", "no", "all", "most", "many",
   "only", "not", "majority", "of", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
   "then", "who", "and", "or", "he", "him", "she", "her",
@@ -893,6 +893,11 @@ const dict = [
   ["if", {type: "__if__"}],
   ["do", {type: "__do__"}],
   
+  ["a", {type: "DET", types: {"num": "sing"}}],
+  ["an", {type: "DET", types: {"num": "sing"}}],
+  // used as a quantifier too
+  // ["the", {type: "DET", types: {"num": "sing"}}],
+
   ["behind", {type: "PREP"}],
   ["in", {type: "PREP"}],
   ["with", {type: "PREP"}],

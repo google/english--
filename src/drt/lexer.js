@@ -60,7 +60,7 @@ class Lexer {
         //console.log("eat: ");
         //console.log(value);
         value["@type"] = "%" + value["type"];
-        value["types"] = {};
+        value["types"] = value["types"] || {};
         return value;
       }
     }
