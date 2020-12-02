@@ -2,6 +2,7 @@ const nearley = require("nearley");
 const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
+const {Lexer} = require("./lexer.js");
 
 class Nearley {
   constructor(compiled, start) {
@@ -20,7 +21,7 @@ class Nearley {
    this.parser.feed(code);
    return this.parser.results;
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     throw this.reportError(e);
   }
  }
@@ -890,17 +891,79 @@ const DrtSyntax = `
       
 `;
 
+const keywords = [
+  "a","an", "the", "every", "some", "no", "all", "most", "many",
+  "only", "not", "majority", "of", "minority", "at", "least",
+  "more", "than", "fewer", "exactly",
+  "then", "who", "and", "or", "he", "him", "she", "her",
+  "they", "them", "himself", "herself", "it", "itself", "does", "did",
+  "will", "would", "which", "is", "are", "was", "were", "be", "been",
+  "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
+  "behind", "over", "under", "near", "before", "after", "during",
+  "from", "to", "about", "by",
+  "happy", "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
+  "married",
+  "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
+  "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
+  "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
+  "brother", "father", "husband", "sister", "mother", "wife",
+  "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
+  "come", "came", "give", "gave", "kiss", "box", "watch", "crash",
+  "like", "seize", "tie", "free", "love", "surprise", "fascinate",
+  "admire", "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
+  "cop", "repl", "tr", "compel", "defer", 
+].map((keyword) => [keyword, {type: keyword}]);
+
+const dict = [
+  [" ", {type: "WS"}],
+  [".", {type: "PERIOD"}],
+  ["?", {type: "QUESTION"}],
+  ["'s", {type: "POSS"}],
+  
+  ["if", {type: "__if__"}],
+  ["do", {type: "__do__"}],
+  ["in", {type: "__in__"}],
+  ["with", {type: "__with__"}],
+  ["of", {type: "__of__"}],
+  ["for", {type: "__for__"}],
+      
+  // ["s", {type: "s"}],
+  ///["Jones", {type: "PN"}],
+  //["love", {type: "V"}],
+  // ["Mary", {type: "PN"}],
+  ["Peter", {type: "PN"}],
+  ["dog", {type: "N"}],
+  // ["man", {type: "N"}],
+];
+
 let DRTGrammar;
 
-function drtGrammar(header = `
-                      @builtin "whitespace.ne"
-                      @builtin "number.ne"
-                      Discourse -> Sentence:+
-                    `,
-                    footer = "",
-                    body = DrtSyntax) {
+function drtGrammar(header, footer = "", body = DrtSyntax) {
   // feed(`@builtin "whitespace.ne"`);
   // feed(`@builtin "number.ne"`);
+  // header = `
+  //                    @builtin "whitespace.ne"
+  //                    @builtin "number.ne"
+  //                    Discourse -> Sentence:+
+  // `
+  // console.log(header);
+  header = header || `
+      @{%
+        ${Lexer.toString()}
+        const lexer = new Lexer(${JSON.stringify(dict.concat(keywords))});
+        // NOTE(goto): this only gets called once per test
+        // so gets reused. We need to figure out why and fix it.
+        // console.log("new lexer");
+        // throw new Error("foobar");
+      %}
+      @lexer lexer
+      _ -> %WS:* {% function(d) {return null;} %}
+      __ -> %WS:+ {% function(d) {return null;} %}
+      Discourse -> Sentence:+
+    `;
+
+  // console.log(header);
+  
   if (!DRTGrammar) {
     DRTGrammar = FeaturedNearley.compile(body, header, footer);
   }

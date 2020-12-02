@@ -752,15 +752,24 @@ describe("FeaturedNearley", function() {
 });
 
 function clear(root) {
- if (!root) {
-  return;
- }
- delete root.types;
- delete root.loc;
- for (let child of root.children || []) {
-  clear(child);
- }
- return root;
+  if (!root) {
+    return;
+  }
+  delete root.types;
+  delete root.loc;
+  for (let i = 0; i < (root.children || []).length; i++) {
+    let child = root.children[i];
+    if (child["value"]) {
+      root.children[i] = child.value;
+      continue;
+    }
+    clear(child);
+  }
+  
+  //for (let child of root.children || []) {
+  //  clear(child);
+  //}
+  return root;
 }
 
 function parse(s, start = "Discourse", raw = false, skip = true) {
@@ -779,7 +788,7 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
  return clear(results[0]);
 }
 
-describe("Statements", function() {
+describe.only("Statements", function() {
 
   it("Jones likes Mary.", function() {
     assertThat(parse("Jones likes Mary."))
@@ -1559,7 +1568,7 @@ describe("DRT Verbs", function() {
   });
 });
 
-describe("Backwards compatibility", function() {
+describe.only("Backwards compatibility", function() {
   it("he likes it.", function() {
     assertThat(parse("he likes it."))
      .equalsTo(S(NP(PRO("he")),

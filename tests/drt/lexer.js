@@ -30,106 +30,7 @@ const {
   HAVE,
   RN} = DRT.nodes;
 
-describe("Lexer", function() {
-  class Lexer {
-    constructor(tokens) {
-      this.buffer = "";
-      this.tokens = tokens;
-
-      this.tokens.sort(([a], [b]) => {
-        if (a < b) {
-          return -1;
-        } else if (a > b) {
-          return 1;
-        }
-        return 0;
-      });
-
-      this.tokens.map(([key, value]) => {
-        value["value"] = key;
-      });
-    }
-    
-    next() {
-      // console.log(this.tokens);
-      //console.log("next");
-      //console.log(this.buffer);
-      let p = 0;
-      let q = this.tokens.length - 1;
-      while (p <= q) {
-        let m = p + Math.floor((q - p) / 2);
-        let [word, value] = this.tokens[m];
-        let result = this.match(word);
-        // console.log(`p=${p} q=${q} m=${m} ${this.buffer} and ${word}? ${result}`);
-        if (result == -1) {
-          p = m + 1;
-        } else if (result == 1) {
-          q = m - 1;
-        } else {
-          // console.log("found a match!");
-          let n = m + 1;
-          // console.log(n);
-          while (n < this.tokens.length) {
-            let [next] = this.tokens[n];
-            let buffer = this.buffer;
-            if (this.match(next) == 0) {
-              word = this.tokens[n][0];
-              value = this.tokens[n][1];
-              n++;
-              continue;
-            } else if (next.substring(0, buffer.length) == buffer) {
-              return undefined;
-            } else {
-              break;
-            }
-          }
-          this.eat(word);
-          //console.log("eat: ");
-          ///console.log(value);
-          return value;
-        }
-      }
-      // console.log("eat: oops, need more food!");
-      return undefined;
-    }
-    match(word) {
-      let head = this.buffer.substring(0, word.length);
-      if (word < head) {
-        return -1;
-      } else if (word > head) {
-        return 1;
-      }
-      return 0;
-    }
-    eat(word) {
-      if (!this.buffer.startsWith(word)) {
-        throw new Error("can't eat " + word);
-      }
-      this.buffer = this.buffer.substring(word.length);
-      return true;
-    }
-    save() {
-      // console.log("saving");
-      return {};
-    }
-    reset(chunk, info) {
-      // console.log("reset: " + chunk);
-      this.buffer += chunk;
-    }
-    formatError(token) {
-      // console.log("formatError");
-      // throw new Error("Unexpected method call: " + token);
-      return token;
-    }
-    has(name) {
-      for (let [key, {type}] of this.tokens) {
-        if (name == type) {
-          return true;
-        }
-      }
-      return false;
-    }
-  }
+describe.only("Lexer", function() {
 
   const tokens = [
         [" ", {type: "WS", value: " "}],
@@ -151,6 +52,51 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
+  it("longest string: direct next isnt a substring", () => {
+    let lexer = new Lexer([
+      ["foo", {value: "foo"}],
+      ["the", {value: "the"}],
+      ["them", {value: "them"}],
+      ["then", {value: "then"}],
+    ]);
+    lexer.reset("then");
+    assertThat(lexer.next()).equalsTo({value: "then"});
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+  
+  it("if Mary is happy then Jones is happy.", () => {
+    let lexer = new Lexer([
+      [" ", {value: "WS"}],
+      [".", {value: "."}],
+      ["the", {value: "the"}],
+      ["them", {value: "them"}],
+      ["if", {value: "if"}],
+      ["Mary", {value: "Mary"}],
+      ["is", {value: "is"}],
+      ["happy", {value: "happy"}],
+      ["then", {value: "happy"}],
+      ["Jones", {value: "happy"}],
+    ]);
+    lexer.reset("if Mary is happy then Jones is happy.");
+    assertThat(lexer.next()).equalsTo({value: "if"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "Mary"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "is"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "happy"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "then"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "Jones"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "is"});
+    assertThat(lexer.next()).equalsTo({value: " "});
+    assertThat(lexer.next()).equalsTo({value: "happy"});
+    assertThat(lexer.next()).equalsTo({value: "."});
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it("match", () => {
     let lexer = new Lexer(tokens);
     lexer.reset("foo");
@@ -159,8 +105,53 @@ describe("Lexer", function() {
     assertThat(lexer.match("football")).equalsTo(1);
   });
 
+  it("longest string: needs more to be seen", () => {
+   let lexer = new Lexer([
+      ["bar", {value: "bar"}],
+      ["foo", {value: "foo"}],
+      ["football", {value: "football"}],
+    ]);
+    
+    lexer.reset("foo");
+    assertThat(lexer.next()).equalsTo(undefined);
+    lexer.reset("bar");
+    assertThat(lexer.next()).equalsTo({value: "foo"});
+    assertThat(lexer.next()).equalsTo({value: "bar"});
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("longest string", () => {
+    let lexer = new Lexer([
+      ["a", {value: "a"}],
+      ["he", {value: "he"}],
+      ["her", {value: "her"}],
+      ["herself", {value: "herself"}],
+    ]);
+    
+    lexer.reset("herself");
+    assertThat(lexer.next()).equalsTo({value: "herself"});
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it("next", () => {
-    let lexer = new Lexer(tokens);
+    let lexer = new Lexer([
+      [" ", {type: "WS", value: " "}],
+      [".", {value: "."}],
+      ["bar", {value: "bar"}],
+      ["man", {type: "WORD", value: "man"}],
+      ["foo", {type: "WORD", value: "foo"}],
+      ["football", {type: "WORD", value: "football"}],
+    ]);
+    
+    lexer.reset("foo");
+    assertThat(lexer.next()).equalsTo(undefined);
+    lexer.reset("bar");
+    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
+    assertThat(lexer.next()).equalsTo({value: "bar"});
+    assertThat(lexer.next()).equalsTo(undefined);
+
+    return;
+    
     lexer.reset("man");
     assertThat(lexer.next()).equalsTo({type: "WORD", value: "man"});
     assertThat(lexer.next()).equalsTo(undefined);
@@ -169,13 +160,6 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo({value: "bar"});
     assertThat(lexer.next()).equalsTo({type: "WS", value: " "});
     assertThat(lexer.next()).equalsTo({type: "WORD", value: "man"});
-    assertThat(lexer.next()).equalsTo(undefined);
-
-    lexer.reset("foo");
-    assertThat(lexer.next()).equalsTo(undefined);
-    lexer.reset("bar");
-    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
-    assertThat(lexer.next()).equalsTo({value: "bar"});
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -302,8 +286,6 @@ describe("Lexer", function() {
     for (let i = 0; i < (root.children || []).length; i++) {
       let child = root.children[i];
       if (child["value"]) {
-        //  delete child.value.kind;
-        // console.log(child.value);
         root.children[i] = child.value;
         continue;
       }
@@ -312,15 +294,6 @@ describe("Lexer", function() {
     return root;
   }
 
-  function create(start = "Statement", header, footer, body) {
-    const {Parser} = DRT;
-    let parser = new Parser(start, header, footer, body);
-    return (s) => {
-      let results = parser.feed(s);
-      return clear(results[0].children[0].children[0]);
-    }
-  }
-  
   function parse(s, start = "Statement", header, footer, body, all) {
     const {Parser} = DRT;
     let parser = new Parser(start, header, footer, body);
@@ -387,105 +360,44 @@ describe("Lexer", function() {
       .equalsTo(NP(PN("Peter")));
   });
 
-  it("a", function() {
-    assertThat(parse("a", "DET", header, footer))
+  it.skip("a", function() {
+    assertThat(parse("a", "DET"))
       .equalsTo(DET("a"));
   });
 
   it("Jones loves Mary", function() {
-    assertThat(parse("Jones loves Mary.", "Statement", header, ""))
+    assertThat(parse("Jones loves Mary.", "Statement"))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
   });
 
-  it.only("Jones loves Mary", function() {
-    const keywords = [
-      "a","an", "the", "every", "some", "no", "all", "most", "many",
-      "only", "not", "majority", "of", "minority", "at", "least",
-      "more", "than", "fewer", "exactly",
-      "then", "who", "and", "or", "he", "him", "she", "her",
-      "they", "them", "himself", "herself", "itself", "does", "did",
-      "will", "would", "which", "is", "are", "was", "were", "be", "been",
-      "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
-      "behind", "over", "under", "near", "during", "from", "to", "about",
-      "by",
-      "happy", "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
-      "married",
-      "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
-      "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
-      "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
-      "brother", "father", "husband", "sister", "mother", "wife",
-      "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
-      "come", "came", "give", "gave", "kiss", "box", "watch", "crash",
-      "like", "seize", "tie", "free", "love", "surprise", "fascinate",
-      "admire", "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
-      "cop", "repl", "tr", "compel", "defer", 
-    ].map((keyword) => [keyword, {type: keyword}]);
-
-    const dict = [
-      [" ", {type: "WS"}],
-      [".", {type: "PERIOD"}],
-      ["?", {type: "QUESTION"}],
-      ["'s", {type: "POSS"}],
-      
-      ["if", {type: "__if__"}],
-      ["do", {type: "__do__"}],
-      ["in", {type: "__in__"}],
-      ["with", {type: "__with__"}],
-      ["of", {type: "__of__"}],
-      ["for", {type: "__for__"}],
-      
-      // ["s", {type: "s"}],
-      ///["Jones", {type: "PN"}],
-      //["love", {type: "V"}],
-      // ["Mary", {type: "PN"}],
-      ["Peter", {type: "PN"}],
-      ["dog", {type: "N"}],
-      // ["man", {type: "N"}],
-    ];
-    
-    const header = `
-      @{%
-        ${Lexer.toString()}
-        const lexer = new Lexer(${JSON.stringify(dict.concat(keywords))});
-        // NOTE(goto): this only gets called once per test
-        // so gets reused. We need to figure out why and fix it.
-        // console.log("new lexer");
-        // throw new Error("foobar");
-      %}
-      @lexer lexer
-      _ -> %WS:* {% function(d) {return null;} %}
-      __ -> %WS:+ {% function(d) {return null;} %}
-    `;
-
-    const footer = `
-    `;
-        
-    assertThat(parse("every man loves Mary.", "Statement", header, footer))
+  it("she loves herself.", () => {
+    assertThat(parse("she loves herself.", "Statement"))
+      .equalsTo(S(NP(PRO("she")),
+                  VP_(VP(V(VERB("love"), "s"), NP(PRO("herself"))))));
+  });
+  
+  it("Jones loves Mary", function() {        
+    assertThat(parse("every man loves Mary.", "Statement"))
       .equalsTo(S(NP(DET("every"), N("man")),
                   VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
     
-    assertThat(parse("some man loves Mary.", "Statement", header, footer))
+    assertThat(parse("some man loves Mary.", "Statement"))
       .equalsTo(S(NP(DET("some"), N("man")),
                   VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
 
-    assertThat(parse("he loves her.", "Statement", header, footer))
+    assertThat(parse("he loves her.", "Statement"))
       .equalsTo(S(NP(PRO("he")),
                   VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))));
-  
-    assertThat(parse("she loves herself.", "Statement", header, footer))
-      .equalsTo(S(NP(PRO("she")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PRO("herself"))))));
 
-    assertThat(parse("she loves a man.", "Statement", header, footer))
+    return;
+    
+    assertThat(parse("she loves a man.", "Statement"))
       .equalsTo(S(NP(PRO("she")),
                   VP_(VP(V(VERB("love"), "s"),
                          NP(DET("a"), N("man"))))));
-
-    // return;
     
-  
-    assertThat(parse("she loves a man who loves her.", "Statement", header, footer))
+    assertThat(parse("she loves a man who loves her.", "Statement"))
       .equalsTo(S(NP(PRO("she")),
                   VP_(VP(V(VERB("love"), "s"),
                          NP(DET("a"),

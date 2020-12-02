@@ -18,9 +18,6 @@ class Lexer {
   }
     
   next() {
-    // console.log(this.tokens);
-    //console.log("next");
-    //console.log(this.buffer);
     let p = 0;
     let q = this.tokens.length - 1;
     while (p <= q) {
@@ -35,24 +32,32 @@ class Lexer {
       } else {
         // console.log("found a match!");
         let n = m + 1;
-        // console.log(n);
         while (n < this.tokens.length) {
           let [next] = this.tokens[n];
-          let buffer = this.buffer;
+          if (!next.startsWith(word)) {
+            break;
+          }
+
           if (this.match(next) == 0) {
             word = this.tokens[n][0];
             value = this.tokens[n][1];
-            n++;
-            continue;
-          } else if (next.substring(0, buffer.length) == buffer) {
-            return undefined;
-          } else {
-            break;
           }
+
+          if (next.length > this.buffer.length &&
+              next.substring(0, this.buffer.length) == this.buffer) {
+            return undefined;
+          }
+          
+          n++;
         }
+
         this.eat(word);
         //console.log("eat: ");
-        ///console.log(value);
+        //console.log(value);
+        //if (value.value == "the") {
+        //  console.log("hi");
+        //  console.log(this.buffer);
+        //}
         return value;
       }
     }
@@ -94,7 +99,9 @@ class Lexer {
         return true;
       }
     }
-      return false;
+
+    throw new Error("Symbol not available in the lexicon: " + name);
+    // return false;
   }
 }
 
