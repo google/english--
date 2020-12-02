@@ -30,7 +30,7 @@ const {
   HAVE,
   RN} = DRT.nodes;
 
-describe.only("Lexer", function() {
+describe("Lexer", function() {
 
   const tokens = [
         [" ", {type: "WS", value: " "}],
@@ -385,7 +385,7 @@ describe.only("Lexer", function() {
     assertThat(parse("some man loves Mary.", "Statement"))
       .equalsTo(S(NP(DET("some"), N("man")),
                   VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
-
+    // return;
     assertThat(parse("he loves her.", "Statement"))
       .equalsTo(S(NP(PRO("he")),
                   VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))));

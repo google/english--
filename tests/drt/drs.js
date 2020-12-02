@@ -1411,7 +1411,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("3 brazilians are happy.", function() {
+  it.skip("3 brazilians are happy.", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
          3 (a: {

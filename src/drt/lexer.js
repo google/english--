@@ -54,10 +54,6 @@ class Lexer {
         this.eat(word);
         //console.log("eat: ");
         //console.log(value);
-        //if (value.value == "the") {
-        //  console.log("hi");
-        //  console.log(this.buffer);
-        //}
         return value;
       }
     }
@@ -81,11 +77,11 @@ class Lexer {
     return true;
   }
   save() {
-    // console.log("saving");
-    return {};
+    // console.log("saving: " + this.buffer);
+    // return {buffer: this.buffer, "foo": "bar"};
   }
   reset(chunk, info) {
-    // console.log("reset: " + chunk);
+    // console.log("reset: " + chunk + ", info: " + info);
     this.buffer += chunk;
   }
   formatError(token) {

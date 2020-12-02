@@ -122,6 +122,7 @@ class DRS {
           cond["@type"] == "Disjunction") {
         result.push(cond.print());
       } else {
+        // console.log(cond);
         result.push(print(cond));
       }
     }

@@ -53,7 +53,7 @@ function clean(node) {
  return node;
 }
 
-describe("Rules", function() {
+describe.skip("Rules", function() {
   it("Keeps types", function() {
     let s = first(parse("Jones loves Smith and Mary."), true);
     let subject = S(NP(PN(capture("Jones"))), VP_());
