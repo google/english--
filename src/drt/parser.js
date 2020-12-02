@@ -772,10 +772,8 @@ const DrtSyntax = `
 
       ADJ -> %ADJ.
 
-      PN[num=sing, gen=male] -> %Socrates.
-      PN[num=sing, gen=male] -> %Jones.
-      PN[num=sing, gen=male] -> %John.
-      PN[num=sing, gen=male] -> %Smith.
+      PN[num=1, gen=2] -> %PN.
+
       PN[num=sing, gen=fem] -> %Mary.
       PN[num=sing, gen=-hum] -> %Brazil.
       PN[num=sing, gen=-hum] -> %Ulysses.
@@ -865,7 +863,7 @@ const keywords = [
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
-  "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
+  "Mary", "Brazil", "Ulysses",
   "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
   "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
   "brother", "father", "husband", "sister", "mother", "wife",
@@ -892,9 +890,17 @@ const dict = [
   
   ["if", {type: "__if__"}],
   ["do", {type: "__do__"}],
-  
+
+  // determiners
   ["a", {type: "DET", types: {"num": "sing"}}],
   ["an", {type: "DET", types: {"num": "sing"}}],
+
+  // proper names
+  ["Socrates", {type: "PN", types: {"num": "sing", "gen": "male"}}],
+  ["Jones", {type: "PN", types: {"num": "sing", "gen": "male"}}],
+  ["John", {type: "PN", types: {"num": "sing", "gen": "male"}}],
+  ["Smith", {type: "PN", types: {"num": "sing", "gen": "male"}}],
+  
   // used as a quantifier too
   // ["the", {type: "DET", types: {"num": "sing"}}],
 
