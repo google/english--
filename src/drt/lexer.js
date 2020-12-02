@@ -87,9 +87,9 @@ class Lexer {
     this.buffer += chunk;
   }
   formatError(token) {
-    //console.log("formatError");
+    console.log("formatError");
     //console.log(token);
-    throw new Error("Unexpected method call: " + token);
+    // throw new Error("Unexpected method call: " + token);
     return token;
   }
   has(name) {

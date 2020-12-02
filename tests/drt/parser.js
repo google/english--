@@ -973,10 +973,10 @@ describe("Statements", function() {
                         ))));
    });
 
-   it("Jones is happy.", function() {
-    assertThat(parse("Jones is happy."))
+   it("Jones is unhappy.", function() {
+    assertThat(parse("Jones is unhappy."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), ADJ("happy")))));
+                 VP_(VP(BE("is"), ADJ("unhappy")))));
    });
 
    it("they are happy.", function() {

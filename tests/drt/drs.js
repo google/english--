@@ -1104,7 +1104,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Mary's father is a brazilian engineer.", function() {
+  it.skip("Mary's father is a brazilian engineer.", function() {
     assertThat("Mary's father is a brazilian engineer.")
      .equalsTo(`
        let a, b

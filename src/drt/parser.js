@@ -800,13 +800,6 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
       ADJ -> %ADJ.
-      ADJ -> %unhappy.
-      ADJ -> %foolish.
-      ADJ -> %fast.
-      ADJ -> %beautiful.
-      ADJ -> %mortal.
-      ADJ -> %brazilian.
-      ADJ -> %married.
 
       PN[num=sing, gen=male] -> %Socrates.
       PN[num=sing, gen=male] -> %Jones.
@@ -901,8 +894,7 @@ const keywords = [
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "behind", "over", "under", "near", "before", "after", "during",
   "from", "to", "about", "by",
-  "unhappy", "foolish", "fast", "beautiful", "mortal", "brazilian",
-  "married",
+  "brazilian",
   "Socrates", "Jones", "John", "Smith", "Mary", "Brazil", "Ulysses",
   "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
   "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
@@ -935,6 +927,17 @@ const dict = [
   ["dog", {type: "N"}],
   // ["man", {type: "N"}],
   ["happy", {type: "ADJ"}],
+  ["unhappy", {type: "ADJ"}],
+  ["foolish", {type: "ADJ"}],  
+  ["fast", {type: "ADJ"}],    
+  ["beautiful", {type: "ADJ"}],
+  ["mortal", {type: "ADJ"}],
+  ["married", {type: "ADJ"}],
+  // TODO: the following can't be added because
+  // it conflicts with the token for the brazilian
+  // as a noun. we are going to have to deal with
+  // the ambiguity there.
+  // ["brazilian", {type: "ADJ"}],
 ];
 
 let DRTGrammar;
