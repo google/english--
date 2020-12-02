@@ -636,6 +636,7 @@ class CREVERY extends Rule {
     super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
+    // console.log(det.types);
     if (!det.types.quantifier) {
       return [[], [], [], []];
     }

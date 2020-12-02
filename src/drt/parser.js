@@ -651,7 +651,7 @@ const DrtSyntax = `
 
       DET[num=sing] -> %DET.
       DET[num=sing] -> %the.
-      
+
       DET[num=sing, quantifier=true] -> %every.
       DET[num=sing, quantifier=true] -> %some.
       DET[num=sing, quantifier=true] -> %no.
@@ -774,11 +774,8 @@ const DrtSyntax = `
 
       PN[num=1, gen=2] -> %PN.
 
-      PN[num=sing, gen=fem] -> %Mary.
-      PN[num=sing, gen=-hum] -> %Brazil.
-      PN[num=sing, gen=-hum] -> %Ulysses.
-
-      N[num=sing, gen=male] -> %man.
+      
+      N[num=sing, gen=male] -> %N.
       N[num=plur, gen=male] -> %men.
       N[num=sing, gen=fem] -> %woman.
       N[num=plur, gen=fem] -> %weman.
@@ -863,8 +860,7 @@ const keywords = [
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
-  "Mary", "Brazil", "Ulysses",
-  "man", "men", "woman", "weman", "girl", "book", "telescope", "donkey",
+  "men", "woman", "weman", "girl", "book", "telescope", "donkey",
   "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
   "brother", "father", "husband", "sister", "mother", "wife",
   "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
@@ -894,13 +890,20 @@ const dict = [
   // determiners
   ["a", {type: "DET", types: {"num": "sing"}}],
   ["an", {type: "DET", types: {"num": "sing"}}],
+  // ["every", {type: "DET", types: {"num": "sing", "quantifier": "true"}}],
 
   // proper names
   ["Socrates", {type: "PN", types: {"num": "sing", "gen": "male"}}],
   ["Jones", {type: "PN", types: {"num": "sing", "gen": "male"}}],
   ["John", {type: "PN", types: {"num": "sing", "gen": "male"}}],
   ["Smith", {type: "PN", types: {"num": "sing", "gen": "male"}}],
-  
+  ["Mary", {type: "PN", types: {"num": "sing", "gen": "fem"}}],
+  ["Brazil", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
+  ["Ulysses", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
+
+  // nouns
+  ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
+
   // used as a quantifier too
   // ["the", {type: "DET", types: {"num": "sing"}}],
 
