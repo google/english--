@@ -775,10 +775,8 @@ const DrtSyntax = `
       PN[num=1, gen=2] -> %PN.
 
       
-      N[num=sing, gen=male] -> %N.
-      N[num=plur, gen=male] -> %men.
-      N[num=sing, gen=fem] -> %woman.
-      N[num=plur, gen=fem] -> %weman.
+      N[num=1, gen=2] -> %N.
+      
       N[num=sing, gen=fem, plur=s] -> %girl.
       N[num=sing, gen=-hum, plur=s] -> %book.
       N[num=sing, gen=-hum, plur=s] -> %telescope.
@@ -860,7 +858,7 @@ const keywords = [
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
-  "men", "woman", "weman", "girl", "book", "telescope", "donkey",
+  "girl", "book", "telescope", "donkey",
   "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
   "brother", "father", "husband", "sister", "mother", "wife",
   "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
@@ -890,6 +888,8 @@ const dict = [
   // determiners
   ["a", {type: "DET", types: {"num": "sing"}}],
   ["an", {type: "DET", types: {"num": "sing"}}],
+  // used as a quantifier too
+  // ["the", {type: "DET", types: {"num": "sing"}}],
   // ["every", {type: "DET", types: {"num": "sing", "quantifier": "true"}}],
 
   // proper names
@@ -903,10 +903,11 @@ const dict = [
 
   // nouns
   ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
+  ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
+  ["men", {type: "N", types: {"num": "plur", "gen": "male"}}],
+  ["weman", {type: "N", types: {"num": "plur", "gen": "fem"}}],
 
-  // used as a quantifier too
-  // ["the", {type: "DET", types: {"num": "sing"}}],
-
+  // prepositions
   ["behind", {type: "PREP"}],
   ["in", {type: "PREP"}],
   ["with", {type: "PREP"}],
