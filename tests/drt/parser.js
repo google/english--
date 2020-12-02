@@ -673,7 +673,7 @@ describe("FeaturedNearley", function() {
     }]);
   });
 
-  it.skip("Tokens", function() {
+  it("Tokens", function() {
     const header = `
        @{%
          const lexer = {
@@ -689,7 +689,9 @@ describe("FeaturedNearley", function() {
                return;
              }
              this.parsed = true;
-             return {"type": "foo", "value": "foo"};
+             return {
+               "@type": "%foo", "type": "foo", "value": "foo", "types": {}
+             };
            },
          };
        %}
@@ -707,13 +709,18 @@ describe("FeaturedNearley", function() {
     
     assertThat(result).equalsTo([{
       "@type": "main",
-      "children": [{"type": "foo", "value": "foo"}],
+      "children": [{
+        "@type": "%foo",
+        "type": "foo",
+        "value": "foo",
+        "types": {},
+      }],
       "loc": 0,
       "types": {}
     }]);
   });
   
-  it.skip("Typed Tokens", function() {
+  it("Typed Tokens", function() {
     const header = `
        @{%
          const lexer = {
@@ -729,7 +736,12 @@ describe("FeaturedNearley", function() {
                return;
              }
              this.parsed = true;
-             return {"@type": "%foo", "type": "foo", "value": "foo"};
+             return {
+               "@type": "%foo", 
+               "type": "foo", 
+               "value": "foo", 
+               "types": {"a": "b"}
+             };
            },
          };
        %}
@@ -753,7 +765,8 @@ describe("FeaturedNearley", function() {
         "children": [{
           "@type": "%foo",
           "type": "foo",
-          "value": "foo"
+          "value": "foo",
+          "types": {"a": "b"}
         }],
         "loc": 0,
         "types": {

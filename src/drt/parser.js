@@ -480,25 +480,27 @@ class FeaturedNearley {
       }
       feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
       if (tail.length == 1 && `%${head.name}` == tail[0]) {
-        //console.log("hi");
-        //console.log(head.types);
-        //console.log(tail[0]);
-        // feed(``);
-      }
-      feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-      for (let term of tail) {
-        if (term.name == "_" ||
-            term.name == "__" ||
-            (typeof term == "string" && !term.startsWith("%")) ||
-            // typeof term == "string" ||
-            term.name == "unsigned_int") {
-          continue;
-        } else {
-          // console.log(term);
-          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
+        // For A[] -> %A rules, we special case and enforce that
+        // the types of %A at runtime need to match the types of A[].
+        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+        feed(`    {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, `);
+        feed(`  ])`);
+      } else {
+        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+        for (let term of tail) {
+          if (term.name == "_" ||
+              term.name == "__" ||
+              (typeof term == "string" && !term.startsWith("%")) ||
+              // typeof term == "string" ||
+              term.name == "unsigned_int") {
+            continue;
+          } else {
+            // console.log(term);
+            feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
+          }
         }
+        feed(`  ])`);
       }
-      feed(`  ])`);
       feed(`%}`);
       
     }
