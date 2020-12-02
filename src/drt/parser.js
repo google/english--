@@ -774,29 +774,14 @@ const DrtSyntax = `
 
       PN[num=1, gen=2] -> %PN.
 
+      N[num=1, gen=2, plur=3] -> %N.
       
-      N[num=1, gen=2] -> %N.
-      
-      N[num=sing, gen=fem, plur=s] -> %girl.
-      N[num=sing, gen=-hum, plur=s] -> %book.
-      N[num=sing, gen=-hum, plur=s] -> %telescope.
-      N[num=sing, gen=-hum, plur=s] -> %donkey.
-      N[num=sing, gen=-hum, plur=s] -> %horse.
-      N[num=sing, gen=-hum, plur=s] -> %cat.
-      N[num=sing, gen=-hum, plur=s] -> %porsche.
-      N[num=sing, gen=[male, fem], plur=s] -> %engineer.
       N[num=sing, gen=1, plur=s] -> %brazilian.
-      N[num=sing, gen=1, plur=es] -> %dish.
-      N[num=sing, gen=1, plur=es] -> %witch.
-      N[num=sing, gen=1, plur=es] -> %judge.
+      N[num=sing, gen=[male, fem], plur=s] -> %engineer.
       
-      RN[num=sing, gen=male] -> %brother.
-      RN[num=sing, gen=male] -> %father.
-      RN[num=sing, gen=male] -> %husband.
-      RN[num=sing, gen=fem] -> %sister.
-      RN[num=sing, gen=fem] -> %mother.
-      RN[num=sing, gen=fem] -> %wife.
-
+      
+      RN[num=1, gen=2] -> %RN.
+  
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> %beat.
       VERB[trans=1, stat=-, pres=+s, past=+ed] -> %listen.
       VERB[trans=+, stat=-, pres=+s, past=+ed] -> %own.
@@ -858,9 +843,7 @@ const keywords = [
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
-  "girl", "book", "telescope", "donkey",
-  "horse", "cat", "porsche", "engineer", "dish", "witch", "judge",
-  "brother", "father", "husband", "sister", "mother", "wife",
+  "engineer",
   "beat", "listen", "own", "walk", "sleep", "stink", "leave", "left",
   "come", "came", "give", "gave", "kiss", "box", "watch", "crash",
   "like", "seize", "tie", "free", "love", "surprise", "fascinate",
@@ -906,7 +889,27 @@ const dict = [
   ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
   ["men", {type: "N", types: {"num": "plur", "gen": "male"}}],
   ["weman", {type: "N", types: {"num": "plur", "gen": "fem"}}],
+  ["girl", {type: "N", types: {"num": "sing", "gen": "fem", "plur": "s"}}],
+  ["book", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["telescope", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["donkey", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["horse", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["cat", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["porsche", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
+  ["dish", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
+  ["witch", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
+  ["judge", {type: "N", types: {"num": "sing", "gen": 1, "plur": "es"}}],
+  //["engineer", {type: "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "es"}}],
 
+  // RNs
+  
+  ["brother", {type: "RN", types: {"num": "sing", "gen": "male"}}],
+  ["father", {type: "RN", types: {"num": "sing", "gen": "male"}}],
+  ["husband", {type: "RN", types: {"num": "sing", "gen": "male"}}],
+  ["sister", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
+  ["mother", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
+  ["wife", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
+  
   // prepositions
   ["behind", {type: "PREP"}],
   ["in", {type: "PREP"}],
