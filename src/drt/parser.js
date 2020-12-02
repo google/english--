@@ -466,50 +466,36 @@ class FeaturedNearley {
     feed(`%}`);
     feed(``);
 
-    // console.log(header);
-
     if (header) {
       feed(header);
     }
 
     for (let {head, tail} of grammar[0]) {
-      // let term = (x) => typeof x == "string" ? `${x}i` : x.name;
       function term(x) {
         if (typeof x == "string") {
-          if (x.startsWith("%")) {
-            return x;
-          } else {
-            //  return `${x}i`;
-            return `${x}`;
-          }
+          return x;
         } else {
           return x.name;
         }
       }
       feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
-      // console.log(tail);
+      if (tail.length == 1 && `%${head.name}` == tail[0]) {
+        //console.log("hi");
+        //console.log(head.types);
+        //console.log(tail[0]);
+        // feed(``);
+      }
       feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
       for (let term of tail) {
-        // console.log(term);
         if (term.name == "_" ||
             term.name == "__" ||
+            (typeof term == "string" && !term.startsWith("%")) ||
             // typeof term == "string" ||
             term.name == "unsigned_int") {
-          // console.log(term);
           continue;
-        } else if (typeof term == "string") {
-          let name = "";
-          if (term.startsWith("%")) {
-            name = term.substring(1);
-          } else {
-            name = term.substring(1, term.length - 1);
-          }
-          // console.log(name);
-          // feed(`    {"@type": "Token", "types": {"type": "${name}"}}, `);
-          // continue;
-          // console.log(term);
         } else {
-          feed(`    {"@type": "${term.name}", "types": ${JSON.stringify(term.types)}}, `);
+          // console.log(term);
+          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
         }
       }
       feed(`  ])`);

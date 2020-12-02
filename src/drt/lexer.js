@@ -19,6 +19,7 @@ class Lexer {
   }
     
   next() {
+    // console.log("next");
     let p = 0;
     let q = this.tokens.length - 1;
     while (p <= q) {
@@ -47,6 +48,8 @@ class Lexer {
 
           if (next.length > this.buffer.length &&
               next.substring(0, this.buffer.length) == this.buffer) {
+            //console.log("hello");
+            //console.log(next);
             return undefined;
           }
           
@@ -56,6 +59,8 @@ class Lexer {
         this.eat(word);
         //console.log("eat: ");
         //console.log(value);
+        value["@type"] = "%" + value["type"];
+        value["types"] = {};
         return value;
       }
     }
@@ -88,7 +93,7 @@ class Lexer {
   }
   formatError(token) {
     console.log("formatError");
-    //console.log(token);
+    console.log(token);
     // throw new Error("Unexpected method call: " + token);
     return token;
   }

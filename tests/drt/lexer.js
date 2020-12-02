@@ -33,67 +33,68 @@ const {
 describe("Lexer", function() {
 
   const tokens = [
-        [" ", {type: "WS", value: " "}],
-        [".", {value: "."}],
-        ["bar", {value: "bar"}],
-        ["man", {type: "WORD", value: "man"}],
-        ["foo", {type: "WORD", value: "foo"}],
-        ["football", {type: "WORD", value: "football"}],
+    [" ", {type: "WS", value: " "}],
+    [".", {type: "PERIOD", value: "."}],
+    ["bar", {type: "bar", value: "bar"}],
+    ["man", {type: "WORD", value: "man"}],
+    ["foo", {type: "WORD", value: "foo"}],
+    ["football", {type: "WORD", value: "football"}],
   ];
   
   it("Lexer", () => {
     let lexer = new Lexer(tokens);
     lexer.reset("foofoo foo.");
-    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
-    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
-    assertThat(lexer.next()).equalsTo({type: "WS", value: " "});
-    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
-    assertThat(lexer.next()).equalsTo({value: "."});
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
+    assertThat(lexer.next()).equalsTo(token( "WORD", "foo"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
   it("longest string: direct next isnt a substring", () => {
     let lexer = new Lexer([
-      ["foo", {value: "foo"}],
-      ["the", {value: "the"}],
-      ["them", {value: "them"}],
-      ["then", {value: "then"}],
+      ["foo", {type: "a", value: "foo"}],
+      ["the", {type: "a", value: "the"}],
+      ["them", {type: "a", value: "them"}],
+      ["then", {type: "a", value: "then"}],
     ]);
     lexer.reset("then");
-    assertThat(lexer.next()).equalsTo({value: "then"});
+    assertThat(lexer.next()).equalsTo(token("a", "then"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
   it("if Mary is happy then Jones is happy.", () => {
     let lexer = new Lexer([
-      [" ", {value: "WS"}],
-      [".", {value: "."}],
-      ["the", {value: "the"}],
-      ["them", {value: "them"}],
-      ["if", {value: "if"}],
-      ["Mary", {value: "Mary"}],
-      ["is", {value: "is"}],
-      ["happy", {value: "happy"}],
-      ["then", {value: "happy"}],
-      ["Jones", {value: "happy"}],
+      [" ", {type: "word", value: "WS"}],
+      [".", {type: "word", value: "."}],
+      ["the", {type: "word", value: "the"}],
+      ["them", {type: "word", value: "them"}],
+      ["if", {type: "word", value: "if"}],
+      ["Mary", {type: "word", value: "Mary"}],
+      ["is", {type: "word", value: "is"}],
+      ["happy", {type: "word", value: "happy"}],
+      ["then", {type: "word", value: "happy"}],
+      ["Jones", {type: "word", value: "happy"}],
     ]);
     lexer.reset("if Mary is happy then Jones is happy.");
-    assertThat(lexer.next()).equalsTo({value: "if"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "Mary"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "is"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "happy"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "then"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "Jones"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "is"});
-    assertThat(lexer.next()).equalsTo({value: " "});
-    assertThat(lexer.next()).equalsTo({value: "happy"});
-    assertThat(lexer.next()).equalsTo({value: "."});
+    assertThat(lexer.next()).equalsTo(token("word", "if"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "Mary"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "is"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "happy"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "then"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "Jones"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "is"));
+    assertThat(lexer.next()).equalsTo(token("word", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "happy"));
+    assertThat(lexer.next()).equalsTo(token("word", "."));
+    
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -107,29 +108,29 @@ describe("Lexer", function() {
 
   it("longest string: needs more to be seen", () => {
    let lexer = new Lexer([
-      ["bar", {value: "bar"}],
-      ["foo", {value: "foo"}],
-      ["football", {value: "football"}],
+     ["bar", {"type": "bar", value: "bar"}],
+     ["foo", {"type": "foo", value: "foo"}],
+     ["football", {"type": "football", value: "football"}],
     ]);
     
     lexer.reset("foo");
     assertThat(lexer.next()).equalsTo(undefined);
     lexer.reset("bar");
-    assertThat(lexer.next()).equalsTo({value: "foo"});
-    assertThat(lexer.next()).equalsTo({value: "bar"});
+    assertThat(lexer.next()).equalsTo(token("foo", "foo"));
+    assertThat(lexer.next()).equalsTo(token("bar", "bar"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
   it("longest string", () => {
     let lexer = new Lexer([
-      ["a", {value: "a"}],
-      ["he", {value: "he"}],
-      ["her", {value: "her"}],
-      ["herself", {value: "herself"}],
+      ["a", {type: "a", value: "a"}],
+      ["he", {type: "he", value: "he"}],
+      ["her", {type: "her", value: "her"}],
+      ["herself", {type: "herself", value: "herself"}],
     ]);
     
     lexer.reset("herself");
-    assertThat(lexer.next()).equalsTo({value: "herself"});
+    assertThat(lexer.next()).equalsTo(token("herself", "herself"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -137,7 +138,7 @@ describe("Lexer", function() {
     let lexer = new Lexer([
       [" ", {type: "WS", value: " "}],
       [".", {value: "."}],
-      ["bar", {value: "bar"}],
+      ["bar", {type: "bar", value: "bar"}],
       ["man", {type: "WORD", value: "man"}],
       ["foo", {type: "WORD", value: "foo"}],
       ["football", {type: "WORD", value: "football"}],
@@ -146,8 +147,8 @@ describe("Lexer", function() {
     lexer.reset("foo");
     assertThat(lexer.next()).equalsTo(undefined);
     lexer.reset("bar");
-    assertThat(lexer.next()).equalsTo({type: "WORD", value: "foo"});
-    assertThat(lexer.next()).equalsTo({value: "bar"});
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
+    assertThat(lexer.next()).equalsTo(token("bar", "bar"));
     assertThat(lexer.next()).equalsTo(undefined);
 
     return;
@@ -173,7 +174,7 @@ describe("Lexer", function() {
       main -> %WORD
     `);
     assertThat(parser.feed("man")).equalsTo([[
-      {type: "WORD", value: "man"}
+      token("WORD", "man")
     ]]);
   });
   
@@ -187,7 +188,7 @@ describe("Lexer", function() {
       main -> "bar"
     `);
     assertThat(parser.feed("bar")).equalsTo([[
-      {value: "bar"}
+      token("bar", "bar")
     ]]);
   });
 
@@ -201,8 +202,8 @@ describe("Lexer", function() {
       main -> (%WORD | "bar"):+
     `);
     assertThat(parser.feed("foobar")).equalsTo([[[
-      [{type: "WORD", value: "foo"}],
-      [{value: "bar"}],
+      [token("WORD", "foo")],
+      [token("bar", "bar")],
     ]]]);
   });
   
@@ -218,7 +219,12 @@ describe("Lexer", function() {
     assertThat(parser.feed("f")).equalsTo([]);
     assertThat(parser.feed("o")).equalsTo([]);
     assertThat(parser.feed("o")).equalsTo([]);
-    assertThat(parser.feed("b")).equalsTo([[{type: "WORD", value: "foo"}]]);
+    assertThat(parser.feed("b")).equalsTo([[{
+      "@type": "%WORD",
+      type: "WORD",
+      value: "foo",
+      "types": {}
+    }]]);
   });
 
   it("football", () => {
@@ -231,7 +237,12 @@ describe("Lexer", function() {
       main -> %WORD
     `);
     assertThat(parser.feed("football"))
-     .equalsTo([[{type: "WORD", value: "football"}]]);
+      .equalsTo([[{
+        "@type": "%WORD",
+        "type": "WORD",
+        "value": "football",
+        "types": {},
+      }]]);
   });
 
   it("foot, ball", () => {
@@ -246,13 +257,18 @@ describe("Lexer", function() {
     assertThat(parser.feed("foot"))
      .equalsTo([]);
     assertThat(parser.feed("ball"))
-     .equalsTo([[{type: "WORD", value: "football"}]]);
+      .equalsTo([[{
+        "@type": "%WORD",
+        "type": "WORD",
+        "value": "football",
+        "types": {},
+      }]]);
   });
 
   it("Jones loves Mary.", () => {
     const tokens = [
       [" ", {type: "WS"}],
-      [".", {}],
+      [".", {type: "PERIOD"}],
       ["Jones", {type: "PN"}],
       ["loves", {type: "V"}],
       ["Mary", {type: "PN"}],
@@ -274,8 +290,9 @@ describe("Lexer", function() {
 
     assertThat(parser.feed("Jones loves Mary ."))
       .equalsTo([[
-        {type: "PN", value: "Jones"},
-        [{type: "V", value: "loves"}, {type: "PN", value: "Mary"},]
+        {"@type": "%PN", type: "PN", value: "Jones", types: {}},
+        [{"@type": "%V", type: "V", value: "loves", types: {}},
+         {"@type": "%PN", type: "PN", value: "Mary", types: {}},]
       ]]);
   });
 
@@ -355,9 +372,9 @@ describe("Lexer", function() {
       .equalsTo({"@type": "MAIN", children: ["foo"]});
   });
   
-  it.skip("Peter", function() {
-    assertThat(parse("Peter", "NP", header, footer))
-      .equalsTo(NP(PN("Peter")));
+  it("every porsche", function() {
+    assertThat(parse("every porsche", "NP"))
+      .equalsTo(NP(DET("every"), N("porsche")));
   });
 
   it.skip("a", function() {
@@ -415,11 +432,20 @@ describe("Lexer", function() {
                   VP_(VP(V(VERB("love"), "s"), NP(DET("a"), N("dog"))))));
   });
 
+  let token = (type, value) => {
+    return {
+      "@type": "%" + type,
+      "type": type,
+      "value": value,
+      "types": {},
+    };
+  };
+    
   it("Jones loves a dog.", () => {
     const lexer = new Lexer([
       [" ", {type: "WS"}],
-      [".", {}],
-      ["a", {}],
+      [".", {type: "PERIOD"}],
+      ["a", {type: "DET"}],
       ["Jones", {type: "PN"}],
       ["loves", {type: "V"}],
       ["happy", {type: "ADJ"}],
@@ -428,14 +454,14 @@ describe("Lexer", function() {
       ["dog", {type: "N"}],
     ]);
     lexer.reset("Jones loves a dog.");
-    assertThat(lexer.next()).equalsTo({"type": "PN", "value": "Jones"});
-    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
-    assertThat(lexer.next()).equalsTo({"type": "V", "value": "loves"});
-    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
-    assertThat(lexer.next()).equalsTo({"value": "a"});
-    assertThat(lexer.next()).equalsTo({"type": "WS", "value": " "});
-    assertThat(lexer.next()).equalsTo({"type": "N", "value": "dog"});
-    assertThat(lexer.next()).equalsTo({"value": "."});
+    assertThat(lexer.next()).equalsTo(token("PN", "Jones"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("V", "loves"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("DET", "a"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("N", "dog"));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   

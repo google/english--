@@ -673,7 +673,7 @@ describe("FeaturedNearley", function() {
     }]);
   });
 
-  it("Tokens", function() {
+  it.skip("Tokens", function() {
     const header = `
        @{%
          const lexer = {
@@ -708,6 +708,58 @@ describe("FeaturedNearley", function() {
     assertThat(result).equalsTo([{
       "@type": "main",
       "children": [{"type": "foo", "value": "foo"}],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+  
+  it.skip("Typed Tokens", function() {
+    const header = `
+       @{%
+         const lexer = {
+           has(name) {
+             return true;
+           },
+           reset(chunk, state) {
+           },
+           save() {
+           },
+           next() {
+             if (this.parsed) {
+               return;
+             }
+             this.parsed = true;
+             return {"@type": "%foo", "type": "foo", "value": "foo"};
+           },
+         };
+       %}
+
+       # Pass your lexer object using the @lexer option:
+       @lexer lexer
+    `;
+    let grammar = FeaturedNearley.compile(`
+       main -> foo[a=b].
+       foo[a=b] -> %foo.
+    `, header);
+
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("foo");
+    
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": [{
+        "@type": "foo",
+        "children": [{
+          "@type": "%foo",
+          "type": "foo",
+          "value": "foo"
+        }],
+        "loc": 0,
+        "types": {
+          "a": "b"
+        }
+      }],
       "loc": 0,
       "types": {}
     }]);
