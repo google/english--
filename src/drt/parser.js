@@ -848,7 +848,7 @@ const dict = [
   ["with", {type: "__with__"}],
   ["for", {type: "__for__"}],
   ["of", {type: "__of__"}],
-  
+].concat([
   // proper names
   ["Socrates", {type: "PN", types: {"num": "sing", "gen": "male"}}],
   ["Jones", {type: "PN", types: {"num": "sing", "gen": "male"}}],
@@ -972,12 +972,13 @@ const dict = [
   ["beautiful", {type: "ADJ"}],
   ["mortal", {type: "ADJ"}],
   ["married", {type: "ADJ"}],
+
   // TODO: the following can't be added because
   // it conflicts with the token for the brazilian
   // as a noun. we are going to have to deal with
   // the ambiguity there.
   // ["brazilian", {type: "ADJ"}],
-];
+]);
 
 let DRTGrammar;
 
