@@ -684,13 +684,20 @@ describe("FeaturedNearley", function() {
            },
            save() {
            },
+           formatError(e) {
+           },
            next() {
              if (this.parsed) {
                return;
              }
              this.parsed = true;
              return {
-               "@type": "%foo", "type": "foo", "value": "foo", "types": {}
+               "value": "foo", 
+               "type": "foo",
+               "tokens": [{
+                 "@type": "foo", 
+                 "types": {}
+               }]
              };
            },
          };
@@ -710,10 +717,12 @@ describe("FeaturedNearley", function() {
     assertThat(result).equalsTo([{
       "@type": "main",
       "children": [{
-        "@type": "%foo",
         "type": "foo",
         "value": "foo",
-        "types": {},
+        "tokens": [{
+          "@type": "foo",
+          "types": {},
+        }]
       }],
       "loc": 0,
       "types": {}
@@ -732,15 +741,18 @@ describe("FeaturedNearley", function() {
            save() {
            },
            next() {
+             // console.log("next");
              if (this.parsed) {
                return;
              }
              this.parsed = true;
              return {
-               "@type": "%foo", 
-               "type": "foo", 
                "value": "foo", 
-               "types": {"a": "b"}
+               "type": "foo",
+               "tokens": [{
+                 "@type": "%foo", 
+                 "types": {"a": "b"}
+               }]
              };
            },
          };
@@ -757,15 +769,13 @@ describe("FeaturedNearley", function() {
     let parser = new Nearley(grammar, "main");
 
     let result = parser.feed("foo");
-    
+    // return;
     assertThat(result).equalsTo([{
       "@type": "main",
       "children": [{
         "@type": "foo",
         "children": [{
           "@type": "%foo",
-          "type": "foo",
-          "value": "foo",
           "types": {"a": "b"}
         }],
         "loc": 0,

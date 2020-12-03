@@ -482,16 +482,26 @@ class FeaturedNearley {
       if (tail.length == 1 && `%${head.name}` == tail[0]) {
         // For A[] -> %A rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
-        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-        feed(`    {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, `);
-        feed(`  ])`);
+        //console.log("hi");
+        //console.log(tail);
+        feed(`([token], location, reject) => {
+          // console.log(token);
+          // console.log("hi");
+          // return token.tokens[0];
+          return bind("${head.name}", ${JSON.stringify(head.types)}, [
+            {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, 
+          ])([token.tokens[0]], location, reject);
+        }`);
+        //feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
+        //feed(`    {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, `);
+        //feed(`  ])`);
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
           if (term.name == "_" ||
               term.name == "__" ||
-              (typeof term == "string" && !term.startsWith("%")) ||
-              // typeof term == "string" ||
+              // (typeof term == "string" && !term.startsWith("%")) ||
+              typeof term == "string" ||
               term.name == "unsigned_int") {
             continue;
           } else {
@@ -993,7 +1003,8 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
   // console.log(header);
   header = header || `
       @{%
-        ${Lexer.toString()}
+        // const {Lexer} = require("./lexer.js");
+        // console.log(Lexer);
         const lexer = new Lexer(${JSON.stringify(dict.concat(keywords))});
         // NOTE(goto): this only gets called once per test
         // so gets reused. We need to figure out why and fix it.

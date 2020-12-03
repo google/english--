@@ -58,10 +58,20 @@ class Lexer {
 
         this.eat(word);
         //console.log("eat: ");
-        //console.log(value);
-        value["@type"] = "%" + value["type"];
-        value["types"] = value["types"] || {};
         // console.log(value);
+        return {
+          "type": value["type"],
+          "value": value.value,
+          "tokens": [{
+            "@type": "%" + value["type"],
+            "types": value["types"] || {},
+            "value": value.value,
+          }]
+        };
+        // console.log(value);
+        // return result;
+        // value["@type"] = "%" + value["type"];
+        // value["types"] = value["types"] || {};
         return value;
       }
     }
@@ -93,8 +103,8 @@ class Lexer {
     this.buffer += chunk;
   }
   formatError(token) {
-    console.log("formatError");
-    console.log(token);
+    // console.log("formatError");
+    // console.log(token);
     // throw new Error("Unexpected method call: " + token);
     return token;
   }
