@@ -678,10 +678,10 @@ const DrtSyntax = `
 
       PRO[num=sing, gen=male, case=+nom] -> %he.
       PRO[num=sing, gen=male, case=-nom] -> %him.
-
+      
       PRO[num=sing, gen=fem, case=+nom] -> %she.
       PRO[num=sing, gen=fem, case=-nom] -> %her.
-
+      
       PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> %it.
 
       PRO[num=plur, gen=[male, fem, -hum], case=+nom] -> %they.
@@ -816,6 +816,9 @@ const keywords = [
   "himself", "herself",
   "it", "itself",
 
+  "then", "who", "and", "or",
+  "they", "them", "himself", "herself", "it", "itself", "does", "did",
+
   "does", "did",
   "will", "would",
   "is", "are",
@@ -854,7 +857,7 @@ const dict = [
   ["Mary", {type: "PN", types: {"num": "sing", "gen": "fem"}}],
   ["Brazil", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
   ["Ulysses", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
-
+  
   // nouns
   ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
   ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
