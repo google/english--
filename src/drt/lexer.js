@@ -61,6 +61,7 @@ class Lexer {
         //console.log(value);
         value["@type"] = "%" + value["type"];
         value["types"] = value["types"] || {};
+        // console.log(value);
         return value;
       }
     }

@@ -649,7 +649,6 @@ const DrtSyntax = `
           %not __ 
           NP[num=3, gen=4, case=5, gap=-].
 
-      DET[num=sing] -> %DET.
       DET[num=sing] -> %the.
 
       DET[num=sing, quantifier=true] -> %every.
@@ -694,8 +693,6 @@ const DrtSyntax = `
 
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
 
-      PREP -> %PREP.
-      
       AUX[num=sing, fin=+, tp=-past, tense=pres] -> %does.
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.
 
@@ -770,19 +767,16 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
-      ADJ -> %ADJ.
-
       PN[num=1, gen=2] -> %PN.
 
-      N[num=1, gen=2, plur=3] -> %N.
-      
       N[num=sing, gen=1, plur=s] -> %brazilian.
-      N[num=sing, gen=[male, fem], plur=s] -> %engineer.
       
-      
+      DET[num=sing] -> %DET.
+      ADJ -> %ADJ.
+      N[num=1, gen=2, plur=3] -> %N.      
       RN[num=1, gen=2] -> %RN.
-
       VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.      
+      PREP -> %PREP.
 `;
 
 const keywords = [
@@ -790,12 +784,14 @@ const keywords = [
   "every", "some", "no", "all", "most", "many",
   "only", "not", "majority", "of", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
+
   "then", "who", "and", "or", "he", "him", "she", "her",
   "they", "them", "himself", "herself", "it", "itself", "does", "did",
+
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
+
   "brazilian",
-  "engineer",
 ].map((keyword) => [keyword, {type: keyword}]);
 
 const dict = [
@@ -846,7 +842,7 @@ const dict = [
   ["dish", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
   ["witch", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
   ["judge", {type: "N", types: {"num": "sing", "gen": 1, "plur": "es"}}],
-  //["engineer", {type: "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "es"}}],
+  ["engineer", {type: "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}],
 
   // RNs
   
@@ -953,7 +949,8 @@ const dict = [
   ["to", {type: "PREP"}],
   ["about", {type: "PREP"}],
   ["by", {type: "PREP"}],  
-  
+
+  // Adjectives
   ["happy", {type: "ADJ"}],
   ["unhappy", {type: "ADJ"}],
   ["foolish", {type: "ADJ"}],  
