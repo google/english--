@@ -782,25 +782,7 @@ const DrtSyntax = `
       
       RN[num=1, gen=2] -> %RN.
 
-      VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.
-  
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %ski.
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %echo.
-
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %play.
-      VERB[trans=-, stat=-, pres=+s, past=+ed] -> %decay.
-      VERB[trans=+, stat=-, pres=+s, past=+ed] -> %enjoy.
-
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> %cr.
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> %appl.
-      VERB[trans=+, stat=-, pres=+ies, past=+ied] -> %cop.
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> %repl.
-      VERB[trans=-, stat=-, pres=+ies, past=+ied] -> %tr.
-
-      VERB[trans=-, stat=-, pres=+s, past=+led] -> %compel.
-      VERB[trans=-, stat=-, pres=+s, past=+red] -> %defer.
-      
+      VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.      
 `;
 
 const keywords = [
@@ -814,10 +796,6 @@ const keywords = [
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
   "engineer",
-  //"like", "seize", "tie", "free", "love", "surprise", "fascinate",
-  //"admire",
-  "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
-  "cop", "repl", "tr", "compel", "defer", 
 ].map((keyword) => [keyword, {type: keyword}]);
 
 const dict = [
@@ -931,7 +909,33 @@ const dict = [
   ["admire", {type: "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
   
-      
+  ["ski", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["echo", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  
+  ["play", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["decay", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["enjoy", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  
+  ["cr", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  ["appl", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  ["cop", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  ["repl", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  ["tr", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  
+  ["compel", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+led"}}],
+  ["defer", {type: "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+red"}}],    
   
   // prepositions
   ["behind", {type: "PREP"}],
