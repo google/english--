@@ -649,6 +649,8 @@ const DrtSyntax = `
           %not __ 
           NP[num=3, gen=4, case=5, gap=-].
 
+      DET[num=sing] -> %a.
+      DET[num=sing] -> %an.
       DET[num=sing] -> %the.
 
       DET[num=sing, quantifier=true] -> %every.
@@ -787,7 +789,6 @@ const DrtSyntax = `
 
       N[num=sing, gen=1, plur=s] -> %brazilian.
       
-      DET[num=sing] -> %DET.
       ADJ -> %ADJ.
       N[num=1, gen=2, plur=3] -> %N.      
       RN[num=1, gen=2] -> %RN.
@@ -795,22 +796,15 @@ const DrtSyntax = `
 `;
 
 const keywords = [
-  "the",
+  // determiners
+  "a", "an", "the",
   "every", "some", "no", "all", "most", "many",
   "only", "not", "majority", "of", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
 
-  "behind",
-  "over",
-  "under",
-  "near",
-  "before",
-  "after",
-  "during",
-  "from",
-  "to",
-  "about",
-  "by",  
+  // prepositions
+  "behind", "over", "under", "near", "before", "after",
+  "during", "from", "to", "about", "by",  
   
   "then",
 
@@ -831,7 +825,8 @@ const keywords = [
 
   "who",
   "which",
-  
+
+  // verbs
   "s", "es", "ies", "ed", "d", "ied", "led", "red",
 
   "brazilian",
@@ -843,14 +838,6 @@ const dict = [
   ["?", {type: "QUESTION"}],
   ["'s", {type: "POSS"}],
 
-  // ["s", {type: "s"}],
-  ///["Jones", {type: "PN"}],
-  //["love", {type: "V"}],
-  // ["Mary", {type: "PN"}],
-  ["Peter", {type: "PN"}],
-  ["dog", {type: "N"}],
-  // ["man", {type: "N"}],
-  
   ["if", {type: "__if__"}],
   ["do", {type: "__do__"}],
 
@@ -859,13 +846,6 @@ const dict = [
   ["for", {type: "__for__"}],
   ["of", {type: "__of__"}],
   
-    // determiners
-  ["a", {type: "DET", types: {"num": "sing"}}],
-  ["an", {type: "DET", types: {"num": "sing"}}],
-  // used as a quantifier too
-  // ["the", {type: "DET", types: {"num": "sing"}}],
-  // ["every", {type: "DET", types: {"num": "sing", "quantifier": "true"}}],
-
   // proper names
   ["Socrates", {type: "PN", types: {"num": "sing", "gen": "male"}}],
   ["Jones", {type: "PN", types: {"num": "sing", "gen": "male"}}],
@@ -879,7 +859,7 @@ const dict = [
   ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
   ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
   ["men", {type: "N", types: {"num": "plur", "gen": "male"}}],
-  ["weman", {type: "N", types: {"num": "plur", "gen": "fem"}}],
+  ["women", {type: "N", types: {"num": "plur", "gen": "fem"}}],
   ["girl", {type: "N", types: {"num": "sing", "gen": "fem", "plur": "s"}}],
   ["book", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
   ["telescope", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
