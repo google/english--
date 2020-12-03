@@ -750,6 +750,9 @@ describe("FeaturedNearley", function() {
                "value": "foo", 
                "type": "foo",
                "tokens": [{
+                 "@type": "%bar", 
+                 "types": {"c": "d"}
+               }, {
                  "@type": "%foo", 
                  "types": {"a": "b"}
                }]

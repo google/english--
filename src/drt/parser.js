@@ -482,25 +482,22 @@ class FeaturedNearley {
       if (tail.length == 1 && `%${head.name}` == tail[0]) {
         // For A[] -> %A rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
-        //console.log("hi");
-        //console.log(tail);
         feed(`([token], location, reject) => {
-          // console.log(token);
-          // console.log("hi");
-          // return token.tokens[0];
-          return bind("${head.name}", ${JSON.stringify(head.types)}, [
-            {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, 
-          ])([token.tokens[0]], location, reject);
+          for (let match of token.tokens) {
+            let result = bind("${head.name}", ${JSON.stringify(head.types)}, [
+              {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, 
+            ])([match], location, reject);
+            if (result != reject) {
+              return result;
+            }
+          }
+          return reject;
         }`);
-        //feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-        //feed(`    {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, `);
-        //feed(`  ])`);
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
           if (term.name == "_" ||
               term.name == "__" ||
-              // (typeof term == "string" && !term.startsWith("%")) ||
               typeof term == "string" ||
               term.name == "unsigned_int") {
             continue;
