@@ -693,6 +693,22 @@ const DrtSyntax = `
 
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
 
+      PREP -> %behind.
+      PREP -> %__in__.
+      PREP -> %__with__.
+      PREP -> %__for__.
+      PREP -> %__of__.
+      PREP -> %over.
+      PREP -> %under.
+      PREP -> %near.
+      PREP -> %before.
+      PREP -> %after.
+      PREP -> %during.
+      PREP -> %from.
+      PREP -> %to.
+      PREP -> %about.
+      PREP -> %by.  
+
       AUX[num=sing, fin=+, tp=-past, tense=pres] -> %does.
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.
 
@@ -776,7 +792,6 @@ const DrtSyntax = `
       N[num=1, gen=2, plur=3] -> %N.      
       RN[num=1, gen=2] -> %RN.
       VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.      
-      PREP -> %PREP.
 `;
 
 const keywords = [
@@ -785,11 +800,39 @@ const keywords = [
   "only", "not", "majority", "of", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
 
-  "then", "who", "and", "or", "he", "him", "she", "her",
-  "they", "them", "himself", "herself", "it", "itself", "does", "did",
+  "behind",
+  "over",
+  "under",
+  "near",
+  "before",
+  "after",
+  "during",
+  "from",
+  "to",
+  "about",
+  "by",  
+  
+  "then",
 
-  "will", "would", "which", "is", "are", "was", "were", "be", "been",
-  "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
+  "and", "or",
+
+  "he", "him",
+  "she", "her",
+  "they", "them",
+  "himself", "herself",
+  "it", "itself",
+
+  "does", "did",
+  "will", "would",
+  "is", "are",
+  "was", "were",
+  "be", "been",
+  "have", "has", "had",
+
+  "who",
+  "which",
+  
+  "s", "es", "ies", "ed", "d", "ied", "led", "red",
 
   "brazilian",
 ].map((keyword) => [keyword, {type: keyword}]);
@@ -811,7 +854,12 @@ const dict = [
   ["if", {type: "__if__"}],
   ["do", {type: "__do__"}],
 
-  // determiners
+  ["in", {type: "__in__"}],
+  ["with", {type: "__with__"}],
+  ["for", {type: "__for__"}],
+  ["of", {type: "__of__"}],
+  
+    // determiners
   ["a", {type: "DET", types: {"num": "sing"}}],
   ["an", {type: "DET", types: {"num": "sing"}}],
   // used as a quantifier too
@@ -933,23 +981,6 @@ const dict = [
   ["defer", {type: "VERB", types: {
     "trans": "-", "stat": "-", "pres": "+s", "past": "+red"}}],    
   
-  // prepositions
-  ["behind", {type: "PREP"}],
-  ["in", {type: "PREP"}],
-  ["with", {type: "PREP"}],
-  ["for", {type: "PREP"}],
-  ["of", {type: "PREP"}],
-  ["over", {type: "PREP"}],
-  ["under", {type: "PREP"}],
-  ["near", {type: "PREP"}],
-  ["before", {type: "PREP"}],
-  ["after", {type: "PREP"}],
-  ["during", {type: "PREP"}],
-  ["from", {type: "PREP"}],
-  ["to", {type: "PREP"}],
-  ["about", {type: "PREP"}],
-  ["by", {type: "PREP"}],  
-
   // Adjectives
   ["happy", {type: "ADJ"}],
   ["unhappy", {type: "ADJ"}],
