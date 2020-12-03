@@ -784,19 +784,6 @@ const DrtSyntax = `
 
       VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.
   
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> %kiss.
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> %box.
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> %watch.
-      VERB[trans=+, stat=-, pres=+es, past=+ed] -> %crash.
-
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %like.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %seize.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %tie.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %free.
-      VERB[trans=1, stat=-, pres=+s, past=+d] -> %love.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %surprise.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %fascinate.
-      VERB[trans=+, stat=-, pres=+s, past=+d] -> %admire.
 
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> %ski.
       VERB[trans=-, stat=-, pres=+s, past=+ed] -> %echo.
@@ -827,15 +814,9 @@ const keywords = [
   "have", "has", "had", "s", "es", "ies", "ed", "d", "ied", "led", "red",
   "brazilian",
   "engineer",
-  // "beat",
-  // "listen", "own",
-  // "walk", "sleep", "stink",
-  //"leave", "left",
-  //"come", "came",
-  //"give", "gave",
-  "kiss", "box", "watch", "crash",
-  "like", "seize", "tie", "free", "love", "surprise", "fascinate",
-  "admire", "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
+  //"like", "seize", "tie", "free", "love", "surprise", "fascinate",
+  //"admire",
+  "ski", "echo", "play", "decay", "enjoy", "cr", "appl",
   "cop", "repl", "tr", "compel", "defer", 
 ].map((keyword) => [keyword, {type: keyword}]);
 
@@ -911,32 +892,45 @@ const dict = [
     "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
   ["stink", {type: "VERB", types: {
     "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-
   ["leave", {type: "VERB", types: {
     "trans": 1, "stat": "-", "pres": "+s"}}],
   ["left", {type: "VERB", types: {
     "trans": 1, "stat": "-", "past": "-reg"}}],
-  //VERB[trans=1, stat=-, pres=+s] -> %leave.
-  // VERB[trans=1, stat=-, past=-reg] -> %left.
-
   ["come", {type: "VERB", types: {
     "trans": 1, "stat": "-", "pres": "+s"}}],
   ["came", {type: "VERB", types: {
     "trans": 1, "stat": "-", "past": "-reg"}}],
-  //VERB[trans=-, stat=-, pres=+s] -> %come.
-  //VERB[trans=-, stat=-, past=-reg] -> %came.
-
   ["give", {type: "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+s"}}],
   ["gave", {type: "VERB", types: {
     "trans": "+", "stat": "-", "past": "-reg"}}],
-  //VERB[trans=+, stat=-, pres=+s] -> %give.
-  //VERB[trans=+, stat=-, past=-reg] -> %gave.
 
-  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %walk.
-  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %sleep.
-  //    VERB[trans=-, stat=-, pres=+s, past=+ed] -> %stink.
+  ["kiss", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
+  ["box", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
+  ["watch", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
+  ["crash", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
 
+  ["like", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["seize", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["tie", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["free", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["love", {type: "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["surprise", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["fascinate", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["admire", {type: "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  
       
   
   // prepositions
