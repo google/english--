@@ -674,11 +674,7 @@ const DrtSyntax = `
 
       N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
 
-      PRO[num=sing, gen=male, case=+nom] -> %he.
-      PRO[num=sing, gen=male, case=-nom] -> %him.
-
-      PRO[num=sing, gen=fem, case=+nom] -> %she.
-      PRO[num=sing, gen=fem, case=-nom] -> %her.
+      PRO[num=1, gen=2, case=3] -> %PRO.
 
       PRO[num=sing, gen=-hum, case=[-nom, +nom]] -> %it.
 
@@ -785,7 +781,7 @@ const keywords = [
   "only", "not", "majority", "of", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
 
-  "then", "who", "and", "or", "he", "him", "she", "her",
+  "then", "who", "and", "or",
   "they", "them", "himself", "herself", "it", "itself", "does", "did",
 
   "will", "would", "which", "is", "are", "was", "were", "be", "been",
@@ -827,6 +823,12 @@ const dict = [
   ["Brazil", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
   ["Ulysses", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
 
+  // pronouns
+  ["he", {type: "PRO", types: {"num": "sing", "gen": "male", "case": "+nom"}}],
+  ["him", {type: "PRO", types: {"num": "sing", "gen": "male", "case": "-nom"}}],
+  ["she", {type: "PRO", types: {"num": "sing", "gen": "fem", "case": "+nom"}}],
+  ["her", {type: "PRO", types: {"num": "sing", "gen": "fem", "case": "-nom"}}],
+  
   // nouns
   ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
   ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
