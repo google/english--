@@ -1,8 +1,13 @@
 class Lexer {
   constructor(tokens) {
     this.buffer = "";
-    this.tokens = tokens;
-    
+    this.tokens = [];
+    this.load(tokens);
+  }
+
+  load(tokens) {
+    // console.log(tokens);
+    this.tokens = this.tokens.concat(tokens);
     this.tokens.sort(([a], [b]) => {
       if (a < b) {
         return -1;
@@ -11,10 +16,7 @@ class Lexer {
       }
       return 0;
     });
-
-    //this.tokens.map(([key, value]) => {
-      // value["value"] = key;
-    //});
+    // console.log(this.tokens);
   }
     
   next() {

@@ -339,10 +339,8 @@ describe("Lexer", function() {
     let parser = new Parser(start, header, footer, body);
     let results = parser.feed(s);
     if (start == "Statement") {
-      // console.log(results);
       return clear(results[0].children[0].children[0]);
     }
-    // console.log(results);
     return clear(results[0]);
   }
 
@@ -449,6 +447,68 @@ describe("Lexer", function() {
     }]);
   });
 
+  it("age-old", function() {
+    const {adj} = require("./lexicon.js");
+    const tokens = adj.map((word) => {
+      return [word, "word", [{
+        "@type": "ADJ"
+      }]];
+    });
+    let grammar = FeaturedNearley.compile(`
+       main -> ADJ. 
+
+       ADJ[] -> %word.
+    `, `
+      @{%
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+       # Pass your lexer object using the @lexer option:
+       @lexer lexer
+    `);
+
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("age-old");
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": [{
+        "@type": "ADJ",
+        "children": [{value: "age-old"}]
+      }],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+
+  it("Jones loves a foo woman.", function() {
+    const {Parser} = DRT;
+    let parser = new Parser("Statement");
+    parser.load([["foo", "word", [{"@type": "ADJ"}]]]);
+    let results = parser.feed("Jones loves a foo woman.");
+    assertThat(clear(results[0].children[0].children[0]))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(DET("a"), N(ADJ("foo"), N("woman")))
+                        ))
+                 ));
+  });
+  
+  it.skip("Jones loves an awesome woman.", function() {
+    const {adj} = require("./lexicon.js");
+    const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    const {Parser} = DRT;
+    // console.log(tokens);
+    let parser = new Parser("Statement");
+    parser.load(tokens);
+    let results = parser.feed("Jones loves a married woman.");
+    assertThat(clear(results[0].children[0].children[0]))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(DET("a"), N(ADJ("foo"), N("woman")))
+                        ))
+                 ));
+  });
+
   it("every porsche", function() {
     assertThat(parse("every porsche", "NP"))
       .equalsTo(NP(DET("every"), N("porsche")));
@@ -541,19 +601,19 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
-  it.skip("Moo", async function() {
+  it.skip("Generate", async function() {
     this.timeout(500000);
     const fs = require("fs");
     const readline = require("readline");
 
-    const stream = fs.createReadStream("tests/drt/clex_lexicon.pl");
+    const stream = fs.createReadStream("./tests/drt/clex_lexicon.pl");
 
     const rl = readline.createInterface({
       input: stream,
     });
 
     let parts = {};
-    // console.log("loading");
+    console.log("loading");
     for await (const line of rl) {
       const parser = new Parser(Grammar.fromCompiled(grammar));
       parser.feed(line + "\n");
@@ -565,6 +625,10 @@ describe("Lexer", function() {
       if (name == "%") {
         continue;
       }
+
+      // console.log(result);
+      // break;
+      
       let [[, args]] = result;
       if (!parts[name]) {
         parts[name] = [];
@@ -574,26 +638,20 @@ describe("Lexer", function() {
       if (name == "prep") {
         break;
       }
+      // break;
     }
 
     // console.log(Object.keys(parts));
-    parts["WS"] = /[ \t]+/;
-    for (let adv of parts["adv"]) {
-      console.log(adv);
-    }
-    let lexer = moo.compile(parts);
-    // console.log("done compiling");
-    lexer.reset("clip-on cast-off awkwardly ");
-    // console.log("done reseting");
-    assertThat(lexer.next().type).equalsTo("adj_itr");
-    assertThat(lexer.next().type).equalsTo("WS");
-    assertThat(lexer.next().type).equalsTo("adj_itr");
-    assertThat(lexer.next().type).equalsTo("WS");
-    assertThat(lexer.next().type).equalsTo("adj_itr");
-    assertThat(lexer.next().type).equalsTo("mn_pl");
-    assertThat(lexer.next().type).equalsTo("mn_pl");
-    assertThat(lexer.next().type).equalsTo("WS");
-    console.log("done testing");
+    let words = parts["adj_itr"];
+    let file = `
+const adj = ${JSON.stringify(words, undefined, 2)};
+module.exports = {
+  adj: adj
+};
+`;
+    fs.writeFileSync("./test/drt/lexicon.js", file);
+    
+    // console.log("hi");
   });
 });
 

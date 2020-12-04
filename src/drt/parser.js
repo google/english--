@@ -43,6 +43,8 @@ class Nearley {
   // console.log(code);
   eval(code);
 
+  // console.log(module.exports.Lexer);
+   
   return module.exports;
  }
 
@@ -1004,13 +1006,9 @@ let DRTGrammar;
 function drtGrammar(header, footer = "", body = DrtSyntax) {
   header = header || `
       @{%
-        // const {Lexer} = require("./lexer.js");
-        // console.log(Lexer);
-        const lexer = new Lexer(${JSON.stringify(dict.concat(keywords))});
+        const lexer = new Lexer(dict.concat(keywords));
         // NOTE(goto): this only gets called once per test
         // so gets reused. We need to figure out why and fix it.
-        // console.log("new lexer");
-        // throw new Error("foobar");
       %}
       @lexer lexer
       _ -> %WS:* {% function(d) {return null;} %}
@@ -1031,7 +1029,13 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
 
 class Parser {
   constructor (start, header, footer, body){
-    this.parser = new Nearley(drtGrammar(header, footer, body), start);
+    const grammar = drtGrammar(header, footer, body);
+    this.parser = new Nearley(grammar, start);
+    this.lexer = this.parser.parser.lexer;;
+  }
+
+  load(tokens) {
+    this.lexer.load(tokens);
   }
 
   feed(code) {
