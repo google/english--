@@ -479,16 +479,30 @@ class FeaturedNearley {
         }
       }
       feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
-      if (tail.length == 1 && `%${head.name}` == tail[0]) {
-        // For A[] -> %A rules, we special case and enforce that
+      if (tail.length == 1 && tail[0] == "%word") {
+        // For A[] -> %word rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
+        // console.log("hi: " + head.name);
         feed(`([token], location, reject) => {
+          //console.log("hello");
           for (let match of token.tokens) {
+            //console.log("foo");
+            //console.log(match);
+            // console.log("${head.name}");
+            //console.log(${JSON.stringify(head)});
+            // console.log(${JSON.stringify(tail[0])});
+            // console.log("${tail[0]}");
             let result = bind("${head.name}", ${JSON.stringify(head.types)}, [
-              {"@type": "${tail[0]}", "types": ${JSON.stringify(head.types)}}, 
+              {"@type": "${head.name}", "types": ${JSON.stringify(head.types)}}, 
             ])([match], location, reject);
+            // console.log(result);
             if (result != reject) {
-              return result;
+              // console.log(result.children[0]);
+              // console.log(token);
+              let node = JSON.parse(JSON.stringify(result.children[0]));
+              node.children = [{value: token.value}];
+              // node.value = token.value; 
+              return node;
             }
           }
           return reject;
@@ -792,14 +806,13 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
-      PN[num=1, gen=2] -> %PN.
-
       N[num=sing, gen=1, plur=s] -> %brazilian.
       
-      ADJ -> %ADJ.
-      N[num=1, gen=2, plur=3] -> %N.      
-      RN[num=1, gen=2] -> %RN.
-      VERB[trans=1, stat=2, pres=3, past=4] -> %VERB.      
+      PN[num=1, gen=2] -> %word.
+      ADJ -> %word.
+      N[num=1, gen=2, plur=3] -> %word.      
+      RN[num=1, gen=2] -> %word.
+      VERB[trans=1, stat=2, pres=3, past=4] -> %word.
 `;
 
 const keywords = [
@@ -824,7 +837,7 @@ const keywords = [
   "it", "itself",
 
   "then", "who", "and", "or",
-  "they", "them", "himself", "herself", "it", "itself", "does", "did",
+  // "they", "them", "himself", "herself", "it", "itself", "does", "did",
 
   "does", "did",
   "will", "would",
@@ -840,145 +853,145 @@ const keywords = [
   "s", "es", "ies", "ed", "d", "ied", "led", "red",
 
   "brazilian",
-].map((keyword) => [keyword, {type: keyword}]);
+].map((keyword) => [keyword, keyword, []]);
 
 const dict = [
-  [" ", {type: "WS"}],
-  [".", {type: "PERIOD"}],
-  ["?", {type: "QUESTION"}],
-  ["'s", {type: "POSS"}],
+  [" ", "WS"],
+  [".", "PERIOD"],
+  ["?", "QUESTION"],
+  ["'s", "POSS"],
 
-  ["if", {type: "__if__"}],
-  ["do", {type: "__do__"}],
+  ["if", "__if__"],
+  ["do", "__do__"],
 
-  ["in", {type: "__in__"}],
-  ["with", {type: "__with__"}],
-  ["for", {type: "__for__"}],
-  ["of", {type: "__of__"}],
+  ["in", "__in__"],
+  ["with", "__with__"],
+  ["for", "__for__"],
+  ["of", "__of__"],
 ].concat([
   // proper names
-  ["Socrates", {type: "PN", types: {"num": "sing", "gen": "male"}}],
-  ["Jones", {type: "PN", types: {"num": "sing", "gen": "male"}}],
-  ["John", {type: "PN", types: {"num": "sing", "gen": "male"}}],
-  ["Smith", {type: "PN", types: {"num": "sing", "gen": "male"}}],
-  ["Mary", {type: "PN", types: {"num": "sing", "gen": "fem"}}],
-  ["Brazil", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
-  ["Ulysses", {type: "PN", types: {"num": "sing", "gen": "-hum"}}],
+  ["Socrates", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  ["Jones", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  ["John", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  ["Smith", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  ["Mary", "word", [{"@type": "PN", types: {"num": "sing", "gen": "fem"}}]],
+  ["Brazil", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
+  ["Ulysses", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
   
   // nouns
-  ["man", {type: "N", types: {"num": "sing", "gen": "male"}}],
-  ["woman", {type: "N", types: {"num": "sing", "gen": "fem"}}],
-  ["men", {type: "N", types: {"num": "plur", "gen": "male"}}],
-  ["women", {type: "N", types: {"num": "plur", "gen": "fem"}}],
-  ["girl", {type: "N", types: {"num": "sing", "gen": "fem", "plur": "s"}}],
-  ["book", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["telescope", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["donkey", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["horse", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["cat", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["porsche", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}],
-  ["dish", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
-  ["witch", {type: "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}],
-  ["judge", {type: "N", types: {"num": "sing", "gen": 1, "plur": "es"}}],
-  ["engineer", {type: "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}],
+  ["man", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
+  ["woman", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
+  ["men", "word", [{"@type": "N", types: {"num": "plur", "gen": "male"}}]],
+  ["women", "word", [{"@type": "N", types: {"num": "plur", "gen": "fem"}}]],
+  ["girl", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem", "plur": "s"}}]],
+  ["book", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["telescope", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["donkey", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["horse", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["cat", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["porsche", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["dish", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}]],
+  ["witch", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}]],
+  ["judge", "word", [{"@type": "N", types: {"num": "sing", "gen": 1, "plur": "es"}}]],
+  ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}]],
 
   // RNs
   
-  ["brother", {type: "RN", types: {"num": "sing", "gen": "male"}}],
-  ["father", {type: "RN", types: {"num": "sing", "gen": "male"}}],
-  ["husband", {type: "RN", types: {"num": "sing", "gen": "male"}}],
-  ["sister", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
-  ["mother", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
-  ["wife", {type: "RN", types: {"num": "sing", "gen": "fem"}}],
+  ["brother", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
+  ["father", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
+  ["husband", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
+  ["sister", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
+  ["mother", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
+  ["wife", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
 
   // verbs
-  ["beat", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["listen", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["own", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["walk", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["sleep", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["stink", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["leave", {type: "VERB", types: {
-    "trans": 1, "stat": "-", "pres": "+s"}}],
-  ["left", {type: "VERB", types: {
-    "trans": 1, "stat": "-", "past": "-reg"}}],
-  ["come", {type: "VERB", types: {
-    "trans": 1, "stat": "-", "pres": "+s"}}],
-  ["came", {type: "VERB", types: {
-    "trans": 1, "stat": "-", "past": "-reg"}}],
-  ["give", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s"}}],
-  ["gave", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "past": "-reg"}}],
+  ["beat", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["listen", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["own", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["walk", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["sleep", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["stink", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["leave", "word", [{"@type": "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s"}}]],
+  ["left", "word", [{"@type": "VERB", types: {
+    "trans": 1, "stat": "-", "past": "-reg"}}]],
+  ["come", "word", [{"@type": "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s"}}]],
+  ["came", "word", [{"@type": "VERB", types: {
+    "trans": 1, "stat": "-", "past": "-reg"}}]],
+  ["give", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s"}}]],
+  ["gave", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "past": "-reg"}}]],
 
-  ["kiss", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
-  ["box", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
-  ["watch", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
-  ["crash", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}],
+  ["kiss", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
+  ["box", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
+  ["watch", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
+  ["crash", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
 
-  ["like", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["seize", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["tie", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["free", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["love", {type: "VERB", types: {
-    "trans": 1, "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["surprise", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["fascinate", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
-  ["admire", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}],
+  ["like", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["seize", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["tie", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["free", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["love", "word", [{"@type": "VERB", types: {
+    "trans": 1, "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["surprise", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["fascinate", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  ["admire", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
   
-  ["ski", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["echo", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["ski", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["echo", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
   
-  ["play", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["decay", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}],
-  ["enjoy", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}],
+  ["play", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["decay", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  ["enjoy", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
   
-  ["cr", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
-  ["appl", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
-  ["cop", {type: "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+ies", "past": "+ied"}}],
-  ["repl", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
-  ["tr", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}],
+  ["cr", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}]],
+  ["appl", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}]],
+  ["cop", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "+ies", "past": "+ied"}}]],
+  ["repl", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}]],
+  ["tr", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+ies", "past": "+ied"}}]],
   
-  ["compel", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+led"}}],
-  ["defer", {type: "VERB", types: {
-    "trans": "-", "stat": "-", "pres": "+s", "past": "+red"}}],    
+  ["compel", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+led"}}]],
+  ["defer", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "pres": "+s", "past": "+red"}}]],    
   
   // Adjectives
-  ["happy", {type: "ADJ"}],
-  ["unhappy", {type: "ADJ"}],
-  ["foolish", {type: "ADJ"}],  
-  ["fast", {type: "ADJ"}],    
-  ["beautiful", {type: "ADJ"}],
-  ["mortal", {type: "ADJ"}],
-  ["married", {type: "ADJ"}],
+  ["happy", "word", [{"@type": "ADJ"}]],
+  ["unhappy", "word", [{"@type": "ADJ"}]],
+  ["foolish", "word", [{"@type": "ADJ"}]],  
+  ["fast", "word", [{"@type": "ADJ"}]],    
+  ["beautiful", "word", [{"@type": "ADJ"}]],
+  ["mortal", "word", [{"@type": "ADJ"}]],
+  ["married", "word", [{"@type": "ADJ"}]],
 
   // TODO: the following can't be added because
   // it conflicts with the token for the brazilian

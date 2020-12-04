@@ -737,24 +737,25 @@ describe("FeaturedNearley", function() {
              return true;
            },
            reset(chunk, state) {
+             this.i = 0;
            },
            save() {
            },
            next() {
              // console.log("next");
-             if (this.parsed) {
-               return;
+             this.i++;
+             if (this.i == 3) {
+               return undefined;
              }
-             this.parsed = true;
              return {
                "value": "foo", 
-               "type": "foo",
+               "type": "word",
                "tokens": [{
-                 "@type": "%bar", 
-                 "types": {"c": "d"}
+                 "@type": "N", 
+                 "types": {}
                }, {
-                 "@type": "%foo", 
-                 "types": {"a": "b"}
+                 "@type": "ADJ", 
+                 "types": {}
                }]
              };
            },
@@ -765,25 +766,25 @@ describe("FeaturedNearley", function() {
        @lexer lexer
     `;
     let grammar = FeaturedNearley.compile(`
-       main -> foo[a=b].
-       foo[a=b] -> %foo.
+       main -> ADJ N.
+       ADJ[] -> %word.
+       N[] -> %word.
     `, header);
 
     let parser = new Nearley(grammar, "main");
 
-    let result = parser.feed("foo");
-    // return;
+    let result = parser.feed("foobar");
     assertThat(result).equalsTo([{
       "@type": "main",
       "children": [{
-        "@type": "foo",
-        "children": [{
-          "@type": "%foo",
-          "types": {"a": "b"}
-        }],
-        "loc": 0,
+        "@type": "ADJ",
+        "children": [{"value": "foo"}],
         "types": {
-          "a": "b"
+        }
+      }, {
+        "@type": "N",
+        "children": [{"value": "foo"}],
+        "types": {
         }
       }],
       "loc": 0,

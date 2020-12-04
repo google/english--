@@ -2,7 +2,6 @@ class Lexer {
   constructor(tokens) {
     this.buffer = "";
     this.tokens = tokens;
-    // console.log(tokens);
     
     this.tokens.sort(([a], [b]) => {
       if (a < b) {
@@ -13,9 +12,9 @@ class Lexer {
       return 0;
     });
 
-    this.tokens.map(([key, value]) => {
-      value["value"] = key;
-    });
+    //this.tokens.map(([key, value]) => {
+      // value["value"] = key;
+    //});
   }
     
   next() {
@@ -32,18 +31,18 @@ class Lexer {
       } else if (result == 1) {
         q = m - 1;
       } else {
-        ///console.log("found a match!");
-        //console.log(this.tokens[m]);
+        // console.log(`found a match: [${word}]!`);
+        let result = this.tokens[m];
         let n = m + 1;
         while (n < this.tokens.length) {
           let [next] = this.tokens[n];
+          // console.log(`next? ${next}, prefix? ${next.startsWith(word)}, match? ${this.match(next)}`);
           if (!next.startsWith(word)) {
             break;
           }
-
           if (this.match(next) == 0) {
-            word = this.tokens[n][0];
-            value = this.tokens[n][1];
+            result = this.tokens[n];
+            // console.log(result);
           }
 
           if (next.length > this.buffer.length &&
@@ -56,23 +55,15 @@ class Lexer {
           n++;
         }
 
-        this.eat(word);
-        //console.log("eat: ");
-        // console.log(value);
+        // let result = this.tokens[n - 1];
+        // value = this.tokens[n][1];
+        this.eat(result[0]);
+        // console.log(`eat: ${result[0]}`);
         return {
-          "type": value["type"],
-          "value": value.value,
-          "tokens": [{
-            "@type": "%" + value["type"],
-            "types": value["types"] || {},
-            "value": value.value,
-          }]
+          "type": result[1],
+          "value": result[0],
+          "tokens": result[2] || []
         };
-        // console.log(value);
-        // return result;
-        // value["@type"] = "%" + value["type"];
-        // value["types"] = value["types"] || {};
-        return value;
       }
     }
     // console.log("eat: oops, need more food!");
@@ -109,10 +100,12 @@ class Lexer {
     return token;
   }
   has(name) {
-    for (let [key, {type}] of this.tokens) {
+    for (let [key, type, types] of this.tokens) {
+      //for (let {type} of types) {
       if (name == type) {
         return true;
       }
+      //}
     }
 
     throw new Error("Symbol not available in the lexicon: " + name);

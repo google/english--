@@ -2,7 +2,7 @@ const Assert = require("assert");
 const moo = require("moo");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
-const {Nearley} = require("../../src/drt/parser.js");
+const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
 const {Lexer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const {
@@ -34,9 +34,9 @@ describe("Lexer", function() {
 
   it("Lexer", () => {
     let lexer = new Lexer([
-      ["foo", {type: "WORD"}],
-      [" ", {type: "WS"}],
-      [".", {type: "PERIOD"}],
+      ["foo", "WORD"],
+      [" ", "WS"],
+      [".", "PERIOD"],
     ]);
     lexer.reset("foofoo foo.");
     assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
@@ -49,28 +49,28 @@ describe("Lexer", function() {
 
   it("longest string: direct next isnt a substring", () => {
     let lexer = new Lexer([
-      ["foo", {type: "a"}],
-      ["the", {type: "a"}],
-      ["them", {type: "a"}],
-      ["then", {type: "a"}],
+      ["foo", "a"],
+      ["the", "a"],
+      ["them", "a"],
+      ["then", "a"],
     ]);
     lexer.reset("then");
     assertThat(lexer.next()).equalsTo(token("a", "then"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
-  it("if Mary is happy then Jones is happy.", () => {
+  it.skip("if Mary is happy then Jones is happy.", () => {
     let lexer = new Lexer([
-      [" ", {type: "word", value: "WS"}],
-      [".", {type: "word", value: "."}],
-      ["the", {type: "word", value: "the"}],
-      ["them", {type: "word", value: "them"}],
-      ["if", {type: "word", value: "if"}],
-      ["Mary", {type: "word", value: "Mary"}],
-      ["is", {type: "word", value: "is"}],
-      ["happy", {type: "word", value: "happy"}],
-      ["then", {type: "word", value: "happy"}],
-      ["Jones", {type: "word", value: "happy"}],
+      [" ", "word"],
+      [".", "word"],
+      ["the", "word"],
+      ["them", "word"],
+      ["if", "word"],
+      ["Mary", "word"],
+      ["is", "word"],
+      ["happy", "word"],
+      ["then", "word"],
+      ["Jones", "word"],
     ]);
     lexer.reset("if Mary is happy then Jones is happy.");
     assertThat(lexer.next()).equalsTo(token("word", "if"));
@@ -95,9 +95,9 @@ describe("Lexer", function() {
 
   it("match", () => {
     let lexer = new Lexer([
-      ["bar", {type: "bar", value: "bar"}],
-      ["foo", {type: "WORD", value: "foo"}],
-      ["football", {type: "WORD", value: "football"}],
+      ["bar"],
+      ["foo"],
+      ["football"],
     ]);
     lexer.reset("foo");
     assertThat(lexer.match("foo")).equalsTo(0);
@@ -107,9 +107,9 @@ describe("Lexer", function() {
 
   it("longest string: needs more to be seen", () => {
    let lexer = new Lexer([
-     ["bar", {"type": "bar", value: "bar"}],
-     ["foo", {"type": "foo", value: "foo"}],
-     ["football", {"type": "football", value: "football"}],
+     ["bar", "bar"],
+     ["foo", "foo"],
+     ["football", "football"],
     ]);
     
     lexer.reset("foo");
@@ -122,10 +122,10 @@ describe("Lexer", function() {
 
   it("longest string", () => {
     let lexer = new Lexer([
-      ["a", {type: "a", value: "a"}],
-      ["he", {type: "he", value: "he"}],
-      ["her", {type: "her", value: "her"}],
-      ["herself", {type: "herself", value: "herself"}],
+      ["a", "a"],
+      ["he", "he"],
+      ["her", "her"],
+      ["herself", "herself"],
     ]);
     
     lexer.reset("herself");
@@ -135,12 +135,12 @@ describe("Lexer", function() {
 
   it("next", () => {
     let lexer = new Lexer([
-      [" ", {type: "WS"}],
-      [".", {type: "PERIOD"}],
-      ["bar", {type: "bar"}],
-      ["man", {type: "WORD"}],
-      ["foo", {type: "WORD"}],
-      ["football", {type: "WORD"}],
+      [" ", "WS"],
+      [".", "PERIOD"],
+      ["bar", "bar"],
+      ["man", "WORD"],
+      ["foo", "WORD"],
+      ["football", "WORD"],
     ]);
     
     lexer.reset("foo");
@@ -165,12 +165,11 @@ describe("Lexer", function() {
 
   it("man", () => {
     const tokens = [
-      ["man", {type: "WORD"}],
+      ["man", "WORD"],
     ];
 
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -183,7 +182,7 @@ describe("Lexer", function() {
   
   it("bar", () => {
     const tokens = [
-      ["bar", {type: "bar"}],
+      ["bar", "bar"],
     ];
     let parser = Nearley.from(`
       @{%
@@ -200,12 +199,11 @@ describe("Lexer", function() {
 
   it("foobar", () => {
     const tokens = [
-      ["foo", {type: "WORD", value: "foo"}],
-      ["bar", {type: "bar", value: "bar"}],
+      ["foo", "WORD"],
+      ["bar", "bar"],
     ];
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -219,13 +217,12 @@ describe("Lexer", function() {
   
   it("f, o, o, b", () => {
     const tokens = [
-      ["foo", {type: "WORD"}],
-      ["bar", {type: "bar"}],
-      ["football", {type: "WORD"}],
+      ["foo", "WORD"],
+      ["bar", "bar"],
+      ["football", "WORD"],
     ];
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -239,13 +236,12 @@ describe("Lexer", function() {
 
   it("football", () => {
     const tokens = [
-      ["foo", {type: "WORD"}],
-      ["bar", {type: "bar"}],
-      ["football", {type: "WORD"}],
+      ["foo", "WORD"],
+      ["bar", "bar"],
+      ["football", "WORD"],
     ];
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -257,13 +253,12 @@ describe("Lexer", function() {
 
   it("foot, ball", () => {
     const tokens = [
-      ["foo", {type: "WORD"}],
-      ["bar", {type: "bar"}],
-      ["football", {type: "WORD"}],
+      ["foo", "WORD"],
+      ["bar", "bar"],
+      ["football", "WORD"],
     ];
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -277,16 +272,15 @@ describe("Lexer", function() {
 
   it("Jones loves Mary.", () => {
     const tokens = [
-      [" ", {type: "WS"}],
-      [".", {type: "PERIOD"}],
-      ["Jones", {type: "PN"}],
-      ["loves", {type: "V"}],
-      ["Mary", {type: "PN"}],
+      [" ", "WS"],
+      [".", "PERIOD"],
+      ["Jones", "PN"],
+      ["loves", "V"],
+      ["Mary", "PN"],
     ];
 
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
         const lexer = new Lexer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
@@ -302,6 +296,25 @@ describe("Lexer", function() {
       .equalsTo([[
         token("PN", "Jones"), [token("V", "loves"), token("PN", "Mary")]
       ]]);
+  });
+
+  it("brazilian", () => {
+    const tokens = [
+      ["brazilian", "WORD", [{type: "N"}]],
+    ];
+
+    let parser = Nearley.from(`
+      @{%
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+      @lexer lexer
+      main -> %WORD
+    `);
+    assertThat(parser.feed("brazilian")).equalsTo([[
+      token("WORD", "brazilian", [{
+        "type": "N",
+      }])
+    ]]);
   });
 
   function clear(root) {
@@ -346,6 +359,51 @@ describe("Lexer", function() {
     ["dog", {type: "N"}],
   ];
     
+  it("Typed Tokens", function() {
+    const tokens = [
+      ["foo", "word", [{
+        "@type": "N",
+        "types": {
+          "num": "sing",
+        }
+      }]],
+      ["bar", "word", [{
+        "@type": "ADJ",
+        "types": {"foo": "bar"}
+      }]],  
+    ];
+    let grammar = FeaturedNearley.compile(`
+       main -> N[num=1] ADJ. 
+
+       ADJ[] -> %word.
+       N[num=1] -> %word.
+    `, `
+      @{%
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+       # Pass your lexer object using the @lexer option:
+       @lexer lexer
+    `);
+
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("foobar");
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": [{
+        "@type": "N",
+        "types": {"num": "sing"},
+        "children": [{value: "foo"}]
+      }, {
+        "@type": "ADJ",
+        "types": {"foo": "bar"},
+        "children": [{value: "bar"}]
+      }],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+
   it("every porsche", function() {
     assertThat(parse("every porsche", "NP"))
       .equalsTo(NP(DET("every"), N("porsche")));
@@ -406,29 +464,25 @@ describe("Lexer", function() {
                   VP_(VP(V(VERB("love"), "s"), NP(DET("a"), N("dog"))))));
   });
 
-  let token = (type, value) => {
+  let token = (type, value, tokens = []) => {
     return {
       "type": type,
       "value": value,
-      "tokens": [{
-        "@type": "%" + type,
-        "value": value,
-        "types": {},
-      }]
+      "tokens": tokens
     };
   };
     
   it("Jones loves a dog.", () => {
     const lexer = new Lexer([
-      [" ", {type: "WS"}],
-      [".", {type: "PERIOD"}],
-      ["a", {type: "DET"}],
-      ["Jones", {type: "PN"}],
-      ["loves", {type: "V"}],
-      ["happy", {type: "ADJ"}],
-      ["bar", {type: "ADJ"}],
-      ["Mary", {type: "PN"}],
-      ["dog", {type: "N"}],
+      [" ", "WS"],
+      [".", "PERIOD"],
+      ["a", "DET"],
+      ["Jones", "PN"],
+      ["loves", "V"],
+      ["happy", "ADJ"],
+      ["bar", "ADJ"],
+      ["Mary", "PN"],
+      ["dog", "N"],
     ]);
     lexer.reset("Jones loves a dog.");
     assertThat(lexer.next()).equalsTo(token("PN", "Jones"));
