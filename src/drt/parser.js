@@ -806,8 +806,6 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
-      N[num=sing, gen=1, plur=s] -> %brazilian.
-      
       PN[num=1, gen=2] -> %word.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      
@@ -851,8 +849,6 @@ const keywords = [
 
   // verbs
   "s", "es", "ies", "ed", "d", "ied", "led", "red",
-
-  "brazilian",
 ].map((keyword) => [keyword, keyword, []]);
 
 const dict = [
@@ -993,24 +989,19 @@ const dict = [
   ["mortal", "word", [{"@type": "ADJ"}]],
   ["married", "word", [{"@type": "ADJ"}]],
 
-  // TODO: the following can't be added because
-  // it conflicts with the token for the brazilian
-  // as a noun. we are going to have to deal with
-  // the ambiguity there.
-  // ["brazilian", {type: "ADJ"}],
+  // Some words can take multiple roles
+  ["brazilian", "word", [{
+    "@type": "ADJ"
+  }, {
+    "@type": "N",
+    "types": {"num": "sing", "plur": "s"}
+  }]],
+      
 ]);
 
 let DRTGrammar;
 
 function drtGrammar(header, footer = "", body = DrtSyntax) {
-  // feed(`@builtin "whitespace.ne"`);
-  // feed(`@builtin "number.ne"`);
-  // header = `
-  //                    @builtin "whitespace.ne"
-  //                    @builtin "number.ne"
-  //                    Discourse -> Sentence:+
-  // `
-  // console.log(header);
   header = header || `
       @{%
         // const {Lexer} = require("./lexer.js");

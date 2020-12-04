@@ -1125,6 +1125,28 @@ describe("DRS", function() {
     `);
   });
 
+  it("Jones likes a brazilian engineer", function() {
+    assertThat("Jones likes a brazilian engineer.")
+     .equalsTo(`
+       let a, b
+       Jones(a)
+       brazilian(b)
+       engineer(b)
+       likes(a, b)
+    `);
+  });
+  
+  it("Jones likes a married brazilian", function() {
+    assertThat("Jones likes a married brazilian.")
+     .equalsTo(`
+       let a, b
+       Jones(a)
+       married(b)
+       brazilian(b)
+       likes(a, b)
+    `);
+  });
+
   it("Jones is behind Mary", function() {
     assertThat("Jones is behind Mary.")
      .equalsTo(`

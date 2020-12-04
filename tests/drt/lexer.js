@@ -404,6 +404,51 @@ describe("Lexer", function() {
     }]);
   });
 
+  it("brazilian brazilian", function() {
+    const tokens = [
+      ["brazilian", "word", [{
+        "@type": "N",
+        "types": {
+          "num": "sing",
+        }
+      }, {
+        "@type": "ADJ",
+        "types": {}
+      }]],
+      ["bar", "word", []],  
+    ];
+    let grammar = FeaturedNearley.compile(`
+       main -> N[num=1] ADJ. 
+
+       ADJ[] -> %word.
+       N[num=1] -> %word.
+    `, `
+      @{%
+        const lexer = new Lexer(${JSON.stringify(tokens)});
+      %}
+       # Pass your lexer object using the @lexer option:
+       @lexer lexer
+    `);
+
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("brazilianbrazilian");
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": [{
+        "@type": "N",
+        "types": {"num": "sing"},
+        "children": [{value: "brazilian"}]
+      }, {
+        "@type": "ADJ",
+        "types": {},
+        "children": [{value: "brazilian"}]
+      }],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+
   it("every porsche", function() {
     assertThat(parse("every porsche", "NP"))
       .equalsTo(NP(DET("every"), N("porsche")));
