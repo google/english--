@@ -3,7 +3,7 @@ const moo = require("moo");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
 const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
-const {Lexer} = require("../../src/drt/lexer.js");
+const {Tokenizer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const {
   Statement,
@@ -32,8 +32,8 @@ const {
 
 describe("Lexer", function() {
 
-  it("Lexer", () => {
-    let lexer = new Lexer([
+  it("Tokenizer", () => {
+    let lexer = new Tokenizer([
       ["foo", "WORD"],
       [" ", "WS"],
       [".", "PERIOD"],
@@ -48,7 +48,7 @@ describe("Lexer", function() {
   });
 
   it("longest string: direct next isnt a substring", () => {
-    let lexer = new Lexer([
+    let lexer = new Tokenizer([
       ["foo", "a"],
       ["the", "a"],
       ["them", "a"],
@@ -93,7 +93,7 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
-  it("match", () => {
+  it.skip("match", () => {
     let lexer = new Lexer([
       ["bar"],
       ["foo"],
@@ -106,7 +106,7 @@ describe("Lexer", function() {
   });
 
   it("longest string: needs more to be seen", () => {
-   let lexer = new Lexer([
+   let lexer = new Tokenizer([
      ["bar", "bar"],
      ["foo", "foo"],
      ["football", "football"],
@@ -121,7 +121,7 @@ describe("Lexer", function() {
   });
 
   it("longest string", () => {
-    let lexer = new Lexer([
+    let lexer = new Tokenizer([
       ["a", "a"],
       ["he", "he"],
       ["her", "her"],
@@ -134,7 +134,7 @@ describe("Lexer", function() {
   });
 
   it("next", () => {
-    let lexer = new Lexer([
+    let lexer = new Tokenizer([
       [" ", "WS"],
       [".", "PERIOD"],
       ["bar", "bar"],
@@ -170,7 +170,8 @@ describe("Lexer", function() {
 
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+            ${Tokenizer.toString()}
+            const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> %WORD
@@ -186,8 +187,8 @@ describe("Lexer", function() {
     ];
     let parser = Nearley.from(`
       @{%
-        ${Lexer.toString()}
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> "bar"
@@ -204,7 +205,8 @@ describe("Lexer", function() {
     ];
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+            ${Tokenizer.toString()}
+            const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> (%WORD | "bar"):+
@@ -223,7 +225,8 @@ describe("Lexer", function() {
     ];
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+            ${Tokenizer.toString()}
+            const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> %WORD
@@ -242,7 +245,8 @@ describe("Lexer", function() {
     ];
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> %WORD
@@ -259,7 +263,8 @@ describe("Lexer", function() {
     ];
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> %WORD
@@ -281,7 +286,8 @@ describe("Lexer", function() {
 
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> _ S _ {% ([ws1, s, ws2]) => s %}
@@ -305,7 +311,8 @@ describe("Lexer", function() {
 
     let parser = Nearley.from(`
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
       @lexer lexer
       main -> %WORD
@@ -377,7 +384,8 @@ describe("Lexer", function() {
        N[num=1] -> %word.
     `, `
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
        # Pass your lexer object using the @lexer option:
        @lexer lexer
@@ -422,7 +430,8 @@ describe("Lexer", function() {
        N[num=1] -> %word.
     `, `
       @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
+        ${Tokenizer.toString()}
+        const lexer = new Tokenizer(${JSON.stringify(tokens)});
       %}
        # Pass your lexer object using the @lexer option:
        @lexer lexer
@@ -447,7 +456,7 @@ describe("Lexer", function() {
     }]);
   });
 
-  it("age-old", function() {
+  it.skip("age-old", function() {
     const {adj} = require("./lexicon.js");
     const tokens = adj.map((word) => {
       return [word, "word", [{
@@ -480,7 +489,7 @@ describe("Lexer", function() {
     }]);
   });
 
-  it("Jones loves a foo woman.", function() {
+  it.skip("Jones loves a foo woman.", function() {
     const {Parser} = DRT;
     let parser = new Parser("Statement");
     parser.load([["foo", "word", [{"@type": "ADJ"}]]]);
@@ -493,6 +502,68 @@ describe("Lexer", function() {
                  ));
   });
   
+  it("longest string", () => {    
+    let tokens = new Tokenizer();
+    
+    tokens.push(" ", "WS", []);
+    tokens.push("foo", "word", [{a: 1}]);
+    tokens.push("foot", "word", [{b: 2}]);
+
+    assertThat(tokens.has("WS")).equalsTo(true);
+    assertThat(tokens.has("word")).equalsTo(true);
+    assertThat(tokens.has("every")).equalsTo(false);
+    
+    assertThat(tokens.longest("bar")).equalsTo(false);
+    assertThat(tokens.longest("foo")).equalsTo(undefined);
+    assertThat(tokens.longest("f")).equalsTo(undefined);
+    assertThat(tokens.longest("foot")).equalsTo("foot");
+    assertThat(tokens.longest("foo ")).equalsTo("foo");
+    assertThat(tokens.longest("foo hello world")).equalsTo("foo");
+
+    assertThat(tokens.get("foo")).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.get("foot")).equalsTo(token("word", "foot", [{b: 2}]));
+
+    tokens.reset("foo foot");
+    assertThat(tokens.eat("foo")).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.buffer).equalsTo(" foot");
+    assertThat(tokens.eat(" ")).equalsTo(token("WS", " ", []));
+    assertThat(tokens.buffer).equalsTo("foot");
+    assertThat(tokens.eat("foot")).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.buffer).equalsTo("");
+
+    tokens.reset("foo foot");
+    assertThat(tokens.next()).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.buffer).equalsTo(" foot");
+    assertThat(tokens.next()).equalsTo(token("WS", " ", []));
+    assertThat(tokens.buffer).equalsTo("foot");
+    assertThat(tokens.next()).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.buffer).equalsTo("");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("");
+
+    tokens.reset("foo");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("foo");
+    tokens.reset("t");
+    assertThat(tokens.next()).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.buffer).equalsTo("");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("");
+    
+    tokens.reset("foo");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("foo");
+    tokens.reset(" ");
+    assertThat(tokens.next()).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.buffer).equalsTo(" ");
+    assertThat(tokens.next()).equalsTo(token("WS", " ", []));
+    assertThat(tokens.buffer).equalsTo("");
+    assertThat(tokens.next()).equalsTo(undefined);
+    assertThat(tokens.buffer).equalsTo("");
+  });
+  
   it.skip("Jones loves an awesome woman.", function() {
     const {adj} = require("./lexicon.js");
     const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
@@ -500,7 +571,7 @@ describe("Lexer", function() {
     // console.log(tokens);
     let parser = new Parser("Statement");
     parser.load(tokens);
-    let results = parser.feed("Jones loves a married woman.");
+    let results = parser.feed("Jones likes a married woman.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"),
@@ -578,7 +649,7 @@ describe("Lexer", function() {
   };
     
   it("Jones loves a dog.", () => {
-    const lexer = new Lexer([
+    const lexer = new Tokenizer([
       [" ", "WS"],
       [".", "PERIOD"],
       ["a", "DET"],

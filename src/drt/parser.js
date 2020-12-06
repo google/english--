@@ -2,7 +2,7 @@ const nearley = require("nearley");
 const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
-const {Lexer} = require("./lexer.js");
+const {Tokenizer} = require("./lexer.js");
 
 class Nearley {
   constructor(compiled, start) {
@@ -686,8 +686,8 @@ const DrtSyntax = `
       DET[num=plur, quantifier=true] -> %many.
       DET[num=plur, quantifier=true] -> %only.
       DET[num=plur, quantifier=true] -> %not _ %all.
-      DET[num=plur, quantifier=true] -> %the _ %majority _ %of.
-      DET[num=plur, quantifier=true] -> %the _ %minority _ %of.
+      DET[num=plur, quantifier=true] -> %the _ %majority _ %__of__.
+      DET[num=plur, quantifier=true] -> %the _ %minority _ %__of__.
       DET[num=plur, quantifier=true] -> %at _ %least _ unsigned_int.
       DET[num=plur, quantifier=true] -> %at _ %most _ unsigned_int.
       DET[num=plur, quantifier=true] -> %more _ %than _ unsigned_int.
@@ -819,7 +819,7 @@ const keywords = [
   // determiners
   "a", "an", "the",
   "every", "some", "no", "all", "most", "many",
-  "only", "not", "majority", "of", "minority", "at", "least",
+  "only", "not", "majority", "minority", "at", "least",
   "more", "than", "fewer", "exactly",
 
   // prepositions
@@ -835,9 +835,6 @@ const keywords = [
   "they", "them",
   "himself", "herself",
   "it", "itself",
-
-  "then", "who", "and", "or",
-  // "they", "them", "himself", "herself", "it", "itself", "does", "did",
 
   "does", "did",
   "will", "would",
@@ -1006,7 +1003,7 @@ let DRTGrammar;
 function drtGrammar(header, footer = "", body = DrtSyntax) {
   header = header || `
       @{%
-        const lexer = new Lexer(dict.concat(keywords));
+        const lexer = new Tokenizer(dict.concat(keywords));
         // NOTE(goto): this only gets called once per test
         // so gets reused. We need to figure out why and fix it.
       %}
