@@ -21,7 +21,7 @@ class Tokenizer {
   }
   push(str, type, value = []) {
     let ref = this.head;
-    for (let char of str) {
+    for (let char of str.toLowerCase()) {
       ref[char] = ref[char] || {};
       ref = ref[char];
     }
@@ -41,7 +41,7 @@ class Tokenizer {
     let ref = this.head;
     let longest;
     for (let i = 0; i < str.length; i++) {
-      let char = str[i];
+      let char = str[i].toLowerCase();
       // console.log(`char ${char} at #${i}. done? ${ref.done || false}.`);
       if (ref.done) {
         //console.log(this.head["l"]["o"]["v"]["e"]);
@@ -77,10 +77,10 @@ class Tokenizer {
   }
   next() {
     let next = this.longest(this.buffer);
-    // console.log(`buffer: ${this.buffer}, next: ${next}`);
     if (!next) {
       return undefined;
     }
+    // console.log(next);
     return this.eat(next);
   }
   eat(str) {
@@ -90,7 +90,7 @@ class Tokenizer {
   get(str) {
     let ref = this.head;
     for (let char of str) {
-      ref = ref[char];
+      ref = ref[char.toLowerCase()];
     }
     // return ref.done;
     return {

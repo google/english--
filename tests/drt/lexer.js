@@ -768,6 +768,19 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
+  it("case insensitivity", () => {
+    let lexer = new Tokenizer([
+      ["foo", "WORD"],
+      ["Bar", "WORD"],
+      [" ", "WS"],
+      [".", "PERIOD"],
+    ]);
+    lexer.reset("Foobar");
+    assertThat(lexer.next()).equalsTo(token("WORD", "Foo"));
+    assertThat(lexer.next()).equalsTo(token("WORD", "bar"));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it.skip("Generate", async function() {
     this.timeout(500000);
     const fs = require("fs");
