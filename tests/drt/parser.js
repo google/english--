@@ -2409,6 +2409,13 @@ describe("Backwards compatibility", function() {
                  VP_(VP(BE("was"), "not",
                         NP(DET("an"), N("engineer"))))));
   });
+
+  it("Sam Goto kissed Dani.", function() {
+    assertThat(parse("Sam Goto kissed Dani."))
+      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
+                  VP_(VP(V(VERB("kiss"), "ed"),
+                         NP(PN("Dani"))))));
+  });
 });
 
 function assertThat(x) {

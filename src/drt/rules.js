@@ -1043,12 +1043,24 @@ class CRSTEM extends Rule {
   }
   apply({stem}, node, refs) {
     let root = stem.children[0].value;
-    // console.log(root);
     if (node.children.length > 1) {
       root += node.children[1].value;
     }
-    // console.log(root);
     node.children = [root];
+    
+    return [[], [], [], []];
+  }
+}
+
+class CRNAME extends Rule {
+  constructor(ids) {
+    super(ids, PN(PN(capture("first")), PN(capture("last"))));
+  }
+  apply({first, last}, node, refs) {
+    node.children = [{
+      "type": "name",
+      "value": first.children[0].value + "-" + last.children[0].value
+    }];
     
     return [[], [], [], []];
   }
@@ -1271,7 +1283,7 @@ class Rules {
       new CRSTEM(ids),
       new CRPUNCT(ids),
     ];
-    return [[new CRPN(ids)], rules, [new CRPRED(ids)]];
+    return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
   }
 }
 

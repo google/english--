@@ -808,6 +808,7 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
+      PN[num=1, gen=2] -> PN __ PN.
       PN[num=1, gen=2] -> %word.
       PN[num=1, gen=2] -> %name.
       ADJ -> %word.

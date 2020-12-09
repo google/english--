@@ -2,9 +2,10 @@ const {clone, print} = require("./base.js");
 const {parse} = require("./parser.js");
 
 class DRS {
-  constructor([before, rules, after = []]) {
+  constructor([setup, before, rules, after = []]) {
     this.head = [];
     this.body = [];
+    this.setup = setup;
     this.before = before;
     this.rules = rules;
     this.after = after;
@@ -80,7 +81,10 @@ class DRS {
       ref.loc = 0;
     }
     
-    // Resolve all proper names first.
+    // Make simplications.
+    this.process([node], this.setup);
+
+    // Resolve all proper names.
     this.process([node], this.before);
  
     this.body.push(node);

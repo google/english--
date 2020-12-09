@@ -1600,12 +1600,22 @@ describe("DRS", function() {
      `);
   });
 
-  it("Sam likes Google.", function() { 
-    assertThat("Sam likes Google.")
+  it("Sam likes Aristotle.", function() { 
+    assertThat("Sam likes Aristotle.")
      .equalsTo(`
        let a, b
        Sam(a)
-       Google(b)
+       Aristotle(b)
+       likes(a, b)
+     `);
+  });
+
+  it("Sam Goto likes Computer Science.", function() { 
+    assertThat("Sam Goto likes Computer Science.")
+     .equalsTo(`
+       let a, b
+       Sam-Goto(a)
+       Computer-Science(b)
        likes(a, b)
      `);
   });
