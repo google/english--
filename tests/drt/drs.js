@@ -1590,22 +1590,32 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Hello likes World.", function() { 
+  it("Hello likes World.", function() { 
     assertThat("Hello likes World.")
      .equalsTo(`
        let a, b
-       Foo(a)
-       Bar(b)
+       Hello(a)
+       World(b)
        likes(a, b)
      `);
   });
 
-  it.skip("Sam likes Bar.", function() { 
-    assertThat("Sam likes Bar.")
+  it("Sam likes Google.", function() { 
+    assertThat("Sam likes Google.")
      .equalsTo(`
        let a, b
-       Foo(a)
-       Bar(b)
+       Sam(a)
+       Google(b)
+       likes(a, b)
+     `);
+  });
+  
+  it("Sam likes DRT.", function() { 
+    assertThat("Sam likes DRT.")
+     .equalsTo(`
+       let a, b
+       Sam(a)
+       DRT(b)
        likes(a, b)
      `);
   });

@@ -779,8 +779,7 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("Foobar");
-    assertThat(lexer.next()).equalsTo(token("WORD", "Foo"));
-    assertThat(lexer.next()).equalsTo(token("WORD", "bar"));
+    assertThat(lexer.next()).equalsTo(token("name", "Foobar"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
@@ -796,6 +795,30 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("WS", " "));
     assertThat(lexer.next()).equalsTo(token("name", "Goto"));
     assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Jones loves Sam.", function() {
+    const {Parser} = DRT;
+    let parser = new Parser("Statement");
+    let tokenizer = parser.parser.parser.lexer.tokenizer;
+
+    tokenizer.reset("Hello");
+    assertThat(tokenizer.next()).equalsTo(token("name", "Hello"));
+
+    tokenizer.reset("He ");
+    assertThat(tokenizer.next()).equalsTo(token("he", "He"));
+    assertThat(tokenizer.next()).equalsTo(token("WS", " "));
+
+    tokenizer.reset("Sam");
+    assertThat(tokenizer.next()).equalsTo(token("name", "Sam"));
+    
+    let results = parser.feed("Jones loves Sam.");
+    assertThat(clear(results[0].children[0].children[0]))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(PN("Sam"))
+                        ))
+                 ));
   });
 
   it.skip("Generate", async function() {

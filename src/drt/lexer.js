@@ -54,6 +54,7 @@ class Tokenizer {
         // terminal node, return the substring.
         // Otherwise, this string isn't in the dictionary.
         // console.log(`char #${i} of [${str}] ([${str[i]}]), longest = ${longest}`);
+        // console.log(longest);
         return longest ? str.substring(0, longest) : false;
       }
       ref = ref[char];
@@ -79,23 +80,21 @@ class Tokenizer {
     let next = this.longest(this.buffer);
 
     //console.log(`next!`);
+
+    // proper names form.
+    let match = this.buffer.match(/^([A-Z][A-Za-z]+)/);
+    // proper names can't collide with reserved dictionary words.
+    let proper = match && match[1] != next;
     
-    if (next) {
+    if (next && !proper) {
+      // If this is a dictionary word and is not a proper name
       this.eat(next);
-      //console.log(`next: ${next}`);
-      //console.log(this.get(next));
-      //console.log(this.head["s"]);
       return this.get(next);
     }
 
-    //console.log(`no match`);
-    
-    // proper names.
-    let match = this.buffer.match(/^([A-Z][a-z]+)/);
-    if (match) {
+    if (proper) {
       let [full, name] = match;
       this.eat(name);
-      //console.log(`name!`);
       return {type: "name", value: name, tokens: []};
     }
     
