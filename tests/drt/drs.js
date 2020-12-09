@@ -6,8 +6,8 @@ const {Parser} = require("../../src/drt/parser.js");
 
 describe("DRS", function() {
 
-  it("a man admires a woman.", function() {
-    assertThat("a man admires a woman.")
+  it("A man admires a woman.", function() {
+    assertThat("A man admires a woman.")
      .equalsTo(`
        let a, b
        man(a)
@@ -16,8 +16,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("a man admires a woman. she likes him.", function() {
-    assertThat("a man admires a woman. she likes him.")
+  it("A man admires a woman. She likes him.", function() {
+    assertThat("A man admires a woman. She likes him.")
      .equalsTo(`
        let a, b
        man(a)
@@ -48,8 +48,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("a man loves Mary.", function() {
-    assertThat("a man loves Mary.")
+  it("A man loves Mary.", function() {
+    assertThat("A man loves Mary.")
      .equalsTo(`
        let a, b
        Mary(a)
@@ -68,8 +68,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("a man who loves Mary fascinates Smith.", function() {
-    assertThat("a man who loves Mary fascinates Smith.")
+  it("A man who loves Mary fascinates Smith.", function() {
+    assertThat("A man who loves Mary fascinates Smith.")
      .equalsTo(`
        let a, b, c
        Smith(a)
@@ -115,8 +115,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("a man who fascinates Mary loves a book which fascinates Smith.", function() {
-    assertThat("a man who fascinates Mary loves a book which fascinates Smith.")
+  it("A man who fascinates Mary loves a book which fascinates Smith.", function() {
+    assertThat("A man who fascinates Mary loves a book which fascinates Smith.")
      .equalsTo(`
        let a, b, c, d
        Mary(a)
@@ -151,8 +151,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("Jones owns a book. it fascinates him. Mary loves him.", function() {
-    assertThat("Jones owns a book. it fascinates him. Mary loves him.")
+  it("Jones owns a book. It fascinates him. Mary loves him.", function() {
+    assertThat("Jones owns a book. It fascinates him. Mary loves him.")
      .equalsTo(`
        let a, b, c
        Jones(a)
@@ -177,8 +177,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("Jones owns a porsche. he does not like it.", function() {
-    assertThat("Jones owns a porsche. he does not like it.")
+  it("Jones owns a porsche. He does not like it.", function() {
+    assertThat("Jones owns a porsche. He does not like it.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -190,14 +190,14 @@ describe("DRS", function() {
      `);
   });
 
-  it("Jones does not own a porsche. he likes it.", function() {
+  it("Jones does not own a porsche. He likes it.", function() {
     let drs = new DRS(Rules.from());
     drs.feed(new Parser("Discourse").feed("Jones does not own a porsche."));
     try {
       // "it" in "he likes it" cannot bind to anything
       // because porsche(b) is inside the negated sub
       // drs.
-      drs.feed(new Parser("Discourse").feed("he likes it."));
+      drs.feed(new Parser("Discourse").feed("He likes it."));
       throw new Error("expected exception");
     } catch (e) {
       Assert.deepEqual(e.message, "Invalid Reference: it");
@@ -220,7 +220,7 @@ describe("DRS", function() {
   });
 
   it("Jones loves a woman who does not admire him.", function() {
-    assertThat("Jones loves a woman who does not love him. she does not love a man.")
+    assertThat("Jones loves a woman who does not love him. She does not love a man.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -237,8 +237,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("a porsche does not stink", function() {
-    assertThat("a porsche does not stink.")
+  it("A porsche does not stink", function() {
+    assertThat("A porsche does not stink.")
      .equalsTo(`
        let a
        not {
@@ -300,8 +300,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("a man is happy.", function() {
-    assertThat("a man is happy.")
+  it("A man is happy.", function() {
+    assertThat("A man is happy.")
      .equalsTo(`
        let a
        happy(a)
@@ -340,8 +340,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones is a man. he is happy. he loves Mary.", function() {
-    assertThat("Jones is a man. he is happy. he loves Mary.")
+  it("Jones is a man. He is happy. He loves Mary.", function() {
+    assertThat("Jones is a man. He is happy. He loves Mary.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -363,8 +363,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("a woman who is happy loves Jones.", function() {
-    assertThat("a woman who is happy loves Jones.")
+  it("A woman who is happy loves Jones.", function() {
+    assertThat("A woman who is happy loves Jones.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -374,8 +374,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones owns a porsche. he is happy.", function() {
-    assertThat("Jones owns a porsche. he is happy.")
+  it("Jones owns a porsche. He is happy.", function() {
+    assertThat("Jones owns a porsche. He is happy.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -397,7 +397,7 @@ describe("DRS", function() {
     `);
   });
   
-  it("if Jones owns a book then he likes it.", function() {
+  it("If Jones owns a book then he likes it.", function() {
     assertThat("if Jones owns a book then he likes it.")
      .equalsTo(`
        let a
@@ -412,10 +412,10 @@ describe("DRS", function() {
     `);
   });
 
-  it("if Jones owns a book then Smith owns a porsche.", function() {
+  it("If Jones owns a book then Smith owns a porsche.", function() {
     // TODO(goto): to make this result match 2.33 we still need to
     // promote proper names to the global DRS.
-    assertThat("if Jones owns a book then Smith owns a porsche.")
+    assertThat("If Jones owns a book then Smith owns a porsche.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -432,8 +432,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones likes Mary. if she likes a book then he likes it.", function() {
-    assertThat("Jones likes Mary. if she likes a book then he likes it.")
+  it("Jones likes Mary. If she likes a book then he likes it.", function() {
+    assertThat("Jones likes Mary. If she likes a book then he likes it.")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -476,8 +476,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every man loves Jones.", function() {
-    assertThat("every man loves Jones.")
+  it("Every man loves Jones.", function() {
+    assertThat("Every man loves Jones.")
      .equalsTo(`
        let a
        Jones(a)
@@ -489,8 +489,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every man is happy.", function() {
-    assertThat("every man is happy.")
+  it("Every man is happy.", function() {
+    assertThat("Every man is happy.")
      .equalsTo(`
        every (a: {
          man(a)
@@ -500,25 +500,25 @@ describe("DRS", function() {
     `);
   });
 
-  it("every man is happy. he likes it.", function() {
+  it("Every man is happy. He likes it.", function() {
     try {
       let drs = new DRS(Rules.from());
-      drs.feed(new Parser("Discourse").feed("every man is happy."));
-      drs.feed(new Parser("Discourse").feed("he likes it."));
+      drs.feed(new Parser("Discourse").feed("Every man is happy."));
+      drs.feed(new Parser("Discourse").feed("He likes it."));
       throw new Error("expected reference 'he' to fail");
     } catch (e) {
-      Assert.deepEqual(e.message, "Invalid reference: he");
+      Assert.deepEqual(e.message, "Invalid reference: He");
     }
   });
 
-  it("every man owns a book. it is happy.", function() {
+  it("Every man owns a book. It is happy.", function() {
     try {
       let drs = new DRS(Rules.from());
-      drs.feed(new Parser("Discourse").feed("every man owns a book."));
-      drs.feed(new Parser("Discourse").feed("it is happy."));
+      drs.feed(new Parser("Discourse").feed("Every man owns a book."));
+      drs.feed(new Parser("Discourse").feed("It is happy."));
       throw new Error("expected reference 'It' to fail");
     } catch (e) {
-      Assert.deepEqual(e.message, "Invalid reference: it");
+      Assert.deepEqual(e.message, "Invalid reference: It");
     }
   });
 
@@ -734,12 +734,12 @@ describe("DRS", function() {
     `);
   });
 
-  it("she loves it and Mary owns a porsche.", function() {
+  it("She loves it and Mary owns a porsche.", function() {
     let drs = new DRS(Rules.from());
     
     try {
       let lines = new Parser("Discourse")
-          .feed("she loves it and Mary owns a porsche.");
+          .feed("She loves it and Mary owns a porsche.");
       drs.feed(lines);
       throw new Error("Expected exception");
     } catch (e) {
@@ -812,8 +812,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones's wife is happy. she likes Smith.", function() {
-    assertThat("Jones's wife is happy. she likes Smith.")
+  it("Jones's wife is happy. She likes Smith.", function() {
+    assertThat("Jones's wife is happy. She likes Smith.")
      .equalsTo(`
        let a, b, c
        Jones(a)
@@ -890,8 +890,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every beautiful woman loves Jones.", function() {
-    assertThat("every beautiful woman loves Jones.")
+  it("Every beautiful woman loves Jones.", function() {
+    assertThat("Every beautiful woman loves Jones.")
      .equalsTo(`
        let a
        Jones(a)
@@ -942,7 +942,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("a woman with a donkey loves Jones.", function() {
+  it("A woman with a donkey loves Jones.", function() {
     assertThat("a woman with a donkey loves Jones.")
      .equalsTo(`
        let a, b, c
@@ -979,8 +979,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every woman with a donkey loves Jones.", function() {
-    assertThat("every woman with a donkey loves Jones.")
+  it("Every woman with a donkey loves Jones.", function() {
+    assertThat("Every woman with a donkey loves Jones.")
      .equalsTo(`
        let a
        Jones(a)
@@ -995,8 +995,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every man from Brazil loves Mary.", function() {
-    assertThat("every man from Brazil loves Mary.")
+  it("Every man from Brazil loves Mary.", function() {
+    assertThat("Every man from Brazil loves Mary.")
      .equalsTo(`
        let a, b
        Mary(a)
@@ -1022,8 +1022,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("every man is mortal. Socrates is a man.", function() {
-    assertThat("every man is mortal. Socrates is a man.")
+  it("Every man is mortal. Socrates is a man.", function() {
+    assertThat("Every man is mortal. Socrates is a man.")
      .equalsTo(`
        let b
        every (a: {
@@ -1391,7 +1391,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("every brazilian was happy.", function() {
+  it("Every brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("every brazilian was happy.")
      .equalsTo(`
@@ -1403,8 +1403,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("all brazilians are happy.", function() {
-    assertThat("all brazilians are happy.")
+  it("All brazilians are happy.", function() {
+    assertThat("All brazilians are happy.")
      .equalsTo(`
          all (a: {
            brazilians(a)
@@ -1414,8 +1414,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("most brazilians are happy.", function() {
-    assertThat("most brazilians are happy.")
+  it("Most brazilians are happy.", function() {
+    assertThat("Most brazilians are happy.")
      .equalsTo(`
          most (a: {
            brazilians(a)
@@ -1425,8 +1425,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("many brazilians are happy.", function() {
-    assertThat("many brazilians are happy.")
+  it("Many brazilians are happy.", function() {
+    assertThat("Many brazilians are happy.")
      .equalsTo(`
        many (a: {
          brazilians(a)
@@ -1447,8 +1447,8 @@ describe("DRS", function() {
     `);
   });
   
-  it("only brazilians are happy.", function() {
-    assertThat("only brazilians are happy.")
+  it("Only brazilians are happy.", function() {
+    assertThat("Only brazilians are happy.")
      .equalsTo(`
          only (a: {
            brazilians(a)
@@ -1458,8 +1458,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("the majority of brazilians are happy.", function() {
-    assertThat("the majority of brazilians are happy.")
+  it("The majority of brazilians are happy.", function() {
+    assertThat("The majority of brazilians are happy.")
      .equalsTo(`
          the-majority-of (a: {
            brazilians(a)
@@ -1484,8 +1484,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("most brazilians like most porsches.", function() {
-    assertThat("most brazilians like most porsches.")
+  it("Most brazilians like most porsches.", function() {
+    assertThat("Most brazilians like most porsches.")
      .equalsTo(`
          most (a: {
            brazilians(a)
@@ -1499,8 +1499,8 @@ describe("DRS", function() {
     `);
   });
   
-  it("most brazilians love a porsche which Smith likes.", function() {
-    assertThat("most brazilians love a porsche which Smith likes.")
+  it("Most brazilians love a porsche which Smith likes.", function() {
+    assertThat("Most brazilians love a porsche which Smith likes.")
      .equalsTo(`
          let a
          Smith(a)
@@ -1515,8 +1515,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("is Jones happy?", function() {
-    assertThat("is Jones happy?")
+  it("Is Jones happy?", function() {
+    assertThat("Is Jones happy?")
      .equalsTo(`
        for () {
          let a
@@ -1526,10 +1526,10 @@ describe("DRS", function() {
     `);
   });
 
-  it("who loves Jones?", function() { 
+  it("Who loves Jones?", function() { 
     // NOTE(goto): we should probably keep the 
     // variable b scoped to the question.
-    assertThat("who loves Jones?")
+    assertThat("Who loves Jones?")
      .equalsTo(`
        let a, b
        Jones(a)
@@ -1540,8 +1540,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("who does Jones love?", function() { 
-    assertThat("who does Jones love?")
+  it("Who does Jones love?", function() { 
+    assertThat("Who does Jones love?")
      .equalsTo(`
        let a
        for (a) {
