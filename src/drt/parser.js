@@ -809,7 +809,7 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
       PN[num=1, gen=2] -> %word.
-      PN -> %name.
+      PN[num=1, gen=2] -> %name.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      
       RN[num=1, gen=2] -> %word.
@@ -866,12 +866,12 @@ const dict = [
   ["of", "__of__"],
 ].concat([
   // proper names
-  ["Socrates", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  //["Socrates", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
   ["Jones", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  ["John", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  //["John", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
   ["Smith", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
   ["Mary", "word", [{"@type": "PN", types: {"num": "sing", "gen": "fem"}}]],
-  ["Brazil", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
+  //["Brazil", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
   ["Ulysses", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
   
   // nouns
