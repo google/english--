@@ -21,7 +21,7 @@ class Nearley {
    this.parser.feed(code);
    return this.parser.results;
   } catch (e) {
-    // console.log(e);
+    console.log(e);
     throw this.reportError(e);
   }
  }
@@ -900,8 +900,8 @@ const dict = [
   ["wife", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
 
   // verbs
-  ["beat", "word", [{"@type": "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
+  //["beat", "word", [{"@type": "VERB", types: {
+  //  "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
   ["listen", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+s", "past": "+ed"}}]],
   ["own", "word", [{"@type": "VERB", types: {
@@ -940,8 +940,8 @@ const dict = [
     "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
   ["tie", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
-  ["free", "word", [{"@type": "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
+  //["free", "word", [{"@type": "VERB", types: {
+  //  "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
   ["love", "word", [{"@type": "VERB", types: {
     "trans": 1, "stat": "-", "pres": "+s", "past": "+d"}}]],
   ["surprise", "word", [{"@type": "VERB", types: {
@@ -1001,11 +1001,33 @@ const dict = [
 let DRTGrammar;
 
 function drtGrammar(header, footer = "", body = DrtSyntax) {
+  // console.log("drt grammar");
   header = header || `
       @{%
-        const lexer = new Tokenizer(dict.concat(keywords));
+        // const lexer = new Tokenizer(dict.concat(keywords));
         // NOTE(goto): this only gets called once per test
         // so gets reused. We need to figure out why and fix it.
+        // console.log("new lexer");
+        const lexer = {
+          use(tokenizer) {
+            this.tokenizer = tokenizer;
+          },
+          next() {
+            return this.tokenizer.next();
+          },
+          save() {
+            return this.tokenizer.save();
+          },
+          reset(chunk, info) {
+            return this.tokenizer.reset(chunk, info);
+          },
+          formatError(token) {
+            return this.tokenizer.formatError(token);
+          },
+          has(name) {
+            return true;
+          }
+        };
       %}
       @lexer lexer
       _ -> %WS:* {% function(d) {return null;} %}
@@ -1028,11 +1050,12 @@ class Parser {
   constructor (start, header, footer, body){
     const grammar = drtGrammar(header, footer, body);
     this.parser = new Nearley(grammar, start);
-    this.lexer = this.parser.parser.lexer;;
+    this.lexer = new Tokenizer(dict.concat(keywords));
+    this.parser.parser.lexer.use(this.lexer);
   }
 
-  load(tokens) {
-    this.lexer.load(tokens);
+  add([str, type, value]) {
+    this.lexer.push(str, type, value);
   }
 
   feed(code) {
@@ -1047,9 +1070,9 @@ let node = (type) => {
 };
 
 function parse(s, start = "Statement") {
- let parser = new Parser(start);
- let result = parser.feed(s);
- return result;
+  let parser = new Parser(start);
+  let result = parser.feed(s);
+  return result;
 }
 
 function child(node, ...path) {

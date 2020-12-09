@@ -15,9 +15,9 @@ class DRS {
     for (let s of lines) {
       this.push(s);
     }
-    return this;
+    return this;    
   }
-
+  
   bind(node) {
     let queue = [node];
     while (queue.length > 0) {

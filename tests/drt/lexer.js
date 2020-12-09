@@ -456,6 +456,29 @@ describe("Lexer", function() {
     }]);
   });
 
+  it("Same token type, multiple node types", () => {
+    let lexer = new Tokenizer([
+      ["brazilian", "word", [{"@type": "ADJ"}]],
+      ["brazilian", "word", [{"@type": "N"}]],
+    ]);
+    lexer.reset("brazilian.");
+    assertThat(lexer.next()).equalsTo(token("word", "brazilian", [
+      {"@type": "ADJ"},
+      {"@type": "N"},
+    ]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Type conflicts with reserved keyword", () => {
+    let lexer = new Tokenizer([
+      ["only", "only"],
+      ["only", "word", [{"@type": "ADJ"}]],
+    ]);
+    lexer.reset("only");
+    assertThat(lexer.next()).equalsTo(token("only", "only"));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it.skip("age-old", function() {
     const {adj} = require("./lexicon.js");
     const tokens = adj.map((word) => {
@@ -489,10 +512,10 @@ describe("Lexer", function() {
     }]);
   });
 
-  it.skip("Jones loves a foo woman.", function() {
+  it("Jones loves a foo woman.", function() {
     const {Parser} = DRT;
     let parser = new Parser("Statement");
-    parser.load([["foo", "word", [{"@type": "ADJ"}]]]);
+    parser.add(["foo", "word", [{"@type": "ADJ"}]]);
     let results = parser.feed("Jones loves a foo woman.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
@@ -563,19 +586,67 @@ describe("Lexer", function() {
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("");
   });
+
+  it("love and lovesick", function() {
+    let tokens = new Tokenizer();
+    
+    tokens.push(" ", "WS", []);
+    tokens.push("love", "word", [{a: 1}]);
+    tokens.push("lovesick", "word", [{b: 2}]);
+    tokens.push("s", "s", []);
+
+    assertThat(tokens.longest("loves ")).equalsTo("love");
+  });
   
-  it.skip("Jones loves an awesome woman.", function() {
+  it("Jones loves an awesome woman.", function() {
     const {adj} = require("./lexicon.js");
     const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
-    // console.log(tokens);
     let parser = new Parser("Statement");
-    parser.load(tokens);
-    let results = parser.feed("Jones likes a married woman.");
+    for (let token of tokens) {
+      parser.add(token);
+    }
+    let {lexer} = parser;
+    lexer.reset("Jones loves an awesome woman.");
+    assertThat(lexer.next()).equalsTo(token("word", "Jones", [{
+      "@type": "PN",
+      "types": {"gen": "male", "num": "sing"}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "love", [{
+      "@type": "VERB",
+      "types": {"past": "+d", "pres": "+s", "stat": "-", "trans": 1}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("s", "s"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("an", "an"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "awesome", [{
+      "@type": "ADJ"
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("word", "woman", [{
+      "@type": "N",
+      "types": {"gen": "fem", "num": "sing"}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+  
+  it("Jones loves an awesome woman.", function() {
+    const {adj} = require("./lexicon.js");
+    const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    const {Parser} = DRT;
+    let parser = new Parser("Statement");
+    
+    for (let token of tokens) {
+      parser.add(token);
+    }
+    let results = parser.feed("Jones loves an awesome woman.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"),
-                         NP(DET("a"), N(ADJ("foo"), N("woman")))
+                         NP(DET("an"), N(ADJ("awesome"), N("woman")))
                         ))
                  ));
   });

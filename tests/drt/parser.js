@@ -1356,9 +1356,9 @@ describe("Statements", function() {
 
   it("they left Brazil.", function() {
     assertThat(parse("they left Brazil."))
-     .equalsTo(S(NP(PRO("they")),
-                 VP_(VP(V(VERB("left")),
-                        NP(PN("Brazil"))))));
+      .equalsTo(S(NP(PRO("they")),
+                  VP_(VP(V(VERB("left")),
+                         NP(PN("Brazil"))))));
   });
 
   it("they have left Brazil.", function() {

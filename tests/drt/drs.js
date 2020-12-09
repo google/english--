@@ -2,6 +2,7 @@ const Assert = require("assert");
 
 const {Rules} = require("../../src/drt/rules.js");
 const {DRS} = require("../../src/drt/drs.js");
+const {Parser} = require("../../src/drt/parser.js");
 
 describe("DRS", function() {
 
@@ -1591,6 +1592,9 @@ describe("DRS", function() {
      `);
   });
 
+  // let result = parser.feed(s);
+  // return result;
+
   function assertThat(x) { 
     return {
       trim (str) {
@@ -1601,11 +1605,10 @@ describe("DRS", function() {
           .join("\n");
       },
       equalsTo(y) {
-       let drs = new DRS(Rules.from());
-       drs.feed(x);
-       Assert.deepEqual(drs.print(), this.trim(y));
+        let drs = new DRS(Rules.from());
+        drs.feed(x);
+        Assert.deepEqual(drs.print(), this.trim(y));
       }
-     }
     }
-
+  }
 });

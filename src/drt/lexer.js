@@ -151,30 +151,36 @@ class Tokenizer {
       ref[char] = ref[char] || {};
       ref = ref[char];
     }
-        
-    ref.done = ref.done || [];
-    //if (value) {
-    //  ref.done.push(value);
-    //}
-    ref.done = value;
-    
-    if (ref.type) {
-      throw new Error(`Registering [${str}] which has already been registered under ${ref.type} [${type}]`);
+
+    if (ref.type && ref.type != type) {
+      // console.log(`Ignoring [${str}] as a token %${type} because if conflicts with a reserved keyword token %${ref.type}`);
+      return;
     }
     
+    ref.done = ref.done || [];
+    ref.done = ref.done.concat(value);
+        
     ref.type = type;
     this.types[type] = true;
   }
   longest(str) {
     let ref = this.head;
+    let longest;
     for (let i = 0; i < str.length; i++) {
       let char = str[i];
+      // console.log(`char ${char} at #${i}. done? ${ref.done || false}.`);
+      if (ref.done) {
+        //console.log(this.head["l"]["o"]["v"]["e"]);
+        //console.log(`new longest ending in ${char} at #${i}`);
+        longest = i;
+      }
       if (!ref[char]) {
         // Found a character that isn't available as
         // a continuation. If this is currently a
         // terminal node, return the substring.
         // Otherwise, this string isn't in the dictionary.
-        return ref.done ? str.substring(0, i) : false;
+        // console.log(`char #${i} of [${str}] ([${str[i]}]), longest = ${longest}`);
+        return longest ? str.substring(0, longest) : false;
       }
       ref = ref[char];
     }
@@ -197,6 +203,7 @@ class Tokenizer {
   }
   next() {
     let next = this.longest(this.buffer);
+    // console.log(`buffer: ${this.buffer}, next: ${next}`);
     if (!next) {
       return undefined;
     }
