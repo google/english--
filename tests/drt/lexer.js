@@ -599,8 +599,11 @@ describe("Lexer", function() {
   });
   
   it("Jones loves an awesome woman.", function() {
-    const {adj} = require("./lexicon.js");
-    const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    const lexicon = require("./lexicon.js");
+
+    const {adj_itr} = lexicon;
+        
+    const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
     let parser = new Parser("Statement");
     for (let token of tokens) {
@@ -634,8 +637,8 @@ describe("Lexer", function() {
   });
   
   it("Jones loves an awesome woman.", function() {
-    const {adj} = require("./lexicon.js");
-    const tokens = adj.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    const {adj_itr} = require("./lexicon.js");
+    const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
     let parser = new Parser("Statement");
     
@@ -647,6 +650,31 @@ describe("Lexer", function() {
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"),
                          NP(DET("an"), N(ADJ("awesome"), N("woman")))
+                        ))
+                 ));
+  });
+  
+  it("Jones loves an au-pair.", function() {
+    const lexicon = require("./lexicon.js");
+
+    const {noun_sg} = lexicon;
+
+    const tokens = noun_sg.map((word) => [word, "word", [{
+      "@type": "N",
+      "types": {"num": "sing"}
+    }]]);
+    
+    const {Parser} = DRT;
+    let parser = new Parser("Statement");
+    
+    for (let token of tokens) {
+      parser.add(token);
+    }
+    let results = parser.feed("Jones loves an au-pair.");
+    assertThat(clear(results[0].children[0].children[0]))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("love"), "s"),
+                         NP(DET("an"), N("au-pair"))
                         ))
                  ));
   });
@@ -784,14 +812,12 @@ describe("Lexer", function() {
     }
 
     // console.log(Object.keys(parts));
-    let words = parts["adj_itr"];
+    // let words = parts["adj_itr"];
+    
     let file = `
-const adj = ${JSON.stringify(words, undefined, 2)};
-module.exports = {
-  adj: adj
-};
+module.exports = ${JSON.stringify(parts, undefined, 2)};
 `;
-    fs.writeFileSync("./test/drt/lexicon.js", file);
+    fs.writeFileSync("lexicon.js", file);
     
     // console.log("hi");
   });
