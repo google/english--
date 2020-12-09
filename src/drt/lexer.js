@@ -77,22 +77,31 @@ class Tokenizer {
   }
   next() {
     let next = this.longest(this.buffer);
-    if (!next) {
-      return undefined;
+
+    if (next) {
+      this.eat(next);      
+      return this.get(next);
     }
-    // console.log(next);
-    return this.eat(next);
+
+    // proper names.
+    let match = this.buffer.match(/^([A-Z][a-z]+)/);
+    if (match) {
+      let [full, name] = match;
+      this.eat(name);
+      return {type: "name", value: name, tokens: []};
+    }
+    
+    return undefined;
   }
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
-    return this.get(str);
+    return this;
   }
   get(str) {
     let ref = this.head;
     for (let char of str) {
       ref = ref[char.toLowerCase()];
     }
-    // return ref.done;
     return {
       type: ref.type,
       value: str,

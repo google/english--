@@ -533,6 +533,17 @@ describe("Lexer", function() {
     tokens.push("foo", "word", [{a: 1}]);
     tokens.push("foot", "word", [{b: 2}]);
 
+    tokens.reset("foo foot");
+    assertThat(tokens.eat("foo").get("foo"))
+      .equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.buffer).equalsTo(" foot");
+    assertThat(tokens.eat(" ").get(" "))
+      .equalsTo(token("WS", " ", []));
+    assertThat(tokens.buffer).equalsTo("foot");
+    assertThat(tokens.eat("foot").get("foot"))
+      .equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.buffer).equalsTo("");
+    
     assertThat(tokens.has("WS")).equalsTo(true);
     assertThat(tokens.has("word")).equalsTo(true);
     assertThat(tokens.has("every")).equalsTo(false);
@@ -546,14 +557,6 @@ describe("Lexer", function() {
 
     assertThat(tokens.get("foo")).equalsTo(token("word", "foo", [{a: 1}]));
     assertThat(tokens.get("foot")).equalsTo(token("word", "foot", [{b: 2}]));
-
-    tokens.reset("foo foot");
-    assertThat(tokens.eat("foo")).equalsTo(token("word", "foo", [{a: 1}]));
-    assertThat(tokens.buffer).equalsTo(" foot");
-    assertThat(tokens.eat(" ")).equalsTo(token("WS", " ", []));
-    assertThat(tokens.buffer).equalsTo("foot");
-    assertThat(tokens.eat("foot")).equalsTo(token("word", "foot", [{b: 2}]));
-    assertThat(tokens.buffer).equalsTo("");
 
     tokens.reset("foo foot");
     assertThat(tokens.next()).equalsTo(token("word", "foo", [{a: 1}]));
@@ -778,6 +781,20 @@ describe("Lexer", function() {
     lexer.reset("Foobar");
     assertThat(lexer.next()).equalsTo(token("WORD", "Foo"));
     assertThat(lexer.next()).equalsTo(token("WORD", "bar"));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+  
+  it("Proper names", () => {
+    let lexer = new Tokenizer([
+      ["foo", "WORD"],
+      ["Bar", "WORD"],
+      [" ", "WS"],
+      [".", "PERIOD"],
+    ]);
+    lexer.reset("Sam Goto");
+    assertThat(lexer.next()).equalsTo(token("name", "Sam"));
+    assertThat(lexer.next()).equalsTo(token("WS", " "));
+    assertThat(lexer.next()).equalsTo(token("name", "Goto"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
