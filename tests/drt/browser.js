@@ -18,7 +18,7 @@ describe("Browser", function() {
   });
 
   it("compiled", async function() {
-    const {load, parse, DRS, Rules} = require("../../bin/bundle.js");
+    const {load, parse, DRS, Parser, Rules} = require("../../bin/bundle.js");
     await load("bin/", async (path) => {
       let content = require("fs").readFileSync(path).toString();
       return Promise.resolve({
@@ -29,7 +29,7 @@ describe("Browser", function() {
     });
     assertThat(parse("John likes Mary.").length).equalsTo(1);
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed("John likes Mary.").print())
+    assertThat(drs.feed(new Parser().feed("John likes Mary.")).print())
       .equalsTo("let a, b\nJohn(a)\nMary(b)\nlikes(a, b)");
   });
 });
