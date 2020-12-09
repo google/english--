@@ -10,8 +10,7 @@ class DRS {
     this.after = after;
   }
 
-  feed(source) {
-    let [[lines]] = parse(source, "Discourse");
+  feed([[lines]]) {
     for (let s of lines) {
       this.push(s);
     }

@@ -1047,7 +1047,7 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
 // console.log(DRTGrammar);
 
 class Parser {
-  constructor (start, header, footer, body){
+  constructor (start = "Discourse", header, footer, body){
     const grammar = drtGrammar(header, footer, body);
     this.parser = new Nearley(grammar, start);
     this.lexer = new Tokenizer(dict.concat(keywords));

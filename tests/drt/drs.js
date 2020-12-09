@@ -192,15 +192,15 @@ describe("DRS", function() {
 
   it("Jones does not own a porsche. he likes it.", function() {
     let drs = new DRS(Rules.from());
-    drs.feed("Jones does not own a porsche.");
+    drs.feed(new Parser("Discourse").feed("Jones does not own a porsche."));
     try {
-     // "it" in "he likes it" cannot bind to anything
-     // because porsche(b) is inside the negated sub
-     // drs.
-     drs.feed("he likes it.");
-     throw new Error("expected exception");
+      // "it" in "he likes it" cannot bind to anything
+      // because porsche(b) is inside the negated sub
+      // drs.
+      drs.feed(new Parser("Discourse").feed("he likes it."));
+      throw new Error("expected exception");
     } catch (e) {
-     Assert.deepEqual(e.message, "Invalid Reference: it");
+      Assert.deepEqual(e.message, "Invalid Reference: it");
     }
   });
 
@@ -502,23 +502,23 @@ describe("DRS", function() {
 
   it("every man is happy. he likes it.", function() {
     try {
-     let drs = new DRS(Rules.from());
-     drs.feed("every man is happy.");
-     drs.feed("he likes it.");
-     throw new Error("expected reference 'he' to fail");
+      let drs = new DRS(Rules.from());
+      drs.feed(new Parser("Discourse").feed("every man is happy."));
+      drs.feed(new Parser("Discourse").feed("he likes it."));
+      throw new Error("expected reference 'he' to fail");
     } catch (e) {
-     Assert.deepEqual(e.message, "Invalid reference: he");
+      Assert.deepEqual(e.message, "Invalid reference: he");
     }
   });
 
   it("every man owns a book. it is happy.", function() {
     try {
-     let drs = new DRS(Rules.from());
-     drs.feed("every man owns a book.");
-     drs.feed("it is happy.");
-     throw new Error("expected reference 'It' to fail");
+      let drs = new DRS(Rules.from());
+      drs.feed(new Parser("Discourse").feed("every man owns a book."));
+      drs.feed(new Parser("Discourse").feed("it is happy."));
+      throw new Error("expected reference 'It' to fail");
     } catch (e) {
-     Assert.deepEqual(e.message, "Invalid reference: it");
+      Assert.deepEqual(e.message, "Invalid reference: it");
     }
   });
 
@@ -738,13 +738,15 @@ describe("DRS", function() {
     let drs = new DRS(Rules.from());
     
     try {
-     drs.feed("she loves it and Mary owns a porsche.");
-     throw new Error("Expected exception");
+      let lines = new Parser("Discourse")
+          .feed("she loves it and Mary owns a porsche.");
+      drs.feed(lines);
+      throw new Error("Expected exception");
     } catch (e) {
-     // She can't bind to "Mary" because Mary is introduced
-     // lexically after She, regardless of "Mary" being a
-     // proper noun and being visible globally.
-     Assert.deepEqual(e.message, "Invalid Reference: it");
+      // She can't bind to "Mary" because Mary is introduced
+      // lexically after She, regardless of "Mary" being a
+      // proper noun and being visible globally.
+      Assert.deepEqual(e.message, "Invalid Reference: it");
     }
   });
 
@@ -1592,9 +1594,6 @@ describe("DRS", function() {
      `);
   });
 
-  // let result = parser.feed(s);
-  // return result;
-
   function assertThat(x) { 
     return {
       trim (str) {
@@ -1606,7 +1605,9 @@ describe("DRS", function() {
       },
       equalsTo(y) {
         let drs = new DRS(Rules.from());
-        drs.feed(x);
+        let parser = new Parser("Discourse");
+        let sentences = parser.feed(x);
+        drs.feed(sentences);
         Assert.deepEqual(drs.print(), this.trim(y));
       }
     }
