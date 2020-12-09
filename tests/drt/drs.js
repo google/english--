@@ -1580,6 +1580,26 @@ describe("DRS", function() {
      `);
   });
 
+  it("Foo likes Bar.", function() { 
+    assertThat("Foo likes Bar.")
+     .equalsTo(`
+       let a, b
+       Foo(a)
+       Bar(b)
+       likes(a, b)
+     `);
+  });
+
+  it.skip("Sam likes Bar.", function() { 
+    assertThat("Sam likes Bar.")
+     .equalsTo(`
+       let a, b
+       Foo(a)
+       Bar(b)
+       likes(a, b)
+     `);
+  });
+
   it.skip("Jones came from Brazil to Italy.", function() { 
     // We need to allow repeated prepositional phrases
     // as adverbs

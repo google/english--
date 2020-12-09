@@ -78,16 +78,24 @@ class Tokenizer {
   next() {
     let next = this.longest(this.buffer);
 
+    //console.log(`next!`);
+    
     if (next) {
-      this.eat(next);      
+      this.eat(next);
+      //console.log(`next: ${next}`);
+      //console.log(this.get(next));
+      //console.log(this.head["s"]);
       return this.get(next);
     }
 
+    //console.log(`no match`);
+    
     // proper names.
     let match = this.buffer.match(/^([A-Z][a-z]+)/);
     if (match) {
       let [full, name] = match;
       this.eat(name);
+      //console.log(`name!`);
       return {type: "name", value: name, tokens: []};
     }
     
