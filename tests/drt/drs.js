@@ -1657,10 +1657,10 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b, c
        Jones(a)
-       Mary(b)
+       Italy(b)
        Brazil(c)
-       < kissed(a, b)
-       < kiss-ined(a, c)
+       < came(a, b)
+       < came-from(a, c)
      `);
   });
 
