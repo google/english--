@@ -891,6 +891,7 @@ const dict = [
   ["witch", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}]],
   ["judge", "word", [{"@type": "N", types: {"num": "sing", "gen": 1, "plur": "es"}}]],
   ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}]],
+  ["reservation", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
 
   // RNs
   
@@ -927,6 +928,11 @@ const dict = [
   ["gave", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "past": "-reg"}}]],
 
+  ["make", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "pres": "s"}}]],
+  ["made", "word", [{"@type": "VERB", types: {
+    "trans": "+", "stat": "-", "past": "-reg"}}]],
+  
   ["kiss", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
   ["box", "word", [{"@type": "VERB", types: {

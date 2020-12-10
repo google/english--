@@ -1694,6 +1694,18 @@ describe("DRS", function() {
      `);
   });
 
+  it("Sam made a reservation for Cascal.", function() { 
+    assertThat("Sam made a reservation for Cascal.")
+     .equalsTo(`
+       let a, b, c
+       Sam(a)
+       Cascal(b)
+       reservation(c)
+       < made(a, c)
+       for(c, b)
+     `);
+  });
+
   it.skip("Mel is unhappy about Brazil", function() { 
     // We need to allow prepositional phrases with adjectives.
     assertThat("Mel is unhappy about Brazil.")

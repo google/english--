@@ -2416,6 +2416,17 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V(VERB("kiss"), "ed"),
                          NP(PN("Dani"))))));
   });
+
+  it("Sam made a reservation.", function() {
+    assertThat(parse("Sam made a reservation for Cascal."))
+      .equalsTo(S(NP(PN("Sam")),
+                  VP_(VP(V(VERB("made")),
+                         NP(DET("a"),
+                            N(N("reservation"), PP(
+                              PREP("for"), NP(PN("Cascal"))
+                            ))
+                           )))));
+  });
 });
 
 function assertThat(x) {
