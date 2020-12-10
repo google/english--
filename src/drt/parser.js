@@ -688,12 +688,12 @@ const DrtSyntax = `
       DET[num=plur, quantifier=true] -> %not _ %all.
       DET[num=plur, quantifier=true] -> %the _ %majority _ %__of__.
       DET[num=plur, quantifier=true] -> %the _ %minority _ %__of__.
-      DET[num=plur, quantifier=true] -> %at _ %least _ unsigned_int.
-      DET[num=plur, quantifier=true] -> %at _ %most _ unsigned_int.
-      DET[num=plur, quantifier=true] -> %more _ %than _ unsigned_int.
-      DET[num=plur, quantifier=true] -> %fewer _ %than _ unsigned_int.
-      DET[num=plur, quantifier=true] -> %exactly _ unsigned_int.
-      DET[num=plur, quantifier=true] -> unsigned_int.
+      DET[num=plur, quantifier=true] -> %at _ %least _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %at _ %most _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %more _ %than _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %fewer _ %than _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %exactly _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %unsigned_int.
       
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ %POSS.
 

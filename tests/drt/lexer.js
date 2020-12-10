@@ -797,6 +797,18 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
+  it("numbers", () => {
+    let lexer = new Tokenizer([
+      ["foo", "WORD"],
+      ["Bar", "WORD"],
+      [" ", "WS"],
+      [".", "PERIOD"],
+    ]);
+    lexer.reset("3010");
+    assertThat(lexer.next()).equalsTo(token("unsigned_int", "3010"));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it("Jones loves Sam.", function() {
     const {Parser} = DRT;
     let parser = new Parser("Statement");

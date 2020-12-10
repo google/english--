@@ -1436,7 +1436,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("3 brazilians are happy.", function() {
+  it("3 brazilians are happy.", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
          3 (a: {
@@ -1447,6 +1447,50 @@ describe("DRS", function() {
     `);
   });
   
+  it("More than 3 brazilians are happy.", function() {
+    assertThat("More than 3 brazilians are happy.")
+     .equalsTo(`
+         more-than-3 (a: {
+           brazilians(a)
+         }) {
+           happy(a)
+         }
+    `);
+  });
+
+  it("Fewer than 3 brazilians are happy.", function() {
+    assertThat("Fewer than 3 brazilians are happy.")
+     .equalsTo(`
+         fewer-than-3 (a: {
+           brazilians(a)
+         }) {
+           happy(a)
+         }
+    `);
+  });
+
+  it("At least 3 brazilians are happy.", function() {
+    assertThat("At least 3 brazilians are happy.")
+     .equalsTo(`
+         at-least-3 (a: {
+           brazilians(a)
+         }) {
+           happy(a)
+         }
+    `);
+  });
+
+  it("At most 3 brazilians are happy.", function() {
+    assertThat("At most 3 brazilians are happy.")
+     .equalsTo(`
+         at-most-3 (a: {
+           brazilians(a)
+         }) {
+           happy(a)
+         }
+    `);
+  });
+
   it("Only brazilians are happy.", function() {
     assertThat("Only brazilians are happy.")
      .equalsTo(`
@@ -1647,6 +1691,19 @@ describe("DRS", function() {
        Sam(a)
        Discourse-Representation-Theory(b)
        likes(a, b)
+     `);
+  });
+
+  it.skip("Mel is unhappy about Brazil", function() { 
+    // We need to allow prepositional phrases with adjectives.
+    assertThat("Mel is unhappy about Brazil.")
+     .equalsTo(`
+       let a, b, c
+       Jones(a)
+       Italy(b)
+       Brazil(c)
+       < came(a, b)
+       < came-from(a, c)
      `);
   });
 

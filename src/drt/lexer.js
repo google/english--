@@ -77,6 +77,17 @@ class Tokenizer {
     return str;
   }
   next() {
+
+    {
+      // numbers.
+      let match = this.buffer.match(/^([0-9]+)/);
+      if (match) {
+        let [full, number] = match;
+        this.eat(number);
+        return {type: "unsigned_int", value: number, tokens: []};        
+      }
+    }
+
     let next = this.longest(this.buffer);
 
     //console.log(`next!`);
