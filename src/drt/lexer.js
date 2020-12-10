@@ -82,7 +82,7 @@ class Tokenizer {
     //console.log(`next!`);
 
     // proper names form.
-    let match = this.buffer.match(/^([A-Z][A-Za-z]+)/);
+    let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
     // proper names can't collide with reserved dictionary words.
     let proper = match && match[1] != next;
     

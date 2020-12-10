@@ -1610,12 +1610,22 @@ describe("DRS", function() {
      `);
   });
 
-  it("Sam Goto likes Computer Science.", function() { 
-    assertThat("Sam Goto likes Computer Science.")
+  it("Sam Goto likes Computer-Science.", function() { 
+    assertThat("Sam Goto likes Computer-Science.")
      .equalsTo(`
        let a, b
        Sam-Goto(a)
        Computer-Science(b)
+       likes(a, b)
+     `);
+  });
+
+  it("Sam Goto likes The-United-States-Of-America.", function() { 
+    assertThat("Sam Goto likes The-United-States-Of-America.")
+     .equalsTo(`
+       let a, b
+       Sam-Goto(a)
+       The-United-States-Of-America(b)
        likes(a, b)
      `);
   });
@@ -1626,6 +1636,16 @@ describe("DRS", function() {
        let a, b
        Sam(a)
        DRT(b)
+       likes(a, b)
+     `);
+  });
+  
+  it("Sam likes Discourse-Representation-Theory.", function() { 
+    assertThat("Sam likes Discourse-Representation-Theory.")
+     .equalsTo(`
+       let a, b
+       Sam(a)
+       Discourse-Representation-Theory(b)
        likes(a, b)
      `);
   });
