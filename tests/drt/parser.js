@@ -802,10 +802,11 @@ describe("FeaturedNearley", function() {
       a -> b "c" d.
       S -> NP _ VP_.
       PRO[gen=-hum, case=[+nom, -nom]] -> "it".
+      PP -> (PREP _ NP):+.
     `);
 
-    let term = (name, types = {}) => {
-     return {name: name, types: types};
+    let term = (name, types = {}, children = []) => {
+      return {name: name, types: types, children: children};
     };
 
     assertThat(result).equalsTo([[{
@@ -826,6 +827,9 @@ describe("FeaturedNearley", function() {
        }, {
         "head": term("PRO", {"case": ["+nom", "-nom"], "gen": "-hum"}), 
         "tail": ["\"it\""]
+       }, {
+        "head": term("PP", {}), 
+        "tail": [term("@list", {"@number": "+"}, [term("PREP"), term("_"), term("NP")])]
        }]]);
   });
 });

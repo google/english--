@@ -361,10 +361,21 @@ const RuntimeSyntax = `
       %}
 
       head -> name {% id %}
-      tail -> (term __ {% id %}):* term {%
+      tail -> termList {% id %}
+
+      termList -> (term __ {% id %}):* term {%
         ([beginning, end]) => {
          return [...beginning, end];
         }
+      %}
+
+      term -> "(" _ termList _ "):+" {% ([paren, ws1, termList]) => {
+          return {
+            "name": "@list",
+            "types": {"@number": "+"},
+            "children": termList,
+          };
+        } 
       %}
 
       term -> name {% id %}
@@ -375,7 +386,8 @@ const RuntimeSyntax = `
         ([word, features]) => {
          return {
           name: word,
-          types: Object.fromEntries(features || [])
+          types: Object.fromEntries(features || []),
+          children: [],
          }
         }
       %}
