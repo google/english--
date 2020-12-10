@@ -221,7 +221,7 @@ function bind(type, types = {}, conditions = []) {
     
     let signature = `${type}${JSON.stringify(bindings)} -> `;
     for (let child of expects) {
-      signature += `${child["@type"] || child}${JSON.stringify(child.types || {})} `;
+      signature += `${child["@type"] || JSON.stringify(child)}${JSON.stringify(child.types || {})} `;
     }
     
     let hash = (str) => {
@@ -234,12 +234,24 @@ function bind(type, types = {}, conditions = []) {
     let namespace = hash(signature);
     
     // console.log(data);
+    // console.log(result[0]);
+
+    let children = [];
+    for (let i = 0; i < result.length; i++) {
+      // console.log(expects[i]);
+      let node = result[i];
+      if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
+        children.push(node);
+        // console.log(`node: ${i} *${JSON.stringify(node)}*`);
+      }
+    }
     
-    let children = result.filter((node) => node["@type"]);
+    // let children = result.filter((node) => node["@type"]);
+    //expects = expects.filter((node) => node["@type"] != "@list");
     
     //console.log(`Trying to bind ${signature}`);
     //let foo = children.map((x) => {
-    //  return `${x["@type"]}${JSON.stringify(x.types)}`;
+    //  return `${x["@type"] || JSON.stringify(x)}${JSON.stringify(x.types || {})}`;
     //}).join(" ");
     //console.log(`To ${foo}`);
     
@@ -255,6 +267,24 @@ function bind(type, types = {}, conditions = []) {
     for (let i = 0; i < expects.length; i++) {
       let expected = expects[i];
       let child = children[i];
+      if (expected["@type"] == "@list") {
+        // console.log("hi");
+        //console.log(child);
+        //console.log(expected.children);
+        // bind(type, types = {}, conditions = [])
+        let sub = expected.children.filter((s) => {
+          // console.log(typeof s == "string");
+          return typeof s != "string";
+        });
+        sub = sub.map((s) => {
+          return {"@type": s.name, types: s.types}
+        });
+        let list = bind("@list", {}, sub)(child[0], location, reject);
+        if (list == reject) {
+          return reject;
+        }
+        continue;
+      }
       if (expected["@type"] != child["@type"]) {
         // console.log("Children of different types");
         return reject;
@@ -469,21 +499,12 @@ class FeaturedNearley {
   static generate(source, header = "", footer = "", raw) {
     let parser = new FeaturedNearley();
     let grammar = parser.feed(source + footer);
-    // console.log(source + footer);
     
     let result = [];
 
     function feed(code) {
       result.push(code);
     }
-
-    // feed(`@builtin "whitespace.ne"`);
-    // feed(`@builtin "number.ne"`);
-    //feed(``);
-    //feed(`@{%`);
-    //feed(`${bind.toString()}`);
-    //feed(`%}`);
-    //feed(``);
 
     if (header) {
       feed(header);
@@ -493,6 +514,9 @@ class FeaturedNearley {
       function term(x) {
         if (typeof x == "string") {
           return x;
+        } else if (x["name"] == "@list") {
+          let children = x.children.map(term).join(" ");
+          return `(${children}):${x["types"]["@number"]}`;
         } else {
           return x.name;
         }
@@ -536,7 +560,7 @@ class FeaturedNearley {
             continue;
           } else {
             // console.log(term);
-            feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
+            feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}, "children": ${JSON.stringify(term.children || [])}}, `);
           }
         }
         feed(`  ])`);

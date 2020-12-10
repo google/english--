@@ -802,7 +802,7 @@ describe("FeaturedNearley", function() {
       a -> b "c" d.
       S -> NP _ VP_.
       PRO[gen=-hum, case=[+nom, -nom]] -> "it".
-      PP -> (PREP _ NP):+.
+      PP -> (PREP _ NP _ "bar"):+.
     `);
 
     let term = (name, types = {}, children = []) => {
@@ -810,45 +810,84 @@ describe("FeaturedNearley", function() {
     };
 
     assertThat(result).equalsTo([[{
-        "head": term("foo", {"num": 1}),
-        "tail": [term("bar"), term("hello", {"gender": "male"})]
-       }, {
-        "head": term("hello"), 
-        "tail": [term("world")]
-       }, {
-        "head": term("a"), 
-        "tail": ["\"hi\""]
-       }, {
-        "head": term("a"), 
-        "tail": [term("b"), "\"c\"", term("d")]
-       }, {
-        "head": term("S"), 
-        "tail": [term("NP"), term("_"), term("VP_")]
-       }, {
-        "head": term("PRO", {"case": ["+nom", "-nom"], "gen": "-hum"}), 
-        "tail": ["\"it\""]
-       }, {
-        "head": term("PP", {}), 
-        "tail": [term("@list", {"@number": "+"}, [term("PREP"), term("_"), term("NP")])]
-       }]]);
+      "head": term("foo", {"num": 1}),
+      "tail": [term("bar"), term("hello", {"gender": "male"})]
+    }, {
+      "head": term("hello"), 
+      "tail": [term("world")]
+    }, {
+      "head": term("a"), 
+      "tail": ["\"hi\""]
+    }, {
+      "head": term("a"), 
+      "tail": [term("b"), "\"c\"", term("d")]
+    }, {
+      "head": term("S"), 
+      "tail": [term("NP"), term("_"), term("VP_")]
+    }, {
+      "head": term("PRO", {"case": ["+nom", "-nom"], "gen": "-hum"}), 
+      "tail": ["\"it\""]
+    }, {
+      "head": term("PP", {}), 
+      "tail": [term("@list", {"@number": "+"},
+                    [term("PREP"),
+                     term("_"),
+                     term("NP"),
+                     term("_"),
+                     "\"bar\"",
+                    ])]
+    }]]);
   });
 
-  it.skip("Repeated", function() {
-    let grammar = FeaturedNearley.generate(`
-      main -> ( "bar" ):+.
-    `);
-
-    console.log(grammar);
-
-    return;
+  it("Repeated", function() {
+    let grammar = `
+      main -> ("bar"):+.
+    `;
+          
+    assertThat(FeaturedNearley.generate(grammar))
+      .equalsTo(
+`main -> ("bar"):+ {%
+  bind("main", {}, [
+    {"@type": "@list", "types": {"@number":"+"}, "children": ["\\"bar\\""]}, 
+  ])
+%}`);
     
-    let parser = new Nearley(grammar, "main");
+    let parser = new Nearley(FeaturedNearley.compile(grammar), "main");
 
-    let result = parser.feed("bar");
+    let result = parser.feed("barbar");
     
     assertThat(result).equalsTo([{
       "@type": "main",
-      "children": ["bar"],
+      "children": [[["bar"], ["bar"]]],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+
+  it("Typed Repeated", function() {
+    let grammar = FeaturedNearley.compile(`
+      main -> (foo[a=1]):+.
+      foo[a=1] -> "bar".
+      foo[a=2] -> "hello".
+    `);
+    
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("barbar");
+    
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": [[[{
+        "@type": "foo",
+        "loc": 0,
+        "types": {"a": 191193832},
+        "children": ["bar"]
+      }], [{
+        "@type": "foo",
+        "loc": 3,
+        "types": {"a": 191193832},
+        "children": ["bar"]
+      }]]],
       "loc": 0,
       "types": {}
     }]);
