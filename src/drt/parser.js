@@ -462,6 +462,11 @@ class FeaturedNearley {
   }
 
   static compile(source, header = "", footer = "", raw) {
+    let grammar = FeaturedNearley.generate(source, header, footer);
+    return Nearley.compile(grammar, raw);    
+  }
+
+  static generate(source, header = "", footer = "", raw) {
     let parser = new FeaturedNearley();
     let grammar = parser.feed(source + footer);
     // console.log(source + footer);
@@ -474,11 +479,11 @@ class FeaturedNearley {
 
     // feed(`@builtin "whitespace.ne"`);
     // feed(`@builtin "number.ne"`);
-    feed(``);
-    feed(`@{%`);
-    feed(`${bind.toString()}`);
-    feed(`%}`);
-    feed(``);
+    //feed(``);
+    //feed(`@{%`);
+    //feed(`${bind.toString()}`);
+    //feed(`%}`);
+    //feed(``);
 
     if (header) {
       feed(header);
@@ -539,10 +544,7 @@ class FeaturedNearley {
       feed(`%}`);
       
     }
-
-    // console.log(result.join("\n"));
-   
-    return Nearley.compile(result.join("\n"), raw);
+    return result.join("\n");
   }
 }
 

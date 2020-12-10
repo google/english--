@@ -832,6 +832,29 @@ describe("FeaturedNearley", function() {
         "tail": [term("@list", {"@number": "+"}, [term("PREP"), term("_"), term("NP")])]
        }]]);
   });
+
+  it.skip("Repeated", function() {
+    let grammar = FeaturedNearley.generate(`
+      main -> ( "bar" ):+.
+    `);
+
+    console.log(grammar);
+
+    return;
+    
+    let parser = new Nearley(grammar, "main");
+
+    let result = parser.feed("bar");
+    
+    assertThat(result).equalsTo([{
+      "@type": "main",
+      "children": ["bar"],
+      "loc": 0,
+      "types": {}
+    }]);
+  });
+
+
 });
 
 function clear(root) {
