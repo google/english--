@@ -211,8 +211,8 @@ function bind(type, types = {}, conditions = []) {
     
     // Creates a copy of the input data, because it is
     // reused across multiple calls.
-    // console.log(data);
-    let result = JSON.parse(JSON.stringify(data))
+    //console.log(data);
+    let result = JSON.parse(JSON.stringify(data || []))
         .filter((ws) => ws != null);
     
     // console.log(data);
@@ -239,20 +239,35 @@ function bind(type, types = {}, conditions = []) {
 
     // console.log(expects);
 
-    let children = result.filter((node) => node["@type"] || Array.isArray(node));
+    //let children = result.filter((node) => {
+    // if (node["@type"]) {
+    //    return true;
+    //  }
+    //  if (Array.isArray(node)) {
+    //    // console.log(node[0]);
+    //    return true;
+    //  }
+    //});
+    let children = [];
+    
 
     //console.log(children);
     
     //let children2 = [];
-    //for (let i = 0; i < result.length; i++) {
+    for (let i = 0; i < result.length; i++) {
+      let node = result[i];
+      if (node["@type"] || Array.isArray(node)) {
+        // console.log("children);
+        children.push([node, i]);
+      }
       // console.log(expects[i]);
-    //  let node = result[i];
-    //  if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
-    //    children2.push(node);
-        //console.log(expects[i]);
-        //console.log(`node: ${i} *${JSON.stringify(node)}*`);
-    //  }
-    //}
+      //  let node = result[i];
+      //  if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
+      //    children2.push(node);
+      //console.log(expects[i]);
+      //console.log(`node: ${i} *${JSON.stringify(node)}*`);
+      //  }
+    }
     
     // let children = result.filter((node) => node["@type"]);
     //expects = expects.filter((node) => node["@type"] != "@list");
@@ -274,7 +289,7 @@ function bind(type, types = {}, conditions = []) {
     
     for (let i = 0; i < expects.length; i++) {
       let expected = expects[i];
-      let child = children[i];
+      let [child, index] = children[i];
       if (expected["@type"] == "@list") {
         // bind(type, types = {}, conditions = [])
         //let sub = expected.children.filter((s) => {
@@ -292,13 +307,22 @@ function bind(type, types = {}, conditions = []) {
         //console.log("hi");
         //console.log(children);
         //console.log(sub);
-        let list = bind("@list", {}, sub)(child[0], location, reject);
-        if (list == reject) {
-          //console.log("blarh");
-          return reject;
+        // console.log(child);
+        let processed = [];
+        for (el of child) {
+          let list = bind("@list", {}, sub)(el, location, reject);
+          if (list == reject) {
+            //console.log("blarh");
+            return reject;
+          }
+          processed.push(list.children);
         }
         // children[i] = list;
-        children[i][0] = list.children;
+        //console.log(`Trying to override ${index} in result`);
+        result[index] = processed;
+        //console.log(list.children);
+        // children[i][0] = list.children;
+        // console.log(result);
         continue;
       }
       if (expected["@type"] != child["@type"]) {
@@ -415,10 +439,12 @@ const RuntimeSyntax = `
         }
       %}
 
-      term -> "(" _ termList _ "):+" {% ([paren, ws1, termList]) => {
+      term -> "(" _ termList _ "):" ("+" | "*") {% 
+        ([paren1, ws1, termList, ws2, paren2, [number]]) => {
+          // console.log(number);
           return {
             "name": "@list",
-            "types": {"@number": "+"},
+            "types": {"@number": number},
             "children": termList,
           };
         } 
@@ -584,6 +610,7 @@ class FeaturedNearley {
       feed(`%}`);
       
     }
+    // console.log(result.join("\n"));
     return result.join("\n");
   }
 }
@@ -661,12 +688,24 @@ const DrtSyntax = `
           V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
           NP[num=6, gen=7, case=-nom, gap=-].
 
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
+          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
+          NP[num=6, gen=7, case=-nom, gap=-].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
+          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] 
+          PP __
+          NP[num=6, gen=7, case=-nom, gap=-].
+
       VP[num=1, fin=2, gap=np, tp=6, tense=7] ->
           V[num=1, fin=2, trans=+, tp=6, tense=7] _ 
           NP[num=4, gen=5, case=-nom, gap=np].
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
         V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
+
+      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
+        V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5] PP.
 
       VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
           HAVE[num=1, fin=+, tp=4, tense=5] __
@@ -676,10 +715,6 @@ const DrtSyntax = `
           HAVE[num=1, fin=+, tp=4, tense=5] __
           %not __
           VP[num=1, fin=part, gap=2, stat=6, tp=4, tense=5].
-
-      V[num=1, fin=2, trans=3, tp=4, tense=5] -> 
-        V[num=1, fin=2, trans=3, tp=4, tense=5] __
-        PP.  
 
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
@@ -713,9 +748,9 @@ const DrtSyntax = `
           BE[num=1, fin=2, tp=-past, tense=4] __ %not __ ADJ.
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
-          BE[num=1, fin=2, tp=-past, tense=4] __ PP.
+          BE[num=1, fin=2, tp=-past, tense=4] PP.
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
-          BE[num=1, fin=2, tp=-past, tense=4] __ %not __ PP.
+          BE[num=1, fin=2, tp=-past, tense=4] __ %not PP.
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
           BE[num=1, fin=2, tp=-past, tense=7] __ 
@@ -768,9 +803,9 @@ const DrtSyntax = `
       PRO[num=sing, gen=fem, case=-nom, refl=+] -> %herself.
       PRO[num=sing, gen=-hum, case=-nom, refl=+] -> %itself.
 
-      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+      N[num=1, gen=2] -> N[num=1, gen=2] PP.
 
-      PP -> (PREP __ NP[num=1, gen=2, case=3, gap=-]):+.
+      PP -> (__ PREP __ NP[num=1, gen=2, case=3, gap=-]):+.
 
       PREP -> %behind.
       PREP -> %__in__.

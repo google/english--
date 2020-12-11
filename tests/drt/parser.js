@@ -846,7 +846,7 @@ describe("FeaturedNearley", function() {
     }]]);
   });
 
-  it("Repeated", function() {
+  it("Repeated: one or more", function() {
     let grammar = `
       main -> ("bar"):+.
     `;
@@ -873,7 +873,7 @@ describe("FeaturedNearley", function() {
 
   it("Typed Repeated", function() {
     let grammar = FeaturedNearley.compile(`
-      main -> "<" (foo[a=1] WS foo[a=2]):+ ">".
+      main -> "<" (foo[a=1] WS foo[a=2]):* ">".
       foo[a=1] -> "hello".
       foo[a=2] -> "world".
       WS -> " ".
@@ -1331,6 +1331,16 @@ describe("Statements", function() {
     assertThat(parse("Jones walks."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("walk"), "s")))));
+  });
+
+  it("Jones walks to Brazil.", function() {
+    assertThat(parse("Jones walks to Brazil."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(V(VERB("walk"), "s"),
+                        PP([
+                          [PREP("to"), NP(PN("Brazil"))]
+                        ])
+                       ))));
   });
 
   it("they walk.", function() {
@@ -2530,14 +2540,36 @@ describe("Backwards compatibility", function() {
                          NP(PN("Dani"))))));
   });
 
-  it("Sam made a reservation.", function() {
-    assertThat(parse("Sam made a reservation for Cascal."))
+  it("Jones came from Brazil.", function() {
+    assertThat(parse("Jones came from Brazil."))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(V(VERB("came")),
+                         PP([
+                           [PREP("from"), NP(PN("Brazil"))],
+                           // [PREP("to"), NP(PN("Italy"))]
+                         ])
+                        ))));
+  });
+
+  it("Sam Goto kissed in Brazil Dani.", function() {
+    assertThat(parse("Sam Goto kissed in Brazil Dani."))
+      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
+                  VP_(VP(V(VERB("kiss"), "ed"),
+                         PP([
+                           [PREP("in"), NP(PN("Brazil"))]
+                         ]),
+                         NP(PN("Dani"))))));
+  });
+    
+  it("Sam made a reservation for Cascal for Dani.", function() {
+    assertThat(parse("Sam made a reservation for Cascal for Dani."))
       .equalsTo(S(NP(PN("Sam")),
                   VP_(VP(V(VERB("made")),
                          NP(DET("a"),
-                            N(N("reservation"), PP(
-                              [[PREP("for"), NP(PN("Cascal"))]]
-                            ))
+                            N(N("reservation"), PP([
+                              [PREP("for"), NP(PN("Cascal"))],
+                              [PREP("for"), NP(PN("Dani"))]
+                            ]))
                            )))));
   });
 });

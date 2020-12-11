@@ -145,7 +145,7 @@ function predicate(name, args, types) {
     args: args,
     types: types,
     print() {
-      // console.log(this.args);
+      //console.log(this.args);
       let args = this.args.map(arg => print(arg));
       return `${this.name}(${args.join(", ")})`;
     }
@@ -184,25 +184,26 @@ class CRVPPN extends Rule {
     super(ids, VP(capture("v"), NP(PN(capture("name")))));
   }
   apply({name}, node, refs = []) {
-    // console.log(name);
+    let last = node.children.length - 1;
+    //let name = child(node, last);
     
+    ///if (name["@type"] != "NP" && child(name, 0)["@type"] != "PN") {
+    // return [[], [], [], []];
+    //}
+    
+    // console.log("hi");
     let head = [];
     let body = [];
     let ref = find(name.types, refs, name.children[0].value, name.loc);
     
     if (!ref) {
       ref = referent(this.id(), name.types, name.children[0], name.loc);
-      // console.log(ref);
       head.push(ref);
       let pred = predicate(child(name, 0).value, [ref], name.types);
       body.push(pred);
-      //let pn = name;
-      //pn.ref = ref;
-      // console.log(pn);
-      //body.push(pn);
     }
-    
-    node.children[1] = ref;
+    node.children[last] = ref;
+    // console.log(JSON.stringify(node, undefined, 2));
     
     return [head, body, [], []];
   }
@@ -252,7 +253,6 @@ class CRPPPN extends Rule {
   apply({pp}, node, refs) {
     let head = [];
     let body = [];
-
     
     for (let phrase of pp.children[0]) {
       const pattern = PP(PREP(), NP(PN(capture("name"))));
@@ -442,17 +442,19 @@ class CRLIN extends CompositeRule {
 class CRADV extends Rule {
   constructor(ids) {
     super(ids, S(capture("subject"),
-                 VP_(VP(V(V(capture("verb")),
-                          PP(capture("pp")))
-                       ))));
+                 VP_(VP(V(capture("verb")),
+                        PP(capture("pp"),
+                          )))));
   }
   apply({subject, verb, pp}, node) {
+    // throw new Error("hi");
     let body = [];
     let sub = child(node, 0);
     
     for (let phrase of pp.children[0]) {
       const pattern = PP(PREP(capture("prep")), capture("np"));
       let result = match(pattern, PP(...phrase));
+      // console.log(result);
       if (result) {
         let {prep} = result;
         let v = clone(verb);
@@ -460,11 +462,15 @@ class CRADV extends Rule {
         let cond = S(sub, VP_(VP(v, phrase[1])));
         cond.types = node.types;
         body.push(cond);
+        // console.log(JSON.stringify(cond, undefined, 2));
       }
     }
 
+    // Removes the prepositional phrase.
+    child(node, 1, 0).children.splice(1, 1);
     child(node, 1, 0).children[0] = verb;
-
+    // console.log(JSON.stringify(node, undefined, 2));
+    
     return [[], body, [], []];
   }
 }
@@ -1180,6 +1186,7 @@ class CRPRED extends Rule {
     if (obj) {
       args.push(obj.name);
     }
+    // console.log(args);
     // console.log(sub.name);
     let name = verb.children.join("");
     // console.log(verb);

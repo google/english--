@@ -91,6 +91,8 @@ class DRS {
 
     // Resolve all proper names.
     this.process([node], this.before);
+
+    // return;
     
     this.body.push(node);
 
