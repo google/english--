@@ -1694,15 +1694,17 @@ describe("DRS", function() {
      `);
   });
 
-  it("Sam made a reservation for Cascal.", function() { 
-    assertThat("Sam made a reservation for Cascal.")
+  it("Sam made a reservation for Cascal for Dani.", function() { 
+    assertThat("Sam made a reservation for Cascal for Dani.")
      .equalsTo(`
-       let a, b, c
+       let a, b, c, d
        Sam(a)
-       Cascal(b)
-       reservation(c)
-       < made(a, c)
-       for(c, b)
+       Dani(b)
+       Cascal(c)
+       reservation(d)
+       < made(a, d)
+       for(d, b)
+       for(d, c)
      `);
   });
 
@@ -1722,6 +1724,8 @@ describe("DRS", function() {
   it.skip("Jones came from Brazil to Italy.", function() { 
     // We need to allow repeated prepositional phrases
     // as adverbs
+    // This is ambiguous because the "to" can be attached
+    // to "came" as an adverb or to "Brazil" as a preposition. 
     assertThat("Jones came from Brazil to Italy.")
      .equalsTo(`
        let a, b, c
