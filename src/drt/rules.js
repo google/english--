@@ -215,12 +215,16 @@ class CRDETPN extends Rule {
   apply({name}, node, refs) {
     let head = [];
     let body = [];
+
+    // throw new Error(name.children[0].value);
+
     //console.log("hi");
     //console.log(name);
-        
+    // console.log(name.children[0].value);
+    
     let ref = find(name.types, refs, name.children[0].value);
     //console.log(name.children[0].value);
-    //console.log(ref);
+    // console.log(ref);
     if (!ref) {
       ref = referent(this.id(), name.types, print(name));
       head.push(ref);
@@ -231,6 +235,7 @@ class CRDETPN extends Rule {
       //pn.ref = ref;
       //body.push(pn);
     }
+    // console.log(body);
     
     node.children[0] = ref;
     
@@ -242,27 +247,32 @@ class CRDETPN extends Rule {
 
 class CRPPPN extends Rule {
   constructor(ids) {
-    super(ids, PP(PREP(), NP(PN(capture("name")))));
+    super(ids, PP(capture("pp")));
   }
-  apply({name}, node, refs) {
+  apply({pp}, node, refs) {
     let head = [];
     let body = [];
-    // console.log("hi");
-    let ref = find(name.types, refs, name.children[0].value);
+
     
-    if (!ref) {
-      ref = referent(this.id(), name.types, print(name));
-      head.push(ref);
-      let pred = predicate(child(name, 0).value, [ref], name.types);
-      body.push(pred);
-      //let pn = name;
-      //pn.ref = ref;
-      //body.push(pn);
+    for (let phrase of pp.children[0]) {
+      const pattern = PP(PREP(), NP(PN(capture("name"))));
+      let result = match(pattern, PP(...phrase));
+      // console.log(JSON.stringify(phrase, undefined, 2));
+      if (result) {
+        let {name} = result;
+        let ref = find(name.types, refs, name.children[0].value);
+    
+        if (!ref) {
+          ref = referent(this.id(), name.types, print(name));
+          head.push(ref);
+          let pred = predicate(child(name, 0).value, [ref], name.types);
+          body.push(pred);
+        }
+    
+        phrase[1] = ref;
+      }
     }
-    
-    // console.log("hi");
-    node.children[1] = ref;
-    
+
     return [head, body, [], []];
   }
 }
@@ -396,21 +406,30 @@ class CRNLIN extends Rule {
 
 class CRPPLIN extends Rule {
   constructor(ids) {
-    super(ids, N(N(capture("noun")), PP(PREP(capture("prep")), capture("np"))));
+    super(ids, N(N(capture("noun")), PP(capture("pp"))));
   }
-  apply({noun, prep, np}, node) {
+  apply({noun, pp}, node) {
     if (!node.ref) {
       return [[], [], [], []];
     }
-    // console.log("hi");
-    // console.log(node);
+
+    let body = [];
     
     noun.ref = node.ref;
-    let cond = S(node.ref, VP_(VP(V(child(prep, 0).value), child(np, 1))));
+    body.push(noun);
     
-    // noun.neg = node.neg;
+    for (let phrase of pp.children[0]) {
+      const pattern = PP(PREP(capture("prep")), capture("np"));
+      let result = match(pattern, PP(...phrase));
+      if (!result) {
+        continue;
+      }
+      let {prep} = result;
+      let cond = S(node.ref, VP_(VP(V(child(prep, 0).value), phrase[1])));
+      body.push(cond);
+    }
     
-    return [[], [noun, cond], [], [node]];
+    return [[], body, [], [node]];
   }
 }
 
@@ -424,18 +443,29 @@ class CRADV extends Rule {
   constructor(ids) {
     super(ids, S(capture("subject"),
                  VP_(VP(V(V(capture("verb")),
-                          PP(PREP(capture("prep")), capture("np")))
+                          PP(capture("pp")))
                        ))));
   }
-  apply({subject, verb, prep, np}, node) {
-    child(node, 1, 0).children[0] = verb;
+  apply({subject, verb, pp}, node) {
+    let body = [];
     let sub = child(node, 0);
-    let v = clone(verb);
-    child(v, 0).children[0].value += "-" + child(prep, 0).value;
-    let cond = S(sub, VP_(VP(v, child(np, 1))));
-    cond.types = node.types;
-    // console.log("hi");
-    return [[], [cond], [], []];
+    
+    for (let phrase of pp.children[0]) {
+      const pattern = PP(PREP(capture("prep")), capture("np"));
+      let result = match(pattern, PP(...phrase));
+      if (result) {
+        let {prep} = result;
+        let v = clone(verb);
+        child(v, 0).children[0].value += "-" + child(prep, 0).value;
+        let cond = S(sub, VP_(VP(v, phrase[1])));
+        cond.types = node.types;
+        body.push(cond);
+      }
+    }
+
+    child(node, 1, 0).children[0] = verb;
+
+    return [[], body, [], []];
   }
 }
 
@@ -531,17 +561,24 @@ class CRPOSBE extends Rule {
 
 class CRPREPBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"), VP_(VP(BE("is"), PP(PREP(capture("prep")), capture("np"))))));
+    super(ids, S(capture("ref"),
+                 VP_(VP(BE("is"), PP(capture("pp"))))
+                ));
   }
-  apply({ref, prep, np}, node, refs) {
-    // console.log("hi");
-    // console.log(child(node, 1, 0, 1, 1));
-    let s = S(child(ref, 0), VP_(VP(V(child(prep, 0).value), child(np, 1))));
-    // let pred = predicate(child(prep, 0).value, [child(ref, 0), child(np, 1)]);
-    // console.log(print(child(np, 1)));
-    // console.log(child(s, 1, 0, 1, 1));
-    // console.log(child());
-    return [[], [s], [], [node]];
+  apply({ref, pp}, node, refs) {
+    let body = [];
+
+    for (let phrase of pp.children[0]) {
+      const pattern = PP(PREP(capture("prep")), capture("np"));
+      let result = match(pattern, PP(...phrase));
+      if (result) {
+        let {prep} = result;
+        let s = S(child(ref, 0), VP_(VP(V(child(prep, 0).value), phrase[1])));
+        body.push(s);
+      }
+    }
+
+    return [[], body, [], [node]];
   }
 }
 
@@ -597,7 +634,7 @@ class CRNEGNBE extends Rule {
     if (node.types && node.types.tense) {
       np.types.tense = node.types.tense;
     }
-    
+    // console.log(np);
     sub.push(np);
     
     return [[], [negation(sub)], [], [node]];
@@ -606,7 +643,13 @@ class CRNEGNBE extends Rule {
 
 class CRBE extends CompositeRule {
   constructor(ids) {
-    super([new CRPOSBE(ids), new CRNEGBE(ids), new CRNBE(ids), new CRNEGNBE(ids), new CRPREPBE(ids)]);
+    super([
+      new CRPOSBE(ids),
+      new CRNEGBE(ids),
+      new CRNBE(ids),
+      new CRNEGNBE(ids),
+      new CRPREPBE(ids)
+    ]);
   }
 }
 
@@ -815,6 +858,7 @@ class CRSPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
+    // throw new Error("hi");
     let u = referent(this.id(), noun.types, print(child(node, 0), refs));
     node.children[0] = u;
     node.ref = u;
@@ -899,20 +943,27 @@ class CRVPPP extends Rule {
                  VP_(VP(V(), 
                         NP(DET(), 
                            N(N(capture("noun")), 
-                             PP(PREP(capture("prep")), 
-                                NP(capture("np")))))))));
+                             PP(capture("pp"))))))));
   }
-  apply({noun, prep, np}, node, refs) {
+  apply({noun, prep, np, pp}, node, refs) {
+    let body = [];
+    
     let u = referent(this.id(), noun.types);
-    child(node, 1, 0).children[1] = u;
-    
+    child(node, 1, 0).children[1] = u; 
     noun.ref = u;
+    body.push(noun);
+   
+    for (let phrase of pp.children[0]) {
+      const pattern = PP(PREP(capture("prep")), capture("np"));
+      let result = match(pattern, PP(...phrase));
+      if (result) {
+        let {prep} = result;
+        let cond = S(u, VP_(VP(V(child(prep, 0).value), phrase[1])));
+        body.push(cond);
+      }
+    }
     
-    //console.log(prep);
-    // console.log("hi");
-    let cond = S(u, VP_(VP(V(child(prep, 0).value), np)));
-    
-    return [[u], [noun, cond], [], []];
+    return [[u], body, [], []];
   }
 }
 

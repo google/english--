@@ -39,6 +39,7 @@ class DRS {
       let p = queue.shift();
       // breadth first search: iterate over
       // this level first ...
+      // console.log(p);
       let skip = false;
       for (let rule of rules) {
         let [head, body, drs, [remove]] = rule.match(p, this.head);
@@ -68,7 +69,11 @@ class DRS {
       // ... and recurse.
       let next = (p && p.children || [])
           .filter(c => typeof c != "string");
-      queue.push(...next);
+
+      //next = next.map(x => Array.isArray(x) ? x.flat(3) : x);
+      
+      // console.log(next.flat(2));
+      queue.push(...next.flat(2));
     }
     
     return this;
@@ -86,9 +91,10 @@ class DRS {
 
     // Resolve all proper names.
     this.process([node], this.before);
- 
+    
     this.body.push(node);
 
+    // console.log("Applying all the rules");
     let result = this.process([node], this.rules);
 
     // console.log(this.body);

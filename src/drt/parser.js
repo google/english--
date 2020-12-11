@@ -21,7 +21,7 @@ class Nearley {
       this.parser.feed(code);
       return this.parser.results;
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       throw this.reportError(e);
     }
   }
@@ -211,6 +211,7 @@ function bind(type, types = {}, conditions = []) {
     
     // Creates a copy of the input data, because it is
     // reused across multiple calls.
+    // console.log(data);
     let result = JSON.parse(JSON.stringify(data))
         .filter((ws) => ws != null);
     
@@ -234,17 +235,24 @@ function bind(type, types = {}, conditions = []) {
     let namespace = hash(signature);
     
     // console.log(data);
-    // console.log(result[0]);
+    // console.log(result);
 
-    let children = [];
-    for (let i = 0; i < result.length; i++) {
+    // console.log(expects);
+
+    let children = result.filter((node) => node["@type"] || Array.isArray(node));
+
+    //console.log(children);
+    
+    //let children2 = [];
+    //for (let i = 0; i < result.length; i++) {
       // console.log(expects[i]);
-      let node = result[i];
-      if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
-        children.push(node);
-        // console.log(`node: ${i} *${JSON.stringify(node)}*`);
-      }
-    }
+    //  let node = result[i];
+    //  if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
+    //    children2.push(node);
+        //console.log(expects[i]);
+        //console.log(`node: ${i} *${JSON.stringify(node)}*`);
+    //  }
+    //}
     
     // let children = result.filter((node) => node["@type"]);
     //expects = expects.filter((node) => node["@type"] != "@list");
@@ -268,21 +276,29 @@ function bind(type, types = {}, conditions = []) {
       let expected = expects[i];
       let child = children[i];
       if (expected["@type"] == "@list") {
-        // console.log("hi");
-        //console.log(child);
-        //console.log(expected.children);
         // bind(type, types = {}, conditions = [])
-        let sub = expected.children.filter((s) => {
-          // console.log(typeof s == "string");
-          return typeof s != "string";
-        });
-        sub = sub.map((s) => {
-          return {"@type": s.name, types: s.types}
-        });
+        //let sub = expected.children.filter((s) => {
+        //  return typeof s != "string";
+        //});
+        let sub = [];
+        for (let s of expected.children) {
+          if (typeof s == "string" ||
+              s.name == "__" ||
+              s.name == "_") {
+            continue;
+          }
+          sub.push({"@type": s.name, types: s.types});
+        }
+        //console.log("hi");
+        //console.log(children);
+        //console.log(sub);
         let list = bind("@list", {}, sub)(child[0], location, reject);
         if (list == reject) {
+          //console.log("blarh");
           return reject;
         }
+        // children[i] = list;
+        children[i][0] = list.children;
         continue;
       }
       if (expected["@type"] != child["@type"]) {
@@ -754,7 +770,7 @@ const DrtSyntax = `
 
       N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
 
-      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+      PP -> (PREP __ NP[num=1, gen=2, case=3, gap=-]):+.
 
       PREP -> %behind.
       PREP -> %__in__.

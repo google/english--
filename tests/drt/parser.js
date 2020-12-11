@@ -636,12 +636,19 @@ describe("FeaturedNearley", function() {
     });
 
     function clear(root) {
-     delete root.types;
-     delete root.loc;
-     for (let child of root.children || []) {
-      clear(child);
-     }
-     return root;
+      //if (Array.isArray(root)) {
+      //  throw new Error("hi");
+      //  for (let child of root) {
+      //    clear(child);
+      //  }
+      //  return root;
+      //}
+      delete root.types;
+      delete root.loc;
+      for (let child of root.children || []) {
+        clear(child);
+      }
+      return root;
     }
 
     assertThat(clear(result[0]))
@@ -866,28 +873,59 @@ describe("FeaturedNearley", function() {
 
   it("Typed Repeated", function() {
     let grammar = FeaturedNearley.compile(`
-      main -> (foo[a=1]):+.
-      foo[a=1] -> "bar".
-      foo[a=2] -> "hello".
+      main -> "<" (foo[a=1] WS foo[a=2]):+ ">".
+      foo[a=1] -> "hello".
+      foo[a=2] -> "world".
+      WS -> " ".
     `);
     
     let parser = new Nearley(grammar, "main");
 
-    let result = parser.feed("barbar");
+    let result = parser.feed("<hello worldhello world>");
     
     assertThat(result).equalsTo([{
       "@type": "main",
-      "children": [[[{
-        "@type": "foo",
-        "loc": 0,
-        "types": {"a": 191193832},
-        "children": ["bar"]
-      }], [{
-        "@type": "foo",
-        "loc": 3,
-        "types": {"a": 191193832},
-        "children": ["bar"]
-      }]]],
+      "children": [
+        "<",
+        // repeated block
+        [
+          // first item in the block
+          [{
+            "@type": "foo",
+            "loc": 1,
+            "types": {"a": 191193832},
+            "children": ["hello"]
+          }, {
+            "@type": "WS",
+            "loc": 6,
+            "types": {},
+            "children": [" "]
+          }, {
+            "@type": "foo",
+            "loc": 7,
+            "types": {"a": 219822984},
+            "children": ["world"]
+          }],
+          // second item in the block
+          [{
+            "@type": "foo",
+            "loc": 12,
+            "types": {"a": 191193832},
+            "children": ["hello"]
+          }, {
+            "@type": "WS",
+            "loc": 17,
+            "types": {},
+            "children": [" "]
+          }, {
+            "@type": "foo",
+            "loc": 18,
+            "types": {"a": 219822984},
+            "children": ["world"]
+          }], 
+        ],
+        ">"
+      ],
       "loc": 0,
       "types": {}
     }]);
@@ -898,6 +936,10 @@ describe("FeaturedNearley", function() {
 
 function clear(root) {
   if (!root) {
+    return;
+  }
+  if (Array.isArray(root)) {
+    root.forEach(x => clear(x));
     return;
   }
   delete root.types;
@@ -918,19 +960,22 @@ function clear(root) {
 }
 
 function parse(s, start = "Discourse", raw = false, skip = true) {
- let parser = new Parser(start);
- let results = parser.feed(s);
+  let parser = new Parser(start);
+  let results = parser.feed(s);
 
- if (raw) {
-  return results[0];
- }
+  if (raw) {
+    return results[0];
+  }
 
- if (skip) {
-  let result = clear(results[0][0][0]);
-  return child(result, 0, 0, 0);
- }
+  if (skip) {
+    let result = clear(results[0][0][0]);
+    // console.log(JSON.stringify(child(result, 0, 0, 0), undefined, 2));
+    return child(result, 0, 0, 0);
+  }
 
- return clear(results[0]);
+  // console.log(results[0]);
+  
+  return clear(results[0]);
 }
 
 describe("Statements", function() {
@@ -1216,7 +1261,7 @@ describe("Statements", function() {
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("book"), 
-                             PP(PREP("about"), NP(PN("Brazil"))))
+                             PP([[PREP("about"), NP(PN("Brazil"))]]))
                            )))));
   });
 
@@ -1226,7 +1271,7 @@ describe("Statements", function() {
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("book"), 
-                             PP(PREP("from"), NP(PN("Brazil"))))
+                             PP([[PREP("from"), NP(PN("Brazil"))]]))
                            )))));
   });
 
@@ -1236,7 +1281,7 @@ describe("Statements", function() {
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
                            N(N("girl"), 
-                             PP(PREP("with"), NP(DET("a"), N("telescope"))))
+                             PP([[PREP("with"), NP(DET("a"), N("telescope"))]]))
                            )))));
   });
 
@@ -1244,14 +1289,14 @@ describe("Statements", function() {
     assertThat(parse("Jones is from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), 
-                        PP(PREP("from"), NP(PN("Brazil")))))));
+                        PP([[PREP("from"), NP(PN("Brazil"))]])))));
   });
 
   it("Jones is not from Brazil.", function() {
     assertThat(parse("Jones is not from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), "not",
-                        PP(PREP("from"), NP(PN("Brazil")))))));
+                        PP([[PREP("from"), NP(PN("Brazil"))]])))));
   });
 
   it("Jones likes a girl who is from Brazil.", function() {
@@ -1263,7 +1308,8 @@ describe("Statements", function() {
                              RC(RPRO("who"),
                                 S(NP(GAP()),
                                   VP_(VP(BE("is"), 
-                                         PP(PREP("from"), NP(PN("Brazil"))))))
+                                         PP([[PREP("from"), NP(PN("Brazil"))]]
+                                           ))))
                                 ))
                            )))
                  ));
@@ -2115,8 +2161,9 @@ describe("Backwards compatibility", function() {
      .equalsTo(S(NP(PN("Jones")), 
                  VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), N(N("woman"), 
-                                       PP(PREP("with"), NP(DET("a"), N("donkey"))
-                                          )))))));
+                                       PP([[PREP("with"), NP(DET("a"), N("donkey"))]]
+                                           )
+                                        ))))));
   });
 
   it("Jones is a man.", function() {
@@ -2263,14 +2310,14 @@ describe("Backwards compatibility", function() {
   it("John is from Brazil", function() {
     assertThat(parse("Jones is from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+                 VP_(VP(BE("is"), PP([[PREP("from"), NP(PN("Brazil"))]])
                         ))));
   });
 
   it("every brazilian is from Brazil", function() {
     assertThat(parse("every brazilian is from Brazil."))
      .equalsTo(S(NP(DET("every"), N("brazilian")),
-                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+                 VP_(VP(BE("is"), PP([[PREP("from"), NP(PN("Brazil"))]])
                         ))));
   });
 
@@ -2489,7 +2536,7 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V(VERB("made")),
                          NP(DET("a"),
                             N(N("reservation"), PP(
-                              PREP("for"), NP(PN("Cascal"))
+                              [[PREP("for"), NP(PN("Cascal"))]]
                             ))
                            )))));
   });
