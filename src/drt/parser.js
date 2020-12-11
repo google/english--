@@ -1016,6 +1016,8 @@ const dict = [
     "trans": "+", "stat": "-", "pres": "+s"}}]],
   ["gave", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "past": "-reg"}}]],
+  ["travelled", "word", [{"@type": "VERB", types: {
+    "trans": "-", "stat": "-", "past": "-reg"}}]],
 
   ["make", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "s"}}]],

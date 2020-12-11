@@ -962,7 +962,7 @@ function clear(root) {
 function parse(s, start = "Discourse", raw = false, skip = true) {
   let parser = new Parser(start);
   let results = parser.feed(s);
-
+  
   if (raw) {
     return results[0];
   }
@@ -2540,13 +2540,13 @@ describe("Backwards compatibility", function() {
                          NP(PN("Dani"))))));
   });
 
-  it("Jones came from Brazil.", function() {
-    assertThat(parse("Jones came from Brazil."))
+  it("Jones travelled from Brazil to Italy.", function() { 
+    assertThat(parse("Jones travelled from Brazil to Italy."))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("came")),
+                  VP_(VP(V(VERB("travelled")),
                          PP([
                            [PREP("from"), NP(PN("Brazil"))],
-                           // [PREP("to"), NP(PN("Italy"))]
+                           [PREP("to"), NP(PN("Italy"))]
                          ])
                         ))));
   });
