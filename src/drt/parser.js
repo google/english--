@@ -722,9 +722,11 @@ const DrtSyntax = `
 
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
 
+      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2] PP.
+
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ RN[num=1, gen=2].
 
-      NP[num=1, gen=2, case=3, gap=-] -> PN[num=1, gen=2].
+      NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
  
       NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
 
@@ -802,8 +804,6 @@ const DrtSyntax = `
       PRO[num=sing, gen=male, case=-nom, refl=+] -> %himself.
       PRO[num=sing, gen=fem, case=-nom, refl=+] -> %herself.
       PRO[num=sing, gen=-hum, case=-nom, refl=+] -> %itself.
-
-      N[num=1, gen=2] -> N[num=1, gen=2] PP.
 
       PP -> (__ PREP __ NP[num=1, gen=2, case=3, gap=-]):+.
 
@@ -897,9 +897,9 @@ const DrtSyntax = `
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
-      PN[num=1, gen=2] -> PN __ PN.
-      PN[num=1, gen=2] -> %word.
-      PN[num=1, gen=2] -> %name.
+      PN[gen=2] -> PN __ PN.
+      PN[gen=2] -> %word.
+      PN[gen=2] -> %name.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      
       RN[num=1, gen=2] -> %word.

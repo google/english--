@@ -999,13 +999,13 @@ describe("DRS", function() {
     assertThat("Every man from Brazil loves Mary.")
      .equalsTo(`
        let a, b
-       Mary(a)
-       Brazil(b)
+       Brazil(a)
+       Mary(b)
        every (c: {
          man(c)
-         from(c, b)
+         from(c, a)
        }) {
-         loves(c, a)
+         loves(c, b)
        }
     `);
   });

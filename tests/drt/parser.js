@@ -10,6 +10,7 @@ const {
   DrtSyntax} = require("../../src/drt/parser.js");
 
 const {
+  Sentence,
   Statement,
   Question,
   S,
@@ -969,7 +970,6 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
 
   if (skip) {
     let result = clear(results[0][0][0]);
-    // console.log(JSON.stringify(child(result, 0, 0, 0), undefined, 2));
     return child(result, 0, 0, 0);
   }
 
@@ -1260,9 +1260,9 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N(N("book"), 
-                             PP([[PREP("about"), NP(PN("Brazil"))]]))
-                           )))));
+                           N("book"), 
+                           PP([[PREP("about"), NP(PN("Brazil"))]]))
+                       ))));
   });
 
   it("Jones likes a book from Brazil", function() {
@@ -1270,9 +1270,9 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N(N("book"), 
-                             PP([[PREP("from"), NP(PN("Brazil"))]]))
-                           )))));
+                           N("book"), 
+                           PP([[PREP("from"), NP(PN("Brazil"))]]))
+                       ))));
   });
 
   it("Jones likes a girl with a telescope.", function() {
@@ -1280,9 +1280,9 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N(N("girl"), 
-                             PP([[PREP("with"), NP(DET("a"), N("telescope"))]]))
-                           )))));
+                           N("girl"), 
+                           PP([[PREP("with"), NP(DET("a"), N("telescope"))]]))
+                       ))));
   });
 
   it("Jones is from Brazil.", function() {
@@ -2170,10 +2170,10 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Jones likes a woman with a donkey."))
      .equalsTo(S(NP(PN("Jones")), 
                  VP_(VP(V(VERB("like"), "s"), 
-                        NP(DET("a"), N(N("woman"), 
-                                       PP([[PREP("with"), NP(DET("a"), N("donkey"))]]
-                                           )
-                                        ))))));
+                        NP(DET("a"),
+                           N("woman"), 
+                           PP([[PREP("with"), NP(DET("a"), N("donkey"))]])
+                          )))));
   });
 
   it("Jones is a man.", function() {
@@ -2566,12 +2566,72 @@ describe("Backwards compatibility", function() {
       .equalsTo(S(NP(PN("Sam")),
                   VP_(VP(V(VERB("made")),
                          NP(DET("a"),
-                            N(N("reservation"), PP([
+                            N("reservation"),
+                            PP([
                               [PREP("for"), NP(PN("Cascal"))],
                               [PREP("for"), NP(PN("Dani"))]
-                            ]))
+                            ])
                            )))));
   });
+});
+
+describe("Ambiguity", () => {
+  it("Sam walks.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam walks.");
+    assertThat(results.length).equalsTo(1);
+  });
+
+  it("Sam loves Dani.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam loves Dani.");
+    assertThat(results.length).equalsTo(2);
+    assertThat(results[0]).equalsTo(results[1]);
+  });
+
+  it("Sam made a reservation for Cascal for Dani.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam made a reservation for Cascal for Dani.");
+    assertThat(results.length).equalsTo(2);
+    // TODO(goto): understand why there are two threes generated.
+    assertThat(results[0]).equalsTo(results[1]);
+  });
+
+  it("Sam travelled from Brazil to Japan.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam travelled from Brazil to Japan.");
+    assertThat(results.length).equalsTo(1);
+  });
+
+  it("Sam made a reservation for Cascal for Dani.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam made a reservation for Cascal for Dani.");
+
+    assertThat(results.length).equalsTo(2);
+
+    assertThat(clear(results[0]))
+      .equalsTo(Sentence(Statement(S_(
+        S(NP(PN("Sam")),
+          VP_(VP(V(VERB("made")),
+                 NP(DET("a"),
+                    N("reservation"),
+                    PP([
+                      [PREP("for"), NP(PN("Cascal"))],
+                      [PREP("for"), NP(PN("Dani"))]
+                    ])))))), ".")));
+
+      assertThat(clear(results[1]))
+      .equalsTo(Sentence(Statement(S_(
+        S(NP(PN("Sam")),
+          VP_(VP(V(VERB("made")),
+                 NP(DET("a"),
+                    N("reservation"),
+                    PP([
+                      [PREP("for"), NP(PN("Cascal"))],
+                      [PREP("for"), NP(PN("Dani"))]
+                    ])))))), ".")));
+  });
+
 });
 
 function assertThat(x) {
