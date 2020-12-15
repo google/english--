@@ -2635,6 +2635,9 @@ describe("Ambiguity", () => {
   it("Sam made a reservation for a woman with a porsche.", () => {
     let parser = new Parser("Sentence");
     let results = parser.feed("Sam made a reservation for a woman with a porsche.");
+    // The following are the two interpretations:
+    // - Sam made a reservation for [a woman] with a porsche.
+    // - Sam made a reservation for [a woman with a porsche].
     assertThat(results.length).equalsTo(4);
 
     assertThat(clear(results[0]))

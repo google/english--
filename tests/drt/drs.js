@@ -1734,6 +1734,25 @@ describe("DRS", function() {
      `);
   });
 
+  it("Sam made a reservation for a woman with a porsche.", function() { 
+    // This is an ambiguous sentence, because it can mean:
+    // - Sam made a reservation for [a woman with a porsche]
+    // or
+    // - Sam made a reservation for [a woman] with a porsche
+    // The interpretation used at the moment is the latter.
+    assertThat("Sam made a reservation for a woman with a porsche.")
+     .equalsTo(`
+       let a, b, c, d
+       Sam(a)
+       reservation(b)
+       woman(c)
+       porsche(d)
+       < made(a, b)
+       for(b, c)
+       with(b, d)
+     `);
+  });
+  
   function assertThat(x) { 
     return {
       trim (str) {
