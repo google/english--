@@ -1721,19 +1721,16 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Jones came from Brazil to Italy.", function() { 
-    // We need to allow repeated prepositional phrases
-    // as adverbs
-    // This is ambiguous because the "to" can be attached
-    // to "came" as an adverb or to "Brazil" as a preposition. 
+  it("Jones came from Brazil to Italy.", function() { 
     assertThat("Jones came from Brazil to Italy.")
      .equalsTo(`
        let a, b, c
        Jones(a)
-       Italy(b)
-       Brazil(c)
-       < came(a, b)
-       < came-from(a, c)
+       Brazil(b)
+       Italy(c)
+       < came(a)
+       < came-from(a, b)
+       < came-to(a, c)
      `);
   });
 
