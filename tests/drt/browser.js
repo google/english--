@@ -28,7 +28,7 @@ describe("Browser", function() {
         }
       });
     });
-    assertThat(parse("John likes Mary.").length).equalsTo(1);
+    assertThat(parse("John likes Mary.").length).equalsTo(2);
     let drs = new DRS(Rules.from());
     assertThat(drs.feed(new Parser().feed("John likes Mary.")).print())
       .equalsTo("let a, b\nJohn(a)\nMary(b)\nlikes(a, b)");
