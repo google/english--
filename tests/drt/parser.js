@@ -2632,6 +2632,42 @@ describe("Ambiguity", () => {
                     ])))))), ".")));
   });
 
+  it("Sam made a reservation for a woman with a porsche.", () => {
+    let parser = new Parser("Sentence");
+    let results = parser.feed("Sam made a reservation for a woman with a porsche.");
+    assertThat(results.length).equalsTo(4);
+
+    assertThat(clear(results[0]))
+      .equalsTo(Sentence(Statement(S_(
+        S(NP(PN("Sam")),
+          VP_(VP(V(VERB("made")),
+                 NP(DET("a"),
+                    N("reservation"),
+                    PP([
+                      [PREP("for"), NP(DET("a"), N("woman"))],
+                      [PREP("with"), NP(DET("a"), N("porsche"))]
+                    ])))))), ".")));
+
+    // NOTE(goto): figure out why this is happening.
+    assertThat(clear(results[0])).equalsTo(clear(results[1]));
+    
+    assertThat(clear(results[2]))
+      .equalsTo(Sentence(Statement(S_(
+        S(NP(PN("Sam")),
+          VP_(VP(V(VERB("made")),
+                 NP(DET("a"),
+                    N("reservation"),
+                    PP([
+                      [PREP("for"),
+                       NP(DET("a"),
+                          N("woman"),
+                          PP([
+                            [PREP("with"), NP(DET("a"), N("porsche"))]
+                          ]))],
+                    ])))))), ".")));
+
+    assertThat(clear(results[2])).equalsTo(clear(results[3]));
+  });
 });
 
 function assertThat(x) {
