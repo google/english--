@@ -216,6 +216,8 @@ function bind(type, types = {}, conditions = []) {
         .filter((ws) => ws != null);
     
     // console.log(data);
+
+
     
     // Ignores the null type.
     let expects = conditions.filter((x) => x["@type"] != "null");
@@ -397,7 +399,7 @@ function bind(type, types = {}, conditions = []) {
       }
     }
     
-    // console.log("hi");
+    // console.log("Binded!");
     let n = {
       "@type": type,
       "types": bindings,
@@ -683,10 +685,6 @@ const DrtSyntax = `
 
       VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
           VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
-
-      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
-          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
-          NP[num=6, gen=7, case=-nom, gap=-].
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
           V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
