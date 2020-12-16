@@ -160,15 +160,9 @@ describe("Ambiguity", () => {
       .equalsTo(1);
   });
 
-// they have walked.
-// jones did not walk.
-// were they happy?
-// was Mary happy?
-// who did they like?
-// they left Brazil.
-// they have not walked.
-// they have walked.
-// jones did not walk.
+  it("Were they happy?", () => {
+    assertThat(new Parser("Question").feed("Were they happy?").length).equalsTo(1);
+  });
 });
 
 function assertThat(x) {

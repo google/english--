@@ -836,9 +836,6 @@ const DrtSyntax = `
       BE[num=sing, fin=+, tp=-past, tense=past] -> %was.
       BE[num=plur, fin=+, tp=-past, tense=past] -> %were.
 
-      BE[num=sing, fin=+, tp=+past, tense=pres] -> %was.
-      BE[num=plur, fin=+, tp=+past, tense=pres] -> %were.
-
       BE[fin=-] -> %be.
       BE[fin=part] -> %been.
 
