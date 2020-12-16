@@ -681,7 +681,7 @@ const DrtSyntax = `
       VP_[num=1, fin=+, gap=2, stat=4, tp=5, tense=6] ->
         AUX[num=1, fin=+, tp=5, tense=6] __ 
         %not __ 
-        VP[num=3, fin=-, gap=2, stat=4, tp=5, tense=6].
+        VP[num=3, fin=-, gap=2, stat=4, tp=5, tense=pres].
 
       VP_[num=1, fin=+, gap=2, state=3, tp=4, tense=5] -> 
           VP[num=1, fin=+, gap=2, state=3, tp=4, tense=5].
@@ -823,8 +823,7 @@ const DrtSyntax = `
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.
 
       AUX[num=1, fin=+, tp=-past, tense=past] -> %did.
-      AUX[num=1, fin=+, tp=+past, tense=pres] -> %did.
-
+      
       AUX[num=1, fin=+, tp=-past, tense=fut] -> %will.
       AUX[num=1, fin=+, tp=+past, tense=fut] -> %would.
 
@@ -851,7 +850,7 @@ const DrtSyntax = `
       HAVE[num=1, fin=+, tp=-past, tense=past] -> %had.
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> %had.
 
-      V[num=1, fin=-, stat=-, trans=2] -> 
+      V[num=1, fin=-, stat=-, trans=2, tense=pres] -> 
           VERB[trans=2, stat=-].
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 

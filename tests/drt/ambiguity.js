@@ -131,7 +131,33 @@ describe("Ambiguity", () => {
   it("They have walked.", () => {
     assertThat(new Parser("VP_").feed("have walked").length).equalsTo(1);
     assertThat(new Parser("Statement").feed("They have walked.").length).equalsTo(1);
-    // console.log(new Parser("VP_").feed("have walked"));
+  });
+
+  it("Jones did not walk.", () => {
+    assertThat(new Parser("V").feed("walk").length).equalsTo(2);
+    assertThat(new Parser("V").feed("walk")[0].types).equalsTo({
+      "fin": "+",
+      "num": "plur",
+      "stat": "-",
+      "tense": "pres",
+      "tp": "-past",
+      "trans": "-",
+    });
+    assertThat(new Parser("V").feed("walk")[1].types).equalsTo({
+      "fin": "-",
+      "num": 467825203,
+      "stat": "-",
+      "trans": "-",
+      "tense": "pres"
+    });
+    //assertThat(new Parser("VP_").feed("did not walk")[0].types)
+    //  .equalsTo(new Parser("VP_").feed("did not walk")[1].types);
+    assertThat(new Parser("VP_").feed("did not walk").length)
+      .equalsTo(1);
+    //assertThat(new Parser("Statement").feed("Jones did not walk.")[0].types)
+    //  .equalsTo({});
+    assertThat(new Parser("Statement").feed("Jones did not walk.").length)
+      .equalsTo(1);
   });
 
 // they have walked.
