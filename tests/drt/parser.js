@@ -963,6 +963,8 @@ function clear(root) {
 function parse(s, start = "Discourse", raw = false, skip = true) {
   let parser = new Parser(start);
   let results = parser.feed(s);
+
+  // assertThat(results.length).equalsTo(1);
   
   if (raw) {
     return results[0];
@@ -1483,9 +1485,9 @@ describe("Statements", function() {
                          NP(PN("Brazil"))))));
   });
 
-  it("they have left Brazil.", function() {
-    assertThat(parse("they have left Brazil."))
-     .equalsTo(S(NP(PRO("they")),
+  it.skip("They have left Brazil.", function() {
+    assertThat(parse("They have left Brazil."))
+     .equalsTo(S(NP(PRO("They")),
                  VP_(VP(HAVE("have"), 
                         VP(V(VERB("left")),
                            NP(PN("Brazil")))))));

@@ -127,6 +127,22 @@ describe("Ambiguity", () => {
                           ]))],
                     ])))))), ".")));
   });
+
+  it("They have walked.", () => {
+    assertThat(new Parser("VP_").feed("have walked").length).equalsTo(1);
+    assertThat(new Parser("Statement").feed("They have walked.").length).equalsTo(1);
+    // console.log(new Parser("VP_").feed("have walked"));
+  });
+
+// they have walked.
+// jones did not walk.
+// were they happy?
+// was Mary happy?
+// who did they like?
+// they left Brazil.
+// they have not walked.
+// they have walked.
+// jones did not walk.
 });
 
 function assertThat(x) {

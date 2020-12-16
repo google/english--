@@ -843,7 +843,7 @@ const DrtSyntax = `
       BE[fin=-] -> %be.
       BE[fin=part] -> %been.
 
-      HAVE[fin=-1] -> %have.
+      HAVE[fin=-] -> %have.
 
       HAVE[num=sing, fin=+, tp=-past, tense=pres] -> %has.
       HAVE[num=plur, fin=+, tp=-past, tense=pres] -> %have.
@@ -1002,7 +1002,7 @@ const dict = [
   ["leave", "word", [{"@type": "VERB", types: {
     "trans": 1, "stat": "-", "pres": "+s"}}]],
   ["left", "word", [{"@type": "VERB", types: {
-    "trans": 1, "stat": "-", "past": "-reg"}}]],
+    "trans": 1, "stat": "-", "pres": "-reg", "past": "-reg"}}]],
   ["come", "word", [{"@type": "VERB", types: {
     "trans": 1, "stat": "-", "pres": "+s"}}]],
   ["came", "word", [{"@type": "VERB", types: {
