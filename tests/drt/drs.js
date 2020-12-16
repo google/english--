@@ -1784,6 +1784,38 @@ describe("lexicon", () => {
     `);
   });
 
+  it.skip("Mel likes Yuji's awesome girlfriend.", function() { 
+    assertThat("Mel likes Yuji's awesome girlfriend.")
+      .equalsTo(`
+      let a, b, c
+      Mel(a)
+      Yuji(b)
+      likes(a, c)
+      girlfriend(c, b)
+    `);
+  });
+
+  it("Yuji is awesome.", function() { 
+    assertThat("Yuji is awesome.")
+      .equalsTo(`
+      let a
+      Yuji(a)
+      awesome(a)
+    `);
+  });
+
+  it("Mel travelled to a country.", function() { 
+    assertThat("Mel travelled to an awesome country.")
+      .equalsTo(`
+       let a, b
+       Mel(a)
+       awesome(b)
+       country(b)
+       < travelled(a)
+       < travelled-to(a, b)
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
