@@ -200,6 +200,9 @@ describe("Lexer", function() {
     ]]);
   });
 
+  // TODO(goto): set up adjective orders?
+  // https://qz.com/773738/how-non-english-speakers-are-taught-this-crazy-english-grammar-rule-you-know-but-youve-never-heard-of/
+  
   it("foobar", () => {
     const tokens = [
       ["foo", "WORD"],
@@ -525,6 +528,34 @@ describe("Lexer", function() {
                         ))
                  ));
   });
+
+  it("girlfriend", function() {
+    const {noun_sg} = lexicon;
+
+    const tokens = noun_sg.map((word) => [word, "word", [{
+      "@type": "N",
+      "types": {"num": "sing"}
+    }]]);
+    
+    let tokenizer = new Tokenizer();
+
+    for (let [word, type, types] of tokens) {
+      tokenizer.push(word, type, types);
+    }
+
+    tokenizer.reset("girlfriend");
+
+    assertThat(tokenizer.next()).equalsTo({
+      tokens: [{
+        "@type": "N",
+        types: {
+          num: "sing"
+        }
+      }],
+      type: "word",
+      value: "girlfriend"
+    });
+  });
   
   it("longest string", () => {    
     let tokens = new Tokenizer();
@@ -675,6 +706,29 @@ describe("Lexer", function() {
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V(VERB("love"), "s"),
                          NP(DET("an"), N("au-pair"))
+                        ))
+                 ));
+  });
+  
+  it("Mel likes Yuji's girlfriend.", function() {
+    const {noun_sg} = lexicon;
+
+    const tokens = noun_sg.map((word) => [word, "word", [{
+      "@type": "N",
+      "types": {"num": "sing"}
+    }]]);
+    
+    const {Parser} = DRT;
+    let parser = new Parser("Statement");
+    
+    for (let token of tokens) {
+      parser.add(token);
+    }
+    let results = parser.feed("Mel likes Yuji's girlfriend.");
+    assertThat(clear(results[0].children[0].children[0]))
+      .equalsTo(S(NP(PN("Mel")),
+                  VP_(VP(V(VERB("like"), "s"),
+                         NP(DET(NP(PN("Yuji")), "'s"), N("girlfriend"))
                         ))
                  ));
   });

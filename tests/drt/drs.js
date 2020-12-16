@@ -1752,7 +1752,6 @@ describe("DRS", function() {
        with(b, d)
      `);
   });
-  
   function assertThat(x) { 
     return {
       trim (str) {
@@ -1772,3 +1771,49 @@ describe("DRS", function() {
     }
   }
 });
+
+describe("lexicon", () => {
+  it("Mel likes Yuji's girlfriend.", function() { 
+    assertThat("Mel likes Yuji's girlfriend.")
+      .equalsTo(`
+      let a, b, c
+      Mel(a)
+      Yuji(b)
+      likes(a, c)
+      girlfriend(c, b)
+    `);
+  });
+
+  function assertThat(x) { 
+    return {
+      trim (str) {
+        return str
+          .trim()
+          .split("\n")
+          .map(line => line.trim())
+          .join("\n");
+      },
+      equalsTo(y) {
+        const {noun_sg, adj_itr} = require("../../src/drt/lexicon.js");
+
+        let drs = new DRS(Rules.from());
+        let parser = new Parser("Discourse");
+        for (let word of noun_sg) {
+          parser.add([word, "word", [{
+            "@type": "N",
+            "types": {"num": "sing"}
+          }]]);
+        }
+        for (let word of adj_itr) {
+          parser.add([word, "word", [{
+            "@type": "ADJ"
+          }]]);
+        }
+        let sentences = parser.feed(x);
+        drs.feed(sentences);
+        Assert.deepEqual(drs.print(), this.trim(y));
+      }
+    }
+  }
+});
+

@@ -90,7 +90,7 @@ class Tokenizer {
 
     let next = this.longest(this.buffer);
 
-    //console.log(`next!`);
+    // console.log(`next!`);
 
     // proper names form.
     let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
@@ -100,6 +100,7 @@ class Tokenizer {
     if (next && !proper) {
       // If this is a dictionary word and is not a proper name
       this.eat(next);
+      // console.log(next);
       return this.get(next);
     }
 

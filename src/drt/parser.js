@@ -724,8 +724,6 @@ const DrtSyntax = `
 
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2] PP.
 
-      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ RN[num=1, gen=2].
-
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
  
       NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
@@ -902,7 +900,6 @@ const DrtSyntax = `
       PN[gen=2] -> %name.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      
-      RN[num=1, gen=2] -> %word.
       VERB[trans=1, stat=2, pres=3, past=4] -> %word.
 `;
 
@@ -984,12 +981,12 @@ const dict = [
 
   // RNs
   
-  ["brother", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
-  ["father", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
-  ["husband", "word", [{"@type": "RN", types: {"num": "sing", "gen": "male"}}]],
-  ["sister", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
-  ["mother", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
-  ["wife", "word", [{"@type": "RN", types: {"num": "sing", "gen": "fem"}}]],
+  ["brother", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
+  ["father", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
+  ["husband", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
+  ["sister", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
+  ["mother", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
+  ["wife", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
 
   // verbs
   //["beat", "word", [{"@type": "VERB", types: {

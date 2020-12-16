@@ -3,7 +3,7 @@ const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {
-  S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, RN, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
+  S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
   Discourse, Sentence, Statement, Question
 } = nodes;
 
@@ -145,7 +145,7 @@ function predicate(name, args, types) {
     args: args,
     types: types,
     print() {
-      //console.log(this.args);
+      // console.log(this.args);
       let args = this.args.map(arg => print(arg));
       return `${this.name}(${args.join(", ")})`;
     }
@@ -216,6 +216,9 @@ class CRDETPN extends Rule {
   apply({name}, node, refs) {
     let head = [];
     let body = [];
+
+    // console.log("hi");
+    // console.log(node);
 
     // throw new Error(name.children[0].value);
 
@@ -621,7 +624,7 @@ class CRNBE extends Rule {
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
     np.ref = child(ref, 0);
-    // console.log("hi");
+    //console.log("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -909,7 +912,7 @@ class CRAND extends CompositeRule {
 // Possessive Phrases
 class CRSPOSS extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+    super(ids, S(NP(DET(capture("name"), "'s"), N(capture("noun")))));
   }
   
   apply({name, noun, verb}, node, refs) {
@@ -930,15 +933,20 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
   constructor(ids) {
-    super(ids, VP(capture("verb"), NP(DET(capture("name"), "'s"), RN(capture("noun")))));
+    super(ids, S(capture("sub"), VP_(VP(capture("verb"), NP(DET(capture("name"), "'s"), N(capture("noun")))))));
   }
   
   apply({name, noun, verb}, node, refs) {
-    // console.log("hi");
-    
+    // console.log("hello");
+    let poss = child(node, 1, 0, 1, 0, 1);
+    if (!poss) {
+      // TODO(goto): figure out why the "'s" isn't preventing this from
+      // matching
+      return [[], [], [], []];
+    }
+    // console.log(node);
     let u = referent(this.id(), noun.types, print(child(node, 1), refs));
-    node.children[1] = u;
-    
+    child(node, 1, 0).children[1] = u;
     let s = S(u, VP_(VP(V(noun.children[0].value), name.children[0])));
     
     return [[u], [s], [], []];
@@ -1257,6 +1265,7 @@ class CRPRED extends Rule {
     if (obj) {
       args.push(obj.name);
     }
+    // console.log(child(obj, 0));
     // console.log(args);
     // console.log(sub.name);
     let name = verb.children.join("");

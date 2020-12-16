@@ -1317,13 +1317,13 @@ describe("Statements", function() {
 
   it("Jones's sister is Mary", function() {
     assertThat(parse("Jones's sister is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("sister")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's sister is not Mary", function() {
     assertThat(parse("Jones's sister is not Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("sister")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
                  VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
@@ -1509,15 +1509,15 @@ describe("Statements", function() {
     assertThat(parse("he likes Jones's brother."))
      .equalsTo(S(NP(PRO("he")),
                  VP_(VP(V(VERB("like"), "s"), 
-                        NP(DET(NP(PN("Jones")), "'s"), RN("brother"))
+                        NP(DET(NP(PN("Jones")), "'s"), N("brother"))
                         ))));
    });
 
   it.skip("Jones's wife or Smith's brother loves Mary.", function() {
     assertThat(parse("Jones's wife or Smith's brother loves Mary."))
-     .equalsTo(S(NP(NP(DET(NP(PN("Jones")), "'s"), RN("wife")), 
+     .equalsTo(S(NP(NP(DET(NP(PN("Jones")), "'s"), N("wife")), 
                     "or", 
-                    NP(DET(NP(PN("Smith")), "'s"), RN("brother"))),
+                    NP(DET(NP(PN("Smith")), "'s"), N("brother"))),
                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))
                  ));
    });
@@ -2132,7 +2132,7 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is happy.", function() {
     assertThat(parse("Jones's wife is happy."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
@@ -2254,7 +2254,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("who does Smith's brother like?", "Question", false, false))
      .equalsTo(Question("who", 
                         AUX("does"),
-                        NP(DET(NP(PN("Smith")), "'s"), RN("brother")), 
+                        NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
                         V(VERB("like")), 
                         "?"));
   });
@@ -2293,13 +2293,13 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is Mary.", function() {
     assertThat(parse("Jones's wife is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's wife was Mary.", function() {
     assertThat(parse("Jones's wife was Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), RN("wife")),
+     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
                  VP_(VP(BE("was"), NP(PN("Mary"))))));
   });
 
@@ -2572,7 +2572,19 @@ describe("Backwards compatibility", function() {
                               [PREP("for"), NP(PN("Dani"))]
                             ])
                            )))));
+
   });
+
+  it.skip("Mel likes Yuji's girlfriend.", function() {
+    assertThat(parse("Mel likes Yuji's girlfriend."))
+      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
+                  VP_(VP(V(VERB("kiss"), "ed"),
+                         PP([
+                           [PREP("in"), NP(PN("Brazil"))]
+                         ]),
+                         NP(PN("Dani"))))));
+  });
+
 });
 
 describe("Ambiguity", () => {
