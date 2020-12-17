@@ -21,7 +21,6 @@ class Nearley {
       this.parser.feed(code);
       return this.parser.results;
     } catch (e) {
-      // console.log(e);
       throw this.reportError(e);
     }
   }
@@ -62,10 +61,15 @@ class Nearley {
     const lastColumnIndex = parser.table.length - 2;
     const lastColumn = parser.table[lastColumnIndex];
     const token = parser.lexer.buffer[parser.current];
+    // console.log(parser.current);
+    // console.log(e);
     let result = {
-      token: token, 
-      expected: [],
-      message: e.message,
+      tracks: [],
+      // offset: e.offset,
+      token: e.token,
+      loc: e.offset, 
+      start: token,
+      // message: e.message,
     };
     // result.token = token;
     // Display each state that is expecting a terminal symbol next.
@@ -75,14 +79,16 @@ class Nearley {
       if (nextSymbol && this.isTerminalSymbol(nextSymbol)) {
         const symbolDisplay = this.getSymbolDisplay(nextSymbol);
         // console.log(`    A ${symbolDisplay} based on:`);
-        let expected = {symbol: symbolDisplay, based: []};
-        result.expected.push(expected);
+        let track = {symbol: symbolDisplay, stack: []};
+        result.tracks.push(track);
         // Display the "state stack" - which shows you how this state
         // came to be, step by step.
         const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
         for (let j = 0; j < stateStack.length; j++) {
           const state = stateStack[j];
-          expected.based.push(state.rule.toString(state.dot));
+          // console.log(state);
+          // expected.based.push(state.rule.toString(state.dot));
+          track.stack.push(state);
         }
       }
     }
@@ -124,6 +130,7 @@ class Nearley {
   */
   buildStateStack(columnIndex, stateIndex, parser) {
     const state = parser.table[columnIndex].states[stateIndex];
+    //console.log(state);
     if (state.dot === 0) { // state not started
       // Find the previous state entry in the table that predicted this state
       const match = this.findPreviousStateWhere(

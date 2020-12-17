@@ -67,27 +67,6 @@ describe("Parser", function() {
     assertThat(parser.feed("fo")).equalsTo([]);
   });
 
-  it("Error", function() {
-    let parser = Nearley.from(`
-      main -> (statement):+
-      statement -> "foo" | "bar"
-    `);
-
-    try {
-     parser.feed("bah");
-     throw new Error();
-    } catch (error) {
-     // console.log(error);
-     // console.log(`Instead of a ${JSON.stringify(error.token)}, I was expecting to see one of the following:`);
-     for (let expected of error.expected) {
-      // console.log(`    A ${expected.symbol} based on:`);
-      for (let based of expected.based) {
-       // console.log(`        ${based}`);
-      } 
-     }
-    }
-  });
-
   it("Rules", function() {
     let parser = Nearley.from(`
       expression -> number "+" number
