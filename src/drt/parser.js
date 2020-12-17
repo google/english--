@@ -50,28 +50,37 @@ class Nearley {
   static from(code, start) {
     return new Nearley(Nearley.compile(code), start);
   }
+
+  reportError(e) {
+    let parser = this.parser;
+    //console.log(parser.current);
+    const token = parser.lexer.buffer[parser.current];
+    return {
+      tracks: this.tracks(true),
+      token: e.token,
+      loc: e.offset, 
+      start: token,
+    };
+  }
   
   /*
     Generates a user friendly error report given the caught error 
     object and the Nearley parser instance.
   */
-  reportError(e) {
-    // console.log(e.message);
+  tracks(error = false) {
     let {parser} = this;
-    const lastColumnIndex = parser.table.length - 2;
+    //const lastColumnIndex = Math.max(0, parser.table.length - 2);
+    const lastColumnIndex = error ? parser.table.length - 2 : parser.table.length - 1;
+    //console.log(parser.results);
+    //console.log(parser.table.length);
     const lastColumn = parser.table[lastColumnIndex];
-    const token = parser.lexer.buffer[parser.current];
-    // console.log(parser.current);
+    //console.log(parser.table);
+    // console.log(e.token);
     // console.log(e);
-    let result = {
-      tracks: [],
-      // offset: e.offset,
-      token: e.token,
-      loc: e.offset, 
-      start: token,
-      // message: e.message,
-    };
-    // result.token = token;
+    //let result = {
+    //  tracks: [],
+    //};
+    let tracks = [];
     // Display each state that is expecting a terminal symbol next.
     for (let i = 0; i < lastColumn.states.length; i++) {
       const state = lastColumn.states[i];
@@ -80,7 +89,7 @@ class Nearley {
         const symbolDisplay = this.getSymbolDisplay(nextSymbol);
         // console.log(`    A ${symbolDisplay} based on:`);
         let track = {symbol: symbolDisplay, stack: []};
-        result.tracks.push(track);
+        tracks.push(track);
         // Display the "state stack" - which shows you how this state
         // came to be, step by step.
         const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
@@ -92,7 +101,7 @@ class Nearley {
         }
       }
     }
-    return result;
+    return tracks;
   }
   
   getSymbolDisplay(symbol) {
@@ -578,14 +587,14 @@ class FeaturedNearley {
         // the types of %A at runtime need to match the types of A[].
         // console.log("hi: " + head.name);
         feed(`([token], location, reject) => {
-          //console.log("hello");
+          // console.log(token);
           for (let match of token.tokens) {
-            //console.log("foo");
+            // console.log("foo");
             //console.log(match);
             // console.log("${head.name}");
             //console.log(${JSON.stringify(head)});
             // console.log(${JSON.stringify(tail[0])});
-            // console.log("${tail[0]}");
+            //console.log("${tail[0]}");
             let result = bind("${head.name}", ${JSON.stringify(head.types)}, [
               {"@type": "${head.name}", "types": ${JSON.stringify(head.types)}}, 
             ])([match], location, reject);
