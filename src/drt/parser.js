@@ -21,7 +21,7 @@ class Nearley {
       this.parser.feed(code);
       return this.parser.results;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       throw this.reportError(e);
     }
   }

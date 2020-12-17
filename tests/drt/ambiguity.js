@@ -163,6 +163,15 @@ describe("Ambiguity", () => {
   it("Were they happy?", () => {
     assertThat(new Parser("Question").feed("Were they happy?").length).equalsTo(1);
   });
+
+  it.skip("Jones is Smith's brother. he likes Brazil.", () => {
+    assertThat(new Parser("Discourse").feed("Jones is Smith's brother.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").feed("He likes Brazil.").length).equalsTo(1);
+    //assertThat(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[0])
+    //.equalsTo(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[1]);
+    assertThat(new Parser("Discourse").feed("Jones is Smith's brother.He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.").length).equalsTo(1);
+  });
 });
 
 function assertThat(x) {
