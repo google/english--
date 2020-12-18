@@ -44,20 +44,28 @@ describe.only("Error handling", () => {
       const postprocessor = rule.postprocess;
       let head = name;
       const meta = postprocessor ? postprocessor.meta : undefined;
+      const features = (types) => Object
+            .entries(types)
+            .map(([key, value]) => `${key}=${value}`)
+            .join(", ");
+      
       if (meta) {
-        const features = Object
-              .entries(meta.types)
-              .map(([key, value]) => `${key}=${value}`)
-              .join(", ");
-        head += `[${features}]`;
+        head += `[${features(meta.types)}]`;
       }
+      let j = 0;
       for (let i = 0; i < symbols.length; i++) {
         if (dot == i) {
           tail.push("●");
         }
         const symbol = symbols[i];
         if (typeof symbol == "string") {
-          tail.push(symbol);
+          let suffix = "";
+          if (meta &&
+              symbol != "__" &&
+              symbol != "_") {
+            suffix = `[${features(meta.conditions[j++].types)}]`;
+          };
+          tail.push(`${symbol}${suffix}`);
         } else if (symbol.literal) {
           tail.push(symbol.literal);
         } else if (symbol.type) {
@@ -180,7 +188,7 @@ A foo token based on:
       @lexer lexer
       main -> FOO {% function() { 
           const f = () => {};
-          f.meta = {types: {a: 1}};
+          f.meta = {types: {a: 1}, conditions: [{types: {}}]};
           return f; 
         }() 
       %}
@@ -197,7 +205,7 @@ Instead, I was expecting to see one of the following:
 
 A foo token based on:
     FOO → ● %foo
-    main[a=1] → ● FOO
+    main[a=1] → ● FOO[]
 `.trim());
     }
   });
@@ -390,7 +398,7 @@ A bar token based on:
       .equalsTo(`
 A word token based on:
     FOO → ● %word
-    main[] → ● FOO
+    main[] → ● FOO[a=1]
 `.trim());
     
   });
@@ -440,8 +448,8 @@ A word token based on:
       .equalsTo(`
 A word token based on:
     BAR → ● %word
-    main[] → FOO ● BAR
-    main[] → ● FOO BAR
+    main[] → FOO[a=1] ● BAR[b=2]
+    main[] → ● FOO[a=1] BAR[b=2]
 `.trim());
     
   });
@@ -470,7 +478,7 @@ A word token based on:
       .equalsTo(`
 A word token based on:
     FOO → ● %word
-    main[] → ● FOO BAR
+    main[] → ● FOO[a=1] BAR[b=2]
 `.trim());
     
   });
@@ -480,9 +488,9 @@ A word token based on:
     const tracks = parser.parser.tracks();
     assertThat(print(tracks[0]).trim()).equalsTo(`
 A __if__ token based on:
-    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S __ %then __ S
-    S_[num=1, gap=-, tp=2, tense=3] → ● S
-    Statement[] → ● S_ _ %PERIOD
+    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[num=1, gap=-, tp=2, tense=3] __ %then __ S[num=1, gap=-, tp=2, tense=3]
+    S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
+    Statement[] → ● S_[] _ %PERIOD
 `.trim());
 
     assertThat(tracks[0].stack.length).equalsTo(3);
@@ -492,7 +500,6 @@ A __if__ token based on:
     }, "__", "S", "__", {
       "type": "then"
     }, "__", "S"]);
-    // assertThat(tracks[0].stack[0].rule.postprocess.meta).equalsTo({});
   });
   
 });
