@@ -429,6 +429,12 @@ function bind(type, types = {}, conditions = []) {
     return n;
   };
 
+  matcher.meta = {
+    type: type,
+    types: types,
+    conditions: conditions
+  };
+  
   return matcher;
 }
 

@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
 
-describe("Error handling", () => {
+describe.only("Error handling", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -43,15 +43,19 @@ describe("Error handling", () => {
       let tail = [];
       const postprocessor = rule.postprocess;
       let head = name;
-      if (postprocessor && postprocessor.meta) {
-        head += `[${postprocessor.meta}]`;
+      const meta = postprocessor ? postprocessor.meta : undefined;
+      if (meta) {
+        const features = Object
+              .entries(meta.types)
+              .map(([key, value]) => `${key}=${value}`)
+              .join(", ");
+        head += `[${features}]`;
       }
       for (let i = 0; i < symbols.length; i++) {
         if (dot == i) {
           tail.push("●");
         }
         const symbol = symbols[i];
-        // console.log(symbol);
         if (typeof symbol == "string") {
           tail.push(symbol);
         } else if (symbol.literal) {
@@ -176,7 +180,7 @@ A foo token based on:
       @lexer lexer
       main -> FOO {% function() { 
           const f = () => {};
-          f.meta = 1;
+          f.meta = {types: {a: 1}};
           return f; 
         }() 
       %}
@@ -193,7 +197,7 @@ Instead, I was expecting to see one of the following:
 
 A foo token based on:
     FOO → ● %foo
-    main[1] → ● FOO
+    main[a=1] → ● FOO
 `.trim());
     }
   });
@@ -386,7 +390,7 @@ A bar token based on:
       .equalsTo(`
 A word token based on:
     FOO → ● %word
-    main → ● FOO
+    main[] → ● FOO
 `.trim());
     
   });
@@ -436,8 +440,8 @@ A word token based on:
       .equalsTo(`
 A word token based on:
     BAR → ● %word
-    main → FOO ● BAR
-    main → ● FOO BAR
+    main[] → FOO ● BAR
+    main[] → ● FOO BAR
 `.trim());
     
   });
@@ -466,7 +470,7 @@ A word token based on:
       .equalsTo(`
 A word token based on:
     FOO → ● %word
-    main → ● FOO BAR
+    main[] → ● FOO BAR
 `.trim());
     
   });
@@ -476,9 +480,9 @@ A word token based on:
     const tracks = parser.parser.tracks();
     assertThat(print(tracks[0]).trim()).equalsTo(`
 A __if__ token based on:
-    S → ● %__if__ __ S __ %then __ S
-    S_ → ● S
-    Statement → ● S_ _ %PERIOD
+    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S __ %then __ S
+    S_[num=1, gap=-, tp=2, tense=3] → ● S
+    Statement[] → ● S_ _ %PERIOD
 `.trim());
 
     assertThat(tracks[0].stack.length).equalsTo(3);
