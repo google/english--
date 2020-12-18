@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
 
-describe.only("Error handling", () => {
+describe("Error handling", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -492,16 +492,34 @@ A __if__ token based on:
     S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
-
-    assertThat(tracks[0].stack.length).equalsTo(3);
-    assertThat(tracks[0].stack[0].rule.name).equalsTo("S");
-    assertThat(tracks[0].stack[0].rule.symbols).equalsTo([{
-      "type": "__if__"
-    }, "__", "S", "__", {
-      "type": "then"
-    }, "__", "S"]);
   });
   
+  it("Types Match", () => {
+    let parser = new Parser("Statement");
+    const tracks = parser.parser.tracks();
+    // This is an invalid track, because the features don't match up.
+    assertThat(print(tracks[30]).trim()).equalsTo(`
+A himself token based on:
+    PRO[num=sing, gen=male, case=-nom, refl=+] → ● %himself
+    NP[num=1, gen=2, case=3, gap=-] → ● PRO[num=1, gen=2, case=3]
+    S[num=1, gap=np, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np, tp=3, tense=4]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %or __ S[num=5, gap=-, tp=2, tense=3]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %and __ S[num=5, gap=-, tp=2, tense=3]
+    S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
+    Statement[] → ● S_[] _ %PERIOD
+`.trim());
+
+    assertThat(tracks[30].stack.length).equalsTo(7);
+    const pro = tracks[30].stack[0];
+    assertThat(pro.rule.name).equalsTo("PRO");
+    assertThat(pro.rule.postprocess.meta.types)
+      .equalsTo({"case": "-nom", "gen": "male", "num": "sing", "refl": "+"});
+    const np = tracks[30].stack[1];
+    assertThat(np.rule.name).equalsTo("NP");
+    assertThat(np.rule.postprocess.meta.conditions[np.dot].types)
+      .equalsTo({"case": "3", "gen": "2", "num": 1});
+  });
+
 });
 
 function assertThat(x) {
