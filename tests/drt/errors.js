@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
+const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
 
 describe("Error handling", () => {
 
@@ -34,6 +34,37 @@ describe("Error handling", () => {
     }
   });
 
+  function print(track) {
+    const result = [];
+    result.push(`A ${track.symbol} token based on:`);
+    for (let stack of track.stack) {
+      const {rule, dot} = stack;
+      const {name, symbols} = rule;
+      let tail = [];
+      const postprocessor = rule.postprocess;
+      let head = name;
+      if (postprocessor && postprocessor.meta) {
+        head += `[${postprocessor.meta}]`;
+      }
+      for (let i = 0; i < symbols.length; i++) {
+        if (dot == i) {
+          tail.push("●");
+        }
+        const symbol = symbols[i];
+        // console.log(symbol);
+        if (typeof symbol == "string") {
+          tail.push(symbol);
+        } else if (symbol.literal) {
+          tail.push(symbol.literal);
+        } else if (symbol.type) {
+          tail.push(`%${symbol.type}`);
+        }
+      }
+      result.push(`    ${head} → ${tail.join(" ")}`);
+    }
+    return result.join("\n");
+  }
+  
   function message(error) {
     const {token, tracks} = error;
       
@@ -48,32 +79,7 @@ describe("Error handling", () => {
       result.push(``);
     }
     for (let track of tracks) {
-      result.push(`A ${track.symbol} token based on:`);
-      for (let stack of track.stack) {
-        const {rule, dot} = stack;
-        const {name, symbols} = rule;
-        let tail = [];
-        const postprocessor = rule.postprocess;
-        let head = name;
-        if (postprocessor && postprocessor.meta) {
-          head += `[${postprocessor.meta}]`;
-        }
-        for (let i = 0; i < symbols.length; i++) {
-          if (dot == i) {
-            tail.push("●");
-          }
-          const symbol = symbols[i];
-          // console.log(symbol);
-          if (typeof symbol == "string") {
-            tail.push(symbol);
-          } else if (symbol.literal) {
-            tail.push(symbol.literal);
-          } else if (symbol.type) {
-            tail.push(`%${symbol.type}`);
-          }
-        }
-        result.push(`    ${head} → ${tail.join(" ")}`);
-      }
+      result.push(print(track));
     }
     result.push(``);
     return result.join("\n");
@@ -435,7 +441,56 @@ A word token based on:
 `.trim());
     
   });
+  
+  it("Features", () => {
+    const header = `
+       @{%
+         const lexer = {
+           has(name) {
+             return true;
+           },
+         };
+       %}
 
+       @lexer lexer
+    `;
+    let grammar = FeaturedNearley.compile(`
+       main -> FOO[a=1] BAR[b=2].
+       FOO[a=1] -> %word.
+       BAR[b=2] -> %word.
+    `, header);
+
+    let parser = new Nearley(grammar, "main");
+
+    assertThat(message({tracks: parser.tracks()}).trim())
+      .equalsTo(`
+A word token based on:
+    FOO → ● %word
+    main → ● FOO BAR
+`.trim());
+    
+  });
+
+  it("Parser", () => {
+    let parser = new Parser("Statement");
+    const tracks = parser.parser.tracks();
+    assertThat(print(tracks[0]).trim()).equalsTo(`
+A __if__ token based on:
+    S → ● %__if__ __ S __ %then __ S
+    S_ → ● S
+    Statement → ● S_ _ %PERIOD
+`.trim());
+
+    assertThat(tracks[0].stack.length).equalsTo(3);
+    assertThat(tracks[0].stack[0].rule.name).equalsTo("S");
+    assertThat(tracks[0].stack[0].rule.symbols).equalsTo([{
+      "type": "__if__"
+    }, "__", "S", "__", {
+      "type": "then"
+    }, "__", "S"]);
+    // assertThat(tracks[0].stack[0].rule.postprocess.meta).equalsTo({});
+  });
+  
 });
 
 function assertThat(x) {

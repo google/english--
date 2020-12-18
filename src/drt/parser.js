@@ -218,7 +218,7 @@ class Nearley {
 }
 
 function bind(type, types = {}, conditions = []) {   
-  return (data, location, reject) => {
+  let matcher = (data, location, reject) => {
     //console.log("hi");
     // console.log(data);
     // Creates a copy of the types because it is reused
@@ -428,6 +428,8 @@ function bind(type, types = {}, conditions = []) {
     
     return n;
   };
+
+  return matcher;
 }
 
 const RuntimeSyntax = `
