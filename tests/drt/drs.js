@@ -1804,6 +1804,17 @@ describe("lexicon", () => {
     `);
   });
 
+  it("Jones is an unhappy foolish man.", function() { 
+    assertThat("Jones is an unhappy foolish man.")
+      .equalsTo(`
+      let a
+      Jones(a)
+      unhappy(a)
+      foolish(a)
+      man(a)
+    `);
+  });
+
   it("Mel travelled to a country.", function() { 
     assertThat("Mel travelled to an awesome country.")
       .equalsTo(`

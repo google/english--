@@ -1144,21 +1144,29 @@ describe("Statements", function() {
                         ))));
    });
 
-   it("Jones is unhappy.", function() {
+  it("Jones is unhappy.", function() {
     assertThat(parse("Jones is unhappy."))
-     .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), ADJ("unhappy")))));
-   });
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(BE("is"), ADJ("unhappy")))));
+  });
+  
+  it("Jones is an unhappy foolish man.", function() {
+    assertThat(parse("Jones is an unhappy foolish man."))
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(BE("is"), NP(DET("an"),
+                                      N(ADJ("unhappy"),
+                                        N(ADJ("foolish"), N("man"))))))));
+  });
 
-   it("they are happy.", function() {
+  it("they are happy.", function() {
     assertThat(parse("they are happy."))
-     .equalsTo(S(NP(PRO("they")),
-                 VP_(VP(BE("are"), ADJ("happy")))));
-   });
-
+      .equalsTo(S(NP(PRO("they")),
+                  VP_(VP(BE("are"), ADJ("happy")))));
+  });
+  
   it("Jones likes a woman who is happy.", function() {
     assertThat(parse("Jones likes a woman who is happy."))
-     .equalsTo(S(NP(PN("Jones")),
+      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"), 
                            N(N("woman"), 
