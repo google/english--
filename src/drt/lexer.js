@@ -84,7 +84,11 @@ class Tokenizer {
       if (match) {
         let [full, number] = match;
         this.eat(number);
-        return {type: "unsigned_int", value: number, tokens: []};        
+        return {
+          "@type": "%unsigned_int",
+          "type": "unsigned_int",
+          "value": number,
+          "tokens": []};        
       }
     }
 
@@ -96,18 +100,25 @@ class Tokenizer {
     let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
     // proper names can't collide with reserved dictionary words.
     let proper = match && match[1] != next;
+
+    // console.log(this.head["t"]["h"]["e"]);
     
     if (next && !proper) {
       // If this is a dictionary word and is not a proper name
       this.eat(next);
-      // console.log(next);
+      //console.log(next);
       return this.get(next);
     }
 
     if (proper) {
       let [full, name] = match;
       this.eat(name);
-      return {type: "name", value: name, tokens: []};
+      return {
+        "@type": "%name",
+        "type": "name",
+        "value": name,
+        "tokens": []
+      };
     }
     
     return undefined;
@@ -122,9 +133,10 @@ class Tokenizer {
       ref = ref[char.toLowerCase()];
     }
     return {
-      type: ref.type,
-      value: str,
-      tokens: ref.done,
+      "@type": "%" + ref.type,
+      "type": ref.type,
+      "value": str,
+      "tokens": ref.done,
     }
   }
 }

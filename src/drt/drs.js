@@ -11,8 +11,8 @@ class DRS {
     this.after = after;
   }
 
-  feed([[lines]]) {
-    for (let s of lines) {
+  feed([sentences]) {
+    for (let s of sentences) {
       this.push(s);
     }
     return this;    

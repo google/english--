@@ -215,23 +215,104 @@ class Nearley {
   isNonTerminalSymbol(symbol) {
     return !this.isTerminalSymbol(symbol);
   }
+
+  print() {
+    let result = [];
+    for (let track of this.tracks()) {
+      result.push(this.track(track));
+    }
+    result.push(``);
+    return result.join("\n");
+  }
+  
+  track(track) {
+    const result = [];
+    result.push(`A ${track.symbol} token based on:`);
+    for (let stack of track.stack) {
+      const {rule, dot} = stack;
+      const {name, symbols} = rule;
+      let tail = [];
+      const postprocessor = rule.postprocess;
+      let head = name;
+      const meta = postprocessor ? postprocessor.meta : undefined;
+      const features = (types) => Object
+            .entries(types)
+            .map(([key, value]) => `${key}=${value}`)
+            .join(", ");
+      
+      if (meta) {
+        head += `[${features(meta.types)}]`;
+      }
+      let j = 0;
+      for (let i = 0; i < symbols.length; i++) {
+        if (dot == i) {
+          tail.push("●");
+        }
+        const symbol = symbols[i];
+        if (typeof symbol == "string") {
+          let suffix = "";
+          if (meta &&
+              symbol != "__" &&
+              symbol != "_") {
+            suffix = `[${features(meta.conditions[j++].types)}]`;
+          };
+          tail.push(`${symbol}${suffix}`);
+        } else if (symbol.literal) {
+          tail.push(symbol.literal);
+        } else if (symbol.type) {
+          tail.push(`%${symbol.type}`);
+        }
+      }
+      result.push(`    ${head} → ${tail.join(" ")}`);
+    }
+    return result.join("\n");
+  }
+  
+  message(error) {
+    const {token, tracks} = error;
+      
+    let result = [];
+    if (token) {
+      if (token.type) {
+        result.push(`Unexpected ${token.type} token: ${token.value}.`);
+      } else {
+        result.push(`Unexpected "${token.value}".`);
+      }
+      result.push(`Instead, I was expecting to see one of the following:`);
+      result.push(``);
+    }
+    for (let track of tracks) {
+      result.push(print(track));
+    }
+    result.push(``);
+    return result.join("\n");
+  }
 }
 
 function match(type, types = {}, conditions = [], data, location, reject) {
   // Creates a copy of the types because it is reused
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
+
+  // console.log(data);
   
   // Creates a copy of the input data, because it is
   // reused across multiple calls.
   let result = JSON.parse(JSON.stringify(data || []))
-      .filter((ws) => ws != null);
-  
+      //.map((item) => {
+      //  console.log(item);
+      //  if (item == null) {
+      //    return {"@type": "GAP"};
+      //  }
+      //return item;
+      //});
+
+  // console.log(data);
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
   
   let signature = `${type}${JSON.stringify(bindings)} -> `;
-  for (let child of expects) {
+  for (let child of conditions) {
     signature += `${child["@type"] || JSON.stringify(child)}${JSON.stringify(child.types || {})} `;
   }
   
@@ -243,30 +324,34 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   
   let namespace = hash(signature);
   
-  let children = [];
-  for (let i = 0; i < result.length; i++) {
-    let node = result[i];
-    if (node["@type"] || Array.isArray(node)) {
-      children.push([node, i]);
-    }
-  }
+  //let children = result;
+  //for (let i = 0; i < result.length; i++) {
+  //  let node = result[i];
+  //  if (node["@type"] || Array.isArray(node)) {
+  //    children.push([node, i]);
+  //  }
+  //}
 
   //console.log(`Trying to bind ${signature}`);
-  //let foo = children.map((x) => {
+  //let foo = result.map((x) => {
   //  return `${x["@type"] || JSON.stringify(x)}${JSON.stringify(x.types || {})}`;
   //}).join(" ");
+  // console.log(children);
   //console.log(`To ${foo}`);
-  
-  if (expects.length != children.length) {
+
+  //console.log(expects);
+  //console.log(data);
+  if (expects.length != data.length) {
     // console.log("not the same length");
     return reject;
   }
   
   let variables = {};
-  
+
   for (let i = 0; i < expects.length; i++) {
     let expected = expects[i];
-    let [child, index] = children[i];
+    let child = result[i];
+    // console.log(child);
     if (expected["@type"] != child["@type"]) {
       // console.log("Children of different types");
       return reject;
@@ -334,12 +419,16 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   let n = {
     "@type": type,
     "types": bindings,
-    "children": result,
+    "children": result.filter(
+      (child) => (child["@type"] != "_" && child["@type"] != "__")),
   };
   
   if (location != undefined) {
     n["loc"] = location;
   }
+
+  // console.log("Binds!");
+  //console.log(result);
   
   return n;
 }
@@ -526,15 +615,7 @@ class FeaturedNearley {
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
-          if (term.name == "_" ||
-              term.name == "__" ||
-              typeof term == "string" ||
-              term.name == "unsigned_int") {
-            continue;
-          } else {
-            // console.log(term);
-            feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}, "children": ${JSON.stringify(term.children || [])}}, `);
-          }
+          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}, "children": ${JSON.stringify(term.children || [])}}, `);
         }
         feed(`  ])`);
       }
@@ -547,8 +628,8 @@ class FeaturedNearley {
 }
 
 const DrtSyntax = `
-      Sentence -> _ Statement _.
-      Sentence -> _ Question _.      
+      Sentence -> Statement.
+      Sentence -> Question.      
 
       Statement -> S_ _ %PERIOD.
 
@@ -1043,12 +1124,15 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
         };
       %}
       @lexer lexer
-      _ -> %WS:* {% function(d) {return null;} %}
-      __ -> %WS:+ {% function(d) {return null;} %}
-      Discourse -> Sentence:+
+      _ -> %WS:* {% function(d) {return {"@type": "_", types: {}};} %}
+      __ -> %WS:+ {% function(d) {return {"@type": "__", types: {}};} %}
+      Discourse -> _ (Sentence _):+ {% ([ws1, sentences]) => {
+         // console.log(sentences);
+         return sentences.map(([s, ws2]) => s); 
+      }%}
     `;
 
-  // console.log(header);
+  //console.log(header);
   
   if (!DRTGrammar) {
     DRTGrammar = FeaturedNearley.compile(body, header, footer);

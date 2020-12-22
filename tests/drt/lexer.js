@@ -552,8 +552,9 @@ describe("Lexer", function() {
           num: "sing"
         }
       }],
-      type: "word",
-      value: "girlfriend"
+      "@type": "%word",
+      "type": "word",
+      "value": "girlfriend"
     });
   });
   
@@ -795,6 +796,7 @@ describe("Lexer", function() {
 
   let token = (type, value, tokens = []) => {
     return {
+      "@type": "%" + type,
       "type": type,
       "value": value,
       "tokens": tokens

@@ -1115,8 +1115,12 @@ class CRPUNCT2 extends Rule {
 
 class CRPUNCT extends CompositeRule {
   constructor(ids) {
-    super([new CRPUNCT1(ids), 
-           new CRPUNCT2(ids)]);
+    super([
+      new CRPUNCT1(ids), 
+      new CRPUNCT2(ids),
+      // new CRWS1(ids),
+      // new CRWS2(ids)
+          ]);
   }
 }
 

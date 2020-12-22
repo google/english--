@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
 
-describe("Error handling", () => {
+describe.skip("Error handling", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -33,69 +33,6 @@ describe("Error handling", () => {
         .equalsTo('main →  ● main$string$1');
     }
   });
-
-  function print(track) {
-    const result = [];
-    result.push(`A ${track.symbol} token based on:`);
-    for (let stack of track.stack) {
-      const {rule, dot} = stack;
-      const {name, symbols} = rule;
-      let tail = [];
-      const postprocessor = rule.postprocess;
-      let head = name;
-      const meta = postprocessor ? postprocessor.meta : undefined;
-      const features = (types) => Object
-            .entries(types)
-            .map(([key, value]) => `${key}=${value}`)
-            .join(", ");
-      
-      if (meta) {
-        head += `[${features(meta.types)}]`;
-      }
-      let j = 0;
-      for (let i = 0; i < symbols.length; i++) {
-        if (dot == i) {
-          tail.push("●");
-        }
-        const symbol = symbols[i];
-        if (typeof symbol == "string") {
-          let suffix = "";
-          if (meta &&
-              symbol != "__" &&
-              symbol != "_") {
-            suffix = `[${features(meta.conditions[j++].types)}]`;
-          };
-          tail.push(`${symbol}${suffix}`);
-        } else if (symbol.literal) {
-          tail.push(symbol.literal);
-        } else if (symbol.type) {
-          tail.push(`%${symbol.type}`);
-        }
-      }
-      result.push(`    ${head} → ${tail.join(" ")}`);
-    }
-    return result.join("\n");
-  }
-  
-  function message(error) {
-    const {token, tracks} = error;
-      
-    let result = [];
-    if (token) {
-      if (token.type) {
-        result.push(`Unexpected ${token.type} token: ${token.value}.`);
-      } else {
-        result.push(`Unexpected "${token.value}".`);
-      }
-      result.push(`Instead, I was expecting to see one of the following:`);
-      result.push(``);
-    }
-    for (let track of tracks) {
-      result.push(print(track));
-    }
-    result.push(``);
-    return result.join("\n");
-  }
 
   it("Invalid Token", function() {
     let parser = Nearley.from(`
@@ -486,9 +423,9 @@ A word token based on:
   it("Parser", () => {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
-    assertThat(print(tracks[0]).trim()).equalsTo(`
+    assertThat(parser.parser.track(tracks[0]).trim()).equalsTo(`
 A __if__ token based on:
-    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[num=1, gap=-, tp=2, tense=3] __ %then __ S[num=1, gap=-, tp=2, tense=3]
+    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[] __ %then __ S[]
     S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
@@ -498,7 +435,7 @@ A __if__ token based on:
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
-    assertThat(print(tracks[30]).trim()).equalsTo(`
+    assertThat(parser.parser.track(tracks[30]).trim()).equalsTo(`
 A himself token based on:
     PRO[num=sing, gen=male, case=-nom, refl=+] → ● %himself
     NP[num=1, gen=2, case=3, gap=-] → ● PRO[num=1, gen=2, case=3]
