@@ -218,19 +218,15 @@ class Nearley {
 }
 
 function match(type, types = {}, conditions = [], data, location, reject) {
-  //console.log("hi");
-  // console.log(data);
   // Creates a copy of the types because it is reused
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
     
   // Creates a copy of the input data, because it is
   // reused across multiple calls.
-  //console.log(data);
   let result = JSON.parse(JSON.stringify(data || []))
       .filter((ws) => ws != null);
   
-  // console.log(data);
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
     
@@ -245,47 +241,16 @@ function match(type, types = {}, conditions = [], data, location, reject) {
               (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
   }
   
-  // console.log(hash(signature));
   let namespace = hash(signature);
   
-  // console.log(data);
-  // console.log(result);
-  
-  // console.log(expects);
-  
-  //let children = result.filter((node) => {
-  // if (node["@type"]) {
-  //    return true;
-  //  }
-  //  if (Array.isArray(node)) {
-  //    // console.log(node[0]);
-  //    return true;
-  //  }
-  //});
   let children = [];
-  
-  
-  //console.log(children);
-  
-  //let children2 = [];
   for (let i = 0; i < result.length; i++) {
     let node = result[i];
     if (node["@type"] || Array.isArray(node)) {
-      // console.log("children);
       children.push([node, i]);
     }
-    // console.log(expects[i]);
-    //  let node = result[i];
-    //  if (node["@type"] || (expects[i] && expects[i]["@type"] == "@list")) {
-    //    children2.push(node);
-    //console.log(expects[i]);
-    //console.log(`node: ${i} *${JSON.stringify(node)}*`);
-    //  }
   }
-  
-  // let children = result.filter((node) => node["@type"]);
-  //expects = expects.filter((node) => node["@type"] != "@list");
-  
+
   //console.log(`Trying to bind ${signature}`);
   //let foo = children.map((x) => {
   //  return `${x["@type"] || JSON.stringify(x)}${JSON.stringify(x.types || {})}`;
@@ -297,18 +262,12 @@ function match(type, types = {}, conditions = [], data, location, reject) {
     return reject;
   }
   
-  // console.log(children);
-  
   let variables = {};
   
   for (let i = 0; i < expects.length; i++) {
     let expected = expects[i];
     let [child, index] = children[i];
     if (expected["@type"] == "@list") {
-      // bind(type, types = {}, conditions = [])
-      //let sub = expected.children.filter((s) => {
-      //  return typeof s != "string";
-      //});
       let sub = [];
       for (let s of expected.children) {
         if (typeof s == "string" ||
@@ -318,21 +277,14 @@ function match(type, types = {}, conditions = [], data, location, reject) {
         }
         sub.push({"@type": s.name, types: s.types});
       }
-      //console.log("hi");
-      //console.log(children);
-      //console.log(sub);
-      // console.log(child);
       let processed = [];
       for (el of child) {
         let list = bind("@list", {}, sub)(el, location, reject);
         if (list == reject) {
-          //console.log("blarh");
           return reject;
         }
         processed.push(list.children);
       }
-      // children[i] = list;
-      //console.log(`Trying to override ${index} in result`);
       result[index] = processed;
       //console.log(list.children);
       // children[i][0] = list.children;
@@ -391,27 +343,18 @@ function match(type, types = {}, conditions = [], data, location, reject) {
       }
     }
   }
-  
-  // Sets variables
+    
+    // Sets variables
   for (let [key, value] of Object.entries(bindings)) {
     if (typeof value == "number") {
-      // console.log(key);
-      // console.log("hello");
       if (!variables[value]) {
-        // console.log(variables);
-        // console.log(types);
-        // console.log(variables);
-        // console.log("hi");
-        // return reject;
         bindings[key] = namespace + value;
       } else {
-        // console.log(`${key} = ${variables[value]}`);
         bindings[key] = variables[value];
       }
     }
   }
   
-  // console.log("Binded!");
   let n = {
     "@type": type,
     "types": bindings,
