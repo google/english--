@@ -267,30 +267,6 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   for (let i = 0; i < expects.length; i++) {
     let expected = expects[i];
     let [child, index] = children[i];
-    if (expected["@type"] == "@list") {
-      let sub = [];
-      for (let s of expected.children) {
-        if (typeof s == "string" ||
-            s.name == "__" ||
-            s.name == "_") {
-          continue;
-        }
-        sub.push({"@type": s.name, types: s.types});
-      }
-      let processed = [];
-      for (el of child) {
-        let list = bind("@list", {}, sub)(el, location, reject);
-        if (list == reject) {
-          return reject;
-        }
-        processed.push(list.children);
-      }
-      result[index] = processed;
-      //console.log(list.children);
-      // children[i][0] = list.children;
-      // console.log(result);
-      continue;
-    }
     if (expected["@type"] != child["@type"]) {
       // console.log("Children of different types");
       return reject;
@@ -515,9 +491,6 @@ class FeaturedNearley {
       function term(x) {
         if (typeof x == "string") {
           return x;
-        } else if (x["name"] == "@list") {
-          let children = x.children.map(term).join(" ");
-          return `(${children}):${x["types"]["@number"]}`;
         } else {
           return x.name;
         }
