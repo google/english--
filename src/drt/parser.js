@@ -401,23 +401,10 @@ const RuntimeSyntax = `
       %}
 
       head -> name {% id %}
-      tail -> termList {% id %}
-
-      termList -> (term __ {% id %}):* term {%
+      tail -> (term __ {% id %}):* term {%
         ([beginning, end]) => {
          return [...beginning, end];
         }
-      %}
-
-      term -> "(" _ termList _ "):" ("+" | "*") {% 
-        ([paren1, ws1, termList, ws2, paren2, [number]]) => {
-          // console.log(number);
-          return {
-            "name": "@list",
-            "types": {"@number": number},
-            "children": termList,
-          };
-        } 
       %}
 
       term -> name {% id %}
