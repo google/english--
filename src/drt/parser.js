@@ -221,7 +221,7 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   // Creates a copy of the types because it is reused
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
-    
+  
   // Creates a copy of the input data, because it is
   // reused across multiple calls.
   let result = JSON.parse(JSON.stringify(data || []))
@@ -229,7 +229,7 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
-    
+  
   let signature = `${type}${JSON.stringify(bindings)} -> `;
   for (let child of expects) {
     signature += `${child["@type"] || JSON.stringify(child)}${JSON.stringify(child.types || {})} `;
@@ -392,7 +392,6 @@ const RuntimeSyntax = `
          return {
           name: word,
           types: Object.fromEntries(features || []),
-          children: [],
          }
         }
       %}

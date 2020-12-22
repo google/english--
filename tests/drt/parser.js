@@ -181,7 +181,11 @@ describe("Parser", function() {
 
 describe("Binding", function() {
   it("Whitespace", function() {
-    let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
+    let post = bind("VP", {}, [
+      {"@type": "V"},
+      {"@type": "null"},
+      {"@type": "NP"}
+    ]);
 
     assertThat(post([{
         "@type": "V", 
@@ -572,6 +576,31 @@ describe("Binding", function() {
 });
 
 describe("FeaturedNearley", function() {
+  it("Parse", function() {
+    let parser = new FeaturedNearley();
+    let grammar = parser.feed(`
+      S[a=1] -> NP[b=2] _ VP[c=3].
+    `);
+    
+    assertThat(grammar).equalsTo([[{
+      "head": {
+        "name": "S",
+        "types": {"a": 1}
+      },
+      "tail": [{
+        "name": "NP",
+        "types": {"b": 2}        
+      }, {
+        "name": "_",
+        "types": {}        
+      }, {
+        "name": "VP",
+        "types": {"c": 3}        
+      }]
+    }]]);
+    
+  });
+
   it("Rejects at Runtime", function() {
     let parser = Nearley.from(`
       @builtin "whitespace.ne"
