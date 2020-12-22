@@ -509,8 +509,10 @@ class FeaturedNearley {
   }
 
   static generate(source, header = "", footer = "", raw) {
+    // console.log("hi");
     let parser = new FeaturedNearley();
     let grammar = parser.feed(source + footer);
+    // console.log("hello");
     
     let result = [];
 
@@ -658,20 +660,12 @@ const DrtSyntax = `
           V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
           NP[num=6, gen=7, case=-nom, gap=-].
 
-      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
-          V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] 
-          PP __
-          NP[num=6, gen=7, case=-nom, gap=-].
-
       VP[num=1, fin=2, gap=np, tp=6, tense=7] ->
           V[num=1, fin=2, trans=+, tp=6, tense=7] _ 
           NP[num=4, gen=5, case=-nom, gap=np].
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
         V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
-
-      VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
-        V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5] PP.
 
       VP[num=1, fin=+, gap=2, stat=+, tp=4, tense=5] -> 
           HAVE[num=1, fin=+, tp=4, tense=5] __
@@ -687,8 +681,6 @@ const DrtSyntax = `
       GAP -> null.
 
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
-
-      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2] PP.
 
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
  
@@ -714,9 +706,9 @@ const DrtSyntax = `
           BE[num=1, fin=2, tp=-past, tense=4] __ %not __ ADJ.
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
-          BE[num=1, fin=2, tp=-past, tense=4] PP.
+          BE[num=1, fin=2, tp=-past, tense=4] __ PP.
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=4] -> 
-          BE[num=1, fin=2, tp=-past, tense=4] __ %not PP.
+          BE[num=1, fin=2, tp=-past, tense=4] __ %not __ PP.
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
           BE[num=1, fin=2, tp=-past, tense=7] __ 
@@ -753,7 +745,7 @@ const DrtSyntax = `
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ %POSS.
 
       N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
-
+      
       PRO[num=sing, gen=male, case=+nom] -> %he.
       PRO[num=sing, gen=male, case=-nom] -> %him.
       
@@ -769,8 +761,12 @@ const DrtSyntax = `
       PRO[num=sing, gen=fem, case=-nom, refl=+] -> %herself.
       PRO[num=sing, gen=-hum, case=-nom, refl=+] -> %itself.
 
-      PP -> (__ PREP __ NP[num=1, gen=2, case=3, gap=-]):+.
-
+      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+      V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] -> 
+        V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] __ 
+        PP.  
+      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+      
       PREP -> %behind.
       PREP -> %__in__.
       PREP -> %__with__.
@@ -1098,6 +1094,7 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
   if (!DRTGrammar) {
     DRTGrammar = FeaturedNearley.compile(body, header, footer);
   }
+    
   return DRTGrammar;  
 }
 

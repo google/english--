@@ -999,13 +999,13 @@ describe("DRS", function() {
     assertThat("Every man from Brazil loves Mary.")
      .equalsTo(`
        let a, b
-       Brazil(a)
-       Mary(b)
+       Mary(a)
+       Brazil(b)
        every (c: {
          man(c)
-         from(c, a)
+         from(c, b)
        }) {
-         loves(c, b)
+         loves(c, a)
        }
     `);
   });
@@ -1607,8 +1607,8 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        porsche(c)
+       to(e, b)
        < gave(a, c)
-       < gave-to(a, b)
      `);
   });
 
@@ -1699,8 +1699,8 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b, c, d
        Sam(a)
-       Cascal(b)
-       Dani(c)
+       Dani(b)
+       Cascal(c)
        reservation(d)
        < made(a, d)
        for(d, b)
@@ -1722,15 +1722,18 @@ describe("DRS", function() {
   });
 
   it("Jones came from Brazil to Italy.", function() { 
+    // TODO(goto): "e" is hard coded, but needs to be a reference
+    // to an eventuality introduced by "come".
+    // "came" also needs to be predicated with "e".
     assertThat("Jones came from Brazil to Italy.")
      .equalsTo(`
        let a, b, c
        Jones(a)
-       Brazil(b)
-       Italy(c)
+       Italy(b)
+       Brazil(c)
+       to(e, b)
+       from(e, c)
        < came(a)
-       < came-from(a, b)
-       < came-to(a, c)
      `);
   });
 
@@ -1745,11 +1748,11 @@ describe("DRS", function() {
        let a, b, c, d
        Sam(a)
        reservation(b)
-       woman(c)
-       porsche(d)
+       porsche(c)
+       woman(d)
        < made(a, b)
-       for(b, c)
-       with(b, d)
+       with(b, c)
+       for(b, d)
      `);
   });
   function assertThat(x) { 
@@ -1822,8 +1825,8 @@ describe("lexicon", () => {
        Mel(a)
        awesome(b)
        country(b)
+       to(e, b)
        < travelled(a)
-       < travelled-to(a, b)
     `);
   });
 

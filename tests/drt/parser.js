@@ -1249,9 +1249,8 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N("book"), 
-                           PP([[PREP("about"), NP(PN("Brazil"))]]))
-                       ))));
+                           N(N("book"), PP(PREP("about"), NP(PN("Brazil"))))
+                          )))));
   });
 
   it("Jones likes a book from Brazil", function() {
@@ -1259,8 +1258,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N("book"), 
-                           PP([[PREP("from"), NP(PN("Brazil"))]]))
+                           N(N("book"), PP(PREP("from"), NP(PN("Brazil"))))), 
                        ))));
   });
 
@@ -1269,23 +1267,23 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V(VERB("like"), "s"),
                         NP(DET("a"), 
-                           N("girl"), 
-                           PP([[PREP("with"), NP(DET("a"), N("telescope"))]]))
+                           N(N("girl"), 
+                             PP(PREP("with"), NP(DET("a"), N("telescope")))))
                        ))));
   });
 
   it("Jones is from Brazil.", function() {
     assertThat(parse("Jones is from Brazil."))
-     .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), 
-                        PP([[PREP("from"), NP(PN("Brazil"))]])))));
+      .equalsTo(S(NP(PN("Jones")),
+                  VP_(VP(BE("is"), 
+                         PP(PREP("from"), NP(PN("Brazil")))))));
   });
 
   it("Jones is not from Brazil.", function() {
     assertThat(parse("Jones is not from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), "not",
-                        PP([[PREP("from"), NP(PN("Brazil"))]])))));
+                        PP(PREP("from"), NP(PN("Brazil")))))));
   });
 
   it("Jones likes a girl who is from Brazil.", function() {
@@ -1297,7 +1295,7 @@ describe("Statements", function() {
                              RC(RPRO("who"),
                                 S(NP(GAP()),
                                   VP_(VP(BE("is"), 
-                                         PP([[PREP("from"), NP(PN("Brazil"))]]
+                                         PP(PREP("from"), NP(PN("Brazil"))
                                            ))))
                                 ))
                            )))
@@ -1325,10 +1323,8 @@ describe("Statements", function() {
   it("Jones walks to Brazil.", function() {
     assertThat(parse("Jones walks to Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(V(VERB("walk"), "s"),
-                        PP([
-                          [PREP("to"), NP(PN("Brazil"))]
-                        ])
+                 VP_(VP(V(V(VERB("walk"), "s"),
+                          PP(PREP("to"), NP(PN("Brazil"))))
                        ))));
   });
 
@@ -2160,8 +2156,8 @@ describe("Backwards compatibility", function() {
      .equalsTo(S(NP(PN("Jones")), 
                  VP_(VP(V(VERB("like"), "s"), 
                         NP(DET("a"),
-                           N("woman"), 
-                           PP([[PREP("with"), NP(DET("a"), N("donkey"))]])
+                           N(N("woman"), 
+                             PP(PREP("with"), NP(DET("a"), N("donkey"))))
                           )))));
   });
 
@@ -2309,14 +2305,14 @@ describe("Backwards compatibility", function() {
   it("John is from Brazil", function() {
     assertThat(parse("Jones is from Brazil."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), PP([[PREP("from"), NP(PN("Brazil"))]])
+                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
                         ))));
   });
 
   it("every brazilian is from Brazil", function() {
     assertThat(parse("every brazilian is from Brazil."))
      .equalsTo(S(NP(DET("every"), N("brazilian")),
-                 VP_(VP(BE("is"), PP([[PREP("from"), NP(PN("Brazil"))]])
+                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
                         ))));
   });
 
@@ -2532,21 +2528,17 @@ describe("Backwards compatibility", function() {
   it("Jones travelled from Brazil to Italy.", function() { 
     assertThat(parse("Jones travelled from Brazil to Italy."))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("travelled")),
-                         PP([
-                           [PREP("from"), NP(PN("Brazil"))],
-                           [PREP("to"), NP(PN("Italy"))]
-                         ])
-                        ))));
+                  VP_(VP(V(V(V(VERB("travelled")),
+                             PP(PREP("from"), NP(PN("Brazil")))),
+                           PP(PREP("to"), NP(PN("Italy"))))
+                        )))) ;
   });
 
   it("Sam Goto kissed in Brazil Dani.", function() {
     assertThat(parse("Sam Goto kissed in Brazil Dani."))
       .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
-                  VP_(VP(V(VERB("kiss"), "ed"),
-                         PP([
-                           [PREP("in"), NP(PN("Brazil"))]
-                         ]),
+                  VP_(VP(V(V(VERB("kiss"), "ed"),
+                           PP(PREP("in"), NP(PN("Brazil")))),
                          NP(PN("Dani"))))));
   });
     
@@ -2555,12 +2547,10 @@ describe("Backwards compatibility", function() {
       .equalsTo(S(NP(PN("Sam")),
                   VP_(VP(V(VERB("made")),
                          NP(DET("a"),
-                            N("reservation"),
-                            PP([
-                              [PREP("for"), NP(PN("Cascal"))],
-                              [PREP("for"), NP(PN("Dani"))]
-                            ])
-                           )))));
+                            N(N(N("reservation"),
+                                PP(PREP("for"), NP(PN("Cascal")))),
+                              PP(PREP("for"), NP(PN("Dani")))
+                             ))))));
 
   });
 
