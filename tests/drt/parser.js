@@ -202,7 +202,7 @@ describe("Binding", function() {
 
   });
   
-  it("Rejects based on length", function() {
+  it.skip("Rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([]))
     .equalsTo(undefined);

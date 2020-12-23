@@ -1,5 +1,9 @@
 const Assert = require("assert");
-const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
+const {
+  match,
+  Nearley,
+  FeaturedNearley,
+  Parser} = require("../../src/drt/parser.js");
 
 describe("Error handling", () => {
 
@@ -428,10 +432,10 @@ A __if__ token based on:
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
-    assertThat(parser.parser.track(tracks[4]).trim()).equalsTo(`
-A every token based on:
-    DET[num=sing, quantifier=true] → ● %every
-    NP[num=1, gen=2, case=3, gap=-] → ● DET[num=1] __ N[num=1, gen=2]
+    assertThat(parser.parser.track(tracks[30]).trim()).equalsTo(`
+A himself token based on:
+    PRO[num=sing, gen=male, case=-nom, refl=+] → ● %himself
+    NP[num=1, gen=2, case=3, gap=-] → ● PRO[num=1, gen=2, case=3]
     S[num=1, gap=np, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np, tp=3, tense=4]
     S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %or __ S[num=5, gap=-, tp=2, tense=3]
     S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %and __ S[num=5, gap=-, tp=2, tense=3]
@@ -439,15 +443,29 @@ A every token based on:
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
 
-    assertThat(tracks[30].stack.length).equalsTo(7);
-    const pro = tracks[30].stack[0];
+    const track = tracks[30];
+    assertThat(track.stack.length).equalsTo(7);
+    const pro = track.stack[0];
     assertThat(pro.rule.name).equalsTo("PRO");
     assertThat(pro.rule.postprocess.meta.types)
       .equalsTo({"case": "-nom", "gen": "male", "num": "sing", "refl": "+"});
-    const np = tracks[30].stack[1];
+    const np = track.stack[1];
+    // console.log(tracks[30].stack[1]);
     assertThat(np.rule.name).equalsTo("NP");
     assertThat(np.rule.postprocess.meta.conditions[np.dot].types)
       .equalsTo({"case": "3", "gen": "2", "num": 1});
+
+    // let result = match(track.stack[1]);
+    // console.log(np.rule.postprocess);
+    const head = track.stack[1].rule.postprocess.meta; 
+    const tail = track.stack[0].rule.postprocess.meta; 
+    
+    let result = match(head.type, head.types, head.conditions, [{
+      "@type": tail.type,
+      "types": tail.types,
+    }], undefined, "reject!");
+
+    // console.log(result);
   });
 
 });

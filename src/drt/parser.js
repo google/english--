@@ -293,7 +293,8 @@ function namespace(type, bindings, conditions) {
   return hash(signature); 
 }
 
-function match(type, types = {}, conditions = [], data, location, reject) {
+function match(type, types = {}, conditions = [], data, location, reject,
+               partial = false) {
   // Creates a copy of the types because it is reused
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
@@ -308,10 +309,9 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   //console.log(`Bind: ${type} -> ${conditions}`);
   //console.log(`To: ${data}`);
   
-  if (expects.length != data.length) {
-    return reject;
+  if (!partial && expects.length != data.length) {
+    throw new Error("Unexpected data length");
   }
-
   
   let variables = {};
 
@@ -319,6 +319,9 @@ function match(type, types = {}, conditions = [], data, location, reject) {
     let expected = expects[i];
     let child = result[i];
     if (expected["@type"] != child["@type"]) {
+      //console.log(expected);
+      //console.log(child);
+      //console.log("different types");
       return reject;
     }
     for (let [key, value] of Object.entries(expected.types || {})) {
@@ -1145,37 +1148,38 @@ function preprocess(node) {
 }
 
 module.exports = {
- parse: parse,
- first: first,
- preprocess: preprocess,
- Nearley: Nearley,
- bind: bind,
- FeaturedNearley: FeaturedNearley,
- Parser: Parser,
- nodes: {
-  "Statement": node("Statement"),
-  "Sentence": node("Sentence"),
-  "Question": node("Question"),
-  "S": node("S"),
-  "S_": node("S_"),
-  "NP": node("NP"),
-  "PN": node("PN"),
-  "VP_": node("VP_"),
-  "VP": node("VP"),
-  "V": node("V"),
-  "AUX": node("AUX"),
-  "PRO": node("PRO"),
-  "DET": node("DET"),
-  "N": node("N"),
-  "RC": node("RC"),
-  "RPRO": node("RPRO"),
-  "GAP": node("GAP"),
-  "BE": node("BE"),
-  "ADJ": node("ADJ"),
-  "PREP": node("PREP"),
-  "PP": node("PP"),
-  "VERB": node("VERB"),
-  "HAVE": node("HAVE"),
-  "RN": node("RN"),
- }
+  parse: parse,
+  first: first,
+  preprocess: preprocess,
+  Nearley: Nearley,
+  bind: bind,
+  match: match,
+  FeaturedNearley: FeaturedNearley,
+  Parser: Parser,
+  nodes: {
+    "Statement": node("Statement"),
+    "Sentence": node("Sentence"),
+    "Question": node("Question"),
+    "S": node("S"),
+    "S_": node("S_"),
+    "NP": node("NP"),
+    "PN": node("PN"),
+    "VP_": node("VP_"),
+    "VP": node("VP"),
+    "V": node("V"),
+    "AUX": node("AUX"),
+    "PRO": node("PRO"),
+    "DET": node("DET"),
+    "N": node("N"),
+    "RC": node("RC"),
+    "RPRO": node("RPRO"),
+    "GAP": node("GAP"),
+    "BE": node("BE"),
+    "ADJ": node("ADJ"),
+    "PREP": node("PREP"),
+    "PP": node("PP"),
+    "VERB": node("VERB"),
+    "HAVE": node("HAVE"),
+    "RN": node("RN"),
+  }
 }
