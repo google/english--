@@ -428,7 +428,7 @@ A __if__ token based on:
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
-    assertThat(parser.parser.track(tracks[30]).trim()).equalsTo(`
+    assertThat(parser.parser.track(tracks[4]).trim()).equalsTo(`
 A himself token based on:
     PRO[num=sing, gen=male, case=-nom, refl=+] → ● %himself
     NP[num=1, gen=2, case=3, gap=-] → ● PRO[num=1, gen=2, case=3]

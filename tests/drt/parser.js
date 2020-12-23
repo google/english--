@@ -609,9 +609,9 @@ describe("FeaturedNearley", function() {
     assertThat(grammar).equalsTo(`
 S -> NP _ VP {%
   bind("S", {"a":1}, [
-    {"@type": "NP", "types": {"b":2}, "children": []}, 
-    {"@type": "_", "types": {}, "children": []}, 
-    {"@type": "VP", "types": {"c":3}, "children": []}, 
+    {"@type": "NP", "types": {"b":2}}, 
+    {"@type": "_", "types": {}}, 
+    {"@type": "VP", "types": {"c":3}}, 
   ])
 %}
 `.trim());

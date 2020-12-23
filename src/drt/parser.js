@@ -592,24 +592,13 @@ class FeaturedNearley {
         // the types of %A at runtime need to match the types of A[].
         // console.log("hi: " + head.name);
         feed(`([token], location, reject) => {
-          // console.log(token);
           for (let match of token.tokens) {
-            // console.log("foo");
-            //console.log(match);
-            // console.log("${head.name}");
-            //console.log(${JSON.stringify(head)});
-            // console.log(${JSON.stringify(tail[0])});
-            //console.log("${tail[0]}");
             let result = bind("${head.name}", ${JSON.stringify(head.types)}, [
               {"@type": "${head.name}", "types": ${JSON.stringify(head.types)}}, 
             ])([match], location, reject);
-            // console.log(result);
             if (result != reject) {
-              // console.log(result.children[0]);
-              // console.log(token);
               let node = JSON.parse(JSON.stringify(result.children[0]));
               node.children = [{value: token.value}];
-              // node.value = token.value; 
               return node;
             }
           }
@@ -618,7 +607,7 @@ class FeaturedNearley {
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
-          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}, "children": ${JSON.stringify(term.children || [])}}, `);
+          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
         }
         feed(`  ])`);
       }
