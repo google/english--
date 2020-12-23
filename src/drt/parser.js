@@ -293,18 +293,7 @@ class Nearley {
   }
 }
 
-function match(type, types = {}, conditions = [], data, location, reject) {
-  // Creates a copy of the types because it is reused
-  // across multiple calls and we assign values to it.
-  let bindings = JSON.parse(JSON.stringify(types));
-
-  // Creates a copy of the input data, because it is
-  // reused across multiple calls.
-  let result = JSON.parse(JSON.stringify(data || []))
-
-  // Ignores the null type.
-  let expects = conditions.filter((x) => x["@type"] != "null");
-  
+function namespace(type, bindings, conditions) {  
   let signature = `${type}${JSON.stringify(bindings)} -> `;
   for (let child of conditions) {
     signature += `${child["@type"] || JSON.stringify(child)}${JSON.stringify(child.types || {})} `;
@@ -316,7 +305,20 @@ function match(type, types = {}, conditions = [], data, location, reject) {
               (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
   }
   
-  let namespace = hash(signature);
+  return hash(signature); 
+}
+
+function match(type, types = {}, conditions = [], data, location, reject) {
+  // Creates a copy of the types because it is reused
+  // across multiple calls and we assign values to it.
+  let bindings = JSON.parse(JSON.stringify(types));
+
+  // Creates a copy of the input data, because it is
+  // reused across multiple calls.
+  let result = JSON.parse(JSON.stringify(data || []))
+
+  // Ignores the null type.
+  let expects = conditions.filter((x) => x["@type"] != "null");
   
   if (expects.length != data.length) {
     return reject;
@@ -380,28 +382,23 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   }
     
   // Sets variables
+  const scope = namespace(type, bindings, conditions);
   for (let [key, value] of Object.entries(bindings)) {
     if (typeof value == "number") {
       if (!variables[value]) {
-        bindings[key] = namespace + value;
+        bindings[key] = scope + value;
       } else {
         bindings[key] = variables[value];
       }
     }
   }
   
-  let n = {
+  return {
     "@type": type,
     "types": bindings,
     "children": result.filter(
       (child) => (child["@type"] != "_" && child["@type"] != "__")),
   };
-  
-  //if (location != undefined) {
-  //  n["loc"] = location;
-  //}
-  
-  return n;
 }
 
 function bind(type, types = {}, conditions = []) {   
