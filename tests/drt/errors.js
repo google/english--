@@ -418,20 +418,20 @@ A word token based on:
     const tracks = parser.parser.tracks();
     assertThat(parser.parser.track(tracks[0]).trim()).equalsTo(`
 A __if__ token based on:
-    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[] __ %then __ S[]
+    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[num=1, gap=-, tp=2, tense=3] __ %then __ S[num=1, gap=-, tp=2, tense=3]
     S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
   });
   
-  it.skip("Types Match", () => {
+  it("Types Match", () => {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
     assertThat(parser.parser.track(tracks[4]).trim()).equalsTo(`
-A himself token based on:
-    PRO[num=sing, gen=male, case=-nom, refl=+] → ● %himself
-    NP[num=1, gen=2, case=3, gap=-] → ● PRO[num=1, gen=2, case=3]
+A every token based on:
+    DET[num=sing, quantifier=true] → ● %every
+    NP[num=1, gen=2, case=3, gap=-] → ● DET[num=1] __ N[num=1, gen=2]
     S[num=1, gap=np, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np, tp=3, tense=4]
     S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %or __ S[num=5, gap=-, tp=2, tense=3]
     S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %and __ S[num=5, gap=-, tp=2, tense=3]

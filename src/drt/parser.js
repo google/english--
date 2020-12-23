@@ -72,17 +72,8 @@ class Nearley {
   */
   tracks(error = false) {
     let {parser} = this;
-    //const lastColumnIndex = Math.max(0, parser.table.length - 2);
     const lastColumnIndex = error ? parser.table.length - 2 : parser.table.length - 1;
-    //console.log(parser.results);
-    //console.log(parser.table.length);
     const lastColumn = parser.table[lastColumnIndex];
-    //console.log(parser.table);
-    // console.log(e.token);
-    // console.log(e);
-    //let result = {
-    //  tracks: [],
-    //};
     let tracks = [];
     // Display each state that is expecting a terminal symbol next.
     for (let i = 0; i < lastColumn.states.length; i++) {
@@ -90,7 +81,6 @@ class Nearley {
       const nextSymbol = state.rule.symbols[state.dot];
       if (nextSymbol && this.isTerminalSymbol(nextSymbol)) {
         const symbolDisplay = this.getSymbolDisplay(nextSymbol);
-        // console.log(`    A ${symbolDisplay} based on:`);
         let track = {symbol: symbolDisplay, stack: []};
         tracks.push(track);
         // Display the "state stack" - which shows you how this state
@@ -98,8 +88,6 @@ class Nearley {
         const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
         for (let j = 0; j < stateStack.length; j++) {
           const state = stateStack[j];
-          // console.log(state);
-          // expected.based.push(state.rule.toString(state.dot));
           track.stack.push(state);
         }
       }
@@ -259,7 +247,6 @@ class Nearley {
         head += `[${features(meta.types)}]`;
       }
       
-      let j = 0;
       for (let i = 0; i < symbols.length; i++) {
         if (dot == i) {
           tail.push("●");
@@ -267,10 +254,8 @@ class Nearley {
         const symbol = symbols[i];
         if (typeof symbol == "string") {
           let suffix = "";
-          if (meta &&
-              symbol != "__" &&
-              symbol != "_") {
-            suffix = `[${features(meta.conditions[j++].types)}]`;
+          if (meta && symbol != "__" && symbol != "_") {
+            suffix = `[${features(meta.conditions[i].types)}]`;
           };
           tail.push(`${symbol}${suffix}`);
         } else if (symbol.literal) {
@@ -316,13 +301,17 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   // Creates a copy of the input data, because it is
   // reused across multiple calls.
   let result = JSON.parse(JSON.stringify(data || []))
-
+  
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
+
+  //console.log(`Bind: ${type} -> ${conditions}`);
+  //console.log(`To: ${data}`);
   
   if (expects.length != data.length) {
     return reject;
   }
+
   
   let variables = {};
 

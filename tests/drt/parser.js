@@ -643,8 +643,6 @@ S -> NP _ VP {%
     let parser = Nearley.from(`
       @builtin "whitespace.ne"
 
-      @{% ${bind.toString()} %}
-
       S -> NP _ VP {%
         bind("S", {"num": 1}, [{
             "@type": "NP",
@@ -679,9 +677,8 @@ S -> NP _ VP {%
     `);
 
     let result = parser.feed("Sam likes Dani");
-
     let node = (type, ...children) => { 
-     return {"@type": type, "children": children} 
+      return {"@type": type, "children": children} 
     };
 
     assertThat(result[0].types).equalsTo({
@@ -689,13 +686,6 @@ S -> NP _ VP {%
     });
 
     function clear(root) {
-      //if (Array.isArray(root)) {
-      //  throw new Error("hi");
-      //  for (let child of root) {
-      //    clear(child);
-      //  }
-      //  return root;
-      //}
       delete root.types;
       delete root.loc;
       for (let child of root.children || []) {
