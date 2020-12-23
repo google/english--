@@ -53,13 +53,16 @@ class Nearley {
 
   reportError(e) {
     let parser = this.parser;
-    //console.log(parser.current);
     const token = parser.lexer.buffer[parser.current];
+    let that = this;
     return {
       tracks: this.tracks(true),
       token: e.token,
       loc: e.offset, 
       start: token,
+      print() {
+        return that.print(e.token);
+      },
     };
   }
   
@@ -216,11 +219,23 @@ class Nearley {
     return !this.isTerminalSymbol(symbol);
   }
 
-  print() {
+  print(token) {
     let result = [];
-    for (let track of this.tracks()) {
+    
+    if (token) {
+      if (token.type) {
+        result.push(`Unexpected ${token.type} token: ${token.value}.`);
+      } else {
+        result.push(`Unexpected "${token.value}".`);
+      }
+      result.push(`Instead, I was expecting to see one of the following:`);
+      result.push(``);
+    }
+
+    for (let track of this.tracks(token)) {
       result.push(this.track(track));
     }
+    
     result.push(``);
     return result.join("\n");
   }
@@ -269,18 +284,6 @@ class Nearley {
   }
   
   message(error) {
-    const {token, tracks} = error;
-      
-    let result = [];
-    if (token) {
-      if (token.type) {
-        result.push(`Unexpected ${token.type} token: ${token.value}.`);
-      } else {
-        result.push(`Unexpected "${token.value}".`);
-      }
-      result.push(`Instead, I was expecting to see one of the following:`);
-      result.push(``);
-    }
     for (let track of tracks) {
       result.push(print(track));
     }

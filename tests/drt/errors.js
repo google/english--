@@ -1,7 +1,7 @@
 const Assert = require("assert");
 const {Nearley, FeaturedNearley, Parser} = require("../../src/drt/parser.js");
 
-describe.skip("Error handling", () => {
+describe("Error handling", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -67,7 +67,7 @@ describe.skip("Error handling", () => {
     try {
       parser.feed("fbar");
     } catch (e) {
-      error = e;      
+      error = e;
     }
 
     const {token, loc, start, tracks} = error;
@@ -87,14 +87,12 @@ describe.skip("Error handling", () => {
     ]);
     assertThat(first.rule.toString(first.dot))
       .equalsTo('main →  ● %foo');
-    assertThat(message(error).trim()).equalsTo(`
+    assertThat(error.print().trim()).equalsTo(`
 Unexpected @unknown token: fbar.
 Instead, I was expecting to see one of the following:
 
 A foo token based on:
     main → ● %foo`.trim());
-
-    
   });
 
   it("Bigger grammar and rule metadata", function() {
@@ -136,7 +134,7 @@ A foo token based on:
       parser.feed("fbar");
       throw new Error("Expected parse error");
     } catch (e) {
-    assertThat(message(e).trim()).equalsTo(`
+      assertThat(e.print().trim()).equalsTo(`
 Unexpected @unknown token: fbar.
 Instead, I was expecting to see one of the following:
 
@@ -156,7 +154,7 @@ A foo token based on:
       parser.feed("fbar");
       throw new Error("Expected parse error");
     } catch (e) {
-      assertThat(message(e).trim()).equalsTo(`
+      assertThat(e.print().trim()).equalsTo(`
 Unexpected "b".
 Instead, I was expecting to see one of the following:
 
@@ -174,8 +172,7 @@ A "o" token based on:
       FOO -> "foo"
     `);
 
-    let tracks = parser.tracks();
-    assertThat(message({tracks: tracks}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A "f" token based on:
     FOO$string$1 → ● f o o
@@ -191,8 +188,7 @@ A "f" token based on:
     `);
 
     parser.feed("f");
-    let tracks = parser.tracks();
-    assertThat(message({tracks: tracks}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A "o" token based on:
     FOO$string$1 → f ● o o
@@ -209,8 +205,7 @@ A "o" token based on:
       FOO -> "bar"
     `);
 
-    let tracks = parser.tracks();
-    assertThat(message({tracks: tracks}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A "f" token based on:
     FOO$string$1 → ● f o o
@@ -250,8 +245,7 @@ A "b" token based on:
       FOO -> %bar
     `);
 
-    let tracks = parser.tracks();
-    assertThat(message({tracks: tracks}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A foo token based on:
     FOO → ● %foo
@@ -290,9 +284,8 @@ A bar token based on:
     `);
 
     parser.feed("f");
-    let tracks = parser.tracks();
     assertThat(parser.parser.lexer.buffer).equalsTo("f");
-    assertThat(message({tracks: tracks}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A foo token based on:
     FOO → ● %foo
@@ -331,7 +324,7 @@ A bar token based on:
 
     let parser = new Nearley(grammar, "main");
 
-    assertThat(message({tracks: parser.tracks()}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
     FOO → ● %word
@@ -381,7 +374,7 @@ A word token based on:
 
     parser.feed("foo");
     
-    assertThat(message({tracks: parser.tracks()}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
     BAR → ● %word
@@ -411,7 +404,7 @@ A word token based on:
 
     let parser = new Nearley(grammar, "main");
 
-    assertThat(message({tracks: parser.tracks()}).trim())
+    assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
     FOO → ● %word
@@ -431,7 +424,7 @@ A __if__ token based on:
 `.trim());
   });
   
-  it("Types Match", () => {
+  it.skip("Types Match", () => {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
