@@ -179,18 +179,20 @@ describe("Parser", function() {
 
  });
 
-describe.skip("Binding", function() {
+describe("Binding", function() {
   it("Whitespace", function() {
     let post = bind("VP", {}, [
       {"@type": "V"},
-      {"@type": "null"},
+      {"@type": "__"},
       {"@type": "NP"}
     ]);
 
     assertThat(post([{
-        "@type": "V", 
-      }, null, {
-        "@type": "NP", 
+      "@type": "V", 
+    }, {
+      "@type": "__", 
+    }, {
+      "@type": "NP", 
     }]))
     .equalsTo({
       "@type": "VP", 
@@ -206,10 +208,10 @@ describe.skip("Binding", function() {
     .equalsTo(undefined);
    });
 
-  it("Rejects based on length", function() {
+  it.skip("Rejects based on length", function() {
     let post = bind("VP", {}, [{"@type": "V"}, {"@type": "NP"}]);
     assertThat(post([null,null]))
-    .equalsTo(undefined);
+      .equalsTo(undefined);
 
    });
 
@@ -323,7 +325,7 @@ describe.skip("Binding", function() {
     });
   });
 
-  it("Binds to literals", function() {
+  it.skip("Binds to literals", function() {
     let post = bind("PN", {"num": "sing"});
 
     assertThat(post(["Sam"]))
