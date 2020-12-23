@@ -315,13 +315,10 @@ function match(type, types = {}, conditions = [], data, location, reject,
   
   let variables = {};
 
-  for (let i = 0; i < expects.length; i++) {
+  for (let i = 0; i < result.length; i++) {
     let expected = expects[i];
     let child = result[i];
     if (expected["@type"] != child["@type"]) {
-      //console.log(expected);
-      //console.log(child);
-      //console.log("different types");
       return reject;
     }
     for (let [key, value] of Object.entries(expected.types || {})) {
@@ -329,6 +326,7 @@ function match(type, types = {}, conditions = [], data, location, reject,
         if (variables[value]) {
           if (Array.isArray(variables[value])) {
             if (!variables[value].includes(child.types[key])) {
+              // console.log("hi");
               return reject;
             }
           } else if (typeof variables[value] == "number") {
@@ -336,6 +334,7 @@ function match(type, types = {}, conditions = [], data, location, reject,
             variables[value] = child.types[key];
           } else if (Array.isArray(child.types[key])) {
             if (!child.types[key].includes(variables[value])) {
+              // console.log("hi");
               return reject;
             }
             continue;
@@ -354,6 +353,7 @@ function match(type, types = {}, conditions = [], data, location, reject,
         child.types[key] = value;
       } else if (Array.isArray(child.types[key])) {
         if (!child.types[key].includes(expected.types[key])) {
+          // console.log("hi");
           return reject;
         }
         child.types[key] = expected.types[key];
@@ -547,20 +547,30 @@ class FeaturedNearley {
       if (tail.length == 1 && tail[0] == "%word") {
         // For A[] -> %word rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
-        // console.log("hi: " + head.name);
-        feed(`([token], location, reject) => {
-          for (let match of token.tokens) {
-            let result = bind("${head.name}", ${JSON.stringify(head.types)}, [
-              {"@type": "${head.name}", "types": ${JSON.stringify(head.types)}}, 
-            ])([match], location, reject);
-            if (result != reject) {
-              let node = JSON.parse(JSON.stringify(result.children[0]));
-              node.children = [{value: token.value}];
-              return node;
+        feed(`
+          (() => {
+            let lexicon = ([token], location, reject) => {
+              for (let match of token.tokens) {
+                let result = bind("${head.name}", 
+                                  ${JSON.stringify(head.types)}, [{
+                                    "@type": "${head.name}", 
+                                    "types": ${JSON.stringify(head.types)}
+                                  }])([match], location, reject);
+                if (result != reject) {
+                  let node = JSON.parse(JSON.stringify(result.children[0]));
+                  node.children = [{value: token.value}];
+                 return node;
+                }
+              }
+              return reject;
             }
-          }
-          return reject;
-        }`);
+            lexicon.meta = {
+              type: ${JSON.stringify(head.name)},
+              types: ${JSON.stringify(head.types)},
+            };
+            return lexicon;
+          })()
+        `);
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {

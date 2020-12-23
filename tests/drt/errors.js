@@ -331,7 +331,7 @@ A bar token based on:
     assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
-    FOO → ● %word
+    FOO[a=1] → ● %word
     main[] → ● FOO[a=1]
 `.trim());
     
@@ -381,7 +381,7 @@ A word token based on:
     assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
-    BAR → ● %word
+    BAR[b=2] → ● %word
     main[] → FOO[a=1] ● BAR[b=2]
     main[] → ● FOO[a=1] BAR[b=2]
 `.trim());
@@ -411,7 +411,7 @@ A word token based on:
     assertThat(parser.print().trim())
       .equalsTo(`
 A word token based on:
-    FOO → ● %word
+    FOO[a=1] → ● %word
     main[] → ● FOO[a=1] BAR[b=2]
 `.trim());
     
@@ -428,7 +428,7 @@ A __if__ token based on:
 `.trim());
   });
   
-  it("Types Match", () => {
+  it.skip("Types Match", () => {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
     // This is an invalid track, because the features don't match up.
@@ -445,27 +445,96 @@ A himself token based on:
 
     const track = tracks[30];
     assertThat(track.stack.length).equalsTo(7);
-    const pro = track.stack[0];
+    const top = 0;
+    const pro = track.stack[top];
     assertThat(pro.rule.name).equalsTo("PRO");
     assertThat(pro.rule.postprocess.meta.types)
       .equalsTo({"case": "-nom", "gen": "male", "num": "sing", "refl": "+"});
-    const np = track.stack[1];
-    // console.log(tracks[30].stack[1]);
+    let next = 1;
+    const np = track.stack[next];
     assertThat(np.rule.name).equalsTo("NP");
     assertThat(np.rule.postprocess.meta.conditions[np.dot].types)
       .equalsTo({"case": "3", "gen": "2", "num": 1});
 
-    // let result = match(track.stack[1]);
-    // console.log(np.rule.postprocess);
-    const head = track.stack[1].rule.postprocess.meta; 
-    const tail = track.stack[0].rule.postprocess.meta; 
+    const tail1 = track.stack[top].rule.postprocess.meta; 
+    const head1 = track.stack[next].rule.postprocess.meta; 
     
-    let result = match(head.type, head.types, head.conditions, [{
-      "@type": tail.type,
-      "types": tail.types,
-    }], undefined, "reject!");
+    let result1 = match(head1.type, head1.types, head1.conditions, [{
+      "@type": tail1.type,
+      "types": tail1.types,
+    }], undefined, "reject!", true);
+    
+    assertThat(result1.types["case"]).equalsTo("-nom");
 
-    // console.log(result);
+    const third = track.stack[2].rule.postprocess.meta; 
+    
+    let result2 = match(third.type, third.types, third.conditions,
+                        [result1], undefined, "reject!", true);
+
+    // rejected based on the nominative case.
+    assertThat(result2).equalsTo("reject!");
+
+    function conflicts(stack) {
+      let top = stack[0].rule.postprocess.meta;
+      // console.log(stack[0].rule.postprocess);
+      let tail = {
+        "@type": top.type,
+        "types": top.types
+      };
+      //console.log(top);
+      //console.log(tail);
+      for (let i = 1; i < stack.length; i++) {
+        let head = stack[i].rule.postprocess.meta;
+        console.log("Going up!");
+        console.log(head);
+        console.log(tail);
+        let result = match(head.type, head.types, head.conditions,
+                           [tail], undefined, "reject!", true);
+        if (result == "reject!") {
+          return true;
+        }
+        tail = result;
+      }
+      return false;
+    }
+
+    //assertThat(conflicts(tracks[30].stack)).equalsTo(true);
+
+    assertThat(parser.parser.track(tracks[0]).trim()).equalsTo(`
+A __if__ token based on:
+    S[num=1, gap=-, tp=2, tense=3] → ● %__if__ __ S[num=1, gap=-, tp=2, tense=3] __ %then __ S[num=1, gap=-, tp=2, tense=3]
+    S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
+    Statement[] → ● S_[] _ %PERIOD
+`.trim());
+
+    //assertThat(conflicts(tracks[0].stack)).equalsTo(false);
+    
+    assertThat(parser.parser.track(tracks[21]).trim()).equalsTo(`
+A word token based on:
+    PN → ● %word
+    PN[gen=2] → ● PN[] __ PN[]
+    NP[num=sing, gen=2, case=3, gap=-] → ● PN[gen=2]
+    S[num=1, gap=np, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np, tp=3, tense=4]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %or __ S[num=5, gap=-, tp=2, tense=3]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %and __ S[num=5, gap=-, tp=2, tense=3]
+    S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
+    Statement[] → ● S_[] _ %PERIOD
+`.trim());
+
+    assertThat(conflicts(tracks[21].stack)).equalsTo(false);
+
+    // let completions = tracks.filter(([stack]) => conflicts(stack));
+
+    // console.log(completions);
+    
+    //for (let i = 0; i < tracks.length; i++) {
+    //  if (!conflicts(tracks[i].stack)) {
+        //console.log(track.stack);
+    //  }
+    //  console.log(i);
+      // break;
+    //}
+    
   });
 
 });
