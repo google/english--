@@ -258,6 +258,7 @@ class Nearley {
       if (meta) {
         head += `[${features(meta.types)}]`;
       }
+      
       let j = 0;
       for (let i = 0; i < symbols.length; i++) {
         if (dot == i) {
@@ -297,20 +298,10 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   // across multiple calls and we assign values to it.
   let bindings = JSON.parse(JSON.stringify(types));
 
-  // console.log(data);
-  
   // Creates a copy of the input data, because it is
   // reused across multiple calls.
   let result = JSON.parse(JSON.stringify(data || []))
-      //.map((item) => {
-      //  console.log(item);
-      //  if (item == null) {
-      //    return {"@type": "GAP"};
-      //  }
-      //return item;
-      //});
 
-  // console.log(data);
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
   
@@ -327,25 +318,7 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   
   let namespace = hash(signature);
   
-  //let children = result;
-  //for (let i = 0; i < result.length; i++) {
-  //  let node = result[i];
-  //  if (node["@type"] || Array.isArray(node)) {
-  //    children.push([node, i]);
-  //  }
-  //}
-
-  //console.log(`Trying to bind ${signature}`);
-  //let foo = result.map((x) => {
-  //  return `${x["@type"] || JSON.stringify(x)}${JSON.stringify(x.types || {})}`;
-  //}).join(" ");
-  // console.log(children);
-  //console.log(`To ${foo}`);
-
-  //console.log(expects);
-  //console.log(data);
   if (expects.length != data.length) {
-    // console.log("not the same length");
     return reject;
   }
   
@@ -354,9 +327,7 @@ function match(type, types = {}, conditions = [], data, location, reject) {
   for (let i = 0; i < expects.length; i++) {
     let expected = expects[i];
     let child = result[i];
-    // console.log(child);
     if (expected["@type"] != child["@type"]) {
-      // console.log("Children of different types");
       return reject;
     }
     for (let [key, value] of Object.entries(expected.types || {})) {
@@ -408,7 +379,7 @@ function match(type, types = {}, conditions = [], data, location, reject) {
     }
   }
     
-    // Sets variables
+  // Sets variables
   for (let [key, value] of Object.entries(bindings)) {
     if (typeof value == "number") {
       if (!variables[value]) {
@@ -426,12 +397,9 @@ function match(type, types = {}, conditions = [], data, location, reject) {
       (child) => (child["@type"] != "_" && child["@type"] != "__")),
   };
   
-  if (location != undefined) {
-    n["loc"] = location;
-  }
-
-  // console.log("Binds!");
-  //console.log(result);
+  //if (location != undefined) {
+  //  n["loc"] = location;
+  //}
   
   return n;
 }

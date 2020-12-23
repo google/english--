@@ -410,7 +410,6 @@ describe("Lexer", function() {
         "types": {"foo": "bar"},
         "children": [{value: "bar"}]
       }],
-      "loc": 0,
       "types": {}
     }]);
   });
@@ -456,7 +455,6 @@ describe("Lexer", function() {
         "types": {},
         "children": [{value: "brazilian"}]
       }],
-      "loc": 0,
       "types": {}
     }]);
   });
@@ -511,7 +509,6 @@ describe("Lexer", function() {
         "@type": "ADJ",
         "children": [{value: "age-old"}]
       }],
-      "loc": 0,
       "types": {}
     }]);
   });

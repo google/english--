@@ -726,7 +726,6 @@ S -> NP _ VP {%
     assertThat(result).equalsTo([{
       "@type": "main",
       "children": ["foo", 1, "bar"],
-      "loc": 0,
       "types": {}
     }]);
   });
@@ -784,7 +783,6 @@ S -> NP _ VP {%
           "types": {},
         }]
       }],
-      "loc": 0,
       "types": {}
     }]);
   });
@@ -847,7 +845,6 @@ S -> NP _ VP {%
         "types": {
         }
       }],
-      "loc": 0,
       "types": {}
     }]);
   });
