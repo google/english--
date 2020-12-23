@@ -251,7 +251,7 @@ class Nearley {
       let head = name;
       const meta = postprocessor ? postprocessor.meta : undefined;
       const features = (types) => Object
-            .entries(types)
+            .entries(types || {})
             .map(([key, value]) => `${key}=${value}`)
             .join(", ");
       
@@ -579,14 +579,14 @@ class FeaturedNearley {
     }
 
     for (let {head, tail} of grammar[0]) {
-      function term(x) {
+      function name(x) {
         if (typeof x == "string") {
           return x;
         } else {
           return x.name;
         }
       }
-      feed(`${head.name} -> ${tail.map(term).join(" ")} {%`);
+      feed(`${head.name} -> ${tail.map(name).join(" ")} {%`);
       if (tail.length == 1 && tail[0] == "%word") {
         // For A[] -> %word rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
@@ -607,14 +607,12 @@ class FeaturedNearley {
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
-          feed(`    {"@type": "${term.name || term}", "types": ${JSON.stringify(term.types || {})}}, `);
+          feed(`    {"@type": "${name(term)}", "types": ${JSON.stringify(term.types)}}, `);
         }
         feed(`  ])`);
       }
       feed(`%}`);
-      
     }
-    // console.log(result.join("\n"));
     return result.join("\n");
   }
 }
