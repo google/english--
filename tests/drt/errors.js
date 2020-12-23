@@ -428,9 +428,10 @@ A __if__ token based on:
 `.trim());
   });
   
-  it.skip("Types Match", () => {
+  it("Types Match", () => {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();
+    assertThat(tracks.length).equalsTo(53);
     // This is an invalid track, because the features don't match up.
     assertThat(parser.parser.track(tracks[30]).trim()).equalsTo(`
 A himself token based on:
@@ -475,22 +476,47 @@ A himself token based on:
     assertThat(result2).equalsTo("reject!");
 
     function conflicts(stack) {
-      let top = stack[0].rule.postprocess.meta;
-      // console.log(stack[0].rule.postprocess);
-      let tail = {
-        "@type": top.type,
-        "types": top.types
+      let top = 0;
+      while (!stack[top].rule.postprocess ||
+             !stack[top].rule.postprocess.meta) {
+        top++;
+      }
+
+      let right = [];
+      if (stack[top].right) {
+        right = [stack[top].right.data];
       };
-      //console.log(top);
+      
+      const meta = stack[top].rule.postprocess.meta; 
+      let tail = {
+        "@type": meta.type,
+        "types": meta.types,
+        "conditions": meta.conditions,
+      };
+
+      let result = match(tail.type, tail.types, tail.conditions,
+                         right, undefined, false, true);
+      if (!result) {
+        // console.log("top conflicts");
+        return true;
+      }
+      // console.log();
       //console.log(tail);
-      for (let i = 1; i < stack.length; i++) {
+      for (let i = (top + 1); i < stack.length; i++) {
         let head = stack[i].rule.postprocess.meta;
-        console.log("Going up!");
-        console.log(head);
-        console.log(tail);
+        //console.log(`Going up: ${i}!`);
+        //console.log(head);
+        //console.log(tail);
+        //let left = [];
+        //if (stack[i - 1].right) {
+        //  left = stack[i - 1].right.data;
+        //};
+        //console.log(left);
         let result = match(head.type, head.types, head.conditions,
-                           [tail], undefined, "reject!", true);
-        if (result == "reject!") {
+                           [tail], undefined, false, true);
+        if (!result) {
+          //console.log("rejected!");
+          //console.log(i);
           return true;
         }
         tail = result;
@@ -498,7 +524,7 @@ A himself token based on:
       return false;
     }
 
-    //assertThat(conflicts(tracks[30].stack)).equalsTo(true);
+    assertThat(conflicts(tracks[30].stack)).equalsTo(true);
 
     assertThat(parser.parser.track(tracks[0]).trim()).equalsTo(`
 A __if__ token based on:
@@ -507,11 +533,11 @@ A __if__ token based on:
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
 
-    //assertThat(conflicts(tracks[0].stack)).equalsTo(false);
-    
+    assertThat(conflicts(tracks[0].stack)).equalsTo(false);
+
     assertThat(parser.parser.track(tracks[21]).trim()).equalsTo(`
 A word token based on:
-    PN → ● %word
+    PN[gen=2] → ● %word
     PN[gen=2] → ● PN[] __ PN[]
     NP[num=sing, gen=2, case=3, gap=-] → ● PN[gen=2]
     S[num=1, gap=np, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=np, tp=3, tense=4]
@@ -521,19 +547,33 @@ A word token based on:
     Statement[] → ● S_[] _ %PERIOD
 `.trim());
 
-    assertThat(conflicts(tracks[21].stack)).equalsTo(false);
+    assertThat(conflicts(tracks[21].stack)).equalsTo(true);
+
+    assertThat(parser.parser.track(tracks[33]).trim()).equalsTo(`
+A WS token based on:
+    __$ebnf$1 → ● %WS
+    __ → ● __$ebnf$1
+    S[num=1, gap=-, tp=3, tense=4] → NP[num=1, gen=2, case=+nom, gap=-] ● __ VP_[num=1, fin=+, gap=-, tp=3, tense=4]
+    S[num=1, gap=-, tp=3, tense=4] → ● NP[num=1, gen=2, case=+nom, gap=-] __ VP_[num=1, fin=+, gap=-, tp=3, tense=4]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %or __ S[num=5, gap=-, tp=2, tense=3]
+    S[num=1, gap=-, tp=2, tense=3] → ● S[num=4, gap=-, tp=2, tense=3] __ %and __ S[num=5, gap=-, tp=2, tense=3]
+    S_[num=1, gap=-, tp=2, tense=3] → ● S[num=1, gap=-, tp=2, tense=3]
+    Statement[] → ● S_[] _ %PERIOD
+`.trim());
+
+    assertThat(conflicts(tracks[33].stack)).equalsTo(true);
 
     // let completions = tracks.filter(([stack]) => conflicts(stack));
 
     // console.log(completions);
     
-    //for (let i = 0; i < tracks.length; i++) {
-    //  if (!conflicts(tracks[i].stack)) {
+    for (let i = 0; i < tracks.length; i++) {
+      if (!conflicts(tracks[i].stack)) {
+        // console.log(i);
         //console.log(track.stack);
-    //  }
-    //  console.log(i);
+      }
       // break;
-    //}
+    }
     
   });
 
