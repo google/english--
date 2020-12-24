@@ -577,6 +577,159 @@ A WS token based on:
     
   });
 
+  it("Tables", function() {
+    let parser = Nearley.from(`
+      main -> bar "foobar"
+      bar -> "hello"
+      bar -> "world"
+      bar -> null
+    `);
+    assertThat(parser.print().trim())
+      .equalsTo(`
+A "h" token based on:
+    bar$string$1 → ● h e l l o
+    bar → ● bar$string$1
+    main → ● bar main$string$1
+A "w" token based on:
+    bar$string$2 → ● w o r l d
+    bar → ● bar$string$2
+    main → ● bar main$string$1
+A "f" token based on:
+    main$string$1 → ● f o o b a r
+    main → bar ● main$string$1
+    main → ● bar main$string$1
+`.trim());
+  });
+
+  function ancestors(state) {
+    let {rule} = state;
+    let meta = {};
+    if (rule.postprocess && rule.postprocess.meta) {
+      meta = rule.postprocess.meta;
+    }
+    let features = (types) => Object
+        .entries(types)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(", ");
+    
+    // console.log(meta);
+    let me = {
+      print() {
+        let result = [];
+        result.push(`${this.head["@type"]}`);
+        if (this.head["types"]) {
+          result.push(`[${features(this.head["types"])}]`);
+        }
+        result.push(" →");
+        for (let i = 0; i < this.tail.length; i++) {
+          let symbol = this.tail[i];
+          result.push(" ");
+          if (this.dot == i) {
+            result.push("● ");
+          };
+          result.push(`${symbol["@type"]}`);
+          if (symbol["types"]) {
+            result.push(`[${features(symbol["types"])}]`);
+          }
+        }
+        return result.join("");
+      },
+      dot: state.dot,
+      head: {
+        "@type": rule.name,
+        types: meta.types,
+      },
+      tail: rule.symbols.map((symbol, i) => {
+        if (symbol.type) {
+          return {
+            "@type": `%${symbol.type}`
+          };
+        }
+        // console.log(meta.conditions);
+        // console.log(symbol);
+        return {
+          "@type": `${symbol}`,
+          "types": meta.conditions ? meta.conditions[i].types : undefined
+        }
+      })
+    };
+
+    if (state.wantedBy.length == 0) {
+      return [[me]];
+    }
+    
+    let result = [];
+    //console.log(`climbing up: ${me.print()} ${state.wantedBy.length}`);
+    for (let parent of state.wantedBy) {
+      for (line of ancestors(parent)) {
+        line.unshift(me);
+        result.push(line);
+        //break;
+      }
+      //console.log(state.wantedBy);
+      // break;
+    }
+    
+    return result;
+  }
+
+  it("Typed Tables", function() {
+    let grammar = FeaturedNearley.compile(`
+       S[gap=-] -> NP[gap=-] VP[gap=-] %c.
+       S[gap=np] -> NP[gap=np] VP[gap=-].
+       NP[gap=-] -> DET[].
+       NP[gap=np] -> null.
+       DET[] -> %a.
+       DET[] -> %every.
+       VP[gap=-] -> %v.
+    `, `
+      @{% const lexer = { has(name) { return true; }, }; %}
+      @lexer lexer
+    `);
+
+    let parser = new Nearley(grammar, "S");    
+    let result = [];
+    
+    for (let track of parser.tracks()) {
+      for (let path of ancestors(track.stack[0])) {
+        result.push(`A ${track.symbol} token based on:`);
+        for (let line of path) {
+          result.push(`    ${line.print()}`);
+        }
+      }
+    }
+
+    console.log(result.join("\n"));
+    
+  });
+
+  it.skip("DRT", function() {
+    let parser = new Parser("DET");
+    
+    let result = [];
+
+    let tracks = parser.parser.tracks();
+    let track = tracks[0];
+
+    //console.log(track.stack[0].rule.symbols);
+    
+    //return;
+    
+    let paths = ancestors(track.stack[0]);
+    for (let path of paths) {
+      result.push(`A ${track.symbol} token based on:`);
+      for (let line of path) {
+        result.push(`    ${line.print()}`);
+      }
+    }
+    //}
+
+    console.log(result.join("\n"));
+
+
+    // console.log(parser.parser.parser.table);
+  });
+  
 });
 
 function assertThat(x) {
