@@ -808,6 +808,8 @@ A "f" token based on:
     let tracks = parser.parser.tracks();
     
     assertThat(tracks.length).equalsTo(53);
+
+    let tokens = {};
     
     for (let track of parser.parser.tracks()) {
       for (let path of ancestors(track.stack[0])) {
@@ -817,11 +819,26 @@ A "f" token based on:
         if (!continuous(path)) {
           continue;
         }
-        
-        result.push(`A ${track.symbol} token based on:`);
-        for (let line of path) {
-          result.push(`    ${print(line)}`);
+        // Saves the first valid path.
+        if (!tokens[track.symbol]) {
+          tokens[track.symbol] = path;
         }
+      }
+    }
+
+    // TODO(goto): there are still a couple of invalid entries
+    // - non-nominative pronouns like himself/her/itself cant
+    //   start a sentence and
+    // - WS based on gap=- and nulls can't start a phrase
+    //
+    // Both of these problems are due to the fact that the
+    // typing information commited in the beginning aren't
+    // being propagated.
+    
+    for (let [symbol, path] of Object.entries(tokens)) {
+      result.push(`A ${symbol} token based on:`);
+      for (let line of path) {
+        result.push(`    ${print(line)}`);
       }
     }
 
