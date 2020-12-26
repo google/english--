@@ -601,7 +601,7 @@ A "f" token based on:
 `.trim());
   });
 
-  function ancestors(state) {
+  function print(state) {
     let {rule} = state;
     let meta = {};
     if (rule.postprocess && rule.postprocess.meta) {
@@ -611,84 +611,130 @@ A "f" token based on:
         .entries(types)
         .map(([key, value]) => `${key}=${value}`)
         .join(", ");
-    
-    // console.log(meta);
-    let me = {
-      print() {
-        let result = [];
-        result.push(`${this.head["@type"]}`);
-        if (this.head["types"]) {
-          result.push(`[${features(this.head["types"])}]`);
-        }
-        result.push(" →");
-        for (let i = 0; i < this.tail.length; i++) {
-          let symbol = this.tail[i];
-          result.push(" ");
-          if (this.dot == i) {
-            result.push("● ");
-          };
-          result.push(`${symbol["@type"]}`);
-          if (symbol["types"]) {
-            result.push(`[${features(symbol["types"])}]`);
-          }
-        }
-        return result.join("");
-      },
-      dot: state.dot,
-      head: {
-        "@type": rule.name,
-        types: meta.types,
-      },
-      tail: rule.symbols.map((symbol, i) => {
-        if (symbol.type) {
-          return {
-            "@type": `%${symbol.type}`
-          };
-        }
-        // console.log(meta.conditions);
-        // console.log(symbol);
-        return {
-          "@type": `${symbol}`,
-          "types": meta.conditions ? meta.conditions[i].types : undefined
-        }
-      })
+
+    let head = {
+      "@type": rule.name,
+      types: meta.types,
     };
 
-    if (state.wantedBy.length == 0) {
-      return [[me]];
+    let tail = rule.symbols.map((symbol, i) => {
+      if (symbol.type) {
+        return {
+          "@type": `%${symbol.type}`
+        };
+      }
+      // console.log(meta.conditions);
+      // console.log(symbol);
+      return {
+        "@type": `${symbol}`,
+        "types": meta.conditions ? meta.conditions[i].types : undefined
+      }
+    });
+
+    let dot = state.dot;
+        
+    // console.log(meta);
+    let result = [];
+    result.push(`${head["@type"]}`);
+    if (head["types"]) {
+      result.push(`[${features(head["types"])}]`);
     }
+    result.push(" →");
+    for (let i = 0; i < tail.length; i++) {
+      let symbol = tail[i];
+      result.push(" ");
+      if (dot == i) {
+        result.push("● ");
+      };
+      result.push(`${symbol["@type"]}`);
+      if (symbol["types"]) {
+        result.push(`[${features(symbol["types"])}]`);
+      }
+    }
+    return result.join("");
+  }
+  
+  function ancestors(state, path = []) {
+    if (state.wantedBy.length == 0) {
+      return [[state]];
+    }
+
+    if (path.includes(state)) {
+      //console.log("cycle");
+      // console.log(`climbing up: ${me.print()}`);
+      // console.log(`path: ${path.map((item) => item.print()).join(", ")}`);
+      //for (let item of path) {
+      //  console.log(`    ${print(item)}`);
+      //}
+      return [];
+      // continue;
+    }
+
     
     let result = [];
-    //console.log(`climbing up: ${me.print()} ${state.wantedBy.length}`);
+    path.push(state);
     for (let parent of state.wantedBy) {
-      for (line of ancestors(parent)) {
-        line.unshift(me);
+      for (line of ancestors(parent, path)) {
+        line.unshift(state);
         result.push(line);
-        //break;
       }
       //console.log(state.wantedBy);
       // break;
     }
+    path.pop();
     
     return result;
   }
 
   it("Typed Tables", function() {
     let grammar = FeaturedNearley.compile(`
-       S[gap=-] -> NP[gap=-] VP[gap=-] %c.
-       S[gap=np] -> NP[gap=np] VP[gap=-].
-       NP[gap=-] -> DET[].
+       S -> NP[] VP[].
+       NP[gap=-] -> DET[] N[].
        NP[gap=np] -> null.
+       DET[] -> NP[gap=-] %POSS.
        DET[] -> %a.
        DET[] -> %every.
-       VP[gap=-] -> %v.
-    `, `
+     `, `
       @{% const lexer = { has(name) { return true; }, }; %}
       @lexer lexer
     `);
 
     let parser = new Nearley(grammar, "S");    
     let result = [];
+
+    //let tracks = parser.tracks();
+    //assertThat(tracks.length).equalsTo(1);
+    //console.log(print(tracks[0].stack[0]));
+    //console.log(ancestors(tracks[0].stack[0]));
+    for (let track of parser.tracks()) {
+      //console.log("hi");
+      for (let path of ancestors(track.stack[0])) {
+        // console.log(path);
+        result.push(`A ${track.symbol} token based on:`);
+        for (let line of path) {
+
+          result.push(`    ${print(line)}`);
+        }
+      }
+    }
+    console.log(result.join("\n"));
+    return;
+    //assertThat(tracks[0].symbol).equalsTo("a");
+    //assertThat(tracks[0].stack.length).equalsTo(1);
+    //assertThat(tracks[0].stack[0].rule.name).equalsTo("DET");
+    //assertThat(tracks[0].stack[0].rule.symbols).equalsTo([{type: "a"}]);
+    //assertThat(tracks[0].stack[0].dot).equalsTo(0);
+    //assertThat(tracks[0].stack[0].wantedBy.length).equalsTo(1);
+    //assertThat(tracks[0].stack[0].wantedBy[0].rule.name).equalsTo("NP");
+    //assertThat(tracks[0].stack[0].wantedBy[0].rule.symbols).equalsTo(["DET", "N"]);
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy.length).equalsTo(1);
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].rule.name).equalsTo("DET");
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].rule.symbols).equalsTo(["NP", {type: "POSS"}]);
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy.length).equalsTo(1);
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy[0].rule.name).equalsTo("NP");
+    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy[0].rule.symbols).equalsTo(["DET", "N"]);
+
+    // return;
     
     for (let track of parser.tracks()) {
       for (let path of ancestors(track.stack[0])) {
@@ -703,31 +749,25 @@ A "f" token based on:
     
   });
 
-  it.skip("DRT", function() {
-    let parser = new Parser("DET");
+  it("DRT", function() {
+    let parser = new Parser("Statement");
     
     let result = [];
 
     let tracks = parser.parser.tracks();
-    let track = tracks[0];
-
-    //console.log(track.stack[0].rule.symbols);
     
-    //return;
+    // assertThat(tracks.length).equalsTo(32);
     
-    let paths = ancestors(track.stack[0]);
-    for (let path of paths) {
-      result.push(`A ${track.symbol} token based on:`);
-      for (let line of path) {
-        result.push(`    ${line.print()}`);
+    for (let track of parser.parser.tracks()) {
+      for (let path of ancestors(track.stack[0])) {
+        result.push(`A ${track.symbol} token based on:`);
+        for (let line of path) {
+          result.push(`    ${print(line)}`);
+        }
       }
     }
-    //}
 
     console.log(result.join("\n"));
-
-
-    // console.log(parser.parser.parser.table);
   });
   
 });
