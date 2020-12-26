@@ -318,6 +318,9 @@ function match(type, types = {}, conditions = [], data, location, reject,
   for (let i = 0; i < result.length; i++) {
     let expected = expects[i];
     let child = result[i];
+    //if (!child || !expected) {
+    //  console.log(result);
+    //}
     if (expected["@type"] != child["@type"]) {
       return reject;
     }

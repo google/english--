@@ -686,11 +686,67 @@ A "f" token based on:
     return result;
   }
 
+  function valid(path) {
+    for (let line of path) {
+      let right = [];
+      if (line.right) {
+        right = [line.right.data];
+      };
+
+      if (!line.rule.postprocess ||
+          !line.rule.postprocess.meta) {
+        return true;
+      }
+      const meta = line.rule.postprocess.meta; 
+        
+      let result = match(meta.type, meta.types, meta.conditions,
+                         right, undefined, false, true);
+      if (!result) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  function continuous(path) {
+    // TODO(goto): we are going to have to propagate
+    // the binding upwards as we match along because
+    // some of the things we commit to early on have
+    // consequencer later on. "himself", for example
+    // cant appear in the beginning of a sentence
+    // since it is a non nominative pronoun, but
+    // it currently matches up locally.
+    for (let i = 0; i < (path.length - 1); i++) {
+      let current = path[i];
+      let next = path[i + 1];
+      let rule = current.rule;
+      if (!rule.postprocess ||
+          !rule.postprocess.meta) {
+        continue;
+      }
+      let node = {
+        "@type": rule.name,
+        "types" : rule.postprocess.meta.types,
+      };
+      //if (rule.postprocess && rule.postprocess.meta) {
+      //  node["types"] = ;
+      //}
+      let meta = next.rule.postprocess.meta;
+      let matches = match(next.rule.name, meta.types, meta.conditions,
+                          [node], undefined, false, true);
+      if (!matches) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
   it("Typed Tables", function() {
     let grammar = FeaturedNearley.compile(`
-       S -> NP[] VP[].
+       S -> NP[gap=-] VP[].
        NP[gap=-] -> DET[] N[].
-       NP[gap=np] -> null.
+       NP[gap=np] -> GAP.
+       GAP -> %foobar.
        DET[] -> NP[gap=-] %POSS.
        DET[] -> %a.
        DET[] -> %every.
@@ -702,50 +758,45 @@ A "f" token based on:
     let parser = new Nearley(grammar, "S");    
     let result = [];
 
-    //let tracks = parser.tracks();
-    //assertThat(tracks.length).equalsTo(1);
+    let tracks = parser.tracks();
+    //assertThat(tracks.length).equalsTo(4);
     //console.log(print(tracks[0].stack[0]));
-    //console.log(ancestors(tracks[0].stack[0]));
+    //console.log(ancestors(tracks[0].stack[0])[0]);
+    let path = ancestors(tracks[0].stack[0])[0];
+    // console.log(valid(path));
+    
+    //for (let line of ancestors(tracks[0].stack[0])[0]) {
+    //  console.log(print(line));
+    //}
+    
+    //return;
+    
+    //let paths2 = ancestors(parser.tracks()[2].stack[0]);
+    //assertThat(valid(paths2[0])).equalsTo(false);
+
+    //let paths0 = ancestors(parser.tracks()[0].stack[0]);
+    //assertThat(valid(paths0[0])).equalsTo(true);
+    // return;
+
     for (let track of parser.tracks()) {
       //console.log("hi");
       for (let path of ancestors(track.stack[0])) {
+        if (!valid(path)) {
+          continue;
+        }
+        if (!continuous(path)) {
+          // console.log(print(path));
+          continue;
+        }
         // console.log(path);
-        result.push(`A ${track.symbol} token based on:`);
+        //console.log(`A ${track.symbol} token based on:`);
         for (let line of path) {
-
-          result.push(`    ${print(line)}`);
+          //console.log(`    ${print(line)}`);
         }
       }
     }
-    console.log(result.join("\n"));
-    return;
-    //assertThat(tracks[0].symbol).equalsTo("a");
-    //assertThat(tracks[0].stack.length).equalsTo(1);
-    //assertThat(tracks[0].stack[0].rule.name).equalsTo("DET");
-    //assertThat(tracks[0].stack[0].rule.symbols).equalsTo([{type: "a"}]);
-    //assertThat(tracks[0].stack[0].dot).equalsTo(0);
-    //assertThat(tracks[0].stack[0].wantedBy.length).equalsTo(1);
-    //assertThat(tracks[0].stack[0].wantedBy[0].rule.name).equalsTo("NP");
-    //assertThat(tracks[0].stack[0].wantedBy[0].rule.symbols).equalsTo(["DET", "N"]);
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy.length).equalsTo(1);
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].rule.name).equalsTo("DET");
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].rule.symbols).equalsTo(["NP", {type: "POSS"}]);
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy.length).equalsTo(1);
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy[0].rule.name).equalsTo("NP");
-    //assertThat(tracks[0].stack[0].wantedBy[0].wantedBy[0].wantedBy[0].rule.symbols).equalsTo(["DET", "N"]);
-
-    // return;
     
-    for (let track of parser.tracks()) {
-      for (let path of ancestors(track.stack[0])) {
-        result.push(`A ${track.symbol} token based on:`);
-        for (let line of path) {
-          result.push(`    ${line.print()}`);
-        }
-      }
-    }
-
-    console.log(result.join("\n"));
+    // console.log();
     
   });
 
@@ -756,10 +807,17 @@ A "f" token based on:
 
     let tracks = parser.parser.tracks();
     
-    // assertThat(tracks.length).equalsTo(32);
+    assertThat(tracks.length).equalsTo(53);
     
     for (let track of parser.parser.tracks()) {
       for (let path of ancestors(track.stack[0])) {
+        if (!valid(path)) {
+          continue;
+        }
+        if (!continuous(path)) {
+          continue;
+        }
+        
         result.push(`A ${track.symbol} token based on:`);
         for (let line of path) {
           result.push(`    ${print(line)}`);
@@ -767,7 +825,7 @@ A "f" token based on:
       }
     }
 
-    console.log(result.join("\n"));
+    // console.log(result.join("\n"));
   });
   
 });
