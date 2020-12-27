@@ -716,37 +716,45 @@ A "f" token based on:
     // cant appear in the beginning of a sentence
     // since it is a non nominative pronoun, but
     // it currently matches up locally.
-    for (let i = 0; i < (path.length - 1); i++) {
-      let current = path[i];
-      let next = path[i + 1];
-      let rule = current.rule;
-      if (!rule.postprocess ||
-          !rule.postprocess.meta) {
-        continue;
+    let j = 0;
+    do  {
+      let rule = path[j].rule;
+      if (rule.postprocess && rule.postprocess.meta) {
+        break;
       }
-      let node = {
-        "@type": rule.name,
-        "types" : rule.postprocess.meta.types,
-      };
-      //if (rule.postprocess && rule.postprocess.meta) {
-      //  node["types"] = ;
-      //}
+      j++;
+    } while (j < path.length);
+
+    //console.log(j);
+    let last = {
+      "@type": path[j].rule.name,
+      "types" : path[j].rule.postprocess.meta.types,
+    };
+
+    for (let i = (j + 1); i < path.length; i++) {
+      // let current = path[i];
+      let next = path[i];
+      //console.log(j);
       let meta = next.rule.postprocess.meta;
-      let matches = match(next.rule.name, meta.types, meta.conditions,
-                          [node], undefined, false, true);
-      if (!matches) {
+      let result = match(next.rule.name, meta.types, meta.conditions,
+                   [last], undefined, false, true);
+      if (!result) {
+        // console.log(`${next.rule.name} cant take ${last["@type"]}`);
         return false;
       }
+      last = result;
     }
     return true;
   }
   
   it("Typed Tables", function() {
     let grammar = FeaturedNearley.compile(`
-       S -> NP[gap=-] VP[].
+       S_ -> S[gap=-].
+       S[gap=1] -> NP[gap=1] VP[].
+       S[gap=np] -> NP[gap=np] VP[].
        NP[gap=-] -> DET[] N[].
        NP[gap=np] -> GAP.
-       GAP -> %foobar.
+       GAP -> null.
        DET[] -> NP[gap=-] %POSS.
        DET[] -> %a.
        DET[] -> %every.
@@ -755,7 +763,7 @@ A "f" token based on:
       @lexer lexer
     `);
 
-    let parser = new Nearley(grammar, "S");    
+    let parser = new Nearley(grammar, "S_");    
     let result = [];
 
     let tracks = parser.tracks();
@@ -778,6 +786,15 @@ A "f" token based on:
     //assertThat(valid(paths0[0])).equalsTo(true);
     // return;
 
+    // console.log(path);
+    //let track = parser.tracks()[1];
+    //console.log(`A ${track.symbol} token based on:`);
+    //let p = ancestors(track.stack[0])[0];
+    //console.log(continuous(p));
+    //for (let line of p) {
+    //  console.log(`    ${print(line)}`);
+    //}
+    //return;
     for (let track of parser.tracks()) {
       //console.log("hi");
       for (let path of ancestors(track.stack[0])) {
@@ -817,6 +834,11 @@ A "f" token based on:
           continue;
         }
         if (!continuous(path)) {
+          //console.log(`A ${track.symbol} token based on:`);
+          //for (let line of path) {
+          //  console.log(`    ${print(line)}`);
+          //}
+          //throw new Error("hi");
           continue;
         }
         // Saves the first valid path.
@@ -842,7 +864,7 @@ A "f" token based on:
       }
     }
 
-    // console.log(result.join("\n"));
+    //console.log(result.join("\n"));
   });
   
 });
