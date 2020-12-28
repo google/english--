@@ -58,12 +58,12 @@ class Nearley {
   reportError(e) {
     let that = this;
     return {
-      tracks: this.tracks(2),
-      completions: this.complete(this.tracks(2)),
       token: e.token,
       loc: e.offset, 
       start: this.parser.lexer.buffer[this.parser.current],
       print() {
+        const tracks = that.tracks(2);
+        const completions = that.complete(tracks);
         const result = [];
         let unexpected = ""; 
         let head = "";
@@ -72,19 +72,19 @@ class Nearley {
         } else {
           head = `Unexpected "${this.token.value}".`;
         }
-        //result.push(``);
         head += " ";
         head += `Instead, I was expecting to see one of the following:`;
         result.push(head);
         result.push(``);
-
-        //console.log(this.tracks);
-        for (let track of this.tracks) {
-          result.push(that.track(track));
+        
+        for (let track of tracks) {
+          result.push(`A ${track.symbol} token based on:`);
+          for (let line of track.stack) {
+            result.push(`    ${print(line)}`);
+          }
         }
         
         return result.join("\n");
-        // return that.print(e.token);
       },
     };
   }
@@ -239,55 +239,6 @@ class Nearley {
         result.push(`    ${print(line)}`);
       }
     }
-    return result.join("\n");
-  }
-  
-  track(track) {
-    const result = [];
-    result.push(`A ${track.symbol} token based on:`);
-    for (let stack of track.stack) {
-      const {rule, dot} = stack;
-      const {name, symbols} = rule;
-      let tail = [];
-      const postprocessor = rule.postprocess;
-      let head = name;
-      const meta = postprocessor ? postprocessor.meta : undefined;
-      const features = (types) => Object
-            .entries(types || {})
-            .map(([key, value]) => `${key}=${value}`)
-            .join(", ");
-      
-      if (meta) {
-        head += `[${features(meta.types)}]`;
-      }
-      
-      for (let i = 0; i < symbols.length; i++) {
-        if (dot == i) {
-          tail.push("●");
-        }
-        const symbol = symbols[i];
-        if (typeof symbol == "string") {
-          let suffix = "";
-          if (meta && symbol != "__" && symbol != "_") {
-            suffix = `[${features(meta.conditions[i].types)}]`;
-          };
-          tail.push(`${symbol}${suffix}`);
-        } else if (symbol.literal) {
-          tail.push(symbol.literal);
-        } else if (symbol.type) {
-          tail.push(`%${symbol.type}`);
-        }
-      }
-      result.push(`    ${head} → ${tail.join(" ")}`);
-    }
-    return result.join("\n");
-  }
-  
-  message(error) {
-    for (let track of tracks) {
-      result.push(print(track));
-    }
-    result.push(``);
     return result.join("\n");
   }
 }
