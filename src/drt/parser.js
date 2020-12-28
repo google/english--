@@ -56,16 +56,35 @@ class Nearley {
   }
   
   reportError(e) {
-    let parser = this.parser;
-    const token = parser.lexer.buffer[parser.current];
     let that = this;
     return {
-      tracks: this.tracks(true),
+      tracks: this.tracks(2),
+      completions: this.complete(this.tracks(2)),
       token: e.token,
       loc: e.offset, 
-      start: token,
+      start: this.parser.lexer.buffer[this.parser.current],
       print() {
-        return that.print(e.token);
+        const result = [];
+        let unexpected = ""; 
+        let head = "";
+        if (this.token.type) {
+          head = `Unexpected ${this.token.type} token: ${this.token.value}.`;
+        } else {
+          head = `Unexpected "${this.token.value}".`;
+        }
+        //result.push(``);
+        head += " ";
+        head += `Instead, I was expecting to see one of the following:`;
+        result.push(head);
+        result.push(``);
+
+        //console.log(this.tracks);
+        for (let track of this.tracks) {
+          result.push(that.track(track));
+        }
+        
+        return result.join("\n");
+        // return that.print(e.token);
       },
     };
   }
@@ -74,9 +93,9 @@ class Nearley {
     Generates a user friendly error report given the caught error 
     object and the Nearley parser instance.
   */
-  tracks(error = false) {
+  tracks(last = 1) {
     let {parser} = this;
-    const lastColumnIndex = error ? parser.table.length - 2 : parser.table.length - 1;
+    const lastColumnIndex = parser.table.length - last;
     const lastColumn = parser.table[lastColumnIndex];
     let tracks = [];
     // Display each state that is expecting a terminal symbol next.
@@ -211,23 +230,15 @@ class Nearley {
     return !this.isTerminalSymbol(symbol);
   }
 
-  print(token) {
-    let result = [];    
-    if (token) {
-      if (token.type) {
-        result.push(`Unexpected ${token.type} token: ${token.value}.`);
-      } else {
-        result.push(`Unexpected "${token.value}".`);
+  print() {
+    let result = [];
+    const tokens = this.complete();
+    for (let [symbol, path] of Object.entries(tokens)) {
+      result.push(`A ${symbol} token based on:`);
+      for (let line of path) {
+        result.push(`    ${print(line)}`);
       }
-      result.push(`Instead, I was expecting to see one of the following:`);
-      result.push(``);
     }
-
-    for (let track of this.tracks(token)) {
-      result.push(this.track(track));
-    }
-    
-    result.push(``);
     return result.join("\n");
   }
   
@@ -1282,8 +1293,11 @@ function print(state) {
         "@type": `%${symbol.type}`
       };
     }
-    // console.log(meta.conditions);
-    // console.log(symbol);
+    if (symbol.literal) {
+      return {
+        "@type": symbol.literal
+      }
+    }
     return {
       "@type": `${symbol}`,
       "types": meta.conditions ? meta.conditions[i].types : undefined
@@ -1292,7 +1306,6 @@ function print(state) {
   
   let dot = state.dot;
   
-  // console.log(meta);
   let result = [];
   result.push(`${head["@type"]}`);
   if (head["types"]) {
@@ -1301,6 +1314,7 @@ function print(state) {
   result.push(" →");
   for (let i = 0; i < tail.length; i++) {
     let symbol = tail[i];
+    // console.log(symbol);
     result.push(" ");
     if (dot == i) {
       result.push("● ");

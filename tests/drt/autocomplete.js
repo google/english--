@@ -6,7 +6,7 @@ const {
   FeaturedNearley,
   Parser} = require("../../src/drt/parser.js");
 
-describe.only("Autocomplete", () => {
+describe("Autocomplete", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -15,27 +15,15 @@ describe.only("Autocomplete", () => {
     try {
       parser.feed("fbar");
       throw new Error("Expected parse error");
-    } catch ({token, tracks}) {
-      assertThat(token).equalsTo({value: "b"});
-      assertThat(tracks.length).equalsTo(1);
-      assertThat(tracks[0].symbol).equalsTo('"o"');
-      assertThat(tracks[0].stack.length).equalsTo(3);
-      const first = tracks[0].stack[0];
-      assertThat(first.rule.toString(first.dot))
-        .equalsTo('main$string$1 → "f" ● "o" "o"');
-      assertThat(first.dot).equalsTo(1);
-      assertThat(first.isComplete).equalsTo(false);
-      assertThat(first.rule.symbols).equalsTo([
-        {"literal": "f"},
-        {"literal": "o"},
-        {"literal": "o"},
-      ]);
-      const second = tracks[0].stack[1];
-      assertThat(second.rule.toString(second.dot))
-        .equalsTo('main$string$1 →  ● "f" "o" "o"');
-      const third = tracks[0].stack[2];
-      assertThat(third.rule.toString(third.dot))
-        .equalsTo('main →  ● main$string$1');
+    } catch (e) {
+      assertThat(e.print().trim()).equalsTo(`
+Unexpected "b". Instead, I was expecting to see one of the following:
+
+A "o" token based on:
+    main$string$1 → f ● o o
+    main$string$1 → ● f o o
+    main → ● main$string$1
+`.trim());
     }
   });
 
@@ -75,29 +63,12 @@ describe.only("Autocomplete", () => {
       error = e;
     }
 
-    const {token, loc, start, tracks} = error;
-    assertThat(start).equalsTo("f");
-    assertThat(token).equalsTo({
-      "type": "@unknown",
-      "value": "fbar",
-    });
-    assertThat(tracks.length).equalsTo(1);
-    assertThat(tracks[0].symbol).equalsTo('foo');
-    assertThat(tracks[0].stack.length).equalsTo(1);
-    const first = tracks[0].stack[0];
-    assertThat(first.rule.name).equalsTo("main");
-    assertThat(first.dot).equalsTo(0);
-    assertThat(first.rule.symbols).equalsTo([
-      {type: "foo"}
-    ]);
-    assertThat(first.rule.toString(first.dot))
-      .equalsTo('main →  ● %foo');
     assertThat(error.print().trim()).equalsTo(`
-Unexpected @unknown token: fbar.
-Instead, I was expecting to see one of the following:
+Unexpected @unknown token: fbar. Instead, I was expecting to see one of the following:
 
 A foo token based on:
-    main → ● %foo`.trim());
+    main → ● %foo
+`.trim());
   });
 
   it("Bigger grammar and rule metadata", function() {
@@ -140,8 +111,7 @@ A foo token based on:
       throw new Error("Expected parse error");
     } catch (e) {
       assertThat(e.print().trim()).equalsTo(`
-Unexpected @unknown token: fbar.
-Instead, I was expecting to see one of the following:
+Unexpected @unknown token: fbar. Instead, I was expecting to see one of the following:
 
 A foo token based on:
     FOO → ● %foo
@@ -160,8 +130,7 @@ A foo token based on:
       throw new Error("Expected parse error");
     } catch (e) {
       assertThat(e.print().trim()).equalsTo(`
-Unexpected "b".
-Instead, I was expecting to see one of the following:
+Unexpected "b". Instead, I was expecting to see one of the following:
 
 A "o" token based on:
     main$string$1 → f ● o o
@@ -197,7 +166,6 @@ A "f" token based on:
       .equalsTo(`
 A "o" token based on:
     FOO$string$1 → f ● o o
-    FOO$string$1 → ● f o o
     FOO → ● FOO$string$1
     main → ● FOO\
       `.trim());
@@ -384,7 +352,6 @@ A word token based on:
 A word token based on:
     BAR[b=2] → ● %word
     main[] → FOO[a=1] ● BAR[b=2]
-    main[] → ● FOO[a=1] BAR[b=2]
 `.trim());
     
   });
@@ -598,7 +565,6 @@ A "w" token based on:
 A "f" token based on:
     main$string$1 → ● f o o b a r
     main → bar ● main$string$1
-    main → ● bar main$string$1
 `.trim());
   });
 
