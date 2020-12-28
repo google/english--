@@ -660,14 +660,7 @@ A "f" token based on:
     }
 
     if (path.includes(state)) {
-      //console.log("cycle");
-      // console.log(`climbing up: ${me.print()}`);
-      // console.log(`path: ${path.map((item) => item.print()).join(", ")}`);
-      //for (let item of path) {
-      //  console.log(`    ${print(item)}`);
-      //}
       return [];
-      // continue;
     }
 
     
@@ -678,30 +671,44 @@ A "f" token based on:
         line.unshift(state);
         result.push(line);
       }
-      //console.log(state.wantedBy);
-      // break;
     }
     path.pop();
     
     return result;
   }
-
+  
+  function walk({isComplete, data, left, right}) {
+    let result = [];
+    if (data) {
+      result.push(data);
+    }
+    if (isComplete) {
+      //console.log("complete!");
+      //console.log(data);
+      return result.flat();
+    }
+    if (left) {
+      result.push(...walk(left));
+    }
+    if (right) {
+      result.push(...walk(right));
+    }
+    return result.flat();
+  }
+    
   function valid(path) {
     for (let line of path) {
-      let right = [];
-      if (line.right) {
-        right = [line.right.data];
-      };
-
       if (!line.rule.postprocess ||
           !line.rule.postprocess.meta) {
         return true;
       }
       const meta = line.rule.postprocess.meta; 
-        
+      let right = walk(line);
       let result = match(meta.type, meta.types, meta.conditions,
                          right, undefined, false, true);
       if (!result) {
+        //console.log(line);
+        //console.log(right);
         return false;
       }
     }
@@ -709,13 +716,6 @@ A "f" token based on:
   }
   
   function continuous(path) {
-    // TODO(goto): we are going to have to propagate
-    // the binding upwards as we match along because
-    // some of the things we commit to early on have
-    // consequencer later on. "himself", for example
-    // cant appear in the beginning of a sentence
-    // since it is a non nominative pronoun, but
-    // it currently matches up locally.
     let j = 0;
     do  {
       let rule = path[j].rule;
@@ -736,10 +736,14 @@ A "f" token based on:
       let next = path[i];
       //console.log(j);
       let meta = next.rule.postprocess.meta;
+      let right = walk(next);
+      right.push(last);
       let result = match(next.rule.name, meta.types, meta.conditions,
-                   [last], undefined, false, true);
+                   right, undefined, false, true);
       if (!result) {
-        // console.log(`${next.rule.name} cant take ${last["@type"]}`);
+        //console.log(meta.conditions);
+        //console.log(walk(next));
+        //console.log(`${next.rule.name} cant take ${last["@type"]}`);
         return false;
       }
       last = result;
@@ -817,28 +821,73 @@ A "f" token based on:
     
   });
 
-  it("DRT", function() {
+  it("Autocomplete from null", function() {
     let parser = new Parser("Statement");
     
     let result = [];
 
-    let tracks = parser.parser.tracks();
-    
-    assertThat(tracks.length).equalsTo(53);
+    let tokens = autocomplete(parser);
 
-    let tokens = {};
+    // There are 24 ways to start a sentence.
+    assertThat(tokens.length).equalsTo(24);
+    assertThat(tokens.map(([token]) => token)).equalsTo([
+      // conditionals
+      "__if__",
+      // quantifiers
+      "a",
+      "an",
+      "the",
+      "every",
+      "some",
+      "no",
+      "all",
+      "most",
+      "many",
+      "only",
+      "not",
+      "at",
+      "more",
+      "fewer",
+      "exactly",
+      "unsigned_int",
+      // TODO(goto): proper names can be words.
+      // we should probably change that.
+      "word",
+      "name",
+      // pronouns.
+      "he",
+      "she",
+      "it",
+      "they",
+      "WS",
+    ]);;
     
+    //console.log(result.join("\n"));
+  });
+
+  function autocomplete(parser) {
+    let tokens = {};
     for (let track of parser.parser.tracks()) {
       for (let path of ancestors(track.stack[0])) {
         if (!valid(path)) {
+          //console.log(`A ${track.symbol} token based on:`);
+          //for (let line of path) {
+          //    console.log(`    ${print(line)}`);
+          //}
+          //throw new Error("hi");
           continue;
         }
         if (!continuous(path)) {
+          //for (let [symbol, path] of Object.entries(tokens)) {
           //console.log(`A ${track.symbol} token based on:`);
           //for (let line of path) {
-          //  console.log(`    ${print(line)}`);
+          //    console.log(`    ${print(line)}`);
           //}
-          //throw new Error("hi");
+          //}
+          //console.log("Not continuous");
+          //if (track.symbol != "WS") {
+          //  throw new Error("Not continous!");
+          //}
           continue;
         }
         // Saves the first valid path.
@@ -848,25 +897,105 @@ A "f" token based on:
       }
     }
 
-    // TODO(goto): there are still a couple of invalid entries
-    // - non-nominative pronouns like himself/her/itself cant
-    //   start a sentence and
-    // - WS based on gap=- and nulls can't start a phrase
-    //
-    // Both of these problems are due to the fact that the
-    // typing information commited in the beginning aren't
-    // being propagated.
+    let completions = Object.entries(tokens);
     
-    for (let [symbol, path] of Object.entries(tokens)) {
-      result.push(`A ${symbol} token based on:`);
-      for (let line of path) {
-        result.push(`    ${print(line)}`);
+    completions.print = () => {
+      let result = [];
+      for (let [symbol, path] of Object.entries(tokens)) {
+        result.push(`A ${symbol} token based on:`);
+        for (let line of path) {
+          result.push(`    ${print(line)}`);
+        }
       }
+      return result.join("\n");
     }
-
-    //console.log(result.join("\n"));
+    
+    return completions;
+  }
+  
+  it("Autocomplete from one token", function() {
+    let parser = new Parser("Statement");
+    parser.feed("at");
+    
+    // There is just a single way to follow an "at": a space.
+    assertThat(autocomplete(parser).map(([token, value]) => token)).equalsTo([
+      // at has to be followed by a space!
+      "WS",
+    ]);
   });
   
+  it("Autocomplete with two tokens", function() {
+    let parser = new Parser("Statement");
+    parser.feed("at ");
+    //console.log(autocomplete(parser).print());
+    //let tracks = parser.parser.tracks();
+    //assertThat(tracks.length).equalsTo(3);
+    //let paths = ancestors(tracks[1].stack[0]);
+    //console.log(`A ${tracks[1].symbol} token based on:`);
+    //assertThat(paths.length).equalsTo(75);
+    //for (let line of paths[0]) {
+    //  console.log(`    ${print(line)}`);
+    //}
+    //console.log(paths[0][0].left.right);
+    //valid(paths[0]);
+    //assertThat(valid(paths[0])).equalsTo(true);
+    //return;
+    
+    assertThat(autocomplete(parser).map(([token, value]) => token)).equalsTo([
+      "WS",
+      "least",
+      "most",
+    ]);
+  });
+  
+  it.skip("Autocomplete with 6 tokens", function() {
+    let parser = new Parser("Statement");
+    parser.feed("at least 3 ");
+    // console.log(autocomplete(parser).print());
+    let tracks = parser.parser.tracks();
+    //assertThat(tracks.length).equalsTo(3);
+    let paths = ancestors(tracks[1].stack[0]);
+    //console.log(`A ${tracks[1].symbol} token based on:`);
+    assertThat(paths.length).equalsTo(75);
+    //for (let line of paths[0]) {
+    //  console.log(`    ${print(line)}`);
+    //}
+
+    //continuous(paths[0]);
+    //return;
+    //console.log(walk(paths[0][1]));
+    //console.log(paths[0][1].left.right);
+    
+    //console.log(paths[0][0]);
+    //valid(paths[0]);
+    //assertThat(valid(paths[0])).equalsTo(true);
+    //return;
+    
+    assertThat(autocomplete(parser).map(([token, value]) => token)).equalsTo([
+      "WS", "word",
+    ]);
+  });
+
+  function feed(parser, str) {
+    parser.feed(str);
+    return autocomplete(parser).map(([token, value]) => token);
+  };
+    
+  
+  it.skip("Autocomplete streaming", function() {
+    let parser = new Parser("Statement");
+    //let feed = (str) => {
+    //  parser.feed(str);
+    //  return autocomplete(parser).map(([token, value]) => token);
+    //};
+    assertThat(feed(parser, "at")).equalsTo(["WS"]);
+    assertThat(feed(parser, " ")).equalsTo(["WS", "least", "most"]);
+    assertThat(feed(parser, "least")).equalsTo(["WS"]);
+    assertThat(feed(parser, " ")).equalsTo(["WS", "unsigned_int"]);
+    assertThat(feed(parser, "3")).equalsTo(["WS"]);
+    assertThat(feed(parser, " ")).equalsTo(["WS", "word"]);
+  });
+
 });
 
 function assertThat(x) {

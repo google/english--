@@ -732,14 +732,14 @@ const DrtSyntax = `
       DET[num=plur, quantifier=true] -> %most.
       DET[num=plur, quantifier=true] -> %many.
       DET[num=plur, quantifier=true] -> %only.
-      DET[num=plur, quantifier=true] -> %not _ %all.
-      DET[num=plur, quantifier=true] -> %the _ %majority _ %__of__.
-      DET[num=plur, quantifier=true] -> %the _ %minority _ %__of__.
-      DET[num=plur, quantifier=true] -> %at _ %least _ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %at _ %most _ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %more _ %than _ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %fewer _ %than _ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %exactly _ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %not __ %all.
+      DET[num=plur, quantifier=true] -> %the __ %majority __ %__of__.
+      DET[num=plur, quantifier=true] -> %the __ %minority __ %__of__.
+      DET[num=plur, quantifier=true] -> %at __ %least __ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %at __ %most __ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %more __ %than __ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %fewer __ %than __ %unsigned_int.
+      DET[num=plur, quantifier=true] -> %exactly __ %unsigned_int.
       DET[num=plur, quantifier=true] -> %unsigned_int.
       
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ %POSS.
