@@ -1,11 +1,10 @@
 const Assert = require("assert");
 const {
   match,
+  autocomplete, ancestors, valid, continuous,
   Nearley,
   FeaturedNearley,
   Parser} = require("../../src/drt/parser.js");
-
-const {autocomplete, ancestors, valid, continuous} = require("../../src/drt/autocomplete.js");
 
 describe("Autocomplete", () => {
 
