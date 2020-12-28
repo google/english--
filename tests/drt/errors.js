@@ -658,14 +658,18 @@ A "f" token based on:
     if (state.wantedBy.length == 0) {
       return [[state]];
     }
-
+    
     if (path.includes(state)) {
       return [];
     }
-
     
     let result = [];
     path.push(state);
+    
+    if (!valid(path) || !continuous(path)) {
+      return [];
+    }
+    
     for (let parent of state.wantedBy) {
       for (line of ancestors(parent, path)) {
         line.unshift(state);
@@ -683,8 +687,6 @@ A "f" token based on:
       result.push(data);
     }
     if (isComplete) {
-      //console.log("complete!");
-      //console.log(data);
       return result.flat();
     }
     if (left) {
@@ -707,8 +709,6 @@ A "f" token based on:
       let result = match(meta.type, meta.types, meta.conditions,
                          right, undefined, false, true);
       if (!result) {
-        //console.log(line);
-        //console.log(right);
         return false;
       }
     }
@@ -723,9 +723,16 @@ A "f" token based on:
         break;
       }
       j++;
-    } while (j < path.length);
+
+      if (j >= path.length) {
+        // If we got to the end of the array
+        // with no types, this is a static path.
+        return true;
+      }
+    } while (true);
 
     //console.log(j);
+    //console.log(path);
     let last = {
       "@type": path[j].rule.name,
       "types" : path[j].rule.postprocess.meta.types,
@@ -820,12 +827,12 @@ A "f" token based on:
     // console.log();
     
   });
-
+  
   it("Autocomplete from null", function() {
     let parser = new Parser("Statement");
     
     let result = [];
-
+    
     let tokens = autocomplete(parser);
 
     // There are 24 ways to start a sentence.
@@ -862,34 +869,12 @@ A "f" token based on:
       "WS",
     ]);;
     
-    //console.log(result.join("\n"));
   });
 
   function autocomplete(parser) {
     let tokens = {};
     for (let track of parser.parser.tracks()) {
       for (let path of ancestors(track.stack[0])) {
-        if (!valid(path)) {
-          //console.log(`A ${track.symbol} token based on:`);
-          //for (let line of path) {
-          //    console.log(`    ${print(line)}`);
-          //}
-          //throw new Error("hi");
-          continue;
-        }
-        if (!continuous(path)) {
-          //for (let [symbol, path] of Object.entries(tokens)) {
-          //console.log(`A ${track.symbol} token based on:`);
-          //for (let line of path) {
-          //    console.log(`    ${print(line)}`);
-          //}
-          //}
-          //console.log("Not continuous");
-          //if (track.symbol != "WS") {
-          //  throw new Error("Not continous!");
-          //}
-          continue;
-        }
         // Saves the first valid path.
         if (!tokens[track.symbol]) {
           tokens[track.symbol] = path;
@@ -927,19 +912,6 @@ A "f" token based on:
   it("Autocomplete with two tokens", function() {
     let parser = new Parser("Statement");
     parser.feed("at ");
-    //console.log(autocomplete(parser).print());
-    //let tracks = parser.parser.tracks();
-    //assertThat(tracks.length).equalsTo(3);
-    //let paths = ancestors(tracks[1].stack[0]);
-    //console.log(`A ${tracks[1].symbol} token based on:`);
-    //assertThat(paths.length).equalsTo(75);
-    //for (let line of paths[0]) {
-    //  console.log(`    ${print(line)}`);
-    //}
-    //console.log(paths[0][0].left.right);
-    //valid(paths[0]);
-    //assertThat(valid(paths[0])).equalsTo(true);
-    //return;
     
     assertThat(autocomplete(parser).map(([token, value]) => token)).equalsTo([
       "WS",
@@ -948,28 +920,9 @@ A "f" token based on:
     ]);
   });
   
-  it.skip("Autocomplete with 6 tokens", function() {
+  it("Autocomplete with 6 tokens", function() {
     let parser = new Parser("Statement");
     parser.feed("at least 3 ");
-    // console.log(autocomplete(parser).print());
-    let tracks = parser.parser.tracks();
-    //assertThat(tracks.length).equalsTo(3);
-    let paths = ancestors(tracks[1].stack[0]);
-    //console.log(`A ${tracks[1].symbol} token based on:`);
-    assertThat(paths.length).equalsTo(75);
-    //for (let line of paths[0]) {
-    //  console.log(`    ${print(line)}`);
-    //}
-
-    //continuous(paths[0]);
-    //return;
-    //console.log(walk(paths[0][1]));
-    //console.log(paths[0][1].left.right);
-    
-    //console.log(paths[0][0]);
-    //valid(paths[0]);
-    //assertThat(valid(paths[0])).equalsTo(true);
-    //return;
     
     assertThat(autocomplete(parser).map(([token, value]) => token)).equalsTo([
       "WS", "word",
@@ -982,12 +935,8 @@ A "f" token based on:
   };
     
   
-  it.skip("Autocomplete streaming", function() {
+  it("Autocomplete streaming", function() {
     let parser = new Parser("Statement");
-    //let feed = (str) => {
-    //  parser.feed(str);
-    //  return autocomplete(parser).map(([token, value]) => token);
-    //};
     assertThat(feed(parser, "at")).equalsTo(["WS"]);
     assertThat(feed(parser, " ")).equalsTo(["WS", "least", "most"]);
     assertThat(feed(parser, "least")).equalsTo(["WS"]);
@@ -996,6 +945,14 @@ A "f" token based on:
     assertThat(feed(parser, " ")).equalsTo(["WS", "word"]);
   });
 
+  it("Ancestors", function() {
+    let parser = new Parser("Statement");
+    const tracks = parser.parser.tracks();
+    let all = ancestors(tracks[1].stack[0]);
+    assertThat(all.length).equalsTo(5);
+  });
+
+  
 });
 
 function assertThat(x) {
