@@ -562,6 +562,14 @@ A "f" token based on:
     assertThat(feed(parser, " ")).equalsTo(["WS", "word"]);
   });
 
+  it.skip("a man ...", function() {
+    let parser = new Parser("Statement");
+    parser.feed("a man ");
+    // NOTE(goto): a verb (e.g."likes") should be able to be
+    // followed by "a man".
+    assertThat(parser.print()).equalsTo(``);
+  });
+
   it("Ancestors", function() {
     let parser = new Parser("Statement");
     const tracks = parser.parser.tracks();

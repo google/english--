@@ -1219,6 +1219,10 @@ class Parser {
     return this.parser.complete();
   }
 
+  print() {
+    return this.parser.print();
+  }
+
 }
 
 
