@@ -51,6 +51,10 @@ class Nearley {
     return new Nearley(Nearley.compile(code), start);
   }
 
+  complete() {
+    return complete(this.tracks());
+  }
+  
   reportError(e) {
     let parser = this.parser;
     const token = parser.lexer.buffer[parser.current];
@@ -208,8 +212,7 @@ class Nearley {
   }
 
   print(token) {
-    let result = [];
-    
+    let result = [];    
     if (token) {
       if (token.type) {
         result.push(`Unexpected ${token.type} token: ${token.value}.`);
@@ -276,59 +279,6 @@ class Nearley {
     result.push(``);
     return result.join("\n");
   }
-}
-
-function print(state) {
-  let {rule} = state;
-  let meta = {};
-  if (rule.postprocess && rule.postprocess.meta) {
-    meta = rule.postprocess.meta;
-  }
-  let features = (types) => Object
-      .entries(types)
-      .map(([key, value]) => `${key}=${value}`)
-      .join(", ");
-  
-  let head = {
-    "@type": rule.name,
-    types: meta.types,
-  };
-  
-  let tail = rule.symbols.map((symbol, i) => {
-    if (symbol.type) {
-      return {
-        "@type": `%${symbol.type}`
-      };
-    }
-    // console.log(meta.conditions);
-    // console.log(symbol);
-    return {
-      "@type": `${symbol}`,
-      "types": meta.conditions ? meta.conditions[i].types : undefined
-    }
-  });
-  
-  let dot = state.dot;
-  
-  // console.log(meta);
-  let result = [];
-  result.push(`${head["@type"]}`);
-  if (head["types"]) {
-    result.push(`[${features(head["types"])}]`);
-  }
-  result.push(" →");
-  for (let i = 0; i < tail.length; i++) {
-    let symbol = tail[i];
-    result.push(" ");
-    if (dot == i) {
-      result.push("● ");
-    };
-    result.push(`${symbol["@type"]}`);
-    if (symbol["types"]) {
-      result.push(`[${features(symbol["types"])}]`);
-    }
-  }
-  return result.join("");
 }
 
 function ancestors(state, path = []) {
@@ -435,9 +385,9 @@ function continuous(path) {
   return true;
 }
 
-function autocomplete(parser) {
+function complete(tracks) {
   let tokens = {};
-  for (let track of parser.parser.tracks()) {
+  for (let track of tracks) {
     for (let path of ancestors(track.stack[0])) {
       // Saves the first valid path.
       if (!tokens[track.symbol]) {
@@ -1287,9 +1237,6 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
   return DRTGrammar;  
 }
 
-// console.log("hi");
-// console.log(DRTGrammar);
-
 class Parser {
   constructor (start = "Discourse", header, footer, body){
     const grammar = drtGrammar(header, footer, body);
@@ -1305,6 +1252,65 @@ class Parser {
   feed(code) {
     return this.parser.feed(code);
   }
+
+  complete() {
+    return this.parser.complete();
+  }
+
+}
+
+
+function print(state) {
+  let {rule} = state;
+  let meta = {};
+  if (rule.postprocess && rule.postprocess.meta) {
+    meta = rule.postprocess.meta;
+  }
+  let features = (types) => Object
+      .entries(types)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(", ");
+  
+  let head = {
+    "@type": rule.name,
+    types: meta.types,
+  };
+  
+  let tail = rule.symbols.map((symbol, i) => {
+    if (symbol.type) {
+      return {
+        "@type": `%${symbol.type}`
+      };
+    }
+    // console.log(meta.conditions);
+    // console.log(symbol);
+    return {
+      "@type": `${symbol}`,
+      "types": meta.conditions ? meta.conditions[i].types : undefined
+    }
+  });
+  
+  let dot = state.dot;
+  
+  // console.log(meta);
+  let result = [];
+  result.push(`${head["@type"]}`);
+  if (head["types"]) {
+    result.push(`[${features(head["types"])}]`);
+  }
+  result.push(" →");
+  for (let i = 0; i < tail.length; i++) {
+    let symbol = tail[i];
+    result.push(" ");
+    if (dot == i) {
+      result.push("● ");
+    };
+    result.push(`${symbol["@type"]}`);
+    if (symbol["types"]) {
+      result.push(`[${features(symbol["types"])}]`);
+    }
+  }
+  return result.join("");
 }
 
 let node = (type) => { 
@@ -1358,7 +1364,7 @@ module.exports = {
   ancestors: ancestors,
   valid: valid,
   continuous: continuous,
-  autocomplete: autocomplete,
+  complete: complete,
   nodes: {
     "Statement": node("Statement"),
     "Sentence": node("Sentence"),

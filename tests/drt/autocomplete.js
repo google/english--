@@ -6,7 +6,7 @@ const {
   FeaturedNearley,
   Parser} = require("../../src/drt/parser.js");
 
-describe("Autocomplete", () => {
+describe.only("Autocomplete", () => {
 
   it("Report", function() {
     let parser = Nearley.from(`
@@ -678,7 +678,7 @@ A "f" token based on:
     
     let result = [];
     
-    let tokens = autocomplete(parser);
+    let tokens = parser.complete();
 
     // There are 24 ways to start a sentence.
     assertThat(Object.keys(tokens)).equalsTo([
@@ -717,7 +717,7 @@ A "f" token based on:
   
   function feed(parser, str) {
     parser.feed(str);
-    return Object.keys(autocomplete(parser));
+    return Object.keys(parser.complete());
   };
   
   it("Autocomplete from one token", function() {
