@@ -520,7 +520,7 @@ A "f" token based on:
 
   it("a man ...", function() {
     let parser = new Parser("Statement");
-
+    
     assertThat(feed(parser, "a man "))
       .equalsTo([
         "WS",
@@ -553,6 +553,18 @@ A "f" token based on:
         "was",
         "word",
       ]);
+  });
+
+  it("a man loves ", function() {
+    let parser = new Parser("Statement");
+    parser.feed("a man loves ");
+    let tokens = parser.complete();
+    // console.log();
+    let path = tokens["her"];
+    for (let line of path) {
+      // console.log(line);
+      // (S (NP (DET(a) N(man))) (VP (V(love)s) NP(...)))
+    }
   });
 
   
