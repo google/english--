@@ -432,51 +432,7 @@ A "f" token based on:
     //assertThat(tracks.length).equalsTo(4);
     //console.log(print(tracks[0].stack[0]));
     //console.log(ancestors(tracks[0].stack[0])[0]);
-    let path = ancestors(tracks[0].stack[0])[0];
-    // console.log(valid(path));
-    
-    //for (let line of ancestors(tracks[0].stack[0])[0]) {
-    //  console.log(print(line));
-    //}
-    
-    //return;
-    
-    //let paths2 = ancestors(parser.tracks()[2].stack[0]);
-    //assertThat(valid(paths2[0])).equalsTo(false);
-
-    //let paths0 = ancestors(parser.tracks()[0].stack[0]);
-    //assertThat(valid(paths0[0])).equalsTo(true);
-    // return;
-
-    // console.log(path);
-    //let track = parser.tracks()[1];
-    //console.log(`A ${track.symbol} token based on:`);
-    //let p = ancestors(track.stack[0])[0];
-    //console.log(continuous(p));
-    //for (let line of p) {
-    //  console.log(`    ${print(line)}`);
-    //}
-    //return;
-    for (let track of parser.tracks()) {
-      //console.log("hi");
-      for (let path of ancestors(track.stack[0])) {
-        if (!valid(path)) {
-          continue;
-        }
-        if (!continuous(path)) {
-          // console.log(print(path));
-          continue;
-        }
-        // console.log(path);
-        //console.log(`A ${track.symbol} token based on:`);
-        for (let line of path) {
-          //console.log(`    ${print(line)}`);
-        }
-      }
-    }
-    
-    // console.log();
-    
+    let path = ancestors(tracks[0].stack[0])[0];        
   });
   
   it("Autocomplete from null", function() {
@@ -562,8 +518,9 @@ A "f" token based on:
     assertThat(feed(parser, " ")).equalsTo(["WS", "word"]);
   });
 
-  it.skip("a man ...", function() {
+  it("a man ...", function() {
     let parser = new Parser("Statement");
+
     assertThat(feed(parser, "a man "))
       .equalsTo([
         "WS",

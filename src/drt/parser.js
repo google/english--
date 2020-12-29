@@ -245,34 +245,28 @@ class Nearley {
 
 function ancestors(state, path = []) {
   if (state.wantedBy.length == 0) {
-    return [[state]];
+    return [state];
   }
   
   if (path.includes(state)) {
-    return [];
+    return false;
   }
+
+  let current = [...path, state];
   
-  let result = [];
-  path.push(state);
-  
-  //console.log(print(state));
-  if (!valid(path) || !continuous(path)) {
-    //console.log(`valid? ${valid(path)}`);
-    //console.log(`continuous? ${continuous(path)}`);
-    
-    path.pop();
-    return [];
+  if (!valid(current) || !continuous(current)) {
+    return false;
   }
   
   for (let parent of state.wantedBy) {
-    for (line of ancestors(parent, path)) {
-      line.unshift(state);
-      result.push(line);
+    let result = ancestors(parent, current);
+    if (result) {
+      result.unshift(state);
+      return result;
     }
   }
-  path.pop();
   
-  return result;
+  return false;
 }
 
 function walk({isComplete, data, left, right}) {
@@ -355,30 +349,15 @@ function continuous(path) {
 function complete(tracks) {
   let tokens = {};
   for (let track of tracks) {
-    for (let path of ancestors(track.stack[0])) {
-      // Saves the first valid path.
-      if (!tokens[track.symbol]) {
-        tokens[track.symbol] = path;
-      }
+    let path = ancestors(track.stack[0]);
+    if (!path) {
+      continue;
     }
+    // Saves the first valid path.
+    tokens[track.symbol] = path;
   }
 
   return tokens;
-    
-  let completions = Object.entries(tokens);
-    
-  completions.print = () => {
-    let result = [];
-    for (let [symbol, path] of Object.entries(tokens)) {
-      result.push(`A ${symbol} token based on:`);
-      for (let line of path) {
-        result.push(`    ${print(line)}`);
-      }
-    }
-    return result.join("\n");
-  }
-    
-  return completions;
 }
 
 function namespace(type, bindings, conditions) {  
