@@ -564,17 +564,38 @@ A "f" token based on:
 
   it.skip("a man ...", function() {
     let parser = new Parser("Statement");
-    parser.feed("a man ");
-    // NOTE(goto): a verb (e.g."likes") should be able to be
-    // followed by "a man".
-    assertThat(parser.print()).equalsTo(``);
-  });
-
-  it("Ancestors", function() {
-    let parser = new Parser("Statement");
-    const tracks = parser.parser.tracks();
-    let all = ancestors(tracks[1].stack[0]);
-    assertThat(all.length).equalsTo(5);
+    assertThat(feed(parser, "a man "))
+      .equalsTo([
+        "WS",
+        "POSS",
+        "and",
+        "or",
+        "does",
+        "did",
+        "will",
+        "would",
+        "who",
+        "behind",
+        "__in__",
+        "__with__",
+        "__for__",
+        "__of__",
+        "over",
+        "under",
+        "near",
+        "before",
+        "after",
+        "during",
+        "from",
+        "to",
+        "about",
+        "by",
+        "has",
+        "had",
+        "is",
+        "was",
+        "word",
+      ]);
   });
 
   

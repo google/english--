@@ -255,7 +255,12 @@ function ancestors(state, path = []) {
   let result = [];
   path.push(state);
   
+  //console.log(print(state));
   if (!valid(path) || !continuous(path)) {
+    //console.log(`valid? ${valid(path)}`);
+    //console.log(`continuous? ${continuous(path)}`);
+    
+    path.pop();
     return [];
   }
   
