@@ -6,6 +6,8 @@ const {
   FeaturedNearley,
   Parser} = require("../../src/drt/parser.js");
 
+const {dict} = require("./dict.js");
+
 describe("Autocomplete", () => {
 
   it("Report", function() {
@@ -437,6 +439,7 @@ A "f" token based on:
   
   it("Autocomplete from null", function() {
     let parser = new Parser("Statement");
+    parser.load(dict);
     
     let result = [];
     
@@ -520,6 +523,7 @@ A "f" token based on:
 
   it("a man ...", function() {
     let parser = new Parser("Statement");
+    parser.load(dict);
     
     assertThat(feed(parser, "a man "))
       .equalsTo([
@@ -557,6 +561,7 @@ A "f" token based on:
 
   it("a man loves ", function() {
     let parser = new Parser("Statement");
+    parser.load(dict);
     parser.feed("a man loves ");
     let tokens = parser.complete();
     // console.log();

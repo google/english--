@@ -6,6 +6,7 @@ const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
 const {Tokenizer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const lexicon = require("../../src/drt/lexicon.js");
+const {dict} = require("./dict.js"); 
 
 const {
   Statement,
@@ -349,6 +350,7 @@ describe("Lexer", function() {
   function parse(s, start = "Statement", header, footer, body, all) {
     const {Parser} = DRT;
     let parser = new Parser(start, header, footer, body);
+    parser.load(dict);
     let results = parser.feed(s);
     if (start == "Statement") {
       return clear(results[0].children[0].children[0]);
@@ -356,7 +358,7 @@ describe("Lexer", function() {
     return clear(results[0]);
   }
 
-  const dict = [
+  const dict2 = [
     [" ", {type: "WS"}],
     [".", {}],
     ["s", {}],
@@ -516,6 +518,7 @@ describe("Lexer", function() {
   it("Jones loves a foo woman.", function() {
     const {Parser} = DRT;
     let parser = new Parser("Statement");
+    parser.load(dict);
     parser.add(["foo", "word", [{"@type": "ADJ"}]]);
     let results = parser.feed("Jones loves a foo woman.");
     assertThat(clear(results[0].children[0].children[0]))
@@ -637,6 +640,8 @@ describe("Lexer", function() {
     const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
     let parser = new Parser("Statement");
+    parser.load(dict);
+
     for (let token of tokens) {
       parser.add(token);
     }
@@ -672,7 +677,7 @@ describe("Lexer", function() {
     const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
     let parser = new Parser("Statement");
-    
+    parser.load(dict);
     for (let token of tokens) {
       parser.add(token);
     }
@@ -695,6 +700,7 @@ describe("Lexer", function() {
     
     const {Parser} = DRT;
     let parser = new Parser("Statement");
+    parser.load(dict);
     
     for (let token of tokens) {
       parser.add(token);
@@ -718,6 +724,7 @@ describe("Lexer", function() {
     
     const {Parser} = DRT;
     let parser = new Parser("Statement");
+    parser.load(dict);
     
     for (let token of tokens) {
       parser.add(token);
@@ -865,6 +872,7 @@ describe("Lexer", function() {
   it("Jones loves Sam.", function() {
     const {Parser} = DRT;
     let parser = new Parser("Statement");
+    parser.load(dict);
     let tokenizer = parser.parser.parser.lexer.tokenizer;
 
     tokenizer.reset("Hello");

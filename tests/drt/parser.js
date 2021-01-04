@@ -35,6 +35,8 @@ const {
   HAVE,
   RN} = nodes;
 
+const {dict} = require("./dict.js");
+
 describe("Parser", function() {
   it("Basic", function() {
     let parser = Nearley.from(`
@@ -631,6 +633,7 @@ S -> NP _ VP {%
   
   it("tokens", function() {
     let parser = new Parser("Discourse");
+    parser.load(dict);
     let results = parser.feed("Jones likes Mary.");
     assertThat(results.length).equalsTo(1);
     //assertThat(clear(results[0][0]))
@@ -867,6 +870,7 @@ function clear(root) {
 
 function parse(s, start = "Discourse", raw = false, skip = true) {
   let parser = new Parser(start);
+  parser.load(dict);
   let results = parser.feed(s);
 
   assertThat(results.length).equalsTo(1);

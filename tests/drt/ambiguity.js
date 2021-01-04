@@ -35,6 +35,8 @@ const {
   HAVE,
   RN} = nodes;
 
+const {dict} = require("./dict.js");
+
 function clear(root) {
   if (!root) {
     return;
@@ -63,32 +65,36 @@ function clear(root) {
 describe("Ambiguity", () => {
   it("Sam walks.", () => {
     let parser = new Parser("Sentence");
+    parser.load(dict);
     let results = parser.feed("Sam walks.");
     assertThat(results.length).equalsTo(1);
   });
 
   it("Sam loves Dani.", () => {
-    assertThat(new Parser("NP").feed("Sam").length).equalsTo(1);
-    assertThat(new Parser("NP").feed("Dani").length).equalsTo(1);
-    assertThat(new Parser("Statement").feed("Sam loves.").length).equalsTo(1);
-    assertThat(new Parser("Statement").feed("Sam loves Dani.").length)
+    assertThat(new Parser("NP").load(dict).feed("Sam").length).equalsTo(1);
+    assertThat(new Parser("NP").load(dict).feed("Dani").length).equalsTo(1);
+    assertThat(new Parser("Statement").load(dict).feed("Sam loves.").length).equalsTo(1);
+    assertThat(new Parser("Statement").load(dict).feed("Sam loves Dani.").length)
       .equalsTo(1);
   });
 
   it("Sam made a reservation for Cascal for Dani.", () => {
     let parser = new Parser("Sentence");
+    parser.load(dict);
     let results = parser.feed("Sam made a reservation for Cascal for Dani.");
     assertThat(results.length).equalsTo(1);
   });
 
   it("Sam travelled from Brazil to Japan.", () => {
     let parser = new Parser("Sentence");
+    parser.load(dict);
     let results = parser.feed("Sam travelled from Brazil to Japan.");
     assertThat(results.length).equalsTo(1);
   });
 
   it("Sam made a reservation for Cascal for Dani.", () => {
     let parser = new Parser("Sentence");
+    parser.load(dict);
     let results = parser.feed("Sam made a reservation for Cascal for Dani.");
 
     assertThat(results.length).equalsTo(1);
@@ -96,6 +102,7 @@ describe("Ambiguity", () => {
 
   it.skip("Sam made a reservation for a woman with a porsche.", () => {
     let parser = new Parser("Sentence");
+    parser.load(dict);
     let results = parser.feed("Sam made a reservation for a woman with a porsche.");
     // The following are the two interpretations:
     // - Sam made a reservation for [a woman] with a porsche.
@@ -129,13 +136,13 @@ describe("Ambiguity", () => {
   });
 
   it("They have walked.", () => {
-    assertThat(new Parser("VP_").feed("have walked").length).equalsTo(1);
-    assertThat(new Parser("Statement").feed("They have walked.").length).equalsTo(1);
+    assertThat(new Parser("VP_").load(dict).feed("have walked").length).equalsTo(1);
+    assertThat(new Parser("Statement").load(dict).feed("They have walked.").length).equalsTo(1);
   });
 
   it("Jones did not walk.", () => {
-    assertThat(new Parser("V").feed("walk").length).equalsTo(2);
-    assertThat(new Parser("V").feed("walk")[0].types).equalsTo({
+    assertThat(new Parser("V").load(dict).feed("walk").length).equalsTo(2);
+    assertThat(new Parser("V").load(dict).feed("walk")[0].types).equalsTo({
       "fin": "+",
       "num": "plur",
       "stat": "-",
@@ -143,7 +150,7 @@ describe("Ambiguity", () => {
       "tp": "-past",
       "trans": "-",
     });
-    assertThat(new Parser("V").feed("walk")[1].types).equalsTo({
+    assertThat(new Parser("V").load(dict).feed("walk")[1].types).equalsTo({
       "fin": "-",
       "num": 467825203,
       "stat": "-",
@@ -152,25 +159,25 @@ describe("Ambiguity", () => {
     });
     //assertThat(new Parser("VP_").feed("did not walk")[0].types)
     //  .equalsTo(new Parser("VP_").feed("did not walk")[1].types);
-    assertThat(new Parser("VP_").feed("did not walk").length)
+    assertThat(new Parser("VP_").load(dict).feed("did not walk").length)
       .equalsTo(1);
     //assertThat(new Parser("Statement").feed("Jones did not walk.")[0].types)
     //  .equalsTo({});
-    assertThat(new Parser("Statement").feed("Jones did not walk.").length)
+    assertThat(new Parser("Statement").load(dict).feed("Jones did not walk.").length)
       .equalsTo(1);
   });
 
   it("Were they happy?", () => {
-    assertThat(new Parser("Question").feed("Were they happy?").length).equalsTo(1);
+    assertThat(new Parser("Question").load(dict).feed("Were they happy?").length).equalsTo(1);
   });
 
   it.skip("Jones is Smith's brother. he likes Brazil.", () => {
-    assertThat(new Parser("Discourse").feed("Jones is Smith's brother.").length).equalsTo(1);
-    assertThat(new Parser("Discourse").feed("He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").load(dict).feed("Jones is Smith's brother.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").load(dict).feed("He likes Brazil.").length).equalsTo(1);
     //assertThat(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[0])
     //.equalsTo(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[1]);
-    assertThat(new Parser("Discourse").feed("Jones is Smith's brother.He likes Brazil.").length).equalsTo(1);
-    assertThat(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").load(dict).feed("Jones is Smith's brother.He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse").load(dict).feed("Jones is Smith's brother. He likes Brazil.").length).equalsTo(1);
   });
 });
 
