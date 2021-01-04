@@ -464,7 +464,7 @@ A "f" token based on:
       "more",
       "fewer",
       "exactly",
-      "unsigned_int",
+      "UNSIGNED_INT",
       "word",
       // pronouns.
       "he",
@@ -512,7 +512,7 @@ A "f" token based on:
     assertThat(feed(parser, "at")).equalsTo(["WS"]);
     assertThat(feed(parser, " ")).equalsTo(["WS", "least", "most"]);
     assertThat(feed(parser, "least")).equalsTo(["WS"]);
-    assertThat(feed(parser, " ")).equalsTo(["WS", "unsigned_int"]);
+    assertThat(feed(parser, " ")).equalsTo(["WS", "UNSIGNED_INT"]);
     assertThat(feed(parser, "3")).equalsTo(["WS"]);
     assertThat(feed(parser, " ")).equalsTo(["WS", "word"]);
   });

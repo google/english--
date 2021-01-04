@@ -1,13 +1,4 @@
-const dict = [
-  // proper names
-  //["Socrates", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  //["Jones", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  //["John", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  //["Smith", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  //["Mary", "word", [{"@type": "PN", types: {"num": "sing", "gen": "fem"}}]],
-  //["Brazil", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
-  //["Ulysses", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
-  
+const dict = [  
   // nouns
   ["man", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
   ["woman", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],

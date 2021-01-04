@@ -825,12 +825,12 @@ const DrtSyntax = `
       DET[num=plur, quantifier=true] -> %not __ %all.
       DET[num=plur, quantifier=true] -> %the __ %majority __ %__of__.
       DET[num=plur, quantifier=true] -> %the __ %minority __ %__of__.
-      DET[num=plur, quantifier=true] -> %at __ %least __ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %at __ %most __ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %more __ %than __ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %fewer __ %than __ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %exactly __ %unsigned_int.
-      DET[num=plur, quantifier=true] -> %unsigned_int.
+      DET[num=plur, quantifier=true] -> %at __ %least __ %UNSIGNED_INT.
+      DET[num=plur, quantifier=true] -> %at __ %most __ %UNSIGNED_INT.
+      DET[num=plur, quantifier=true] -> %more __ %than __ %UNSIGNED_INT.
+      DET[num=plur, quantifier=true] -> %fewer __ %than __ %UNSIGNED_INT.
+      DET[num=plur, quantifier=true] -> %exactly __ %UNSIGNED_INT.
+      DET[num=plur, quantifier=true] -> %UNSIGNED_INT.
       
       DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ %POSS.
 
@@ -1026,6 +1026,8 @@ function drtGrammar() {
             return this.tokenizer.formatError(token);
           },
           has(name) {
+            this.keywords = this.keywords || [];
+            this.keywords.push(name);
             return true;
           }
         };
@@ -1050,6 +1052,10 @@ class Parser {
     const grammar = drtGrammar();
     this.parser = new Nearley(grammar, start);
     this.lexer = new Tokenizer(keywords);
+    const reserved = this.parser.parser.lexer.keywords;
+    //console.log(reserved
+    //            .filter(word => word.match("^[a-z]") || word.match("^__"))
+    //            .filter((value, index, self) => self.indexOf(value) === index));
     this.parser.parser.lexer.use(this.lexer);
     this.load(dict);
   }

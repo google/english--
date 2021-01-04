@@ -874,7 +874,7 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("3010");
-    assertThat(lexer.next()).equalsTo(token("unsigned_int", "3010"));
+    assertThat(lexer.next()).equalsTo(token("UNSIGNED_INT", "3010"));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 

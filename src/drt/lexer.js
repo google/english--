@@ -86,8 +86,8 @@ class Tokenizer {
         let [full, number] = match;
         this.eat(number);
         return {
-          "@type": "%unsigned_int",
-          "type": "unsigned_int",
+          "@type": "%UNSIGNED_INT",
+          "type": "UNSIGNED_INT",
           "value": number,
           "loc": this.loc - number.length,
           "tokens": []};        
