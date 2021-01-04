@@ -4,7 +4,7 @@ const {Rules} = require("../../src/drt/rules.js");
 const {DRS} = require("../../src/drt/drs.js");
 const {Parser} = require("../../src/drt/parser.js");
 const {dict} = require("./dict.js");
-
+const {Tokenizer} = require("../../src/drt/lexer.js");
 
 describe("DRS", function() {
 

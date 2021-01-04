@@ -995,9 +995,8 @@ keywords.push(...[
 
 let DRTGrammar;
 
-function drtGrammar(header, footer = "", body = DrtSyntax) {
-  // console.log("drt grammar");
-  header = header || `
+function drtGrammar() {
+  const header = `
       @{%
         const lexer = {
           use(tokenizer) {
@@ -1029,18 +1028,16 @@ function drtGrammar(header, footer = "", body = DrtSyntax) {
       }%}
     `;
 
-  //console.log(header);
-  
   if (!DRTGrammar) {
-    DRTGrammar = FeaturedNearley.compile(body, header, footer);
+    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header);
   }
     
   return DRTGrammar;  
 }
 
 class Parser {
-  constructor (start = "Discourse", header, footer, body){
-    const grammar = drtGrammar(header, footer, body);
+  constructor (start = "Discourse"){
+    const grammar = drtGrammar();
     this.parser = new Nearley(grammar, start);
     this.lexer = new Tokenizer(keywords);
     this.parser.parser.lexer.use(this.lexer);
