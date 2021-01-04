@@ -940,10 +940,10 @@ const DrtSyntax = `
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=past, trans=3] 
          -> VERB[trans=3, stat=2, past=-reg].
 
-      N[num=plur, gen=1] -> N[num=sing, gen=1, plur=s] %s.
       N[num=plur, gen=1] -> N[num=sing, gen=1, plur=es] %es.
 
       PN[gen=2] -> PN __ PN.
+
       PN[gen=2] -> %word.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      

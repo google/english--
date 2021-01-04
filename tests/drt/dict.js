@@ -4,18 +4,19 @@ const dict = [
   ["woman", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
   ["men", "word", [{"@type": "N", types: {"num": "plur", "gen": "male"}}]],
   ["women", "word", [{"@type": "N", types: {"num": "plur", "gen": "fem"}}]],
-  ["girl", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem", "plur": "s"}}]],
-  ["book", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["telescope", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["donkey", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["horse", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["cat", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["porsche", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
-  ["dish", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}]],
-  ["witch", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "es"}}]],
-  ["judge", "word", [{"@type": "N", types: {"num": "sing", "gen": 1, "plur": "es"}}]],
-  ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}]],
-  ["reservation", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
+  ["girl", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
+  ["book", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["telescope", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["donkey", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["horse", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["cat", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["porsche", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["porsches", "word", [{"@type": "N", types: {"num": "plur", "gen": "-hum"}}]],
+  ["dish", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["witch", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
+  ["judge", "word", [{"@type": "N", types: {"num": "sing", "gen": 1}}]],
+  ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"]}}]],
+  ["reservation", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
 
   // RNs  
   ["brother", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
@@ -126,7 +127,12 @@ const dict = [
     "@type": "ADJ"
   }, {
     "@type": "N",
-    "types": {"num": "sing", "plur": "s"}
+    "types": {"num": "sing"}
+  }]],      
+
+  ["brazilians", "word", [{
+    "@type": "N",
+    "types": {"num": "plur"}
   }]],      
 ];
 
