@@ -950,60 +950,6 @@ const DrtSyntax = `
       VERB[trans=1, stat=2, pres=3, past=4] -> %word.
 `;
 
-const keywords = [
-  // determiners
-  "a", "an", "the",
-  "every", "some", "no", "all", "most", "many",
-  "only", "not", "majority", "minority", "at", "least",
-  "more", "than", "fewer", "exactly",
-
-  // prepositions
-  "behind", "over", "under", "near", "before", "after",
-  "during", "from", "to", "about", "by",  
-  
-  "then",
-
-  // compositions
-  "and", "or",
-
-  // pronouns
-  "he", "him",
-  "she", "her",
-  "they", "them",
-  "himself", "herself",
-  "it", "itself",
-
-  // auxiliaries
-  "does", "did",
-  "will", "would",
-  "is", "are",
-  "was", "were",
-  "be", "been",
-  "have", "has", "had",
-
-  // prepositions
-  "who",
-  "which",
-
-  // verb morphology
-  "s", "es", "ies", "ed", "d", "ied", "led", "red",
-].map((keyword) => [keyword, keyword, []]);
-
-keywords.push(...[
-  [" ", "WS"],
-  [".", "PERIOD"],
-  ["?", "QUESTION"],
-  ["'s", "POSS"],
-
-  ["if", "__if__"],
-  ["do", "__do__"],
-
-  ["in", "__in__"],
-  ["with", "__with__"],
-  ["for", "__for__"],
-  ["of", "__of__"],
-]);
-
 let DRTGrammar;
 
 function drtGrammar() {
@@ -1051,12 +997,23 @@ class Parser {
   constructor (start = "Discourse", dict = []){
     const grammar = drtGrammar();
     this.parser = new Nearley(grammar, start);
-    this.lexer = new Tokenizer(keywords);
-    const reserved = this.parser.parser.lexer.keywords;
-    //console.log(reserved
-    //            .filter(word => word.match("^[a-z]") || word.match("^__"))
-    //            .filter((value, index, self) => self.indexOf(value) === index));
+    this.lexer = new Tokenizer();
     this.parser.parser.lexer.use(this.lexer);
+    const reserved = this.parser.parser.lexer.keywords
+          .filter(word => word.match("^[a-z]") || word.match("^__"))
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .filter(word => word != "word")
+          .map(word => [word.match("^(__)?([a-z]+)(__)?")[2], word, []]);
+    // keywords
+    this.load(reserved);
+    // punctuation
+    this.load([
+      [" ", "WS"],
+      [".", "PERIOD"],
+      ["?", "QUESTION"],
+      ["'s", "POSS"],
+    ]);
+    // world/content words
     this.load(dict);
   }
 
