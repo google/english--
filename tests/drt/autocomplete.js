@@ -438,8 +438,7 @@ A "f" token based on:
   });
   
   it("Autocomplete from null", function() {
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     
     let result = [];
     
@@ -466,10 +465,7 @@ A "f" token based on:
       "fewer",
       "exactly",
       "unsigned_int",
-      // TODO(goto): proper names can be words.
-      // we should probably change that.
       "word",
-      "name",
       // pronouns.
       "he",
       "she",
@@ -522,8 +518,7 @@ A "f" token based on:
   });
 
   it("a man ...", function() {
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     
     assertThat(feed(parser, "a man "))
       .equalsTo([
@@ -560,8 +555,7 @@ A "f" token based on:
   });
 
   it("a man loves ", function() {
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     parser.feed("a man loves ");
     let tokens = parser.complete();
     // console.log();

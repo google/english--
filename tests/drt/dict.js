@@ -1,12 +1,12 @@
 const dict = [
   // proper names
   //["Socrates", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  ["Jones", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  //["Jones", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
   //["John", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  ["Smith", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
-  ["Mary", "word", [{"@type": "PN", types: {"num": "sing", "gen": "fem"}}]],
+  //["Smith", "word", [{"@type": "PN", types: {"num": "sing", "gen": "male"}}]],
+  //["Mary", "word", [{"@type": "PN", types: {"num": "sing", "gen": "fem"}}]],
   //["Brazil", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
-  ["Ulysses", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
+  //["Ulysses", "word", [{"@type": "PN", types: {"num": "sing", "gen": "-hum"}}]],
   
   // nouns
   ["man", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
@@ -26,8 +26,7 @@ const dict = [
   ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"], "plur": "s"}}]],
   ["reservation", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum", "plur": "s"}}]],
 
-  // RNs
-  
+  // RNs  
   ["brother", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
   ["father", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
   ["husband", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],

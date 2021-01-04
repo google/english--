@@ -4,6 +4,7 @@ class Tokenizer {
     this.head = {};
     this.types = {};
     this.buffer = "";
+    this.loc = 0;
 
     for (let [value, type, types] of tokens) {
       this.push(value, type, types);
@@ -88,6 +89,7 @@ class Tokenizer {
           "@type": "%unsigned_int",
           "type": "unsigned_int",
           "value": number,
+          "loc": this.loc - number.length,
           "tokens": []};        
       }
     }
@@ -106,7 +108,7 @@ class Tokenizer {
     if (next && !proper) {
       // If this is a dictionary word and is not a proper name
       this.eat(next);
-      //console.log(next);
+      // console.log(next);
       return this.get(next);
     }
 
@@ -114,10 +116,15 @@ class Tokenizer {
       let [full, name] = match;
       this.eat(name);
       return {
-        "@type": "%name",
-        "type": "name",
+        "@type": "%word",
+        "type": "word",
         "value": name,
-        "tokens": []
+        "loc": this.loc - name.length,
+        "tokens": [{
+          "@type": "PN",
+          "types": {"gen": "?", "num": "?"},
+          "loc": this.loc - name.length,
+        }]
       };
     }
     
@@ -125,6 +132,7 @@ class Tokenizer {
   }
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
+    this.loc += str.length;
     return this;
   }
   get(str) {
@@ -132,11 +140,13 @@ class Tokenizer {
     for (let char of str) {
       ref = ref[char.toLowerCase()];
     }
+    //console.log(ref.done);
     return {
       "@type": "%" + ref.type,
       "type": ref.type,
       "value": str,
       "tokens": ref.done,
+      "loc": this.loc - str.length,
     }
   }
 }

@@ -42,11 +42,11 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("foofoo foo.");
-    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
-    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
-    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo", 0));
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo", 3));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 6));
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo", 7));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", ".", 10));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -118,8 +118,8 @@ describe("Lexer", function() {
     lexer.reset("foo");
     assertThat(lexer.next()).equalsTo(undefined);
     lexer.reset("bar");
-    assertThat(lexer.next()).equalsTo(token("foo", "foo"));
-    assertThat(lexer.next()).equalsTo(token("bar", "bar"));
+    assertThat(lexer.next()).equalsTo(token("foo", "foo", 0));
+    assertThat(lexer.next()).equalsTo(token("bar", "bar", 3));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -149,8 +149,8 @@ describe("Lexer", function() {
     lexer.reset("foo");
     assertThat(lexer.next()).equalsTo(undefined);
     lexer.reset("bar");
-    assertThat(lexer.next()).equalsTo(token("WORD", "foo"));
-    assertThat(lexer.next()).equalsTo(token("bar", "bar"));
+    assertThat(lexer.next()).equalsTo(token("WORD", "foo", 0));
+    assertThat(lexer.next()).equalsTo(token("bar", "bar", 3));
     assertThat(lexer.next()).equalsTo(undefined);
 
     return;
@@ -218,8 +218,8 @@ describe("Lexer", function() {
       main -> (%WORD | "bar"):+
     `);
     assertThat(parser.feed("foobar")).equalsTo([[[
-      [token("WORD", "foo")],
-      [token("bar", "bar")],
+      [token("WORD", "foo", 0)],
+      [token("bar", "bar", 3)],
     ]]]);
   });
   
@@ -306,7 +306,7 @@ describe("Lexer", function() {
 
     assertThat(parser.feed("Jones loves Mary ."))
       .equalsTo([[
-        token("PN", "Jones"), [token("V", "loves"), token("PN", "Mary")]
+        token("PN", "Jones", 0), [token("V", "loves", 6), token("PN", "Mary", 12)]
       ]]);
   });
 
@@ -324,7 +324,7 @@ describe("Lexer", function() {
       main -> %WORD
     `);
     assertThat(parser.feed("brazilian")).equalsTo([[
-      token("WORD", "brazilian", [{
+      token("WORD", "brazilian", 0, [{
         "type": "N",
       }])
     ]]);
@@ -347,10 +347,9 @@ describe("Lexer", function() {
     return root;
   }
 
-  function parse(s, start = "Statement", header, footer, body, all) {
+  function parse(s, start = "Statement") {
     const {Parser} = DRT;
-    let parser = new Parser(start, header, footer, body);
-    parser.load(dict);
+    let parser = new Parser(start, dict);
     let results = parser.feed(s);
     if (start == "Statement") {
       return clear(results[0].children[0].children[0]);
@@ -467,7 +466,7 @@ describe("Lexer", function() {
       ["brazilian", "word", [{"@type": "N"}]],
     ]);
     lexer.reset("brazilian.");
-    assertThat(lexer.next()).equalsTo(token("word", "brazilian", [
+    assertThat(lexer.next()).equalsTo(token("word", "brazilian", 0, [
       {"@type": "ADJ"},
       {"@type": "N"},
     ]));
@@ -517,8 +516,7 @@ describe("Lexer", function() {
 
   it("Jones loves a foo woman.", function() {
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     parser.add(["foo", "word", [{"@type": "ADJ"}]]);
     let results = parser.feed("Jones loves a foo woman.");
     assertThat(clear(results[0].children[0].children[0]))
@@ -554,7 +552,8 @@ describe("Lexer", function() {
       }],
       "@type": "%word",
       "type": "word",
-      "value": "girlfriend"
+      "value": "girlfriend",
+      "loc": 0,
     });
   });
   
@@ -567,13 +566,13 @@ describe("Lexer", function() {
 
     tokens.reset("foo foot");
     assertThat(tokens.eat("foo").get("foo"))
-      .equalsTo(token("word", "foo", [{a: 1}]));
+      .equalsTo(token("word", "foo", 0, [{a: 1}]));
     assertThat(tokens.buffer).equalsTo(" foot");
     assertThat(tokens.eat(" ").get(" "))
-      .equalsTo(token("WS", " ", []));
+      .equalsTo(token("WS", " ", 3, []));
     assertThat(tokens.buffer).equalsTo("foot");
     assertThat(tokens.eat("foot").get("foot"))
-      .equalsTo(token("word", "foot", [{b: 2}]));
+      .equalsTo(token("word", "foot", 4, [{b: 2}]));
     assertThat(tokens.buffer).equalsTo("");
     
     assertThat(tokens.has("WS")).equalsTo(true);
@@ -587,15 +586,15 @@ describe("Lexer", function() {
     assertThat(tokens.longest("foo ")).equalsTo("foo");
     assertThat(tokens.longest("foo hello world")).equalsTo("foo");
 
-    assertThat(tokens.get("foo")).equalsTo(token("word", "foo", [{a: 1}]));
-    assertThat(tokens.get("foot")).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.get("foo")).equalsTo(token("word", "foo", 5, [{a: 1}]));
+    assertThat(tokens.get("foot")).equalsTo(token("word", "foot", 4, [{b: 2}]));
 
     tokens.reset("foo foot");
-    assertThat(tokens.next()).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.next()).equalsTo(token("word", "foo", 8, [{a: 1}]));
     assertThat(tokens.buffer).equalsTo(" foot");
-    assertThat(tokens.next()).equalsTo(token("WS", " ", []));
+    assertThat(tokens.next()).equalsTo(token("WS", " ", 11, []));
     assertThat(tokens.buffer).equalsTo("foot");
-    assertThat(tokens.next()).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.next()).equalsTo(token("word", "foot", 12, [{b: 2}]));
     assertThat(tokens.buffer).equalsTo("");
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("");
@@ -606,7 +605,7 @@ describe("Lexer", function() {
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("foo");
     tokens.reset("t");
-    assertThat(tokens.next()).equalsTo(token("word", "foot", [{b: 2}]));
+    assertThat(tokens.next()).equalsTo(token("word", "foot", 16, [{b: 2}]));
     assertThat(tokens.buffer).equalsTo("");
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("");
@@ -615,9 +614,9 @@ describe("Lexer", function() {
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("foo");
     tokens.reset(" ");
-    assertThat(tokens.next()).equalsTo(token("word", "foo", [{a: 1}]));
+    assertThat(tokens.next()).equalsTo(token("word", "foo", 20, [{a: 1}]));
     assertThat(tokens.buffer).equalsTo(" ");
-    assertThat(tokens.next()).equalsTo(token("WS", " ", []));
+    assertThat(tokens.next()).equalsTo(token("WS", " ", 23, []));
     assertThat(tokens.buffer).equalsTo("");
     assertThat(tokens.next()).equalsTo(undefined);
     assertThat(tokens.buffer).equalsTo("");
@@ -639,36 +638,36 @@ describe("Lexer", function() {
         
     const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
-
+    let parser = new Parser("Statement", dict);
+    
     for (let token of tokens) {
       parser.add(token);
     }
     let {lexer} = parser;
     lexer.reset("Jones loves an awesome woman.");
-    assertThat(lexer.next()).equalsTo(token("word", "Jones", [{
+    assertThat(lexer.next()).equalsTo(token("word", "Jones", 0, [{
       "@type": "PN",
-      "types": {"gen": "male", "num": "sing"}
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
     }]));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("word", "love", [{
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
+    assertThat(lexer.next()).equalsTo(token("word", "love", 6, [{
       "@type": "VERB",
       "types": {"past": "+d", "pres": "+s", "stat": "-", "trans": 1}
     }]));
-    assertThat(lexer.next()).equalsTo(token("s", "s"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("an", "an"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("word", "awesome", [{
+    assertThat(lexer.next()).equalsTo(token("s", "s", 10));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
+    assertThat(lexer.next()).equalsTo(token("an", "an", 12));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 14));
+    assertThat(lexer.next()).equalsTo(token("word", "awesome", 15, [{
       "@type": "ADJ"
     }]));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("word", "woman", [{
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 22));
+    assertThat(lexer.next()).equalsTo(token("word", "woman", 23, [{
       "@type": "N",
       "types": {"gen": "fem", "num": "sing"}
     }]));
-    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", ".", 28));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
@@ -676,8 +675,7 @@ describe("Lexer", function() {
     const {adj_itr} = lexicon;
     const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     for (let token of tokens) {
       parser.add(token);
     }
@@ -699,8 +697,7 @@ describe("Lexer", function() {
     }]]);
     
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     
     for (let token of tokens) {
       parser.add(token);
@@ -723,8 +720,7 @@ describe("Lexer", function() {
     }]]);
     
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     
     for (let token of tokens) {
       parser.add(token);
@@ -798,12 +794,13 @@ describe("Lexer", function() {
                   VP_(VP(V(VERB("love"), "s"), NP(DET("a"), N("dog"))))));
   });
 
-  let token = (type, value, tokens = []) => {
+  let token = (type, value, loc = 0, tokens = []) => {
     return {
       "@type": "%" + type,
       "type": type,
       "value": value,
-      "tokens": tokens
+      "loc": loc,
+      "tokens": tokens,
     };
   };
     
@@ -820,14 +817,14 @@ describe("Lexer", function() {
       ["dog", "N"],
     ]);
     lexer.reset("Jones loves a dog.");
-    assertThat(lexer.next()).equalsTo(token("PN", "Jones"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("V", "loves"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("DET", "a"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("N", "dog"));
-    assertThat(lexer.next()).equalsTo(token("PERIOD", "."));
+    assertThat(lexer.next()).equalsTo(token("PN", "Jones", 0));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
+    assertThat(lexer.next()).equalsTo(token("V", "loves", 6));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
+    assertThat(lexer.next()).equalsTo(token("DET", "a", 12));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 13));
+    assertThat(lexer.next()).equalsTo(token("N", "dog", 14));
+    assertThat(lexer.next()).equalsTo(token("PERIOD", ".", 17));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
@@ -839,7 +836,11 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("Foobar");
-    assertThat(lexer.next()).equalsTo(token("name", "Foobar"));
+    assertThat(lexer.next()).equalsTo(token("word", "Foobar", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
@@ -851,9 +852,17 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("Sam Goto");
-    assertThat(lexer.next()).equalsTo(token("name", "Sam"));
-    assertThat(lexer.next()).equalsTo(token("WS", " "));
-    assertThat(lexer.next()).equalsTo(token("name", "Goto"));
+    assertThat(lexer.next()).equalsTo(token("word", "Sam", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 3));
+    assertThat(lexer.next()).equalsTo(token("word", "Goto", 4, [{
+      "@type": "PN",
+      "loc": 4,
+      "types": {"gen": "?", "num": "?"}
+    }]));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -871,19 +880,26 @@ describe("Lexer", function() {
 
   it("Jones loves Sam.", function() {
     const {Parser} = DRT;
-    let parser = new Parser("Statement");
-    parser.load(dict);
+    let parser = new Parser("Statement", dict);
     let tokenizer = parser.parser.parser.lexer.tokenizer;
 
     tokenizer.reset("Hello");
-    assertThat(tokenizer.next()).equalsTo(token("name", "Hello"));
+    assertThat(tokenizer.next()).equalsTo(token("word", "Hello", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
 
     tokenizer.reset("He ");
-    assertThat(tokenizer.next()).equalsTo(token("he", "He"));
-    assertThat(tokenizer.next()).equalsTo(token("WS", " "));
+    assertThat(tokenizer.next()).equalsTo(token("he", "He", 5));
+    assertThat(tokenizer.next()).equalsTo(token("WS", " ", 7));
 
     tokenizer.reset("Sam");
-    assertThat(tokenizer.next()).equalsTo(token("name", "Sam"));
+    assertThat(tokenizer.next()).equalsTo(token("word", "Sam", 8, [{
+      "@type": "PN",
+      "loc": 8,
+      "types": {"gen": "?", "num": "?"}
+    }]));
     
     let results = parser.feed("Jones loves Sam.");
     assertThat(clear(results[0].children[0].children[0]))

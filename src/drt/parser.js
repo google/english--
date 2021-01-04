@@ -57,13 +57,21 @@ class Nearley {
   
   reportError(e) {
     let that = this;
+    //console.log(this.parser.current);
+    //console.log();
+    const buffer = this.parser.lexer.tokenizer ?
+          this.parser.lexer.tokenizer.buffer :
+          this.parser.lexer.buffer;
     return {
+      buffer: buffer,
       token: e.token,
       loc: e.offset, 
-      start: this.parser.lexer.buffer[this.parser.current],
+      start: buffer[that.parser.current],
+      get message() { return this.print(); },
       print() {
         const tracks = that.tracks(2);
-        const completions = that.complete(tracks);
+        // console.log(tracks);
+        // const completions = that.complete(tracks);
         const result = [];
         let unexpected = ""; 
         let head = "";
@@ -76,7 +84,6 @@ class Nearley {
         head += `Instead, I was expecting to see one of the following:`;
         result.push(head);
         result.push(``);
-        
         for (let track of tracks) {
           result.push(`A ${track.symbol} token based on:`);
           for (let line of track.stack) {
@@ -642,6 +649,7 @@ class FeaturedNearley {
                                     "types": ${JSON.stringify(head.types)}
                                   }])([match], location, reject);
                 if (result != reject) {
+                  //console.log(result.children[0]);
                   let node = JSON.parse(JSON.stringify(result.children[0]));
                   node.children = [{value: token.value}];
                  return node;
@@ -937,7 +945,6 @@ const DrtSyntax = `
 
       PN[gen=2] -> PN __ PN.
       PN[gen=2] -> %word.
-      PN[gen=2] -> %name.
       ADJ -> %word.
       N[num=1, gen=2, plur=3] -> %word.      
       VERB[trans=1, stat=2, pres=3, past=4] -> %word.
@@ -956,14 +963,17 @@ const keywords = [
   
   "then",
 
+  // compositions
   "and", "or",
 
+  // pronouns
   "he", "him",
   "she", "her",
   "they", "them",
   "himself", "herself",
   "it", "itself",
 
+  // auxiliaries
   "does", "did",
   "will", "would",
   "is", "are",
@@ -971,10 +981,11 @@ const keywords = [
   "be", "been",
   "have", "has", "had",
 
+  // prepositions
   "who",
   "which",
 
-  // verbs
+  // verb morphology
   "s", "es", "ies", "ed", "d", "ied", "led", "red",
 ].map((keyword) => [keyword, keyword, []]);
 
@@ -1023,7 +1034,6 @@ function drtGrammar() {
       _ -> %WS:* {% function(d) {return {"@type": "_", types: {}};} %}
       __ -> %WS:+ {% function(d) {return {"@type": "__", types: {}};} %}
       Discourse -> _ (Sentence _):+ {% ([ws1, sentences]) => {
-         // console.log(sentences);
          return sentences.map(([s, ws2]) => s); 
       }%}
     `;
@@ -1036,11 +1046,12 @@ function drtGrammar() {
 }
 
 class Parser {
-  constructor (start = "Discourse"){
+  constructor (start = "Discourse", dict = []){
     const grammar = drtGrammar();
     this.parser = new Nearley(grammar, start);
     this.lexer = new Tokenizer(keywords);
     this.parser.parser.lexer.use(this.lexer);
+    this.load(dict);
   }
 
   load(dict) {

@@ -102,21 +102,34 @@ class CompositeRule extends Rule {
 }
 
 function find({gen, num}, refs, name, loc, exclude = []) {
+  //console.log(refs);
+  //console.log(loc);
   let match = (ref) => {
     let byName = name ? ref.value == name : true;
     let types = ref.types || {};
-    if (!byName || types.num != num || ref.loc > loc) {
+    //console.log(`${JSON.stringify(types)} ${byName} ${types.num} preceeds? ${ref.loc} > ${loc}`);
+    //console.log(exclude);
+    //console.log(exclude);
+    if (ref.loc > loc) {
+      // A referent can never make a reference to a previous location.
       return false;
+    } else if (name) {
+      //console.log(name);
+      return name == ref.value;
     } else if (exclude.map(x => x.name).includes(ref.name)) {
       return false;
-    } else if (types.gen == "?") {
+    } else if (types.gen == "?" && types.num == "?") {
       types.gen = gen;
+      types.num = num;
       return true;
+    } else if (types.num != num) {
+      return false;
     }
     return types.gen == gen;
   };
   
   for (let i = refs.length - 1; i >= 0; i--) {
+    // console.log(refs[i]);
     if (match(refs[i])) {
       return refs[i];
     }
@@ -164,9 +177,10 @@ class CRSPN extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
     // console.log(refs);
     // console.log(ref);
-    //console.log(name.children[0].value);
+    //console.log(child(node, 0, 0));
     if (!ref) {
       ref = referent(this.id(), name.types, name.children[0].value, name.loc);
+      // console.log(name.types);
       head.push(ref);
       
       let pred = predicate(child(name, 0).value, [ref], name.types);
@@ -195,7 +209,7 @@ class CRVPPN extends Rule {
     let head = [];
     let body = [];
     let ref = find(name.types, refs, name.children[0].value, name.loc);
-    
+    //console.log(ref);
     if (!ref) {
       ref = referent(this.id(), name.types, name.children[0], name.loc);
       head.push(ref);
@@ -283,11 +297,14 @@ class CRPN extends CompositeRule {
 
 class CRSPRO extends Rule {
   constructor(ids) {
-    super(ids, S(NP(PRO(capture("pronoun"))), VP_(capture("?"))));
+    super(ids, S(NP(PRO(capture("pronoun"))), VP_(capture("obj"))));
   }
   
-  apply({pronoun}, node, refs) {
-    let u = find(pronoun.types, refs, undefined, pronoun.loc);
+  apply({pronoun, obj}, node, refs) {
+    //let exclude = pronoun.types.refl != "+" ? [child(obj, 0, 1)] : [];
+    //console.log(obj);
+    //console.log(pronoun);
+    let u = find(pronoun.types, refs, undefined, child(pronoun, 0).loc);
     
     if (!u) {
       throw new Error("Invalid reference: " + pronoun.children[0].value);
@@ -308,7 +325,9 @@ class CRVPPRO extends Rule {
   
   apply({sub, pro}, node, refs) {
     // Exclude the subject if the pronoun is non-reflexive.
-    let exclude = pro.types.refl == "-" ? [child(sub, 0)] : [];
+    // console.log(pro);
+    let exclude = pro.types.refl != "+" ? [child(sub, 0)] : [];
+    // console.log(exclude);
     let ref = find(pro.types, refs, undefined, undefined, exclude);
     
     if (!ref) {
