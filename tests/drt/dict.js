@@ -99,7 +99,7 @@ const dict = [
   ADJ("mortal"),
   ADJ("married"),
   
-  // Regular Verbs
+  // Verbs
   ...V("live", "-"),
   ...V("admire", "+"),
   ...V("fascinate", "+"),
@@ -115,13 +115,15 @@ const dict = [
   ...V("cry", "-"),
   ...V("copy", ["+", "-"]),
   ...V("thrive", "-"),
+  ...V("make", "+"),
+  ...V("give", "+"),
+  ...V("play", ["+", "-"]),
+  ...V("come", ["+", "-"]),
 
-  // Irregular Verbs
-  PAST("made", "+"),
-  PAST("came", 2),
+  // NOTE(goto): travelled doesn't seem to be
+  // conjugated correctly.
+  //...V("travel", "-"),
   PAST("travelled", "-"),
-  PAST("gave", "+"),
-  PAST("played", "-"),
 ];
 
 module.exports = {
