@@ -27,9 +27,8 @@ describe("Browser", function() {
         }
       });
     });
-    assertThat(parse("John likes Mary.").length).equalsTo(1);
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().feed("John likes Mary.")).print())
+    assertThat(drs.feed(new Parser().load(dict).feed("John likes Mary.")).print())
       .equalsTo("let a, b\nJohn(a)\nMary(b)\nlikes(a, b)");
   });
 });
