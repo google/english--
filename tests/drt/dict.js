@@ -108,12 +108,9 @@ const dict = [
   ...V("own", "+"),
   ...V("kiss", "+"),
   ...V("stink", "-"),
-  
-  // Plural Present Tense
-  PRES("ski", "plur", "-"),
-
+  ...V("ski", "-"),
+ 
   // Singular Present
-  PRES("skis", "sing", "-"),
   PRES("watches", "sing", "+"),
 
   // Past
@@ -122,7 +119,6 @@ const dict = [
   PAST("travelled", "-"),
   PAST("gave", "+"),
   PAST("played", "-"),
-  PAST("skied", "-"),
 ];
 
 module.exports = {
