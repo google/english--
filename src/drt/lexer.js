@@ -96,19 +96,14 @@ class Tokenizer {
 
     let next = this.longest(this.buffer);
 
-    // console.log(`next!`);
-
     // proper names form.
     let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
     // proper names can't collide with reserved dictionary words.
     let proper = match && match[1] != next;
 
-    // console.log(this.head["t"]["h"]["e"]);
-    
     if (next && !proper) {
       // If this is a dictionary word and is not a proper name
       this.eat(next);
-      // console.log(next);
       return this.get(next);
     }
 
@@ -140,7 +135,6 @@ class Tokenizer {
     for (let char of str) {
       ref = ref[char.toLowerCase()];
     }
-    //console.log(ref.done);
     return {
       "@type": "%" + ref.type,
       "type": ref.type,

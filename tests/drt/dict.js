@@ -156,18 +156,10 @@ const dict = [
   ["walk", "word", [{
     "@type": "V",
     "types": {
-      "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"
+      "num": 1, "fin": ["-", "+"], "trans": "-", "stat": "-", "tense": "pres"
     }
   }]],
 
-  ["walk", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  
   // Infinitives
   ["admire", "word", [{"@type": "V", types: {
     "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"}}]],

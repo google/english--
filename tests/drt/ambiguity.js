@@ -135,29 +135,7 @@ describe("Ambiguity", () => {
     assertThat(new Parser("Statement", dict).feed("They have walked.").length).equalsTo(1);
   });
 
-  it.skip("Jones did not walk.", () => {
-    assertThat(new Parser("V", dict).feed("walk").length).equalsTo(2);
-    assertThat(new Parser("V", dict).feed("walk")[0].types).equalsTo({
-      "fin": "+",
-      "num": "plur",
-      "stat": "-",
-      "tense": "pres",
-      "tp": "-past",
-      "trans": "-",
-    });
-    assertThat(new Parser("V", dict).feed("walk")[1].types).equalsTo({
-      "fin": "-",
-      "num": 467825203,
-      "stat": "-",
-      "trans": "-",
-      "tense": "pres"
-    });
-    //assertThat(new Parser("VP_").feed("did not walk")[0].types)
-    //  .equalsTo(new Parser("VP_").feed("did not walk")[1].types);
-    assertThat(new Parser("VP_", dict).feed("did not walk").length)
-      .equalsTo(1);
-    //assertThat(new Parser("Statement").feed("Jones did not walk.")[0].types)
-    //  .equalsTo({});
+  it("Jones did not walk.", () => {
     assertThat(new Parser("Statement", dict).feed("Jones did not walk.").length)
       .equalsTo(1);
   });
@@ -166,11 +144,9 @@ describe("Ambiguity", () => {
     assertThat(new Parser("Question", dict).feed("Were they happy?").length).equalsTo(1);
   });
 
-  it.skip("Jones is Smith's brother. he likes Brazil.", () => {
+  it("Jones is Smith's brother. he likes Brazil.", () => {
     assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother.").length).equalsTo(1);
     assertThat(new Parser("Discourse", dict).feed("He likes Brazil.").length).equalsTo(1);
-    //assertThat(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[0])
-    //.equalsTo(new Parser("Discourse").feed("Jones is Smith's brother. He likes Brazil.")[1]);
     assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother.He likes Brazil.").length).equalsTo(1);
     assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother. He likes Brazil.").length).equalsTo(1);
   });
