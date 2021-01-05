@@ -871,7 +871,7 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
   let parser = new Parser(start, dict);
   let results = parser.feed(s);
 
-  // assertThat(results.length).equalsTo(1);
+  assertThat(results.length).equalsTo(1);
   
   if (raw) {
     return results[0];

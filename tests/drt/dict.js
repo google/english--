@@ -131,7 +131,6 @@ const dict = [
     }
   }]],
   
-  // TODO(goto): if you invert the order here tests break. Figure out why.
   ["love", "word", [{
     "@type": "V",
     "types": {
@@ -142,7 +141,7 @@ const dict = [
   ["love", "word", [{
     "@type": "V",
     "types": {
-      "num": 1, "fin": "+", "trans": ["+", "-"], "stat": "-", "tense": "pres"
+      "num": "plur", "fin": "+", "trans": ["+", "-"], "stat": "-", "tense": "pres"
     }
   }]],
 
@@ -156,7 +155,14 @@ const dict = [
   ["walk", "word", [{
     "@type": "V",
     "types": {
-      "num": 1, "fin": ["-", "+"], "trans": "-", "stat": "-", "tense": "pres"
+      "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"
+    }
+  }]],
+
+  ["walk", "word", [{
+    "@type": "V",
+    "types": {
+      "num": "plur", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"
     }
   }]],
 

@@ -904,9 +904,8 @@ const DrtSyntax = `
       PN[gen=2] -> PN __ PN.
 
       V[num=1, fin=part, trans=3, stat=4, tp=5, tense=6] -> %word.
-      V[num=sing, fin=[+, -], trans=3, stat=4, tp=5, tense=6] -> %word.
-      V[num=plur, fin=+, trans=3, stat=4, tp=5, tense=6] -> %word.
-      V[num=plur, fin=-, trans=3, stat=4, tp=5, tense=6] -> %word.
+      V[num=1, fin=-, trans=3, stat=4, tp=5, tense=6] -> %word.
+      V[num=1, fin=+, trans=3, stat=4, tp=5, tense=6] -> %word.
       PN[num=1, gen=2] -> %word.
       ADJ[] -> %word.
       N[num=1, gen=2] -> %word.      
