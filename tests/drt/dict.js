@@ -105,17 +105,16 @@ const dict = [
   ...V("like", "+"),
   ...V("love", ["+", "-"]),
   ...V("walk", "-"),
+  ...V("own", "+"),
+  ...V("kiss", "+"),
   
   // Infinitives
-  INF("own", "+"),
-  INF("kiss", "+"),
   INF("stink", "-"),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),
 
   // Singular Present
-  PRES("owns", "sing", "+"),
   PRES("skis", "sing", "-"),
   PRES("stinks", "sing", "-"),
   PRES("watches", "sing", "+"),
@@ -127,11 +126,6 @@ const dict = [
   PAST("gave", "+"),
   PAST("played", "-"),
   PAST("skied", "-"),
-  PAST("kissed", "+"),  
-
-  // Past Participle
-  PART("owned", "+"),
-  PART("kissed", "+"),
 ];
 
 module.exports = {
