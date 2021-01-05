@@ -907,7 +907,7 @@ const DrtSyntax = `
       V[num=sing, fin=[+, -], trans=3, stat=4, tp=5, tense=6] -> %word.
       V[num=plur, fin=+, trans=3, stat=4, tp=5, tense=6] -> %word.
       V[num=plur, fin=-, trans=3, stat=4, tp=5, tense=6] -> %word.
-      PN[gen=2] -> %word.
+      PN[num=1, gen=2] -> %word.
       ADJ[] -> %word.
       N[num=1, gen=2] -> %word.      
 `;
