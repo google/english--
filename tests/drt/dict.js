@@ -1,3 +1,5 @@
+const {Inflectors} = require("en-inflectors");
+
 const N = (str, num, gen) => [str, "word", [{"@type": "N", "types": {"num": num, "gen": gen}}]];
 const ADJ = (str, types = {}) => [str, "word", [{"@type": "ADJ", types: types}]];
 const INF = (str, trans) => [str, "word", [{
@@ -42,46 +44,18 @@ const PART = (str, trans) => [str, "word", [{
     "tp": "-past"
   }}]];
 
-const V = (str, trans) => {
-  // https://www.grammar-monster.com/glossary/regular_verbs.htm
-  
-  // Verbs ending in a consonant followed by "e"
-  // such as dance, save, devote, or evolve.
-  if (str.endsWith("e")) {
-    return [
-      INF(str, trans),
-      PRES(str, "plur", trans),
-      PRES(str + "s", "sing", trans),
-      PAST(str + "d", trans),
-      PART(str + "d", trans),
-    ];
-  }
-
-  const consonant_y = new RegExp("([a-z]+)([b-df-hj-np-tv-z])y$");
-  if (consonant_y.test(str)) {
-    const [, base, consonant] = str.match(consonant_y);
-    return [
-      INF(str, trans),
-      PRES(str, "plur", trans),
-      PRES(base + consonant + "ies", "sing", trans),
-      PAST(base + consonant + "ied", trans),
-      PART(base + consonant + "ied", trans),
-    ];
-  }
-
-  return [
-    // Infinitive
-    INF(str, trans),
-    // Plural Present Tense
-    PRES(str, "plur", trans),
-    // Singular Present Tense
-    PRES(str + (str.endsWith("ch") ? "es" : "s"), "sing", trans),
-    // Past
-    PAST(str + "ed", trans),
-    // Past Participle
-    PART(str + "ed", trans),
-  ];
-}
+const V = (str, trans) => [
+  // Infinitive
+  INF(str, trans),
+  // Plural Present Tense
+  PRES(new Inflectors(str).toPresent(), "plur", trans),
+  // Singular Present Tense
+  PRES(new Inflectors(str).toPresentS(), "sing", trans),
+  // Past
+  PAST(new Inflectors(str).toPast(), trans),
+  // Past Participle
+  PART(new Inflectors(str).toPastParticiple(), trans),
+];
 
 const dict = [  
   // Singular Nouns
