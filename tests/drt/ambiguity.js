@@ -83,9 +83,9 @@ describe("Ambiguity", () => {
     assertThat(results.length).equalsTo(1);
   });
 
-  it("Sam travelled from Brazil to Japan.", () => {
+  it("Sam traveled from Brazil to Japan.", () => {
     let parser = new Parser("Sentence", dict);
-    let results = parser.feed("Sam travelled from Brazil to Japan.");
+    let results = parser.feed("Sam traveled from Brazil to Japan.");
     assertThat(results.length).equalsTo(1);
   });
 

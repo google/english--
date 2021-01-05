@@ -119,11 +119,7 @@ const dict = [
   ...V("give", "+"),
   ...V("play", ["+", "-"]),
   ...V("come", ["+", "-"]),
-
-  // NOTE(goto): travelled doesn't seem to be
-  // conjugated correctly.
-  //...V("travel", "-"),
-  PAST("travelled", "-"),
+  ...V("travel", "-"),
 ];
 
 module.exports = {

@@ -2455,10 +2455,10 @@ describe("Backwards compatibility", function() {
                          NP(PN("Dani"))))));
   });
 
-  it("Jones travelled from Brazil to Italy.", function() { 
-    assertThat(parse("Jones travelled from Brazil to Italy."))
+  it("Jones traveled from Brazil to Italy.", function() { 
+    assertThat(parse("Jones traveled from Brazil to Italy."))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(V(V("travelled"),
+                  VP_(VP(V(V(V("traveled"),
                              PP(PREP("from"), NP(PN("Brazil")))),
                            PP(PREP("to"), NP(PN("Italy"))))
                         )))) ;
