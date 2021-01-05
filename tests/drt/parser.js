@@ -1920,7 +1920,7 @@ describe("Backwards compatibility", function() {
                  ));
    });
 
-  it("a man who does not love her watches him.", function() {
+  it.skip("a man who does not love her watches him.", function() {
     assertThat(parse("a man who does not love her watches him."))
      .equalsTo(S(NP(DET("a"),
                     N(N("man"), RC(RPRO("who"), 

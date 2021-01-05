@@ -901,27 +901,6 @@ const DrtSyntax = `
       HAVE[num=1, fin=+, tp=-past, tense=past] -> %had.
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> %had.
 
-      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, pres=+es] %es.
-
-      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, pres=+ies] %ies.
-
-      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
-          -> VERB[trans=3, stat=2, past=+d] %d.
-
-      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
-          -> VERB[trans=3, stat=2, past=+d] %d.
-
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, past=+ied] %ied.
-
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, past=+led] %led.
-
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
-         -> VERB[trans=3, stat=2, past=+red] %red.
-
       PN[gen=2] -> PN __ PN.
 
       V[num=1, fin=part, trans=3, stat=4, tp=5, tense=6] -> %word.
