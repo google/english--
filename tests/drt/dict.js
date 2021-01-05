@@ -100,30 +100,27 @@ const dict = [
   // Regular Verb
   ...V("live", "-"),
   ...V("admire", "+"),
+  ...V("fascinate", "+"),
+  ...V("surprise", "+"),
+  ...V("like", "+"),
   
   // Infinitives
-  INF("fascinate", "+"),
   INF("own", "+"),
   INF("kiss", "+"),
   INF("stink", "-"),
   INF("walk", "-"),
   INF("love", ["+", "-"]),
-  INF("like", "+"),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),
-  PRES("like", "plur", "+"),
   PRES("love", "plur", ["+", "-"]),
   PRES("walk", "plur", "-"),
 
   // Singular Present
-  PRES("likes", "sing", "+"),
   PRES("loves", "sing", 1),
-  PRES("fascinates", "sing", "+"),
   PRES("owns", "sing", "+"),
   PRES("skis", "sing", "-"),
   PRES("walks", "sing", "-"),
-  PRES("surprises", "sing", "+"),
   PRES("stinks", "sing", "-"),
   PRES("watches", "sing", "+"),
 
@@ -134,7 +131,6 @@ const dict = [
   PAST("gave", "+"),
   PAST("played", "-"),
   PAST("skied", "-"),
-  PAST("liked", "+"),
   PAST("kissed", "+"),  
   PAST("walked", "-"),
 
