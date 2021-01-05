@@ -97,11 +97,11 @@ const dict = [
   ADJ("mortal"),
   ADJ("married"),
   
-  // Verb Morphology
+  // Regular Verb
   ...V("live", "-"),
+  ...V("admire", "+"),
   
   // Infinitives
-  INF("admire", "+"),
   INF("fascinate", "+"),
   INF("own", "+"),
   INF("kiss", "+"),
@@ -117,7 +117,6 @@ const dict = [
   PRES("walk", "plur", "-"),
 
   // Singular Present
-  PRES("admires", "sing", "+"),
   PRES("likes", "sing", "+"),
   PRES("loves", "sing", 1),
   PRES("fascinates", "sing", "+"),
