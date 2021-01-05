@@ -2531,6 +2531,19 @@ describe("Backwards compatibility", function() {
                   VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
   });
 
+  // Not working:
+  // They rented Mary.
+  // Brazil is a country in South America. // wondering if this is conflicting with a "south" verb
+  // Brazil borders Chile. // works with Brazil borders Italy.
+  // Italy is a country which killed a man.
+  // Italy is a country with a man.
+  // Italy is a country which kills many people.
+  // Most brazilians like Italy.
+  // Trump is a person. // this is possibly conflicting with the verb to-trump.
+  // Obama was the president of America. He was great.
+  // we probably want to add the () operator to resolve the ambiguity.
+  // 
+  
 });
 
 

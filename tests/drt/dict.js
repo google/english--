@@ -124,15 +124,11 @@ const dict = [
 **/
 ];
 
-const verbs = require("./verbs.js");
+const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");
 
 for (let {inf, trans} of verbs) {
-  // console.log(inf);
   dict.push(...V(inf, trans));
-  // break;
 }
-
-// console.log(new Inflectors("travel").toPast());
 
 module.exports = {
   dict: dict

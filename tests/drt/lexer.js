@@ -912,9 +912,34 @@ describe("Lexer", function() {
                  ));
   });
 
-  it.skip("Verbs", async function() {
+  it.skip("Build lexicon", async function() {
     const {tv_finsg, tv_infpl, tv_pp,
-           iv_finsg, iv_infpl} = require("./../../lexicon.js");
+           iv_finsg, iv_infpl,
+           noun_sg, noun_pl,
+           adj_itr
+          } = require("./lexicon.js");
+
+    const adjs = [];
+    
+    for (let [name] of adj_itr) {
+      adjs.push({name: name});
+    }
+    
+    const nouns = [];
+    const genders = {
+      "undef": "-hum",
+      "neutr": "-hum",
+      "human": ["male", "fem"],
+      "masc": "male",
+      "fem": "fem",
+    };
+    for (let [name, key, gen] of noun_sg) {
+      nouns.push({name: name, num: "sing", gen: genders[gen]});
+    }
+    for (let [name, key, gen] of noun_pl) {
+      nouns.push({name: name, num: "plur", gen: genders[gen]});
+    }
+    
     let verbs = {};
     for (let [inflection, key] of tv_finsg) {
       verbs[key] = verbs[key] || {};
@@ -938,8 +963,7 @@ describe("Lexer", function() {
     } 
     let dict = Object
         .entries(verbs)
-        // excludes phrasal verbs for now
-        .filter(([key, value]) => !key.includes("-"))
+        .filter(([key, value]) => !key.includes("-")) // excludes phrasal verbs for now
         .map(([key, value]) => {
           let result = {inf: key, trans: []};
           if (value.tv_pp) {
@@ -954,12 +978,18 @@ describe("Lexer", function() {
           }
           return result;
         });
-    // console.log(dict);
+
+    const result = {
+      verbs: dict,
+      nouns: nouns,
+      adjs: adjs
+    };
+
     let file = `
-module.exports = ${JSON.stringify(dict, undefined, 2)};
+module.exports = ${JSON.stringify(result, undefined, 2)};
 `;
     const fs = require("fs");
-    fs.writeFileSync("./verbs.js", file);
+    fs.writeFileSync("./wordlist.js", file);
   });
   
   it.skip("Generate", async function() {
