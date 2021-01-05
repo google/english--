@@ -2494,6 +2494,30 @@ describe("Backwards compatibility", function() {
                          NP(PN("Dani"))))));
   });
 
+  it("They cry.", function() {
+    assertThat(parse("They cry."))
+      .equalsTo(S(NP(PRO("They")),
+                  VP_(VP(V("cry")))));
+  });
+
+  it("He cries.", function() {
+    assertThat(parse("He cries."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(V("cries")))));
+  });
+
+  it("He does not cry.", function() {
+    assertThat(parse("He does not cry."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(AUX("does"), "not", VP(V("cry")))));
+  });
+
+  it("He cried.", function() {
+    assertThat(parse("He cried."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(V("cried")))));
+  });
+
 });
 
 
