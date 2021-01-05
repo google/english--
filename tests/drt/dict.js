@@ -47,6 +47,9 @@ const dict = [
     "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
   ["stinks", "word", [{"@type": "V", types: {
     "num": "sing", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"}}]],
+  ["watches", "word", [{"@type": "V", types: {
+    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
+    //"trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
 
   // Third Person Present
   ["ski", "word", [{"@type": "V", types: {
@@ -202,8 +205,6 @@ const dict = [
     "trans": "+", "stat": "-", "pres": "s"}}]],
 
   ["box", "word", [{"@type": "VERB", types: {
-    "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
-  ["watch", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],
   ["crash", "word", [{"@type": "VERB", types: {
     "trans": "+", "stat": "-", "pres": "+es", "past": "+ed"}}]],

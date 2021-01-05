@@ -1920,14 +1920,14 @@ describe("Backwards compatibility", function() {
                  ));
    });
 
-  it.skip("a man who does not love her watches him.", function() {
+  it("a man who does not love her watches him.", function() {
     assertThat(parse("a man who does not love her watches him."))
      .equalsTo(S(NP(DET("a"),
                     N(N("man"), RC(RPRO("who"), 
                                    S(NP(GAP()),
                                      VP_(AUX("does"), "not", VP(V("love"), NP(PRO("her")))))
                                    ))),
-                 VP_(VP(V(VERB("watch"), "es"), NP(PRO("him"))))
+                 VP_(VP(V("watches"), NP(PRO("him"))))
                  ));
 
   });
