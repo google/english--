@@ -103,21 +103,19 @@ const dict = [
   ...V("fascinate", "+"),
   ...V("surprise", "+"),
   ...V("like", "+"),
+  ...V("love", ["+", "-"]),
   
   // Infinitives
   INF("own", "+"),
   INF("kiss", "+"),
   INF("stink", "-"),
   INF("walk", "-"),
-  INF("love", ["+", "-"]),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),
-  PRES("love", "plur", ["+", "-"]),
   PRES("walk", "plur", "-"),
 
   // Singular Present
-  PRES("loves", "sing", 1),
   PRES("owns", "sing", "+"),
   PRES("skis", "sing", "-"),
   PRES("walks", "sing", "-"),
@@ -136,7 +134,6 @@ const dict = [
 
   // Past Participle
   PART("owned", "+"),
-  PART("loved", "+"),
   PART("walked", "-"),
   PART("kissed", "+"),
 ];
