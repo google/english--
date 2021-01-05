@@ -2,6 +2,7 @@ const {parse, Parser} = require("./parser.js")
 const {DRS} = require("./drs.js");
 const {Rules} = require("./rules.js");
 const lexicon = require("./lexicon");
+const dict = require("../../tests/drt/dict.js");
 const fs = require("fs");
 
 const files = {};
@@ -32,4 +33,5 @@ module.exports = {
   parse: parse,
   Parser: Parser,
   lexicon: lexicon,
+  dict: dict,
 }
