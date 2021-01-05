@@ -1,78 +1,121 @@
+const N = (str, types = {}) => [str, "word", [{"@type": "N", types: types}]];
+const ADJ = (str, types = {}) => [str, "word", [{"@type": "ADJ", types: types}]];
+const INF = (str, types = {}) => [str, "word", [{
+  "@type": "V",
+  "types": Object.assign({
+    "num": 1,
+    "fin": "-",
+    "stat": "-",
+    "tense": "pres"
+  }, types)}]];
+
+const PRES = (str, types = {}) => [str, "word", [{
+  "@type": "V",
+  "types": Object.assign({
+    // "num": "plur",
+    "fin": "+",
+    "stat": "-",
+    "tense": "pres"
+  }, types)}]];
+
 const dict = [  
   // Singular Nouns
-  ["man", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
-  ["woman", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
-  ["girl", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
-  ["book", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["telescope", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["donkey", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["horse", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["cat", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["porsche", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["dish", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["witch", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["judge", "word", [{"@type": "N", types: {"num": "sing", "gen": 1}}]],
-  ["engineer", "word", [{"@type": "N", types: {"num": "sing", "gen": ["male", "fem"]}}]],
-  ["reservation", "word", [{"@type": "N", types: {"num": "sing", "gen": "-hum"}}]],
-  ["brazilian", "word", [{"@type": "N","types": {"num": "sing"}}]],
+  N("man", {"num": "sing", "gen": "male"}),
+  N("woman", {"num": "sing", "gen": "fem"}),
+  N("girl", {"num": "sing", "gen": "fem"}),
+  N("book", {"num": "sing", "gen": "-hum"}),
+  N("telescope", {"num": "sing", "gen": "-hum"}),
+  N("donkey", {"num": "sing", "gen": "-hum"}),
+  N("horse", {"num": "sing", "gen": "-hum"}),
+  N("cat", {"num": "sing", "gen": "-hum"}),
+  N("porsche", {"num": "sing", "gen": "-hum"}),
+  N("dish", {"num": "sing", "gen": "-hum"}),
+  N("witch", {"num": "sing", "gen": "-hum"}),
+  N("judge", {"num": "sing", "gen": 1}),
+  N("engineer", {"num": "sing", "gen": ["male", "fem"]}),
+  N("reservation", {"num": "sing", "gen": "-hum"}),
+  N("brazilian", {"num": "sing"}),
 
   // Plural Nouns
-  ["brazilians", "word", [{"@type": "N", "types": {"num": "plur"}}]],      
-  ["men", "word", [{"@type": "N", types: {"num": "plur", "gen": "male"}}]],
-  ["women", "word", [{"@type": "N", types: {"num": "plur", "gen": "fem"}}]],
-  ["porsches", "word", [{"@type": "N", types: {"num": "plur", "gen": "-hum"}}]],
+  N("brazilians", {"num": "plur"}),
+  N("men", {"num": "plur", "gen": "male"}),
+  N("women", {"num": "plur", "gen": "fem"}),
+  N("porsches", {"num": "plur", "gen": "-hum"}),
   
   // RNs  
-  ["brother", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
-  ["father", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
-  ["husband", "word", [{"@type": "N", types: {"num": "sing", "gen": "male"}}]],
-  ["sister", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
-  ["mother", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
-  ["wife", "word", [{"@type": "N", types: {"num": "sing", "gen": "fem"}}]],
+  N("brother", {"num": "sing", "gen": "male"}),
+  N("father", {"num": "sing", "gen": "male"}),
+  N("husband", {"num": "sing", "gen": "male"}),
+  N("sister", {"num": "sing", "gen": "fem"}),
+  N("mother", {"num": "sing", "gen": "fem"}),
+  N("wife", {"num": "sing", "gen": "fem"}),
 
   // Adjectives
-  ["brazilian", "word", [{"@type": "ADJ"}]],
-  ["happy", "word", [{"@type": "ADJ"}]],
-  ["unhappy", "word", [{"@type": "ADJ"}]],
-  ["foolish", "word", [{"@type": "ADJ"}]],  
-  ["fast", "word", [{"@type": "ADJ"}]],    
-  ["beautiful", "word", [{"@type": "ADJ"}]],
-  ["mortal", "word", [{"@type": "ADJ"}]],
-  ["married", "word", [{"@type": "ADJ"}]],
+  ADJ("brazilian"),
+  ADJ("happy"),
+  ADJ("unhappy"),
+  ADJ("foolish"),  
+  ADJ("fast"),    
+  ADJ("beautiful"),
+  ADJ("mortal"),
+  ADJ("married"),
   
   // Verb Morphology
 
-  // First Person Present
-  ["admires", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["likes", "word", [{"@type": "V", types: { 
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["loves", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": 1, "stat": "-", "tense": "pres"}}]],
-  ["fascinates", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["owns", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["skis", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"}}]],
-  ["walks", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"}}]],
-  ["surprises", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["stinks", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"}}]],
-  ["watches", "word", [{"@type": "V", types: {
-    "num": "sing", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"}}]],
+  // Infinitives
+  INF("admire", {"trans": "+"}),
+  INF("fascinate", {"trans": "+"}),
+  INF("own", {"trans": "+"}),
+  INF("kiss", {"trans": "+"}),
+  INF("stink", {"trans": "-"}),
+  INF("walk", {"trans": "-"}),
+  INF("love", {"trans": ["+", "-"]}),
+  INF("like", {"trans": "+"}),
 
-  // Third Person Present
-  ["ski", "word", [{"@type": "V", types: {
-    "num": "plur", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"}}]],
+  // Plural Present Tense
+  PRES("ski", {"num": "plur", "trans": "-"}),
+  PRES("like", {"num": "plur", "trans": "+"}),
+  PRES("love", {"num": "plur", "trans": ["+", "-"]}),
+  PRES("walk", {"num": "plur", "trans": "-"}),
+
+  // Singular Present
+  PRES("admires", {"num": "sing", "trans": "+"}),
+  PRES("likes", {"num": "sing", "trans": "+"}),
+  PRES("loves", {"num": "sing", "trans": 1}),
+  PRES("fascinates", {"num": "sing", "trans": "+"}),
+  PRES("owns", {"num": "sing", "trans": "+"}),
+  PRES("skis", {"num": "sing", "trans": "-"}),
+  PRES("walks", {"num": "sing", "trans": "-"}),
+  PRES("surprises", {"num": "sing", "trans": "+"}),
+  PRES("stinks", {"num": "sing", "trans": "-"}),
+  PRES("watches", {"num": "sing", "trans": "+"}),
+
   
   // Past participle
   ["owned", "word", [{"@type": "V", types: {
     "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"}}]],
-
-  // Simple past
+  ["loved", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": "pres", "tp": "-past"
+    }
+  }]],
+  
+  ["walked", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "-", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
+    }
+  }]],
+  
+  ["kissed", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
+    }
+  }]],
+  
+  // Past
   ["made", "word", [{"@type": "V", types: {
     "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"}}]],
   ["came", "word", [{"@type": "V", types: {
@@ -87,96 +130,18 @@ const dict = [
     "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"}}]],
   ["liked", "word", [{"@type": "V", types: {
     "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  
-  ["kissed", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-    }
-  }]],
-  
   ["kissed", "word", [{
     "@type": "V",
     "types": {
       "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"
     }
-  }]],
-
-  ["walked", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "-", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-    }
-  }]],
-  
+  }]],  
   ["walked", "word", [{
     "@type": "V",
     "types": {
       "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"
     }
   }]],
-  
-  // Third person present and inifinitives
-  ["like", "word", [{
-    "@type": "V",
-    "types": { 
-      "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  ["like", "word", [{
-    "@type": "V",
-    "types": {
-      "num": "plur", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"
-    }
-  }]],
-  
-  ["love", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "-", "trans": ["+", "-"], "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  ["love", "word", [{
-    "@type": "V",
-    "types": {
-      "num": "plur", "fin": "+", "trans": ["+", "-"], "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  ["loved", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": "pres", "tp": "-past"
-    }
-  }]],
-  
-  ["walk", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  ["walk", "word", [{
-    "@type": "V",
-    "types": {
-      "num": "plur", "fin": "+", "trans": "-", "stat": "-", "tense": "pres"
-    }
-  }]],
-
-  // Infinitives
-  ["admire", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["fascinate", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["own", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["kiss", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"}}]],
-  ["stink", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"}}]],
 ];
 
 module.exports = {
