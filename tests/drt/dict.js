@@ -42,6 +42,19 @@ const PART = (str, trans) => [str, "word", [{
     "tp": "-past"
   }}]];
 
+const V = (str, trans) => [
+  // Infinitive
+  INF(str, trans),
+  // Plural Present Tense
+  PRES(str, "plur", trans),
+  // Singular Present Tense
+  PRES(str + "s", "sing", trans),
+  // Past
+  PAST(str + "d", trans),
+  // Past Participle
+  PART(str + "d", trans),
+];
+
 const dict = [  
   // Singular Nouns
   N("man", "sing", "male"),
@@ -85,7 +98,8 @@ const dict = [
   ADJ("married"),
   
   // Verb Morphology
-
+  ...V("live", "-"),
+  
   // Infinitives
   INF("admire", "+"),
   INF("fascinate", "+"),
@@ -95,7 +109,6 @@ const dict = [
   INF("walk", "-"),
   INF("love", ["+", "-"]),
   INF("like", "+"),
-  INF("live", "-"),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),

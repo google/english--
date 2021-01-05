@@ -1845,6 +1845,53 @@ describe("lexicon", () => {
     `);
   });
 
+  it("Most brazilians live in Brazil.", function() { 
+    assertThat("Most brazilians live in Brazil.")
+      .equalsTo(`
+       let a
+       Brazil(a)
+       most (b: {
+         brazilians(b)
+       }) {
+         in(e, a)
+         live(b)
+       }
+    `);
+  });
+
+  it("Mel lives in Brazil.", function() { 
+    assertThat("Mel lives in Brazil.")
+      .equalsTo(`
+       let a, b
+       Mel(a)
+       Brazil(b)
+       in(e, b)
+       lives(a)
+    `);
+  });
+
+  it("Mel lived in Brazil.", function() { 
+    assertThat("Mel lived in Brazil.")
+      .equalsTo(`
+       let a, b
+       Mel(a)
+       Brazil(b)
+       in(e, b)
+       < lived(a)
+    `);
+  });
+
+  it("Mel has lived in Brazil.", function() { 
+    assertThat("Mel has lived in Brazil.")
+      .equalsTo(`
+       let a, b
+       Mel(a)
+       Brazil(b)
+       in(e, b)
+       lived(a)
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
