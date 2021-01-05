@@ -83,93 +83,84 @@ const dict = [
 
   // kissed can be taken as simple past or the past participle.
   // TODO(goto): make the lexer merge the tokens when it runs into the same key.
-  ["kissed", "word", [
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-      }
-    },
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"
-     }
+  ["kissed", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
     }
-    //,
-  ]],
-
-
-  ["walked", "word", [
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "part", "trans": "-", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-      }
-    },
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"
-     }
+  }]],
+  
+  ["kissed", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"
     }
-  ]],
+  }]],
+
+  ["walked", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "-", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
+    }
+  }]],
+  
+  ["walked", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"
+    }
+  }]],
   
   // Third person present and inifinitives
-  ["like", "word", [
-    {
-      "@type": "V",
-      "types": { 
-        "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"
-      }
-    },
-    {
-      "@type": "V",
-      "types": {
-        "num": "plur", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"
-      }
+  ["like", "word", [{
+    "@type": "V",
+    "types": { 
+      "num": 1, "fin": "-", "trans": "+", "stat": "-", "tense": "pres"
     }
-  ]],
+  }]],
 
+  ["like", "word", [{
+    "@type": "V",
+    "types": {
+      "num": "plur", "fin": "+", "trans": "+", "stat": "-", "tense": "pres"
+    }
+  }]],
+  
   // TODO(goto): if you invert the order here tests break. Figure out why.
-  ["love", "word", [
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "-", "trans": ["+", "-"], "stat": "-", "tense": "pres"
-      }
-    },
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "+", "trans": ["+", "-"], "stat": "-", "tense": "pres"
-      }
+  ["love", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "-", "trans": ["+", "-"], "stat": "-", "tense": "pres"
     }
-  ]],
+  }]],
 
-  ["loved", "word", [
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": "pres", "tp": "-past"
-      }
+  ["love", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "+", "trans": ["+", "-"], "stat": "-", "tense": "pres"
     }
-  ]],
+  }]],
 
-  ["walk", "word", [
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"
-      }
-    },
-    {
-      "@type": "V",
-      "types": {
-        "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "pres"
-      }
+  ["loved", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": "pres", "tp": "-past"
     }
-  ]],
+  }]],
+  
+  ["walk", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "-", "trans": "-", "stat": "-", "tense": "pres"
+    }
+  }]],
+
+  ["walk", "word", [{
+    "@type": "V",
+    "types": {
+      "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "pres"
+    }
+  }]],
 
   
   // Infinitives
@@ -215,7 +206,6 @@ const dict = [
     "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
   //["free", "word", [{"@type": "VERB", types: {
   //  "trans": "+", "stat": "-", "pres": "+s", "past": "+d"}}]],
-
   
   ["echo", "word", [{"@type": "VERB", types: {
     "trans": "-", "stat": "-", "pres": "+s", "past": "+ed"}}]],
