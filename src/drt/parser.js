@@ -910,7 +910,6 @@ const DrtSyntax = `
       PN[gen=2] -> %word.
       ADJ[] -> %word.
       N[num=1, gen=2] -> %word.      
-      VERB[trans=1, stat=2, pres=3, past=4] -> %word.
 `;
 
 let DRTGrammar;
