@@ -774,6 +774,8 @@ const DrtSyntax = `
 
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
  
+      PN -> PN __ PN.
+
       NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
 
       NP[num=plur, gen=1, case=2, gap=-] -> 
@@ -836,8 +838,6 @@ const DrtSyntax = `
 
       N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
       
-      PN[] -> PN __ PN.
-
       PRO[num=sing, gen=male, case=+nom] -> %he.
       PRO[num=sing, gen=male, case=-nom] -> %him.
       
