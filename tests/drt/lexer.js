@@ -951,6 +951,21 @@ module.exports = ${JSON.stringify(parts, undefined, 2)};
 `;
     fs.writeFileSync("lexicon.js", file);
   });
+
+  it("Multiple Tokens", () => {
+    let lexer = new Tokenizer();
+    lexer.push("brazilian", "word", {"@type": "N"});
+    lexer.push("brazilian", "word", {"@type": "ADJ"});
+    lexer.reset("brazilian");
+    assertThat(lexer.next()).equalsTo(token("word", "brazilian", 0, [{
+      "@type": "N"
+    }, {
+      "@type": "ADJ"
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+
 });
 
 function assertThat(x) {

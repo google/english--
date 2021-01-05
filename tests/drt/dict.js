@@ -253,11 +253,11 @@ const dict = [
   // Some words can take multiple roles
   ["brazilian", "word", [{
     "@type": "ADJ"
-  }, {
+  }]],
+  ["brazilian", "word", [{
     "@type": "N",
     "types": {"num": "sing"}
-  }]],      
-
+  }]],
   ["brazilians", "word", [{
     "@type": "N",
     "types": {"num": "plur"}
