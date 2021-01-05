@@ -100,6 +100,7 @@ const dict = [
   ADJ("married"),
   
   // Verbs
+  /**
   ...V("live", "-"),
   ...V("admire", "+"),
   ...V("fascinate", "+"),
@@ -120,7 +121,18 @@ const dict = [
   ...V("play", ["+", "-"]),
   ...V("come", ["+", "-"]),
   ...V("travel", "-"),
+**/
 ];
+
+const verbs = require("./verbs.js");
+
+for (let {inf, trans} of verbs) {
+  // console.log(inf);
+  dict.push(...V(inf, trans));
+  // break;
+}
+
+// console.log(new Inflectors("travel").toPast());
 
 module.exports = {
   dict: dict

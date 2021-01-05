@@ -656,7 +656,7 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
     assertThat(lexer.next()).equalsTo(token("word", "loves", 6, [{
       "@type": "V",
-      "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["+", "-"]}
+      "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["-", "+"]}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
     assertThat(lexer.next()).equalsTo(token("an", "an", 12));
@@ -912,6 +912,56 @@ describe("Lexer", function() {
                  ));
   });
 
+  it.skip("Verbs", async function() {
+    const {tv_finsg, tv_infpl, tv_pp,
+           iv_finsg, iv_infpl} = require("./../../lexicon.js");
+    let verbs = {};
+    for (let [inflection, key] of tv_finsg) {
+      verbs[key] = verbs[key] || {};
+      verbs[key].tv_finsg = inflection;
+    }
+    for (let [inflection, key] of tv_infpl) {
+      verbs[key] = verbs[key] || {};
+      verbs[key].tv_infpl = inflection;
+    } 
+    for (let [inflection, key] of tv_pp) {
+      verbs[key] = verbs[key] || {};
+      verbs[key].tv_pp = inflection;
+    }    
+    for (let [inflection, key] of iv_finsg) {
+      verbs[key] = verbs[key] || {};
+      verbs[key].iv_finsg = inflection;
+    }
+    for (let [inflection, key] of iv_infpl) {
+      verbs[key] = verbs[key] || {};
+      verbs[key].iv_infpl = inflection;
+    } 
+    let dict = Object
+        .entries(verbs)
+        // excludes phrasal verbs for now
+        .filter(([key, value]) => !key.includes("-"))
+        .map(([key, value]) => {
+          let result = {inf: key, trans: []};
+          if (value.tv_pp) {
+            result.pp = value.tv_pp;
+          }
+          result.sing = value.iv_finsg || value.tv_finsg;
+          if (value.iv_infpl) {
+            result.trans.push("-");
+          }
+          if (value.tv_infpl) {
+            result.trans.push("+");
+          }
+          return result;
+        });
+    // console.log(dict);
+    let file = `
+module.exports = ${JSON.stringify(dict, undefined, 2)};
+`;
+    const fs = require("fs");
+    fs.writeFileSync("./verbs.js", file);
+  });
+  
   it.skip("Generate", async function() {
     this.timeout(500000);
     const fs = require("fs");
@@ -940,7 +990,7 @@ describe("Lexer", function() {
       if (!parts[name]) {
         parts[name] = [];
       }
-      parts[name].push(args[0]);
+      parts[name].push(args);
       if (name == "prep") {
         break;
       }

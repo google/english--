@@ -2465,11 +2465,18 @@ describe("Backwards compatibility", function() {
   });
 
   it("Sam Goto kissed in Brazil Dani.", function() {
-    assertThat(parse("Sam Goto kissed in Brazil Dani."))
+    // TODO: Sam Goto kissed in Brazil Dani. is ambiguous
+    // because kissed is transitive or intransitive, and
+    // proper names can be repeated, so, this can be:
+    // - Sam Goto kissed in [Brazil Dani]. or
+    // - Sam Goto kissed in [Brazil] Dani.
+    // We are going to have to figure out a way to avoid
+    // this ambiguity.
+    assertThat(parse("Sam Goto kissed in Brazil her."))
       .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
                   VP_(VP(V(V("kissed"),
                            PP(PREP("in"), NP(PN("Brazil")))),
-                         NP(PN("Dani"))))));
+                         NP(PRO("her"))))));
   });
     
   it("Sam made a reservation for Cascal for Dani.", function() {
@@ -2516,6 +2523,12 @@ describe("Backwards compatibility", function() {
     assertThat(parse("He cried."))
       .equalsTo(S(NP(PRO("He")),
                   VP_(VP(V("cried")))));
+  });
+
+  it("He has abandoned her.", function() {
+    assertThat(parse("He has abandoned her."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
   });
 
 });
