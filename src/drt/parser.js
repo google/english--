@@ -836,6 +836,8 @@ const DrtSyntax = `
 
       N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
       
+      PN[] -> PN __ PN.
+
       PRO[num=sing, gen=male, case=+nom] -> %he.
       PRO[num=sing, gen=male, case=-nom] -> %him.
       
@@ -876,10 +878,10 @@ const DrtSyntax = `
       AUX[num=sing, fin=+, tp=-past, tense=pres] -> %does.
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.
 
-      AUX[num=1, fin=+, tp=-past, tense=past] -> %did.
+      AUX[fin=+, tp=-past, tense=past] -> %did.
       
-      AUX[num=1, fin=+, tp=-past, tense=fut] -> %will.
-      AUX[num=1, fin=+, tp=+past, tense=fut] -> %would.
+      AUX[fin=+, tp=-past, tense=fut] -> %will.
+      AUX[fin=+, tp=+past, tense=fut] -> %would.
 
       RPRO[num=[sing, plur], gen=[male, fem]] -> %who.
       RPRO[num=[sing, plur], gen=-hum] -> %which.
@@ -898,17 +900,15 @@ const DrtSyntax = `
       HAVE[num=sing, fin=+, tp=-past, tense=pres] -> %has.
       HAVE[num=plur, fin=+, tp=-past, tense=pres] -> %have.
 
-      HAVE[num=1, fin=+, tp=-past, tense=past] -> %had.
-      HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> %had.
+      HAVE[fin=+, tp=-past, tense=past] -> %had.
+      HAVE[fin=+, tp=+past, tense=[pres, past]] -> %had.
 
-      PN[gen=2] -> PN __ PN.
-
-      V[num=1, fin=part, trans=3, stat=4, tp=5, tense=6] -> %word.
-      V[num=1, fin=-, trans=3, stat=4, tp=5, tense=6] -> %word.
-      V[num=1, fin=+, trans=3, stat=4, tp=5, tense=6] -> %word.
-      PN[num=1, gen=2] -> %word.
+      V[fin=part] -> %word.
+      V[fin=-] -> %word.
+      V[fin=+] -> %word.
+      PN[] -> %word.
       ADJ[] -> %word.
-      N[num=1, gen=2] -> %word.      
+      N[] -> %word.      
 `;
 
 let DRTGrammar;
