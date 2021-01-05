@@ -107,16 +107,13 @@ const dict = [
   ...V("walk", "-"),
   ...V("own", "+"),
   ...V("kiss", "+"),
-  
-  // Infinitives
-  INF("stink", "-"),
+  ...V("stink", "-"),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),
 
   // Singular Present
   PRES("skis", "sing", "-"),
-  PRES("stinks", "sing", "-"),
   PRES("watches", "sing", "+"),
 
   // Past
