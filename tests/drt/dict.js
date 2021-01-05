@@ -50,9 +50,9 @@ const V = (str, trans) => [
   // Singular Present Tense
   PRES(str + "s", "sing", trans),
   // Past
-  PAST(str + "d", trans),
+  PAST(str + (str.endsWith("e") ? "d" : "ed"), trans),
   // Past Participle
-  PART(str + "d", trans),
+  PART(str + (str.endsWith("e") ? "d" : "ed"), trans),
 ];
 
 const dict = [  
@@ -104,21 +104,19 @@ const dict = [
   ...V("surprise", "+"),
   ...V("like", "+"),
   ...V("love", ["+", "-"]),
+  ...V("walk", "-"),
   
   // Infinitives
   INF("own", "+"),
   INF("kiss", "+"),
   INF("stink", "-"),
-  INF("walk", "-"),
   
   // Plural Present Tense
   PRES("ski", "plur", "-"),
-  PRES("walk", "plur", "-"),
 
   // Singular Present
   PRES("owns", "sing", "+"),
   PRES("skis", "sing", "-"),
-  PRES("walks", "sing", "-"),
   PRES("stinks", "sing", "-"),
   PRES("watches", "sing", "+"),
 
@@ -130,11 +128,9 @@ const dict = [
   PAST("played", "-"),
   PAST("skied", "-"),
   PAST("kissed", "+"),  
-  PAST("walked", "-"),
 
   // Past Participle
   PART("owned", "+"),
-  PART("walked", "-"),
   PART("kissed", "+"),
 ];
 
