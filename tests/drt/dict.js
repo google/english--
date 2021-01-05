@@ -12,10 +12,29 @@ const INF = (str, types = {}) => [str, "word", [{
 const PRES = (str, types = {}) => [str, "word", [{
   "@type": "V",
   "types": Object.assign({
-    // "num": "plur",
     "fin": "+",
     "stat": "-",
     "tense": "pres"
+  }, types)}]];
+
+const PAST = (str, types = {}) => [str, "word", [{
+  "@type": "V",
+  "types": Object.assign({
+    "num": 1,
+    "fin": "+",
+    "stat": "-",
+    "tense": "past",
+    "tp": "-past"
+  }, types)}]];
+
+const PART = (str, types = {}) => [str, "word", [{
+  "@type": "V",
+  "types": Object.assign({
+    "num": 1,
+    "fin": "part",
+    "stat": "-",
+    "tense": ["pres", "past"],
+    "tp": "-past"
   }, types)}]];
 
 const dict = [  
@@ -90,58 +109,22 @@ const dict = [
   PRES("stinks", {"num": "sing", "trans": "-"}),
   PRES("watches", {"num": "sing", "trans": "+"}),
 
-  
-  // Past participle
-  ["owned", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"}}]],
-  ["loved", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": "pres", "tp": "-past"
-    }
-  }]],
-  
-  ["walked", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "-", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-    }
-  }]],
-  
-  ["kissed", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "part", "trans": "+", "stat": "-", "tense": ["pres", "past"], "tp": "-past"
-    }
-  }]],
-  
   // Past
-  ["made", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["came", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": 2, "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["travelled", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["gave", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["played", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["skied", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["liked", "word", [{"@type": "V", types: {
-    "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"}}]],
-  ["kissed", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "+", "trans": "+", "stat": "-", "tense": "past", "tp": "-past"
-    }
-  }]],  
-  ["walked", "word", [{
-    "@type": "V",
-    "types": {
-      "num": 1, "fin": "+", "trans": "-", "stat": "-", "tense": "past", "tp": "-past"
-    }
-  }]],
+  PAST("made", {"trans": "+"}),
+  PAST("came", {"trans": 2}),
+  PAST("travelled", {"trans": "-"}),
+  PAST("gave", {"trans": "+"}),
+  PAST("played", {"trans": "-"}),
+  PAST("skied", {"trans": "-"}),
+  PAST("liked", {"trans": "+"}),
+  PAST("kissed", {"trans": "+"}),  
+  PAST("walked", {"trans": "-"}),
+
+  // Past Participle
+  PART("owned", {"trans": "+"}),
+  PART("loved", {"trans": "+"}),
+  PART("walked", {"trans": "-"}),
+  PART("kissed", {"trans": "+"}),
 ];
 
 module.exports = {
