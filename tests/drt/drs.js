@@ -1832,6 +1832,19 @@ describe("lexicon", () => {
     `);
   });
 
+  it("Mel does not live in Brazil.", function() { 
+    assertThat("Mel does not live in Brazil.")
+      .equalsTo(`
+       let a, b
+       Mel(a)
+       Brazil(b)
+       not {
+         in(e, b)
+         live(a)
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

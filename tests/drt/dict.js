@@ -95,7 +95,8 @@ const dict = [
   INF("walk", "-"),
   INF("love", ["+", "-"]),
   INF("like", "+"),
-
+  INF("live", "-"),
+  
   // Plural Present Tense
   PRES("ski", "plur", "-"),
   PRES("like", "plur", "+"),
