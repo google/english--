@@ -524,7 +524,7 @@ describe("Lexer", function() {
     let results = parser.feed("Jones loves a foo woman.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("love"), "s"),
+                  VP_(VP(V("loves"),
                          NP(DET("a"), N(ADJ("foo"), N("woman")))
                         ))
                  ));
@@ -654,11 +654,10 @@ describe("Lexer", function() {
       "types": {"gen": "?", "num": "?"}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
-    assertThat(lexer.next()).equalsTo(token("word", "love", 6, [{
-      "@type": "VERB",
-      "types": {"past": "+d", "pres": "+s", "stat": "-", "trans": 1}
+    assertThat(lexer.next()).equalsTo(token("word", "loves", 6, [{
+      "@type": "V",
+      "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": 1}
     }]));
-    assertThat(lexer.next()).equalsTo(token("s", "s", 10));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
     assertThat(lexer.next()).equalsTo(token("an", "an", 12));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 14));
@@ -685,7 +684,7 @@ describe("Lexer", function() {
     let results = parser.feed("Jones loves an awesome woman.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("love"), "s"),
+                  VP_(VP(V("loves"),
                          NP(DET("an"), N(ADJ("awesome"), N("woman")))
                         ))
                  ));
@@ -708,7 +707,7 @@ describe("Lexer", function() {
     let results = parser.feed("Jones loves an au-pair.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("love"), "s"),
+                  VP_(VP(V("loves"),
                          NP(DET("an"), N("au-pair"))
                         ))
                  ));
@@ -731,7 +730,7 @@ describe("Lexer", function() {
     let results = parser.feed("Mel likes Yuji's girlfriend.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Mel")),
-                  VP_(VP(V(VERB("like"), "s"),
+                  VP_(VP(V("likes"),
                          NP(DET(NP(PN("Yuji")), "'s"), N("girlfriend"))
                         ))
                  ));
@@ -750,27 +749,27 @@ describe("Lexer", function() {
   it("Jones loves Mary", function() {
     assertThat(parse("Jones loves Mary.", "Statement"))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+                  VP_(VP(V("loves"), NP(PN("Mary"))))));
   });
 
   it("she loves herself.", () => {
     assertThat(parse("she loves herself.", "Statement"))
       .equalsTo(S(NP(PRO("she")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PRO("herself"))))));
+                  VP_(VP(V("loves"), NP(PRO("herself"))))));
   });
   
   it("Jones loves Mary", function() {        
     assertThat(parse("every man loves Mary.", "Statement"))
       .equalsTo(S(NP(DET("every"), N("man")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+                  VP_(VP(V("loves"), NP(PN("Mary"))))));
     
     assertThat(parse("some man loves Mary.", "Statement"))
       .equalsTo(S(NP(DET("some"), N("man")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PN("Mary"))))));
+                  VP_(VP(V("loves"), NP(PN("Mary"))))));
     // return;
     assertThat(parse("he loves her.", "Statement"))
       .equalsTo(S(NP(PRO("he")),
-                  VP_(VP(V(VERB("love"), "s"), NP(PRO("her"))))));
+                  VP_(VP(V("loves"), NP(PRO("her"))))));
 
     return;
     
@@ -907,7 +906,7 @@ describe("Lexer", function() {
     let results = parser.feed("Jones loves Sam.");
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
-                  VP_(VP(V(VERB("love"), "s"),
+                  VP_(VP(V("loves"),
                          NP(PN("Sam"))
                         ))
                  ));

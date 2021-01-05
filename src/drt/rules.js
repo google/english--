@@ -280,10 +280,6 @@ class CRPPPN extends Rule {
     }
 
     node.children[1] = ref;
-
-    // console.log(JSON.stringify(node, undefined, 2));
-    //console.log("hi");
-    //throw new Error("hi");
     
     return [head, body, [], []];
   }
@@ -434,7 +430,7 @@ class CRPPLIN extends Rule {
     noun.ref = node.ref;
     body.push(noun);
 
-    let cond = S(node.ref, VP_(VP(V(child(prep, 0).value), child(np, 1))));
+    let cond = S(node.ref, VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
     return [[], body, [], [node]];
@@ -458,7 +454,7 @@ class CRADV extends Rule {
     let body = [];
     let sub = child(node, 0);
     let e = referent("e");
-    let cond = S(e, VP_(VP(V(child(prep, 0).value), child(np, 1))));
+    let cond = S(e, VP_(VP(V(child(prep, 0)), child(np, 1))));
     
     body.push(cond);
     
@@ -570,7 +566,7 @@ class CRPREPBE extends Rule {
   apply({ref, prep, np}, node, refs) {
     let body = [];
 
-    let s = S(child(ref, 0), VP_(VP(V(child(prep, 0).value), child(np, 1))));
+    let s = S(child(ref, 0), VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(s);
     
     return [[], body, [], [node]];
@@ -792,7 +788,6 @@ class CROR extends Rule {
     first.head.push(...clone(refs));
     first.head.forEach(ref => ref.closure = true);
     first.push(a);
-    
     let second = drs(this.ids);
     second.head.push(...clone(first.head));
     second.head.forEach(ref => ref.closure = true);
@@ -830,12 +825,12 @@ class CRNPOR extends Rule {
     let a = drs(this.ids);
     a.head.push(...clone(refs));
     a.head.forEach(ref => ref.closure = true);
-    a.push(S(first, VP_(clone(vp))));
+    a.push(S(first, clone(vp)));
     
     let b = drs(this.ids);
     b.head.push(...clone(a.head));
     b.head.forEach(ref => ref.closure = true);
-    b.push(S(second, VP_(clone(vp))));
+    b.push(S(second, clone(vp)));
     
     return [[], [disjunction(a, b)], [], [node]];
   }
@@ -899,7 +894,7 @@ class CRSPOSS extends Rule {
     
     // console.log("hi");
     
-    let s = S(u, VP_(VP(V(noun.children[0].value), name.children[0])));
+    let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     // console.log(noun.children[0]);
     // console.log(child(s, 1, 0, 0));
     
@@ -913,7 +908,6 @@ class CRVPPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
-    // console.log("hello");
     let poss = child(node, 1, 0, 1, 0, 1);
     if (!poss) {
       // TODO(goto): figure out why the "'s" isn't preventing this from
@@ -923,7 +917,7 @@ class CRVPPOSS extends Rule {
     // console.log(node);
     let u = referent(this.id(), noun.types, print(child(node, 1), refs));
     child(node, 1, 0).children[1] = u;
-    let s = S(u, VP_(VP(V(noun.children[0].value), name.children[0])));
+    let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     
     return [[u], [s], [], []];
   }
@@ -1068,21 +1062,6 @@ class CRQUESTION extends CompositeRule {
   }
 }
 
-class CRSTEM extends Rule {
-  constructor(ids) {
-    super(ids, V(VERB(capture("stem"))));
-  }
-  apply({stem}, node, refs) {
-    let root = stem.children[0].value;
-    if (node.children.length > 1) {
-      root += node.children[1].value;
-    }
-    node.children = [root];
-    
-    return [[], [], [], []];
-  }
-}
-
 class CRNAME extends Rule {
   constructor(ids) {
     super(ids, PN(PN(capture("first")), PN(capture("last"))));
@@ -1151,7 +1130,6 @@ class CRPRED extends Rule {
   }
   
   apply({verb, object}, node, refs = []) {
-    // console.log("hi");
     let sub = child(node, 0);
     let obj = child(node, 1, 0, 1);
     // console.log(object);
@@ -1167,8 +1145,8 @@ class CRPRED extends Rule {
     // console.log(child(obj, 0));
     // console.log(args);
     // console.log(sub.name);
-    let name = verb.children.join("");
-    // console.log(verb);
+    let name = verb.children[0].value;
+    //console.log(verb);
     let pred = predicate(name, args, node.types);
     
     return [[], [pred], [], [node]];
@@ -1316,7 +1294,7 @@ class Rules {
       new CRWILL(ids),
       new CRQUESTION(ids),
       new CRPLURAL(ids),
-      new CRSTEM(ids),
+      // new CRSTEM(ids),
       new CRPUNCT(ids),
     ];
     return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];

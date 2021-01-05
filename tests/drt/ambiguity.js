@@ -135,7 +135,7 @@ describe("Ambiguity", () => {
     assertThat(new Parser("Statement", dict).feed("They have walked.").length).equalsTo(1);
   });
 
-  it("Jones did not walk.", () => {
+  it.skip("Jones did not walk.", () => {
     assertThat(new Parser("V", dict).feed("walk").length).equalsTo(2);
     assertThat(new Parser("V", dict).feed("walk")[0].types).equalsTo({
       "fin": "+",

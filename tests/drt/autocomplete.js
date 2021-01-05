@@ -546,11 +546,11 @@ A "f" token based on:
         "to",
         "about",
         "by",
+        "word",
         "has",
         "had",
         "is",
         "was",
-        "word",
       ]);
   });
 

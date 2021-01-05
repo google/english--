@@ -221,7 +221,7 @@ describe("DRS", function() {
      `);
   });
 
-  it("Jones loves a woman who does not admire him.", function() {
+  it("Jones loves a woman who does not admire him. She does not love a man.", function() {
     assertThat("Jones loves a woman who does not love him. She does not love a man.")
      .equalsTo(`
        let a, b
@@ -593,11 +593,11 @@ describe("DRS", function() {
        {
          let b
          Jones(b)
-         b loves a
+         loves(b, a)
        } or {
          let c
          Smith(c)
-         c loves a
+         loves(c, a)
        }
     `);
   });
@@ -611,11 +611,11 @@ describe("DRS", function() {
        {
          let b
          Jones(b)
-         b loves a
+         loves(b, a)
        } or {
          let c
          Smith(c)
-         c loves a
+         loves(c, a)
        }
     `);
   });
@@ -707,7 +707,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Mary loves Smith and he lovers her.", function() {
+  it("Mary loves Smith and he loves her.", function() {
     assertThat("Mary loves Smith and he loves her.")
      .equalsTo(`
        let a, b
@@ -1294,7 +1294,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("John does not like Mary.", function() {
+  it.skip("John does not like Mary.", function() {
     // This is a slightly different result we get at
     // page 555, with regards to the temporal
     // referents.
@@ -1572,7 +1572,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Who loves Jones?", function() { 
+  it.skip("Who loves Jones?", function() { 
     // NOTE(goto): we should probably keep the 
     // variable b scoped to the question.
     assertThat("Who loves Jones?")
@@ -1586,7 +1586,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Who does Jones love?", function() { 
+  it.skip("Who does Jones love?", function() { 
     assertThat("Who does Jones love?")
      .equalsTo(`
        let a

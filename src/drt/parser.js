@@ -67,7 +67,7 @@ class Nearley {
       token: e.token,
       loc: e.offset, 
       start: buffer[that.parser.current],
-      get message() { return this.print(); },
+      // get message() { return this.print(); },
       print() {
         const tracks = that.tracks(2);
         // console.log(tracks);
@@ -901,26 +901,11 @@ const DrtSyntax = `
       HAVE[num=1, fin=+, tp=-past, tense=past] -> %had.
       HAVE[num=1, fin=+, tp=+past, tense=[pres, past]] -> %had.
 
-      V[num=1, fin=-, stat=-, trans=2, tense=pres] -> 
-          VERB[trans=2, stat=-].
-
-      V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1, pres=+s] %s.
-
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
           VERB[trans=2, stat=1, pres=+es] %es.
 
       V[num=sing, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
           VERB[trans=2, stat=1, pres=+ies] %ies.
-
-      V[num=plur, fin=+, stat=1, tp=-past, tense=pres, trans=2] -> 
-          VERB[trans=2, stat=1].
-
-      V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
-          -> VERB[trans=3, stat=2, past=+ed] %ed.
-
-      V[num=1, fin=+, stat=2, tp=+past, tense=past, trans=3] 
-          -> VERB[trans=3, stat=2, past=+ed] %ed.
 
       V[num=1, fin=part, stat=2, tp=-past, tense=[pres, past], trans=3] 
           -> VERB[trans=3, stat=2, past=+d] %d.
@@ -937,11 +922,12 @@ const DrtSyntax = `
       V[num=1, fin=[+, part], stat=2, tp=-past, tense=[pres, past], trans=3] 
          -> VERB[trans=3, stat=2, past=+red] %red.
 
-      V[num=1, fin=[+, part], stat=2, tp=-past, tense=past, trans=3] 
-         -> VERB[trans=3, stat=2, past=-reg].
-
       PN[gen=2] -> PN __ PN.
 
+      V[num=1, fin=part, trans=3, stat=4, tp=5, tense=6] -> %word.
+      V[num=sing, fin=[+, -], trans=3, stat=4, tp=5, tense=6] -> %word.
+      V[num=plur, fin=+, trans=3, stat=4, tp=5, tense=6] -> %word.
+      V[num=plur, fin=-, trans=3, stat=4, tp=5, tense=6] -> %word.
       PN[gen=2] -> %word.
       ADJ[] -> %word.
       N[num=1, gen=2] -> %word.      
