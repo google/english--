@@ -48,7 +48,7 @@ const V = (str, trans) => [
   // Plural Present Tense
   PRES(str, "plur", trans),
   // Singular Present Tense
-  PRES(str + "s", "sing", trans),
+  PRES(str + (str.endsWith("ch") ? "es" : "s"), "sing", trans),
   // Past
   PAST(str + (str.endsWith("e") ? "d" : "ed"), trans),
   // Past Participle
@@ -97,7 +97,7 @@ const dict = [
   ADJ("mortal"),
   ADJ("married"),
   
-  // Regular Verb
+  // Regular Verbs
   ...V("live", "-"),
   ...V("admire", "+"),
   ...V("fascinate", "+"),
@@ -109,11 +109,9 @@ const dict = [
   ...V("kiss", "+"),
   ...V("stink", "-"),
   ...V("ski", "-"),
- 
-  // Singular Present
-  PRES("watches", "sing", "+"),
+  ...V("watch", "+"),
 
-  // Past
+  // Irregular Verbs
   PAST("made", "+"),
   PAST("came", 2),
   PAST("travelled", "-"),
