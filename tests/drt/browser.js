@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {dict} = require("./dict.js");
+const {dict} = require("../../src/drt/dict.js");
 
 describe("Browser", function() {
   it("source", async function() {

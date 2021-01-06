@@ -35,7 +35,7 @@ const {
   HAVE,
   RN} = nodes;
 
-const {dict} = require("./dict.js");
+const {dict} = require("../../src/drt/dict.js");
 
 describe("Parser", function() {
   it("Basic", function() {

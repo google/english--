@@ -6,7 +6,7 @@ const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
 const {Tokenizer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const lexicon = require("../../src/drt/lexicon.js");
-const {dict} = require("./dict.js"); 
+const {dict} = require("../../src/drt/dict.js"); 
 
 const {
   Statement,

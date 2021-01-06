@@ -6,7 +6,7 @@ const {
   FeaturedNearley,
   Parser} = require("../../src/drt/parser.js");
 
-const {dict} = require("./dict.js");
+const {dict} = require("../../src/drt/dict.js");
 
 describe("Autocomplete", () => {
 

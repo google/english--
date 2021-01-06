@@ -35,7 +35,7 @@ const {
   HAVE,
   RN} = nodes;
 
-const {dict} = require("./dict.js");
+const {dict} = require("../../src/drt/dict.js");
 
 function clear(root) {
   if (!root) {
