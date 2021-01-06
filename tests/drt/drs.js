@@ -1684,7 +1684,7 @@ describe("DRS", function() {
        like(a, b)
      `);
   });
-  
+
   it("Sam likes DRT.", function() { 
     assertThat("Sam likes DRT.")
      .equalsTo(`
@@ -1695,8 +1695,8 @@ describe("DRS", function() {
      `);
   });
   
-  it("Sam likes Discourse-Representation-Theory.", function() { 
-    assertThat("Sam likes Discourse-Representation-Theory.")
+  it("Sam likes Discourse Representation Theory.", function() { 
+    assertThat("Sam likes Discourse Representation Theory.")
      .equalsTo(`
        let a, b
        Sam(a)

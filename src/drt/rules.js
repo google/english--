@@ -1070,7 +1070,7 @@ class CRQUESTION extends CompositeRule {
   }
 }
 
-class CRNAME extends Rule {
+class CRNAMED extends Rule {
   constructor(ids) {
     super(ids, PN(PN(capture("first")), PN(capture("last"))));
   }
@@ -1081,6 +1081,35 @@ class CRNAME extends Rule {
     }];
     
     return [[], [], [], []];
+  }
+}
+
+class CRNAMET extends Rule {
+  constructor(ids) {
+    super(ids, PN(PN(capture("first")), PN(capture("middle")), PN(capture("last"))));
+  }
+  apply({first, middle, last}, node, refs) {
+    let name = first.children[0].value +
+        "-" +
+        middle.children[0].value +
+        "-" +
+        last.children[0].value;
+
+    node.children = [{
+      "type": "name",
+      "value": name
+    }];
+    
+    return [[], [], [], []];
+  }
+}
+
+class CRNAME extends CompositeRule {
+  constructor(ids) {
+    super([
+      new CRNAMET(ids),
+      new CRNAMED(ids), 
+    ]);
   }
 }
 
@@ -1124,9 +1153,7 @@ class CRPUNCT extends CompositeRule {
     super([
       new CRPUNCT1(ids), 
       new CRPUNCT2(ids),
-      // new CRWS1(ids),
-      // new CRWS2(ids)
-          ]);
+    ]);
   }
 }
 

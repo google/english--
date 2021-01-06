@@ -780,6 +780,7 @@ const DrtSyntax = `
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
  
       PN -> PN __ PN.
+      PN -> PN __ PN __ PN.
 
       NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
 
