@@ -82,7 +82,7 @@ const dict = [
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
-  N("porsches", "plur", "-hum"),
+  N("porsches", "plur", "-hum", "porsche"),
 
   // Adjectives
   ADJ("brazilian"),

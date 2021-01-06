@@ -20,9 +20,9 @@ const dict = [
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
-  N("porsches", "plur", "-hum"),
-  N("men", "plur", "male"),
-  N("women", "plur", "fem"),
+  N("porsches", "plur", "-hum", "porsche"),
+  N("men", "plur", "male", "man"),
+  N("women", "plur", "fem", "woman"),
   
   // RNs  
   N("brother", "sing", "male"),

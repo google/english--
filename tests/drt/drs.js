@@ -1537,7 +1537,7 @@ describe("DRS", function() {
            brazilian(a)
          }) {
            most (b: {
-             porsches(b)
+             porsche(b)
            }) {
              like(a, b)
            }
