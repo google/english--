@@ -2,7 +2,7 @@ const Assert = require("assert");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
 
-describe.skip("Attempto", function() {
+describe.skip("Wordlist", function() {
   it("Parsing", function() {
     const parser = new Parser(Grammar.fromCompiled(grammar));
     parser.feed(`
