@@ -66,13 +66,13 @@ const V = (str, trans, pp, prop) => [
   // Infinitive
   INF(str, trans),
   // Plural Present Tense
-  PRES(new Inflectors(str).toPresent(), "plur", trans),
+  PRES(new Inflectors(str).toPresent(), "plur", trans, str),
   // Singular Present Tense
-  PRES(new Inflectors(str).toPresentS(), "sing", trans),
+  PRES(new Inflectors(str).toPresentS(), "sing", trans, str),
   // Past
-  PAST(pp ? pp : new Inflectors(str).toPast(), trans),
+  PAST(pp ? pp : new Inflectors(str).toPast(), trans, str),
   // Past Participle
-  PART(pp ? pp : new Inflectors(str).toPastParticiple(), trans),
+  PART(pp ? pp : new Inflectors(str).toPastParticiple(), trans, str),
 ];
 
 const dict = [  

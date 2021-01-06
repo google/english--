@@ -653,7 +653,7 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
     assertThat(lexer.next()).equalsTo(token("word", "loves", 6, [{
       "@type": "V",
-      "prop": "loves",
+      "prop": "love",
       "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["-", "+"]}
     }, {
       "@type": "N",

@@ -550,7 +550,7 @@ class CRPOSBE extends Rule {
     //console.log(s);
     //console.log("hi");
     //console.log(node.types);
-    let s = predicate(adj.children[0].value, [ref.children[0]], node.types);
+    let s = predicate(adj.prop, [ref.children[0]], node.types);
     // console.log(s);
     //adj.ref = ref.children[0];
     //s.types = node.types;   
@@ -947,7 +947,7 @@ class CRADJ extends Rule {
     // adj.ref = node.ref;
     noun.ref = node.ref;
     // console.log(adj);
-    let pred = predicate(adj.children[0].value, [node.ref]);
+    let pred = predicate(adj.prop, [node.ref]);
     // console.log(pred);
     
     return [[], [noun, pred], [], [node]];
@@ -1153,7 +1153,7 @@ class CRPRED extends Rule {
     // console.log(child(obj, 0));
     // console.log(args);
     // console.log(sub.name);
-    let name = verb.children[0].value;
+    let name = verb.prop || verb.children[0].value;
     //console.log(verb);
     let pred = predicate(name, args, node.types);
     
