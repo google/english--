@@ -2481,21 +2481,26 @@ describe("Backwards compatibility", function() {
   });
 
   // Not working:
-  // They rented Mary.
-  // Most brazilians like Italy.
-  // Trump is a person. // this is possibly conflicting with the verb to-trump.
   // Obama was the president of America. He was great.
-  // we probably want to add the () operator to resolve the ambiguity.
-  // 
-  
 });
 
-
 describe("large dictionary", () => {
-  it("Trump is a president.", function() {
-    assertThat(parse("Trump is a president."))
+  it("Most brazilians like Italy.", function() {
+    assertThat(parse("Most brazilians like Italy."))
+      .equalsTo(S(NP(DET("Most"), N("brazilians")),
+                  VP_(VP(V("like"), NP(PN("Italy"))))));
+  });
+
+  it("Trump is the president.", function() {
+    assertThat(parse("Trump is the president."))
       .equalsTo(S(NP(PN("Trump")),
-                  VP_(VP(BE("is"), NP(DET("a"), N("president"))))));
+                  VP_(VP(BE("is"), NP(DET("the"), N("president"))))));
+  });
+
+  it("Trump is a person.", function() {
+    assertThat(parse("Trump is a person."))
+      .equalsTo(S(NP(PN("Trump")),
+                  VP_(VP(BE("is"), NP(DET("a"), N("person"))))));
   });
 
   it("Sam married Dani.", function() {
