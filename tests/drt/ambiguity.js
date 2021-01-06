@@ -148,11 +148,11 @@ describe("Ambiguity", () => {
     assertThat(new Parser("Question", dict).feed("Were they happy?").length).equalsTo(1);
   });
 
-  it("Jones is Smith's brother. he likes Brazil.", () => {
-    assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother.").length).equalsTo(1);
+  it("Jones is Brian's brother. he likes Brazil.", () => {
+    assertThat(new Parser("Discourse", dict).feed("Jones is Brian's brother.").length).equalsTo(1);
     assertThat(new Parser("Discourse", dict).feed("He likes Brazil.").length).equalsTo(1);
-    assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother.He likes Brazil.").length).equalsTo(1);
-    assertThat(new Parser("Discourse", dict).feed("Jones is Smith's brother. He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse", dict).feed("Jones is Brian's brother.He likes Brazil.").length).equalsTo(1);
+    assertThat(new Parser("Discourse", dict).feed("Jones is Brian's brother. He likes Brazil.").length).equalsTo(1);
   });
 });
 

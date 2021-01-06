@@ -2002,9 +2002,9 @@ describe("Backwards compatibility", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it("Jones or Smith loves her.", function() {
-    assertThat(parse("Jones or Smith loves her."))
-     .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
+  it("Jones or Brian loves her.", function() {
+    assertThat(parse("Jones or Brian loves her."))
+     .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Brian"))),
                  VP_(VP(V("loves"), NP(PRO("her"))))));
   });
 
@@ -2028,10 +2028,10 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
   });
 
-  it("Mary likes Smith and she loves him.", function() {
-    assertThat(parse("Mary likes Smith and she loves him."))
+  it("Mary likes Brian and she loves him.", function() {
+    assertThat(parse("Mary likes Brian and she loves him."))
      .equalsTo(S(S(NP(PN("Mary")), 
-                   VP_(VP(V("likes"), NP(PN("Smith"))))), 
+                   VP_(VP(V("likes"), NP(PN("Brian"))))), 
                  "and", 
                  S(NP(PRO("she")), 
                    VP_(VP(V("loves"), NP(PRO("him")))))));
@@ -2055,13 +2055,13 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V(V("likes"), "and", V("loves")), NP(PN("Mary"))))));
   });
 
-  it("Jones and Smith love Mary and Brazil.", function() {
+  it("Jones and Brian love Mary and Brazil.", function() {
     //console.log(parse("They love him."));
     ///return;
-    assertThat(parse("Jones and Smith love Mary and Brazil."))
+    assertThat(parse("Jones and Brian love Mary and Brazil."))
      .equalsTo(S(NP(NP(PN("Jones")), 
                     "and", 
-                    NP(PN("Smith"))),
+                    NP(PN("Brian"))),
                  VP_(VP(V("love"), 
                         NP(NP(PN("Mary")), 
                            "and", 
@@ -2165,11 +2165,11 @@ describe("Backwards compatibility", function() {
                         "?"));
   });
 
-  it("who does Smith's brother like?", function() {
-    assertThat(parse("who does Smith's brother like?", "Question", false, false))
+  it("who does Brian's brother like?", function() {
+    assertThat(parse("who does Brian's brother like?", "Question", false, false))
      .equalsTo(Question("who", 
                         AUX("does"),
-                        NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
+                        NP(DET(NP(PN("Brian")), "'s"), N("brother")), 
                         V("like"), 
                         "?"));
   });
@@ -2224,11 +2224,11 @@ describe("Backwards compatibility", function() {
                  VP_(VP(BE("is"), NP(DET("a"), N(ADJ("happy"), N("man")))))));
   });
 
-  it("Mary loves Jones and Smith.", function() {
-    assertThat(parse("Mary loves Jones and Smith."))
+  it("Mary loves Jones and Brian.", function() {
+    assertThat(parse("Mary loves Jones and Brian."))
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(V("loves"), 
-                        NP(NP(PN("Jones")), "and", NP(PN("Smith")))
+                        NP(NP(PN("Jones")), "and", NP(PN("Brian")))
                         ))));
   });
 
@@ -2281,10 +2281,10 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V("walks")))));
   });
 
-  it("Jones likes a porsche.", function() {
+  it("Brian likes a porsche.", function() {
     // non-stative verbs
-    assertThat(parse("Jones likes a porsche."))
-     .equalsTo(S(NP(PN("Jones")),
+    assertThat(parse("Brian likes a porsche."))
+     .equalsTo(S(NP(PN("Brian")),
                  VP_(VP(V("likes"),
                         NP(DET("a"), N("porsche"))
                         ))));

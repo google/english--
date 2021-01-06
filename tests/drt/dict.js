@@ -59,6 +59,14 @@ const V = (str, trans) => [
 
 const dict = [  
   // Singular Nouns
+  N("porsche", "sing", "-hum"),
+  N("brazilian", "sing", 1),
+
+  // Plural Nouns
+  N("brazilians", "plur", 1),
+  N("porsches", "plur", "-hum"),
+
+  /**
   N("man", "sing", "male"),
   N("woman", "sing", "fem"),
   N("girl", "sing", "fem"),
@@ -67,19 +75,14 @@ const dict = [
   N("donkey", "sing", "-hum"),
   N("horse", "sing", "-hum"),
   N("cat", "sing", "-hum"),
-  N("porsche", "sing", "-hum"),
   N("dish", "sing", "-hum"),
   N("witch", "sing", "-hum"),
   N("judge", "sing", 1),
   N("engineer", "sing", ["male", "fem"]),
   N("reservation", "sing", "-hum"),
-  N("brazilian", "sing", 1),
 
-  // Plural Nouns
-  N("brazilians", "plur", 1),
   N("men", "plur", "male"),
   N("women", "plur", "fem"),
-  N("porsches", "plur", "-hum"),
   
   // RNs  
   N("brother", "sing", "male"),
@@ -88,7 +91,7 @@ const dict = [
   N("sister", "sing", "fem"),
   N("mother", "sing", "fem"),
   N("wife", "sing", "fem"),
-
+*/
   // Adjectives
   ADJ("brazilian"),
   ADJ("happy"),
@@ -128,6 +131,10 @@ const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");
 
 for (let {inf, trans} of verbs) {
   dict.push(...V(inf, trans));
+}
+
+for (let {name, num, gen} of nouns) {
+  dict.push(N(name, num, gen));
 }
 
 module.exports = {

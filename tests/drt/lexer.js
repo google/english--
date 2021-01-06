@@ -636,7 +636,7 @@ describe("Lexer", function() {
     assertThat(tokens.longest("loves ")).equalsTo("love");
   });
   
-  it("Jones loves an awesome woman.", function() {
+  it("Brian loves an awesome woman.", function() {
     const {adj_itr} = lexicon;
         
     const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
@@ -647,8 +647,8 @@ describe("Lexer", function() {
       parser.add(token);
     }
     let {lexer} = parser;
-    lexer.reset("Jones loves an awesome woman.");
-    assertThat(lexer.next()).equalsTo(token("word", "Jones", 0, [{
+    lexer.reset("Brian loves an awesome woman.");
+    assertThat(lexer.next()).equalsTo(token("word", "Brian", 0, [{
       "@type": "PN",
       "loc": 0,
       "types": {"gen": "?", "num": "?"}
@@ -657,6 +657,9 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("word", "loves", 6, [{
       "@type": "V",
       "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["-", "+"]}
+    }, {
+      "@type": "N",
+      "types": {"gen": "-hum", "num": "plur"}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
     assertThat(lexer.next()).equalsTo(token("an", "an", 12));

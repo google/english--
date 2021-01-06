@@ -13,8 +13,8 @@ describe("Browser", function() {
       });
     });
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().load(dict).feed("John likes Mary.")).print())
-      .equalsTo("let a, b\nJohn(a)\nMary(b)\nlikes(a, b)");
+    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
+      .equalsTo("let a, b\nBrian(a)\nMary(b)\nlikes(a, b)");
   });
 
   it("compiled", async function() {
@@ -28,8 +28,8 @@ describe("Browser", function() {
       });
     });
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().load(dict).feed("John likes Mary.")).print())
-      .equalsTo("let a, b\nJohn(a)\nMary(b)\nlikes(a, b)");
+    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
+      .equalsTo("let a, b\nBrian(a)\nMary(b)\nlikes(a, b)");
   });
 });
 
