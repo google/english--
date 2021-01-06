@@ -29,7 +29,7 @@ describe("Browser", function() {
     });
     let drs = new DRS(Rules.from());
     assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
-      .equalsTo("let a, b\nBrian(a)\nMary(b)\nlikes(a, b)");
+      .equalsTo("let a, b\nBrian(a)\nMary(b)\nlike(a, b)");
   });
 });
 
