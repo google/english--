@@ -2525,6 +2525,12 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V("cried")))));
   });
 
+  it("Smith cried.", function() {
+    assertThat(parse("Smith cried."))
+      .equalsTo(S(NP(PN("Smith")),
+                  VP_(VP(V("cried")))));
+  });
+
   // Not working:
   // They rented Mary.
   // Brazil is a country in South America. // wondering if this is conflicting with a "south" verb
