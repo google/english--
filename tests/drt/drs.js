@@ -387,14 +387,27 @@ describe("DRS", function() {
     `);
   });
   
-  it.skip("If the man loves Mary then Smith likes the woman.", function() {
-    assertThat("If the man loves Mary then Smith likes the woman.")
+  it("If a man loves Mary then Smith likes the woman.", function() {
+    assertThat("If a man loves Mary then Smith likes a woman.")
      .equalsTo(`
+      let a, b
+      Smith(a)
+      Mary(b)
+      if ({
+        let c
+        man(c)
+        love(c, b)
+      }) {
+        let d
+        woman(d)
+        like(a, d)
+      }
     `);
   });
 
-  it.skip("The man loves Mary.", function() {
-    assertThat("The man loves Mary.")
+  it.skip("A man likes Smith. The man loves Mary.", function() {
+    // Anaphora resoution of "the" seems to not be working.
+    assertThat("A man likes Smith. The man loves Mary.")
      .equalsTo(`
     `);
   });
@@ -458,23 +471,19 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("If Mary likes a man then he likes Jones.", function() {
-    // TODO(goto): he here probably refers to "a man". It is pointing
-    // to Jones at the moment because we have parsed proper names first.
-    // The search algorithm for referents should probably search
-    // backwards, from most recent to oldest.
+  it("If Mary likes a man then he likes Jones.", function() {
     assertThat("If Mary likes a man then he likes Jones.")
      .equalsTo(`
-       drs(a, b) {
-         Mary(a)
-         Jones(b)
-         drs(c) {
-           a like c
-           man(c)
-         } every (c) drs() {
-           b like b
-         }
-       }
+      let a, b
+      Mary(a)
+      Jones(b)
+      if ({
+        let c
+        man(c)
+        like(a, c)
+      }) {
+        like(c, b)
+      }
     `);
   });
 
@@ -552,18 +561,18 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones owns a porsche or he likes it.", function() {
+  it("Jones owns a porsche or he likes it.", function() {
     assertThat("Jones owns a porsche or he likes it.")
      .equalsTo(`
-       drs(a) {
-         Jones(a)
-         drs(b) {
-           a own b
-           porsche(b)
-         } or drs() {
-           a like b
-         }
-       }
+      let a
+      Jones(a)
+      {
+        let b
+        porsche(b)
+        own(a, b)
+      } or {
+        like(a, b)
+      }
     `);
   });
 
@@ -1320,11 +1329,10 @@ describe("DRS", function() {
   it.skip("Smith has not kissed Mary.", function() {
     assertThat("Smith has not kissed Mary.")
      .equalsTo(`
-       drs(a, b) {
-         Smith(a)
-         Mary(b)
-         a has not kissed b
-       }
+       let a, b
+       Smith(a)
+       Mary(b)
+       a has not b
     `);
   });
 
@@ -1517,15 +1525,13 @@ describe("DRS", function() {
 
   it.skip("Every engineer who was brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
+    // who was brazilian 
     assertThat("Every engineer who was brazilian was happy.")
      .equalsTo(`
-       drs() {
-         drs(a) {
-           engineer(a)
-           < brazilian(a)
-         } every (a) drs() {
-           < happy(a)
-         }
+       every (a: {
+         engineer(a)
+       }) {
+         < happy(a)
        }
     `);
   });
@@ -1614,13 +1620,7 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Jones kissed Mary in Brazil.", function() {
-    // This can't be done because Brazil and Mary get
-    // merged toghether as a single proper name, and
-    // kissed being transitive requires a noun phrase
-    // to follow it.
-    // I believe we are going to have to add the []
-    // operator to allow the unmerging here.
+  it("Jones kissed in Brazil Mary.", function() {
     assertThat("Jones kissed in Brazil Mary.")
      .equalsTo(`
        let a, b, c
