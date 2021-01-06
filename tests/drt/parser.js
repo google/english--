@@ -690,6 +690,7 @@ S -> NP _ VP {%
     function clear(root) {
       delete root.types;
       delete root.loc;
+      delete root.prop;
       for (let child of root.children || []) {
         clear(child);
       }
@@ -852,6 +853,7 @@ function clear(root) {
 
   delete root.types;
   delete root.loc;
+  delete root.prop;
   root.children = (root.children || [])
     .filter((child) => (child["@type"] != "_" && child["@type"] != "__"));
 

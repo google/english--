@@ -1,19 +1,35 @@
 const {Inflectors} = require("en-inflectors");
 
-const N = (str, num, gen) => [str, "word", [{"@type": "N", "types": {"num": num, "gen": gen}}]];
-const ADJ = (str, types = {}) => [str, "word", [{"@type": "ADJ", types: types}]];
-const INF = (str, trans) => [str, "word", [{
+const N = (str, num, gen, prop) => [str, "word", [{
+  "@type": "N",
+  "prop": prop || str,
+  "types": {
+    "num": num,
+    "gen": gen,
+  }
+}]];
+
+const ADJ = (str, prop) => [str, "word", [{
+  "@type": "ADJ",
+  "prop": prop || str,
+  "types": {
+  }
+}]];
+
+const INF = (str, trans, prop) => [str, "word", [{
   "@type": "V",
+  "prop": prop || str,
   "types": {
     "num": 1,
     "trans": trans,
     "fin": "-",
     "stat": "-",
-    "tense": "pres"
+    "tense": "pres",
   }}]];
 
-const PRES = (str, num, trans) => [str, "word", [{
+const PRES = (str, num, trans, prop) => [str, "word", [{
   "@type": "V",
+  "prop": prop || str,
   "types": {
     "num": num,
     "trans": trans,
@@ -22,19 +38,21 @@ const PRES = (str, num, trans) => [str, "word", [{
     "tense": "pres"
   }}]];
 
-const PAST = (str, trans) => [str, "word", [{
+const PAST = (str, trans, prop) => [str, "word", [{
   "@type": "V",
+  "prop": prop || str,
   "types": {
     "num": 1,
     "trans": trans,
     "fin": "+",
     "stat": "-",
     "tense": "past",
-    "tp": "-past"
+    "tp": "-past",
   }}]];
 
-const PART = (str, trans) => [str, "word", [{
+const PART = (str, trans, prop) => [str, "word", [{
   "@type": "V",
+  "prop": prop || str,
   "types": {
     "num": 1,
     "trans": trans,
@@ -44,7 +62,7 @@ const PART = (str, trans) => [str, "word", [{
     "tp": "-past"
   }}]];
 
-const V = (str, trans, pp) => [
+const V = (str, trans, pp, prop) => [
   // Infinitive
   INF(str, trans),
   // Plural Present Tense
@@ -63,68 +81,13 @@ const dict = [
   N("brazilian", "sing", 1),
 
   // Plural Nouns
-  N("brazilians", "plur", 1),
+  N("brazilians", "plur", 1, "brazilian"),
   N("porsches", "plur", "-hum"),
 
-  /**
-  N("man", "sing", "male"),
-  N("woman", "sing", "fem"),
-  N("girl", "sing", "fem"),
-  N("book", "sing", "-hum"),
-  N("telescope", "sing", "-hum"),
-  N("donkey", "sing", "-hum"),
-  N("horse", "sing", "-hum"),
-  N("cat", "sing", "-hum"),
-  N("dish", "sing", "-hum"),
-  N("witch", "sing", "-hum"),
-  N("judge", "sing", 1),
-  N("engineer", "sing", ["male", "fem"]),
-  N("reservation", "sing", "-hum"),
-
-  N("men", "plur", "male"),
-  N("women", "plur", "fem"),
-  
-  // RNs  
-  N("brother", "sing", "male"),
-  N("father", "sing", "male"),
-  N("husband", "sing", "male"),
-  N("sister", "sing", "fem"),
-  N("mother", "sing", "fem"),
-  N("wife", "sing", "fem"),
-*/
   // Adjectives
   ADJ("brazilian"),
-  //ADJ("happy"),
-  //ADJ("unhappy"),
-  //ADJ("foolish"),  
-  //ADJ("fast"),    
-  //ADJ("beautiful"),
-  //ADJ("mortal"),
-  //ADJ("married"),
   
   // Verbs
-  /**
-  ...V("live", "-"),
-  ...V("admire", "+"),
-  ...V("fascinate", "+"),
-  ...V("surprise", "+"),
-  ...V("like", "+"),
-  ...V("love", ["+", "-"]),
-  ...V("walk", "-"),
-  ...V("own", "+"),
-  ...V("kiss", "+"),
-  ...V("stink", "-"),
-  ...V("ski", "-"),
-  ...V("watch", "+"),
-  ...V("cry", "-"),
-  ...V("copy", ["+", "-"]),
-  ...V("thrive", "-"),
-  ...V("make", "+"),
-  ...V("give", "+"),
-  ...V("play", ["+", "-"]),
-  ...V("come", ["+", "-"]),
-  ...V("travel", "-"),
-  **/
 ];
 
 const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");

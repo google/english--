@@ -334,6 +334,7 @@ describe("Lexer", function() {
   function clear(root) {
     delete root.types;
     delete root.loc;
+    delete root.prop;
     // console.log(root);
     for (let i = 0; i < (root.children || []).length; i++) {
       let child = root.children[i];
@@ -652,9 +653,11 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
     assertThat(lexer.next()).equalsTo(token("word", "loves", 6, [{
       "@type": "V",
+      "prop": "loves",
       "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["-", "+"]}
     }, {
       "@type": "N",
+      "prop": "loves",
       "types": {"gen": "-hum", "num": "plur"}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
@@ -662,11 +665,13 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("WS", " ", 14));
     assertThat(lexer.next()).equalsTo(token("word", "awesome", 15, [{
       "@type": "ADJ",
+      "prop": "awesome",
       "types": {}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 22));
     assertThat(lexer.next()).equalsTo(token("word", "woman", 23, [{
       "@type": "N",
+      "prop": "woman",
       "types": {"gen": "fem", "num": "sing"}
     }]));
     assertThat(lexer.next()).equalsTo(token("PERIOD", ".", 28));

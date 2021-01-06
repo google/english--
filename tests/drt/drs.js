@@ -1409,7 +1409,7 @@ describe("DRS", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
          all (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1420,7 +1420,7 @@ describe("DRS", function() {
     assertThat("Most brazilians are happy.")
      .equalsTo(`
          most (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1431,7 +1431,7 @@ describe("DRS", function() {
     assertThat("Many brazilians are happy.")
      .equalsTo(`
        many (a: {
-         brazilians(a)
+         brazilian(a)
        }) {
          happy(a)
        }
@@ -1442,7 +1442,7 @@ describe("DRS", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
          3 (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1453,7 +1453,7 @@ describe("DRS", function() {
     assertThat("More than 3 brazilians are happy.")
      .equalsTo(`
          more-than-3 (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1464,7 +1464,7 @@ describe("DRS", function() {
     assertThat("Fewer than 3 brazilians are happy.")
      .equalsTo(`
          fewer-than-3 (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1475,7 +1475,7 @@ describe("DRS", function() {
     assertThat("At least 3 brazilians are happy.")
      .equalsTo(`
          at-least-3 (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1486,7 +1486,7 @@ describe("DRS", function() {
     assertThat("At most 3 brazilians are happy.")
      .equalsTo(`
          at-most-3 (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1497,7 +1497,7 @@ describe("DRS", function() {
     assertThat("Only brazilians are happy.")
      .equalsTo(`
          only (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1508,7 +1508,7 @@ describe("DRS", function() {
     assertThat("The majority of brazilians are happy.")
      .equalsTo(`
          the-majority-of (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            happy(a)
          }
@@ -1534,7 +1534,7 @@ describe("DRS", function() {
     assertThat("Most brazilians like most porsches.")
      .equalsTo(`
          most (a: {
-           brazilians(a)
+           brazilian(a)
          }) {
            most (b: {
              porsches(b)
@@ -1551,7 +1551,7 @@ describe("DRS", function() {
          let a
          Smith(a)
          most (b: {
-           brazilians(b)
+           brazilian(b)
          }) {
            let c
            porsche(c)
@@ -1863,7 +1863,7 @@ describe("Large Lexicon", () => {
        let a
        Brazil(a)
        most (b: {
-         brazilians(b)
+         brazilian(b)
        }) {
          in(e, a)
          live(b)

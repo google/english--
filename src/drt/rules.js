@@ -408,7 +408,8 @@ class CRNLIN extends Rule {
     if (!node.ref || node.children.length != 1) {
       return [[], [], [], []];
     }
-    let pred = predicate(child(noun, 0).value, [node.ref], node.types);
+
+    let pred = predicate(noun.prop, [node.ref], node.types);
     
     return [[], [pred], [], [node]];
   }

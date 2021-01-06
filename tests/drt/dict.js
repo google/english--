@@ -19,7 +19,7 @@ const dict = [
   N("reservation", "sing", "-hum"),
 
   // Plural Nouns
-  N("brazilians", "plur", 1),
+  N("brazilians", "plur", 1, "brazilian"),
   N("porsches", "plur", "-hum"),
   N("men", "plur", "male"),
   N("women", "plur", "fem"),
