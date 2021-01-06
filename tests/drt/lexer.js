@@ -284,9 +284,9 @@ describe("Lexer", function() {
     const tokens = [
       [" ", "WS"],
       [".", "PERIOD"],
-      ["Jones", "PN"],
+      ["Jones", "word"],
       ["loves", "V"],
-      ["Mary", "PN"],
+      ["Mary", "word"],
     ];
 
     let parser = Nearley.from(`
@@ -297,7 +297,7 @@ describe("Lexer", function() {
       @lexer lexer
       main -> _ S _ {% ([ws1, s, ws2]) => s %}
       S -> NP __ VP _ "." {% ([np, ws, vp]) => [np, vp]%}
-      NP -> %PN {% id %}
+      NP -> %word {% id %}
       VP -> %V __ NP {% ([v, ws, np]) => [v, np] %}
       _ -> %WS:* {% id %}
       __ -> %WS:+ {% id %}
@@ -305,7 +305,9 @@ describe("Lexer", function() {
 
     assertThat(parser.feed("Jones loves Mary ."))
       .equalsTo([[
-        token("PN", "Jones", 0), [token("V", "loves", 6), token("PN", "Mary", 12)]
+        token("word", "Jones", 0, [{"@type": "PN", "loc": 0, "types": {"gen": "?", "num": "?"}}]),
+        [token("V", "loves", 6),
+         token("word", "Mary", 12, [{"@type": "PN", "loc": 12, "types": {"gen": "?", "num": "?"}}])]
       ]]);
   });
 
@@ -809,7 +811,7 @@ describe("Lexer", function() {
       [" ", "WS"],
       [".", "PERIOD"],
       ["a", "DET"],
-      ["Jones", "PN"],
+      // ["Jones", "PN"],
       ["loves", "V"],
       ["happy", "ADJ"],
       ["bar", "ADJ"],
@@ -817,7 +819,11 @@ describe("Lexer", function() {
       ["dog", "N"],
     ]);
     lexer.reset("Jones loves a dog.");
-    assertThat(lexer.next()).equalsTo(token("PN", "Jones", 0));
+    assertThat(lexer.next()).equalsTo(token("word", "Jones", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 5));
     assertThat(lexer.next()).equalsTo(token("V", "loves", 6));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
@@ -891,7 +897,11 @@ describe("Lexer", function() {
     }]));
 
     tokenizer.reset("He ");
-    assertThat(tokenizer.next()).equalsTo(token("he", "He", 5));
+    assertThat(tokenizer.next()).equalsTo(token("he", "He", 5, [{ 
+      "@type": "PN",
+      "loc": 5,
+      "types": {"gen": "?", "num": "?"}     
+    }]));
     assertThat(tokenizer.next()).equalsTo(token("WS", " ", 7));
 
     tokenizer.reset("Sam");
@@ -1039,6 +1049,23 @@ module.exports = ${JSON.stringify(parts, undefined, 2)};
       "@type": "N"
     }, {
       "@type": "ADJ"
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Multiple Tokens: proper names and verbs", () => {
+    let lexer = new Tokenizer();
+    lexer.push("trump", "word", {"@type": "V"});
+    lexer.reset("Trump");
+    assertThat(lexer.next()).equalsTo(token("word", "Trump", 0, [{
+      "@type": "V"
+    }, {
+      "@type": "PN",
+      "loc": 0,
+      "types": {
+        "gen": "?",
+        "num": "?"
+      }
     }]));
     assertThat(lexer.next()).equalsTo(undefined);
   });

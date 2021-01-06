@@ -101,26 +101,42 @@ class Tokenizer {
     // proper names can't collide with reserved dictionary words.
     let proper = match && match[1] != next;
 
-    if (next && !proper) {
-      // If this is a dictionary word and is not a proper name
-      this.eat(next);
-      return this.get(next);
-    }
-
-    if (proper) {
-      let [full, name] = match;
-      this.eat(name);
+    let pn = (name, loc) => {
       return {
         "@type": "%word",
         "type": "word",
         "value": name,
-        "loc": this.loc - name.length,
+        "loc": loc - name.length,
         "tokens": [{
           "@type": "PN",
           "types": {"gen": "?", "num": "?"},
-          "loc": this.loc - name.length,
+          "loc": loc - name.length,
         }]
-      };
+      }
+    };
+
+    // If the proper name is the longest string
+    // use it.
+    if (match && !next) {
+      let [full, name] = match;
+      this.eat(name);
+      return pn(name, this.loc);
+    } else if (match && next) {
+      let [full, name] = match;
+      if (name.length > next.length) {
+        this.eat(name);
+        return pn(name, this.loc);
+      } else if (name.length == next.length) {
+        this.eat(next);
+        let token = this.get(next);
+        token.tokens.push(pn(name, this.loc).tokens[0]);
+        return token;
+      }
+    }
+    
+    if (next) {
+      this.eat(next);
+      return this.get(next);
     }
     
     return undefined;
@@ -128,6 +144,7 @@ class Tokenizer {
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
     this.loc += str.length;
+    //console.log(`eating ${str}`);
     return this;
   }
   get(str) {

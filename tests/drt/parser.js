@@ -2541,12 +2541,32 @@ describe("Backwards compatibility", function() {
 });
 
 
-describe.skip("large dictionary", () => {
+describe("large dictionary", () => {
+  it("Trump is a man.", function() {
+    assertThat(parse("Trump is a man."))
+      .equalsTo(S(NP(PN("Trump")),
+                  VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
+  });
+
+  it("Sam married Dani.", function() {
+    assertThat(parse("Sam married Dani."))
+      .equalsTo(S(NP(PN("Sam")),
+                  VP_(VP(V("married"), NP(PN("Dani"))))));
+  });
+
   it("He has abandoned her.", function() {
     assertThat(parse("He has abandoned her."))
       .equalsTo(S(NP(PRO("He")),
                   VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
   });
+
+  function parse(s) {
+    const {dict} = require("../../src/drt/dict.js");
+    let parser = new Parser("Sentence", dict);
+    const result = parser.feed(s);
+    return clear(result[0].children[0].children[0].children[0]);
+  }
+  
 });
 
 function assertThat(x) {

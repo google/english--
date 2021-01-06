@@ -67,22 +67,27 @@ class Nearley {
       token: e.token,
       loc: e.offset, 
       start: buffer[that.parser.current],
-      // get message() { return this.print(); },
+      get message() { return this.print(); },
       print() {
         const tracks = that.tracks(2);
-        // console.log(tracks);
-        // const completions = that.complete(tracks);
+        //console.log(tracks);
+        //return;
+        //const completions = that.complete(tracks);
+        //console.log("hi");
+        //console.log(completions);
+        //return;
         const result = [];
         let unexpected = ""; 
         let head = "";
         if (this.token.type) {
-          head = `Unexpected ${this.token.type} token: ${this.token.value}.`;
+          head = `Unexpected %${this.token.type} token: "${this.token.value}".`;
         } else {
           head = `Unexpected "${this.token.value}".`;
         }
         head += " ";
         head += `Instead, I was expecting to see one of the following:`;
         result.push(head);
+        // return result.join("\n");
         result.push(``);
         for (let track of tracks) {
           result.push(`A ${track.symbol} token based on:`);

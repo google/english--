@@ -66,7 +66,7 @@ A "o" token based on:
     }
 
     assertThat(error.print().trim()).equalsTo(`
-Unexpected @unknown token: fbar. Instead, I was expecting to see one of the following:
+Unexpected %@unknown token: "fbar". Instead, I was expecting to see one of the following:
 
 A foo token based on:
     main → ● %foo
@@ -113,7 +113,7 @@ A foo token based on:
       throw new Error("Expected parse error");
     } catch (e) {
       assertThat(e.print().trim()).equalsTo(`
-Unexpected @unknown token: fbar. Instead, I was expecting to see one of the following:
+Unexpected %@unknown token: "fbar". Instead, I was expecting to see one of the following:
 
 A foo token based on:
     FOO → ● %foo
