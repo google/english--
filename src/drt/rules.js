@@ -596,7 +596,6 @@ class CRNBE extends Rule {
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
     np.ref = child(ref, 0);
-    //console.log("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -920,8 +919,11 @@ class CRVPPOSS extends Rule {
     // console.log(noun);
     // console.log(child(name, 0));
     //let n = clone(noun);
-    //n.ref = u;
+    //n.ref = child(name, 0);
+    // console.log(child(name, 0));
+    //noun.ref = child(name, 0);
 
+    // let s = S(u, VP_(VP(BE("is"), NP(DET("a"), noun))));
     let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     
     return [[u], [s], [], []];

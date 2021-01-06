@@ -1797,23 +1797,27 @@ describe("Large Lexicon", () => {
     // using CRLIN correctly.
     // Mel likes Yuji's girlfriend works correctly, but
     // if you add the adjective before the noun it doesn't.
+    // There is a chance we are going to have to rethink how
+    // CLIN and refs work to enable this use case, possibly
+    // making refs be arrays rather than primitives.
     assertThat("Mel likes Yuji's awesome girlfriend.")
       .equalsTo(`
       let a, b, c
       Mel(a)
       Yuji(b)
       awesome(c)
-      girlfriend(c)
+      girlfriend(c, b)
       likes(a, c)
     `);
   });
 
-  it("Yuji is awesome.", function() { 
-    assertThat("Yuji is awesome.")
+  it("Yuji is an awesome person.", function() { 
+    assertThat("Yuji is an awesome person.")
       .equalsTo(`
       let a
       Yuji(a)
       awesome(a)
+      person(a)
     `);
   });
 
