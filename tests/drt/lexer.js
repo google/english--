@@ -6,7 +6,7 @@ const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
 const {Tokenizer} = require("../../src/drt/lexer.js");
 const DRT = require("../../src/drt/parser.js");
 const lexicon = require("../../src/drt/lexicon.js");
-const {dict} = require("../../src/drt/dict.js"); 
+const {dict} = require("./dict.js"); 
 
 const {
   Statement,
@@ -637,15 +637,10 @@ describe("Lexer", function() {
   });
   
   it("Brian loves an awesome woman.", function() {
-    //const {adj_itr} = lexicon;
-        
-    //const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    const {dict} = require("../../src/drt/dict.js"); 
     const {Parser} = DRT;
     let parser = new Parser("Statement", dict);
     
-    //for (let token of tokens) {
-    //  parser.add(token);
-    //}
     let {lexer} = parser;
     lexer.reset("Brian loves an awesome woman.");
     assertThat(lexer.next()).equalsTo(token("word", "Brian", 0, [{

@@ -35,7 +35,7 @@ const {
   HAVE,
   RN} = nodes;
 
-const {dict} = require("../../src/drt/dict.js");
+const {dict} = require("./dict.js");
 
 describe("Parser", function() {
   it("Basic", function() {
@@ -2525,12 +2525,6 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V("cried")))));
   });
 
-  it("He has abandoned her.", function() {
-    assertThat(parse("He has abandoned her."))
-      .equalsTo(S(NP(PRO("He")),
-                  VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
-  });
-
   // Not working:
   // They rented Mary.
   // Brazil is a country in South America. // wondering if this is conflicting with a "south" verb
@@ -2546,6 +2540,14 @@ describe("Backwards compatibility", function() {
   
 });
 
+
+describe.skip("large dictionary", () => {
+  it("He has abandoned her.", function() {
+    assertThat(parse("He has abandoned her."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
+  });
+});
 
 function assertThat(x) {
  return {
