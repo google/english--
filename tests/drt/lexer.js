@@ -855,24 +855,83 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
   
-  it("Proper names", () => {
+  it("The-United-States", () => {
     let lexer = new Tokenizer([
       ["foo", "WORD"],
       ["Bar", "WORD"],
       [" ", "WS"],
       [".", "PERIOD"],
     ]);
-    lexer.reset("Sam Goto");
-    assertThat(lexer.next()).equalsTo(token("word", "Sam", 0, [{
+    lexer.reset("The-United-States");
+    assertThat(lexer.next()).equalsTo(token("word", "The-United-States", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Computer Science", () => {
+    let lexer = new Tokenizer([
+      ["foo", "WORD"],
+      ["Bar", "WORD"],
+      [" ", "WS"],
+      [".", "PERIOD"],
+    ]);
+    lexer.reset("Computer Science");
+    assertThat(lexer.next()).equalsTo(token("word", "Computer", 0, [{
+      "@type": "PN",
+      "loc": 0,
+      "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 8));
+    assertThat(lexer.next()).equalsTo(token("word", "Science", 9, [{
+      "@type": "PN",
+      "loc": 9,
+      "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("The United States", () => {
+    let lexer = new Tokenizer([
+      ["the", "the"],
+      [" ", "WS"],
+    ]);
+    lexer.reset("The United States");
+    assertThat(lexer.next()).equalsTo(token("the", "The", 0, [{
       "@type": "PN",
       "loc": 0,
       "types": {"gen": "?", "num": "?"}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 3));
-    assertThat(lexer.next()).equalsTo(token("word", "Goto", 4, [{
+    assertThat(lexer.next()).equalsTo(token("word", "United", 4, [{
       "@type": "PN",
       "loc": 4,
       "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 10));
+    assertThat(lexer.next()).equalsTo(token("word", "States", 11, [{
+      "@type": "PN",
+      "loc": 11,
+      "types": {"gen": "?", "num": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Trump", () => {
+    let lexer = new Tokenizer([
+      ["trump", "word", [{"@type": "V"}]],
+      [" ", "WS"],
+    ]);
+    // Trump can be a verb (to-trump) or a proper name.
+    lexer.reset("Trump");
+    assertThat(lexer.next()).equalsTo(token("word", "Trump", 0, [{
+      "@type": "V"
+    }, {
+      "@type": "PN",
+      "loc": 0,
+      "types": {"num": "?", "gen": "?"}
     }]));
     assertThat(lexer.next()).equalsTo(undefined);
   });

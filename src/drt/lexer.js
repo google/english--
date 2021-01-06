@@ -12,6 +12,7 @@ class Tokenizer {
   }
   reset(buffer) {
     this.buffer += buffer;
+    //console.log(`resetting: ${this.buffer}`);
   }
   save() {
   }
@@ -98,14 +99,17 @@ class Tokenizer {
 
     // proper names form.
     let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
+    //let match = this.buffer.match(/^([A-Z][A-Za-z]+)(\s[A-Z][A-Za-z]+)*/);
+    // console.log(match);
     // proper names can't collide with reserved dictionary words.
-    let proper = match && match[1] != next;
+    // let proper = match && match[0] != next;
 
     let pn = (name, loc) => {
       return {
         "@type": "%word",
         "type": "word",
         "value": name,
+        //"prop": name.replaceAll(" ", "-"),
         "loc": loc - name.length,
         "tokens": [{
           "@type": "PN",
@@ -115,40 +119,88 @@ class Tokenizer {
       }
     };
 
-    // If the proper name is the longest string
-    // use it.
-    if (match && !next) {
-      let [full, name] = match;
+    //console.log(match);
+    //console.log(next);
+
+    //let result = {
+    //"@type": "%" + ref.type,
+    //"type": ref.type,
+    //"value": str,
+    //"tokens": ref.done,
+    //"loc": this.loc - str.length,
+    //};
+
+    // There are four possibilities here:
+    //   - a match for an open word and not a proper name
+    //   - no match for an open word and a match for a proper name
+    //   - no match for both
+    //   - a match for both the open word and the proper name
+    let [name] = match || [];
+    if (next && !name) {
+      this.eat(next);
+      return this.get(next);
+    } else if (!next && name) {
       this.eat(name);
       return pn(name, this.loc);
-    } else if (match && next) {
-      let [full, name] = match;
+    } else if (!next && !name) {
+      return undefined;
+    } else {
+      // Both are defined.
       if (name.length > next.length) {
+        // If the proper name is the longest string
+        // it trumps the open word.
+        this.eat(name);
+        return pn(name, this.loc);
+      } else if (name == next) {
+        // If they are the same, they can be
+        // interpreted multiple ways.
+        this.eat(name);
+        let result = this.get(name);
+        result.tokens.push({
+          "@type": "PN",
+          "types": {"gen": "?", "num": "?"},
+          "loc": this.loc - name.length,
+        });
+        return result;
+      }
+    } 
+
+    return undefined;
+
+    
+    if (match && !next) {
+    } else if (match && next) {
+      let word = this.get(next);
+      // console.log(word);
+      let [name] = match;
+      if (word["@type"] != "%word") {
+        // Reserved keywords trump proper names.
+        this.eat(next);
+        return this.get(next);
+      } else if (name.length > next.length) {
+        // If the proper name is longer than the open-class word,
+        // it trumps it.
         this.eat(name);
         return pn(name, this.loc);
       } else if (name.length == next.length) {
+        // console.log(next);
         this.eat(next);
         let token = this.get(next);
         token.tokens.push(pn(name, this.loc).tokens[0]);
         return token;
       }
     }
-    
-    if (next) {
-      this.eat(next);
-      return this.get(next);
-    }
-    
-    return undefined;
+        
   }
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
     this.loc += str.length;
-    //console.log(`eating ${str}`);
+    //console.log(`eating [${str}]`);
     return this;
   }
   get(str) {
     let ref = this.head;
+    // console.log(ref);
     for (let char of str) {
       ref = ref[char.toLowerCase()];
     }
