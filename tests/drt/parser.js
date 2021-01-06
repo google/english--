@@ -2527,11 +2527,6 @@ describe("Backwards compatibility", function() {
 
   // Not working:
   // They rented Mary.
-  // Brazil is a country in South America. // wondering if this is conflicting with a "south" verb
-  // Brazil borders Chile. // works with Brazil borders Italy.
-  // Italy is a country which killed a man.
-  // Italy is a country with a man.
-  // Italy is a country which kills many people.
   // Most brazilians like Italy.
   // Trump is a person. // this is possibly conflicting with the verb to-trump.
   // Obama was the president of America. He was great.
@@ -2542,10 +2537,10 @@ describe("Backwards compatibility", function() {
 
 
 describe("large dictionary", () => {
-  it("Trump is a man.", function() {
-    assertThat(parse("Trump is a man."))
+  it("Trump is a president.", function() {
+    assertThat(parse("Trump is a president."))
       .equalsTo(S(NP(PN("Trump")),
-                  VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
+                  VP_(VP(BE("is"), NP(DET("a"), N("president"))))));
   });
 
   it("Sam married Dani.", function() {
@@ -2554,15 +2549,61 @@ describe("large dictionary", () => {
                   VP_(VP(V("married"), NP(PN("Dani"))))));
   });
 
+  it("Brazil borders Chile and Argentina.", function() {
+    assertThat(parse("Brazil borders Chile and Argentina."))
+      .equalsTo(S(NP(PN("Brazil")),
+                  VP_(VP(V("borders"), NP(NP(PN("Chile")),
+                                          "and",
+                                          NP(PN("Argentina"))
+                                         )))));
+  });
+
+  it("Brazil is a country in South America.", function() {
+    assertThat(parse("Brazil is a country in South America."))
+      .equalsTo(S(NP(PN("Brazil")),
+                  VP_(VP(BE("is"), NP(DET("a"),
+                                      N(N("country"),
+                                        PP(PREP("in"), NP(PN(PN("South"), PN("America"))))))))));
+  });
+
+  it("Obama was a great president.", function() {
+    assertThat(parse("Obama was a great president."))
+      .equalsTo(S(NP(PN("Obama")),
+                  VP_(VP(BE("was"), NP(DET("a"), N(ADJ("great"), N("president")))))));
+  });
+
+  it("Obama was the president.", function() {
+    assertThat(parse("Obama was the president."))
+      .equalsTo(S(NP(PN("Obama")),
+                  VP_(VP(BE("was"), NP(DET("the"), N("president"))))));
+  });
+
   it("He has abandoned her.", function() {
     assertThat(parse("He has abandoned her."))
       .equalsTo(S(NP(PRO("He")),
                   VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
   });
 
+  it.skip("They rented the car.", function() {
+    assertThat(parse("They rented the car."))
+      .equalsTo(S(NP(PRO("They")),
+                  VP_(VP(V("rented"), NP(DET("the"), N("car"))))));
+  });
+
+  it("He has married many peoples.", function() {
+    assertThat(parse("He has married many peoples."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(HAVE("has"), VP(V("married"), NP(DET("many"), N("peoples")))))));
+  });
+
+  
   function parse(s) {
     const {dict} = require("../../src/drt/dict.js");
     let parser = new Parser("Sentence", dict);
+
+    //console.log(parser.lexer.head["p"]["e"]["o"]["p"]["l"]["e"].done[2].types);
+    //return;
+    
     const result = parser.feed(s);
     return clear(result[0].children[0].children[0].children[0]);
   }

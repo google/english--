@@ -997,7 +997,7 @@ describe("Lexer", function() {
 module.exports = ${JSON.stringify(result, undefined, 2)};
 `;
     const fs = require("fs");
-    fs.writeFileSync("./wordlist.js", file);
+    fs.writeFileSync("./src/drt/wordlist.js", file);
   });
   
   it.skip("Generate", async function() {
@@ -1037,7 +1037,7 @@ module.exports = ${JSON.stringify(result, undefined, 2)};
     let file = `
 module.exports = ${JSON.stringify(parts, undefined, 2)};
 `;
-    fs.writeFileSync("lexicon.js", file);
+    fs.writeFileSync("./tests/drt/lexicon.js", file);
   });
 
   it("Multiple Tokens", () => {
