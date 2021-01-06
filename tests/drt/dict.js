@@ -63,6 +63,7 @@ const dict = [
   ...V("play", ["+", "-"]),
   ...V("come", ["+", "-"]),
   ...V("travel", "-"),
+  ...V("marry", ["+", "-"]),
 ];
 
 module.exports = {

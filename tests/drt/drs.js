@@ -970,14 +970,13 @@ describe("DRS", function() {
   it.skip("Jones likes a woman near Smith's brother.", function() {
     assertThat("Jones likes a woman near Smith's brother.")
      .equalsTo(`
-       drs(a, b, c, d) {
+         let a, b, c, d
          Jones(a)
          Smith(b)
-         a likes c
-         c near d
-         woman(c)
-         d brother b
-       }
+         woman(d)
+         likes(a, c)
+         brother(c, d)
+         near(d, b)
     `);
   });
 
@@ -1109,7 +1108,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Mary's father is a brazilian engineer.", function() {
+  it("Mary's father is a brazilian engineer.", function() {
     assertThat("Mary's father is a brazilian engineer.")
      .equalsTo(`
        let a, b
@@ -1210,7 +1209,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Jones loves himself.", function() {
+  it("Jones loves himself.", function() {
     assertThat("Jones loves himself.")
      .equalsTo(`
        let a
@@ -1271,16 +1270,15 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Smith did not love Mary.", function() {
+  it("Smith did not love Mary.", function() {
     assertThat("Smith did not kiss Mary.")
      .equalsTo(`
-       drs(a, b) {
+         let a, b
          Smith(a)
          Mary(b)
-         ~drs() {
-           < a kiss b
+         not {
+           < kiss(a, b)
          }
-       }
     `);
   });
 
@@ -1294,7 +1292,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Smith does not like Mary.", function() {
+  it("Smith does not like Mary.", function() {
     // This is a slightly different result we get at
     // page 555, with regards to the temporal
     // referents.
@@ -1372,6 +1370,8 @@ describe("DRS", function() {
   });
 
   it.skip("Smith was married to Mary.", function() {
+    // TODO: allow prepositional phrases to be attached
+    // to adjectives.
     assertThat("Smith was married to Mary.")
      .equalsTo(`
        let a
@@ -1572,7 +1572,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Who loves Jones?", function() { 
+  it("Who loves Jones?", function() { 
     // NOTE(goto): we should probably keep the 
     // variable b scoped to the question.
     assertThat("Who loves Jones?")
@@ -1586,7 +1586,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Who does Jones love?", function() { 
+  it("Who does Jones love?", function() { 
     assertThat("Who does Jones love?")
      .equalsTo(`
        let a
@@ -1614,15 +1614,15 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Jones kissed in Brazil Mary.", function() { 
+  it("Jones kissed in Brazil Mary.", function() { 
     assertThat("Jones kissed in Brazil Mary.")
      .equalsTo(`
        let a, b, c
        Jones(a)
        Mary(b)
        Brazil(c)
+       in(e, c)
        < kissed(a, b)
-       < kiss-ined(a, c)
      `);
   });
 
