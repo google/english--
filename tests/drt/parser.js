@@ -1389,21 +1389,6 @@ describe("Statements", function() {
                  VP_(VP(HAVE("have"), "not", VP(V("walked"))))));
   });
 
-  it.skip("They left Brazil.", function() {
-    assertThat(parse("they left Brazil."))
-      .equalsTo(S(NP(PRO("they")),
-                  VP_(VP(V(VERB("left")),
-                         NP(PN("Brazil"))))));
-  });
-
-  it.skip("They have left Brazil.", function() {
-    assertThat(parse("They have left Brazil."))
-     .equalsTo(S(NP(PRO("They")),
-                 VP_(VP(HAVE("have"), 
-                        VP(V(VERB("left")),
-                           NP(PN("Brazil")))))));
-  });
-
   it("Jones and Mary like him.", function() {
     assertThat(parse("Jones and Mary like him."))
      .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
@@ -1538,55 +1523,40 @@ describe("Generalized Quantifiers", function() {
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("at least 5 men are mortal.", function() {
+  it("at least 5 men are mortal.", function() {
     assertThat(parse("at least 5 men are mortal."))
       .equalsTo(S(NP(DET("at", "least", 5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("at most 5 men are mortal.", function() {
+  it("at most 5 men are mortal.", function() {
     assertThat(parse("at most 5 men are mortal."))
       .equalsTo(S(NP(DET("at", "most", 5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("more than 5 men are mortal.", function() {
+  it("more than 5 men are mortal.", function() {
     assertThat(parse("more than 5 men are mortal."))
       .equalsTo(S(NP(DET("more", "than", 5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("fewer than 5 men are mortal.", function() {
+  it("fewer than 5 men are mortal.", function() {
     assertThat(parse("fewer than 5 men are mortal."))
       .equalsTo(S(NP(DET("fewer", "than", 5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("exactly 5 men are mortal.", function() {
+  it("exactly 5 men are mortal.", function() {
     assertThat(parse("exactly 5 men are mortal."))
       .equalsTo(S(NP(DET("exactly", 5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
-  it.skip("5 men are mortal.", function() {
+  it("5 men are mortal.", function() {
     assertThat(parse("5 men are mortal."))
       .equalsTo(S(NP(DET(5), N("men")),
                   VP_(VP(BE("are"), ADJ("mortal")))));
-  });
-});
-
-describe.skip("Plural Morphology", function() {
-  it("Plural", function() {
-    assertThat(parse("brazilians", "N", false, false))
-      .equalsTo(N(N("brazilian"), "s"));
-    assertThat(parse("engineers", "N", false, false))
-      .equalsTo(N(N("engineer"), "s"));
-    assertThat(parse("cats", "N", false, false))
-      .equalsTo(N(N("cat"), "s"));
-    assertThat(parse("witches", "N", false, false))
-      .equalsTo(N(N("witch"), "es"));
-    assertThat(parse("dishes", "N", false, false))
-      .equalsTo(N(N("dish"), "es"));
   });
 });
 
@@ -2419,13 +2389,6 @@ describe("Backwards compatibility", function() {
                         NP(PN("Jones"))))));
   });
 
-  it.skip("Mary knows Jones.", function() {
-    assertThat(parse("Mary knows Jones."))
-     .equalsTo(S(NP(PN("Mary")),
-                 VP_(VP(V("knows"),
-                        NP(PN("Jones"))))));
-  });
-
   it("Mary has loved Anna.", function() {
     assertThat(parse("Mary has loved Jones."))
      .equalsTo(S(NP(PN("Mary")),
@@ -2489,16 +2452,6 @@ describe("Backwards compatibility", function() {
                               PP(PREP("for"), NP(PN("Dani")))
                              ))))));
 
-  });
-
-  it.skip("Mel likes Yuji's girlfriend.", function() {
-    assertThat(parse("Mel likes Yuji's girlfriend."))
-      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
-                  VP_(VP(V(VERB("kiss"), "ed"),
-                         PP([
-                           [PREP("in"), NP(PN("Brazil"))]
-                         ]),
-                         NP(PN("Dani"))))));
   });
 
   it("They cry.", function() {
@@ -2596,7 +2549,35 @@ describe("large dictionary", () => {
                   VP_(VP(HAVE("has"), VP(V("married"), NP(DET("many"), N("peoples")))))));
   });
 
+  it("Mel likes Yuji's girlfriend.", function() {
+    assertThat(parse("Mel likes Yuji's girlfriend."))
+      .equalsTo(S(NP(PN("Mel")),
+                  VP_(VP(V("likes"),
+                         NP(DET(NP(PN("Yuji")), "'s"), N("girlfriend"))))));
+  });
+
+  it("Mary knows Jones.", function() {
+    assertThat(parse("Mary knows Jones."))
+     .equalsTo(S(NP(PN("Mary")),
+                 VP_(VP(V("knows"),
+                        NP(PN("Jones"))))));
+  });
   
+  it("They left Brazil.", function() {
+    assertThat(parse("they left Brazil."))
+      .equalsTo(S(NP(PRO("they")),
+                  VP_(VP(V("left"),
+                         NP(PN("Brazil"))))));
+  });
+
+  it("They have left Brazil.", function() {
+    assertThat(parse("They have left Brazil."))
+     .equalsTo(S(NP(PRO("They")),
+                 VP_(VP(HAVE("have"), 
+                        VP(V("left"),
+                           NP(PN("Brazil")))))));
+  });
+
   function parse(s) {
     const {dict} = require("../../src/drt/dict.js");
     let parser = new Parser("Sentence", dict);

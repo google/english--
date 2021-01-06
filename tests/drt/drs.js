@@ -1792,14 +1792,19 @@ describe("Large Lexicon", () => {
     `);
   });
 
-  it.skip("Mel likes Yuji's awesome girlfriend.", function() { 
+  it.skip("Mel likes Yuji's awesome girlfriend.", function() {
+    // TODO: this fails because our CRVPPOSS rule isn't
+    // using CRLIN correctly.
+    // Mel likes Yuji's girlfriend works correctly, but
+    // if you add the adjective before the noun it doesn't.
     assertThat("Mel likes Yuji's awesome girlfriend.")
       .equalsTo(`
       let a, b, c
       Mel(a)
       Yuji(b)
+      awesome(c)
+      girlfriend(c)
       likes(a, c)
-      girlfriend(c, b)
     `);
   });
 

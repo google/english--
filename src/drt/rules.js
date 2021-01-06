@@ -887,7 +887,6 @@ class CRSPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
-    // throw new Error("hi");
     let u = referent(this.id(), noun.types, print(child(node, 0), refs));
     node.children[0] = u;
     node.ref = u;
@@ -915,8 +914,14 @@ class CRVPPOSS extends Rule {
       return [[], [], [], []];
     }
     // console.log(node);
+    // throw new Error("hi");
     let u = referent(this.id(), noun.types, print(child(node, 1), refs));
     child(node, 1, 0).children[1] = u;
+    // console.log(noun);
+    // console.log(child(name, 0));
+    //let n = clone(noun);
+    //n.ref = u;
+
     let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     
     return [[u], [s], [], []];
