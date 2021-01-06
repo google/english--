@@ -142,5 +142,8 @@ for (let {name} of adjs) {
 }
 
 module.exports = {
-  dict: dict
+  ADJ: ADJ,
+  N: N,
+  V: V,
+  dict: dict,
 };
