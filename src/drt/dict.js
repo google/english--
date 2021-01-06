@@ -44,7 +44,7 @@ const PART = (str, trans) => [str, "word", [{
     "tp": "-past"
   }}]];
 
-const V = (str, trans) => [
+const V = (str, trans, pp) => [
   // Infinitive
   INF(str, trans),
   // Plural Present Tense
@@ -52,9 +52,9 @@ const V = (str, trans) => [
   // Singular Present Tense
   PRES(new Inflectors(str).toPresentS(), "sing", trans),
   // Past
-  PAST(new Inflectors(str).toPast(), trans),
+  PAST(pp ? pp : new Inflectors(str).toPast(), trans),
   // Past Participle
-  PART(new Inflectors(str).toPastParticiple(), trans),
+  PART(pp ? pp : new Inflectors(str).toPastParticiple(), trans),
 ];
 
 const dict = [  
@@ -129,8 +129,8 @@ const dict = [
 
 const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");
 
-for (let {inf, trans} of verbs) {
-  dict.push(...V(inf, trans));
+for (let {inf, trans, pp} of verbs) {
+  dict.push(...V(inf, trans, pp));
 }
 
 for (let {name, num, gen} of nouns) {

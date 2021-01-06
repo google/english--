@@ -1823,15 +1823,15 @@ describe("Large Lexicon", () => {
     `);
   });
 
-  it("Mel traveled to a country.", function() { 
-    assertThat("Mel traveled to an awesome country.")
+  it("Mel travelled to a country.", function() { 
+    assertThat("Mel travelled to an awesome country.")
       .equalsTo(`
        let a, b
        Mel(a)
        awesome(b)
        country(b)
        to(e, b)
-       < traveled(a)
+       < travelled(a)
     `);
   });
 

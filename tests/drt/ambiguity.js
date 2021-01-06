@@ -83,11 +83,9 @@ describe("Ambiguity", () => {
     assertThat(results.length).equalsTo(1);
   });
 
-  it("Sam traveled from Brazil to Italy.", () => {
+  it("Sam travelled from Brazil to Italy.", () => {
     let parser = new Parser("Sentence", dict);
-    // TODO: To-Japan seems to be a verb introduced in the dictionary and
-    // creates parsing error which we need to investigate.
-    let results = parser.feed("Sam traveled from Brazil to Italy.");
+    let results = parser.feed("Sam travelled from Brazil to Japan.");
     assertThat(results.length).equalsTo(1);
   });
 

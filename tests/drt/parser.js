@@ -2584,7 +2584,7 @@ describe("large dictionary", () => {
                   VP_(VP(HAVE("has"), VP(V("abandoned"), NP(PRO("her")))))));
   });
 
-  it.skip("They rented the car.", function() {
+  it("They rented the car.", function() {
     assertThat(parse("They rented the car."))
       .equalsTo(S(NP(PRO("They")),
                   VP_(VP(V("rented"), NP(DET("the"), N("car"))))));
