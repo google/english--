@@ -94,13 +94,13 @@ const dict = [
 */
   // Adjectives
   ADJ("brazilian"),
-  ADJ("happy"),
-  ADJ("unhappy"),
-  ADJ("foolish"),  
-  ADJ("fast"),    
-  ADJ("beautiful"),
-  ADJ("mortal"),
-  ADJ("married"),
+  //ADJ("happy"),
+  //ADJ("unhappy"),
+  //ADJ("foolish"),  
+  //ADJ("fast"),    
+  //ADJ("beautiful"),
+  //ADJ("mortal"),
+  //ADJ("married"),
   
   // Verbs
   /**
@@ -124,7 +124,7 @@ const dict = [
   ...V("play", ["+", "-"]),
   ...V("come", ["+", "-"]),
   ...V("travel", "-"),
-**/
+  **/
 ];
 
 const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");
@@ -135,6 +135,10 @@ for (let {inf, trans} of verbs) {
 
 for (let {name, num, gen} of nouns) {
   dict.push(N(name, num, gen));
+}
+
+for (let {name} of adjs) {
+  dict.push(ADJ(name));
 }
 
 module.exports = {

@@ -637,15 +637,15 @@ describe("Lexer", function() {
   });
   
   it("Brian loves an awesome woman.", function() {
-    const {adj_itr} = lexicon;
+    //const {adj_itr} = lexicon;
         
-    const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
+    //const tokens = adj_itr.map((word) => [word, "word", [{"@type": "ADJ"}]]);
     const {Parser} = DRT;
     let parser = new Parser("Statement", dict);
     
-    for (let token of tokens) {
-      parser.add(token);
-    }
+    //for (let token of tokens) {
+    //  parser.add(token);
+    //}
     let {lexer} = parser;
     lexer.reset("Brian loves an awesome woman.");
     assertThat(lexer.next()).equalsTo(token("word", "Brian", 0, [{
@@ -665,7 +665,8 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("an", "an", 12));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 14));
     assertThat(lexer.next()).equalsTo(token("word", "awesome", 15, [{
-      "@type": "ADJ"
+      "@type": "ADJ",
+      "types": {}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 22));
     assertThat(lexer.next()).equalsTo(token("word", "woman", 23, [{
