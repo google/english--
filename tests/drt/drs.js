@@ -1910,6 +1910,27 @@ describe("Large Lexicon", () => {
     `);
   });
 
+  it.skip("Sam was born in Brazil.", function() {
+    assertThat("Sam was born.")
+      .equalsTo(`
+    `);    
+  });
+  
+  it("Brazil is a country. Every person from Brazil is a brazilian.", function() { 
+    assertThat("Brazil is a country. Every person from Brazil is a brazilian. ")
+      .equalsTo(`
+       let a
+       Brazil(a)
+       country(a)
+       every (b: {
+         person(b)
+         from(b, a)
+       }) {
+         brazilian(b)
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

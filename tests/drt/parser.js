@@ -2239,11 +2239,12 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V("loves"), NP(PRO("himself"))))));
   });
 
-  it.skip("John is happy with Mary.", function() {
+  it("John is happy with Mary.", function() {
     // TODO(goto): this probably involves second order logic?
     assertThat(parse("Jones is happy with Mary."))
-     .equalsTo(S(NP(PN("John")),
-                 VP_(VP(V("loves"), NP(PRO("himself"))))));
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"), ADJ(ADJ("happy"),
+                                      PP(PREP("with"), NP(PN("Mary"))))))));
   });
 
   it("Jones walks.", function() {
