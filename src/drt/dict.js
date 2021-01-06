@@ -1,7 +1,7 @@
 const {Inflectors} = require("en-inflectors");
 
 const N = (str, num, gen) => [str, "word", [{"@type": "N", "types": {"num": num, "gen": gen}}]];
-const ADJ = (str, types = {}) => [str, "word", [{"@type": "ADJ", types: types}]];
+const ADJ = (str) => [str, "word", [{"@type": "ADJ"}]];
 const INF = (str, trans) => [str, "word", [{
   "@type": "V",
   "types": {

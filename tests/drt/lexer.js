@@ -661,8 +661,7 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("an", "an", 12));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 14));
     assertThat(lexer.next()).equalsTo(token("word", "awesome", 15, [{
-      "@type": "ADJ",
-      "types": {}
+      "@type": "ADJ"
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 22));
     assertThat(lexer.next()).equalsTo(token("word", "woman", 23, [{
