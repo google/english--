@@ -67,7 +67,7 @@ class Nearley {
       token: e.token,
       loc: e.offset, 
       start: buffer[that.parser.current],
-      get message() { return this.print(); },
+      // get message() { return this.print(); },
       print() {
         const tracks = that.tracks(2);
         //console.log(tracks);
@@ -400,8 +400,10 @@ function match(type, types = {}, conditions = [], data, location, reject,
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
 
-  //console.log(`Bind: ${type} -> ${conditions}`);
-  //console.log(`To: ${data}`);
+  //let b = (types = {}) => Object.entries(types).map(([key, value]) => `${key}=${value}`).join(", ");
+  //let a = (node) => `${node["@type"]}[${b(node.types)}]`;
+  //console.log(`Trying to bind: ${type}[${b(types)}] -> ${expects.map(a).join(" ")}`);
+  //console.log(`To: ${data.map(a).join(" ")}`);
   
   if (!partial && expects.length != data.length) {
     throw new Error("Unexpected data length");
@@ -409,12 +411,13 @@ function match(type, types = {}, conditions = [], data, location, reject,
   
   let variables = {};
 
+  let intersection = (a, b) => a.filter(value => b.includes(value));
+
+  // console.log(intersection([1, 5, 2, 3], [1, 4, 5, 3, 6]));
+  
   for (let i = 0; i < result.length; i++) {
     let expected = expects[i];
     let child = result[i];
-    //if (!child || !expected) {
-    //  console.log(result);
-    //}
     if (expected["@type"] != child["@type"]) {
       return reject;
     }
@@ -422,8 +425,14 @@ function match(type, types = {}, conditions = [], data, location, reject,
       if (typeof value == "number") {
         if (variables[value]) {
           if (Array.isArray(variables[value])) {
-            if (!variables[value].includes(child.types[key])) {
-              // console.log("hi");
+            if (Array.isArray(child.types[key])) {
+              if (intersection(child.types[key], variables[value]).length == 0) {
+                //console.log("hi");
+                //console.log(child.types[key]);
+                //console.log(variables[value]);
+                return reject;
+              }
+            } else if (!variables[value].includes(child.types[key])) {
               return reject;
             }
           } else if (typeof variables[value] == "number") {
@@ -481,6 +490,8 @@ function match(type, types = {}, conditions = [], data, location, reject,
       }
     }
   }
+
+  //console.log("Done!");
   
   return {
     "@type": type,
@@ -654,10 +665,11 @@ class FeaturedNearley {
                                     "types": ${JSON.stringify(head.types)}
                                   }])([match], location, reject);
                 if (result != reject) {
-                  //console.log(result.children[0]);
+                  // console.log(result.children[0]);
                   let node = JSON.parse(JSON.stringify(result.children[0]));
                   node.children = [{value: token.value}];
-                 return node;
+                  //console.log(node);
+                  return node;
                 }
               }
               return reject;
@@ -916,7 +928,7 @@ const DrtSyntax = `
       V[fin=+] -> %word.
       PN[] -> %word.
       ADJ[] -> %word.
-      N[] -> %word.      
+      N[num=1, gen=2] -> %word.      
 `;
 
 let DRTGrammar;
@@ -978,6 +990,7 @@ class Parser {
     // punctuation
     this.load([
       [" ", "WS"],
+      ["\n", "WS"],
       [".", "PERIOD"],
       ["?", "QUESTION"],
       ["'s", "POSS"],

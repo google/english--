@@ -1911,14 +1911,35 @@ describe("Large Lexicon", () => {
   });
 
   it.skip("Sam was born in Brazil.", function() {
-    assertThat("Sam was born.")
+    // TODO: expand prepositional phrases in adjectives.
+    assertThat("Sam was born in Brazil.")
       .equalsTo(`
+        let a
+        Sam(a)
+        Brazil(b)
+        < born(a)
+    `);    
+  });
+
+  it("Every person who is from Brazil is brazilian.", function() {
+    assertThat("Every person who is from Brazil is brazilian.")
+      .equalsTo(`
+       let a
+       Brazil(a)
+       every (b: {
+         person(b)
+         from(b, a)
+       }) {
+         brazilian(b)
+       }
     `);    
   });
   
   it("Brazil is a country. Every person from Brazil is a brazilian.", function() { 
-    assertThat("Brazil is a country. Every person from Brazil is a brazilian. ")
-      .equalsTo(`
+    assertThat(`
+        Brazil is a country. 
+        Every person from Brazil is a brazilian.
+    `).equalsTo(`
        let a
        Brazil(a)
        country(a)
@@ -1947,6 +1968,7 @@ describe("Large Lexicon", () => {
         let parser = new Parser("Discourse", dict);
         parser.load(dict);
         let sentences = parser.feed(x);
+        // console.log(sentences);
         drs.feed(sentences);
         Assert.deepEqual(drs.print(), this.trim(y));
       }

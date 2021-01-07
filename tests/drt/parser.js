@@ -567,6 +567,59 @@ describe("Binding", function() {
     });
   });
 
+  it("Binds and array entry to a literal", function() {
+    let post = bind("VP", {"num": 1}, [{
+       "@type": "V",
+       "types": {"num": 1}
+      }, {
+       "@type": "NP",
+       "types": {"num": 1}
+      }]);
+
+    assertThat(post([{
+        "@type": "V", 
+        "types": {"num": "sing"}, 
+      }, {
+        "@type": "NP", 
+        "types": {"num": ["sing", "plur"]}, 
+    }]))
+    .equalsTo({
+      "@type": "VP", 
+      "types": {"num": "sing"}, 
+      "children": [{
+          "@type": "V", 
+          "types": {"num": "sing"}, 
+        }, {
+          "@type": "NP", 
+          "types": {"num": ["sing", "plur"]}, 
+      }]
+    });
+  });
+
+  it("Binds array to array", function() {
+    //Trying to bind: N[num=1, gen=2] -> N[num=1, gen=2] __[] RC[num=1, gen=2]
+    //To: N[num=sing, gen=male,fem] __[] RC[num=sing, gen=male,fem]
+    let post = bind("N", {num: 1, gen: 2}, [{
+      "@type": "N",
+      "types": {num: 1, gen: 2}
+    }, {
+      "@type": "RC",
+      "types": {num: 1, gen: 2}
+    }]);
+
+    // TODO: we should add mores tests for different types of
+    // intersection corner cases, like rotating the order of the
+    // elements, etc.
+    assertThat(post([{
+      "@type": "N", 
+      "types": {num: "sing", gen: ["male", "fem"]},
+    }, {
+      "@type": "RC", 
+      "types": {num: "sing", gen: ["male", "fem"]}, 
+    }]).types)
+      .equalsTo({num: "sing", "gen": ["male", "fem"]});
+  });
+  
   it("Numbers", function() {
     let parser = Nearley.from(`
       @builtin "number.ne"
@@ -2586,14 +2639,31 @@ describe("large dictionary", () => {
                            NP(PN("Brazil")))))));
   });
 
+  it("Every person who was born is brazilian.", function() {
+    assertThat(parse("Every person who was born is brazilian."))
+      .equalsTo(S(NP(DET("Every"),
+                     N(N("person"), RC(RPRO("who"),
+                                       S(NP(GAP()), VP_(VP(BE("was"), ADJ("born"))))
+                                      ))),
+                  VP_(VP(BE("is"),
+                         ADJ("brazilian")))));
+  });
+
+  it("Every person who was born in Brazil is brazilian.", function() {
+    assertThat(parse("Every person who was born in Brazil is brazilian."))
+      .equalsTo(2);
+  });
+
   function parse(s) {
     const {dict} = require("../../src/drt/dict.js");
     let parser = new Parser("Sentence", dict);
 
-    //console.log(parser.lexer.head["p"]["e"]["o"]["p"]["l"]["e"].done[2].types);
-    //return;
-    
     const result = parser.feed(s);
+
+    if (result.length > 1) {
+      return result.length;
+    }
+    
     return clear(result[0].children[0].children[0].children[0]);
   }
   
