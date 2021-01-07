@@ -771,6 +771,7 @@ class CRVPEVERY extends Rule {
     }
     // console.log(det);
 
+    // throw new Error("hi");
     let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
@@ -778,6 +779,7 @@ class CRVPEVERY extends Rule {
     // n.head.push(ref);
     noun.ref = ref;
     n.push(noun);
+    // console.log(noun);
     
     let verb = drs(this.ids);
     verb.head.push(...clone(n.head));

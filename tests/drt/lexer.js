@@ -657,7 +657,7 @@ describe("Lexer", function() {
       "types": {"fin": "+", "num": "sing", "stat": "-", "tense": "pres", "trans": ["-", "+"]}
     }, {
       "@type": "N",
-      "prop": "loves",
+      "prop": "love",
       "types": {"gen": "-hum", "num": "plur"}
     }]));
     assertThat(lexer.next()).equalsTo(token("WS", " ", 11));
@@ -1006,10 +1006,10 @@ describe("Lexer", function() {
       "fem": "fem",
     };
     for (let [name, key, gen] of noun_sg) {
-      nouns.push({name: name, num: "sing", gen: genders[gen]});
+      nouns.push({name: name, num: "sing", gen: genders[gen], prop: key});
     }
     for (let [name, key, gen] of noun_pl) {
-      nouns.push({name: name, num: "plur", gen: genders[gen]});
+      nouns.push({name: name, num: "plur", gen: genders[gen], prop: key});
     }
     
     let verbs = {};

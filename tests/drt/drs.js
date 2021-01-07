@@ -1946,7 +1946,7 @@ describe("Large Lexicon", () => {
         let a
         Brazil(a)
         211m (b: {
-          peoples(b)
+          people(b)
         }) {
           in(e, a)
           live(b)
@@ -1977,6 +1977,19 @@ describe("Large Lexicon", () => {
       `);
   });
 
+  it("Brazil borders most countries.", () => {
+    assertThat("Brazil borders most countries.")
+      .equalsTo(`
+        let a
+        Brazil(a)
+        most (b: {
+          country(b)
+        }) {
+          border(a, b)
+        }
+      `);
+  });
+  
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
     //   - The capital of Brazil is Brasilia.
@@ -2004,6 +2017,7 @@ describe("Large Lexicon", () => {
         Brazil is classified by The-World-Bank and an industrialized country.
         Brazil is a member of The-United-Nations.
     `);
+    // .equalsTo("");
   });
 
   function assertThat(x) { 

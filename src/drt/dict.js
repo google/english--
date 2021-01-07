@@ -96,8 +96,8 @@ for (let {inf, trans, pp} of verbs) {
   dict.push(...V(inf, trans, pp));
 }
 
-for (let {name, num, gen} of nouns) {
-  dict.push(N(name, num, gen));
+for (let {name, num, gen, prop} of nouns) {
+  dict.push(N(name, num, gen, prop));
 }
 
 for (let {name} of adjs) {
