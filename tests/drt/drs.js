@@ -1726,7 +1726,7 @@ describe("DRS", function() {
         Mel(a)
         Brazil(b)
         unhappy(a)
-        about(a, b)
+        unhappy-about(a, b)
      `);
   });
 
@@ -2025,8 +2025,8 @@ describe("Large Lexicon", () => {
         East(b)
         Atlantic Ocean(c)
         bounded(a)
-        on(a, b)
-        by(a, c)
+        bounded-on(a, b)
+        bounded-by(a, c)
       `);
   });
 
@@ -2068,8 +2068,8 @@ describe("Large Lexicon", () => {
         tribal-nation(d)
         nation(d)
         of(a, b)
-        before(a, c)
-        by(a, d)
+        inhabited-before(a, c)
+        inhabited-by(a, d)
       `);        
   });
 
@@ -2103,8 +2103,8 @@ describe("Large Lexicon", () => {
         Lisbon(c)
         capital(d, a)
         transferred(d)
-        to(d, b)
-        from(d, c)
+        transferred-to(d, b)
+        transferred-from(d, c)
       `);
   });
 
@@ -2120,8 +2120,8 @@ describe("Large Lexicon", () => {
         classified(a)
         industrialized-country(c)
         country(c)
-        as(a, c)
-        by(a, b)
+        classified-as(a, c)
+        classified-by(a, b)
       `);
   });
 
@@ -2147,7 +2147,7 @@ describe("Large Lexicon", () => {
         considered(a)
         advanced-economy(b)
         economy(b)
-        as(a, b)
+        considered-as(a, b)
       `);
   });
 
@@ -2208,8 +2208,8 @@ describe("Large Lexicon", () => {
        East(i)
        Atlantic Ocean(j)
        bounded(f)
-       on(f, i)
-       by(f, j)
+       bounded-on(f, i)
+       bounded-by(f, j)
        Portuguese(k)
        l = k
        official-language(l)
@@ -2221,28 +2221,28 @@ describe("Large Lexicon", () => {
        tribal-nation(o)
        nation(o)
        of(l, m)
-       before(l, n)
-       by(l, o)
+       inhabited-before(l, n)
+       inhabited-by(l, o)
        Portugese Empire(p)
        Rio De Janeiro(q)
        Lisbon(r)
        capital(s, p)
        transferred(s)
-       to(s, q)
-       from(s, r)
+       transferred-to(s, q)
+       transferred-from(s, r)
        World Bank(t)
        classified(l)
        industrialized-country(u)
        country(u)
-       as(l, u)
-       by(l, t)
+       classified-as(l, u)
+       classified-by(l, t)
        United Nations(v)
        member(l)
        of(l, v)
        considered(l)
        advanced-economy(w)
        economy(w)
-       as(l, w)
+       considered-as(l, w)
     `);
   });
 

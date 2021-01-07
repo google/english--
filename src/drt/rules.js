@@ -419,6 +419,8 @@ class CRPPLIN extends Rule {
     }
 
     const noun = child(node, 0);
+
+    // throw new Error("hi");
     
     let body = [];
     noun.ref = node.ref;
@@ -465,10 +467,25 @@ class CRPPADJLIN extends Rule {
     adj.ref = node.ref;
     body.push(adj);
 
+    let name = [];
+    let i = adj;
+    while (i && i["@type"] == "ADJ") {
+      if (i.prop) {
+        name.push(i.prop);
+      } else if (child(i, 0).prop) {
+        name.push(child(i, 0).prop);
+        // console.log(child(i, 0));
+      }
+      //console.log(JSON.stringify(i));
+      i = child(i, 1);
+    }
+
+    name.push(child(prep, 0).value);
+    //console.log(name.join("-"));
+    child(prep, 0).value = name.join("-");
+    
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
-
-    // throw new Error("hi");
     
     return [[], body, [], [node]];
   }
@@ -1005,16 +1022,11 @@ class CRADJ extends Rule {
     super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
   }
   apply({adj, noun}, node, refs) {
-    // adj = clone(adj);
     noun = clone(noun);
-    // adj.ref = node.ref;
-    // throw new Error("hi");
     noun.ref = node.ref;
-    //console.log(noun);
     let name = [];
     let i = node;
     while (i && i["@type"] == "N") {
-      //console.log(i.prop);
       if (i.prop) {
         name.push(i.prop);
       } else {
@@ -1022,10 +1034,7 @@ class CRADJ extends Rule {
       }
       i = child(i, 1);
     }
-    //console.log(name.join("-"));
-    //console.log(noun);
     let pred = predicate(name.join("-"), [node.ref[0]]);
-    // console.log(pred);
     
     return [[], [noun, pred], [], [node]];
   }
