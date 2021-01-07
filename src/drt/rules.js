@@ -979,13 +979,13 @@ class CRVPPOSS extends Rule {
     child(node, 1, 0).children[1] = u;
     // console.log(noun);
     // console.log(child(name, 0));
-    //let n = clone(noun);
-    //n.ref = child(name, 0);
+    let s = clone(noun);
+    s.ref = [u, child(name, 0)];
     // console.log(child(name, 0));
     //noun.ref = child(name, 0);
 
     // let s = S(u, VP_(VP(BE("is"), NP(DET("a"), noun))));
-    let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
+    //let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     
     return [[u], [s], [], []];
   }
@@ -1007,7 +1007,7 @@ class CRADJ extends Rule {
     // adj.ref = node.ref;
     noun.ref = node.ref;
     // console.log(adj);
-    let pred = predicate(adj.prop, node.ref);
+    let pred = predicate(adj.prop, [node.ref[0]]);
     // console.log(pred);
     
     return [[], [noun, pred], [], [node]];

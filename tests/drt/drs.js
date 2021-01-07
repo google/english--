@@ -841,8 +841,8 @@ describe("DRS", function() {
        let a, b, c
        Smith(a)
        Jones(b)
-       like(a, c)
        wife(c, b)
+       like(a, c)
     `);
   });
 
@@ -1112,8 +1112,8 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        c = d
-       father(c, a)
        husband(d, b)
+       father(c, a)
     `);
   });
 
@@ -1177,9 +1177,9 @@ describe("DRS", function() {
        let a, b, c, d
        Jones(a)
        Mary(b)
+       sister(d, b)
        wife(c, a)
        behind(c, d)
-       sister(d, b)
     `);
   });
 
@@ -1791,19 +1791,12 @@ describe("Large Lexicon", () => {
       let a, b, c
       Mel(a)
       Yuji(b)
-      like(a, c)
       girlfriend(c, b)
+      like(a, c)
     `);
   });
 
-  it.skip("Mel likes Yuji's awesome girlfriend.", function() {
-    // TODO: this fails because our CRVPPOSS rule isn't
-    // using CRLIN correctly.
-    // Mel likes Yuji's girlfriend works correctly, but
-    // if you add the adjective before the noun it doesn't.
-    // There is a chance we are going to have to rethink how
-    // CLIN and refs work to enable this use case, possibly
-    // making refs be arrays rather than primitives.
+  it("Mel likes Yuji's awesome girlfriend.", function() {
     assertThat("Mel likes Yuji's awesome girlfriend.")
       .equalsTo(`
       let a, b, c
@@ -2018,8 +2011,8 @@ describe("Large Lexicon", () => {
           state(b)
         }) {
           let c
-          compose(b, c)
           federation(c, a)
+          compose(b, c)
         }
       `);
   });
