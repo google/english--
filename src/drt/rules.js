@@ -401,7 +401,6 @@ class CRNLIN extends Rule {
       return [[], [], [], []];
     }
 
-    // console.log(node);
     let pred = predicate(noun.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
@@ -413,21 +412,31 @@ class CRPPLIN extends Rule {
     super(ids, N(capture("noun"),
                  PP(PREP(capture("prep")), capture("np"))));
   }
-  apply({prep, np}, node) {
+  apply({noun, prep, np}, node) {
     if (!node.ref) {
       return [[], [], [], []];
     }
 
-    const noun = child(node, 0);
+    const n = child(node, 0);
 
     let body = [];
-    noun.ref = node.ref;
-    body.push(noun);
+    n.ref = node.ref;
+    body.push(n);
 
-    if (noun.prop) {
-      // TODO: we have to deal with the case where the noun is composite.
-      child(prep, 0).value = noun.prop + "-" + child(prep, 0).value;
+    let name = [];
+    let i = child(noun, 0);
+    while (i && i["@type"] == "N") {
+      if (i.prop) {
+        name.push(i.prop);
+      } else if (child(i, 0).prop) {
+        name.push(child(i, 0).prop);
+      }
+      i = child(i, 1);
     }
+
+    name.push(child(prep, 0).value);
+
+    child(prep, 0).value = name.join("-");
     
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);

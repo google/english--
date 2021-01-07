@@ -1714,7 +1714,7 @@ describe("DRS", function() {
        Cascal(c)
        reservation(d)
        < make(a, d)
-       for(d, b)
+       reservation-for(d, b)
        reservation-for(d, c)
      `);
   });
@@ -1760,7 +1760,7 @@ describe("DRS", function() {
        porsche(c)
        woman(d)
        < make(a, b)
-       with(b, c)
+       reservation-with(b, c)
        reservation-for(b, d)
      `);
   });
@@ -2051,7 +2051,7 @@ describe("Large Lexicon", () => {
         c = a
         official-language(c)
         language(c)
-        of(c, b)
+        official-language-of(c, b)
       `);
   });
 
