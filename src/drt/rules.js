@@ -364,11 +364,13 @@ class CRSID extends Rule {
 
 class CRVPID extends Rule {
   constructor(ids) {
+    // super(ids, S(NP(), VP_(VP(V(), NP(DET(capture("det")), N(capture("noun")))))));
     super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
   }
   
   apply({det, noun}, node, refs) {
-    // console.log("hi");
+    /// console.log("hi");
+    // throw new Error("hi");
     if (!(det.children[0].value == "a" || det.children[0].value == "an")) {
       return [[], [], [], []];
     }
