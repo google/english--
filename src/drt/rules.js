@@ -1008,9 +1008,23 @@ class CRADJ extends Rule {
     // adj = clone(adj);
     noun = clone(noun);
     // adj.ref = node.ref;
+    // throw new Error("hi");
     noun.ref = node.ref;
-    //console.log(node);
-    let pred = predicate(adj.prop, [node.ref[0]]);
+    //console.log(noun);
+    let name = [];
+    let i = node;
+    while (i && i["@type"] == "N") {
+      //console.log(i.prop);
+      if (i.prop) {
+        name.push(i.prop);
+      } else {
+        name.push(child(i, 0).prop);
+      }
+      i = child(i, 1);
+    }
+    //console.log(name.join("-"));
+    //console.log(noun);
+    let pred = predicate(name.join("-"), [node.ref[0]]);
     // console.log(pred);
     
     return [[], [noun, pred], [], [node]];

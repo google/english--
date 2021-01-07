@@ -325,7 +325,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       happy(a)
+       happy-man(a)
        man(a)
     `);
   });
@@ -336,7 +336,7 @@ describe("DRS", function() {
        let a, b
        Jones(a)
        Mary(b)
-       happy(a)
+       happy-man(a)
        man(a)
        love(a, b)
     `);
@@ -870,7 +870,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       unhappy(b)
+       unhappy-donkey(b)
        donkey(b)
        own(a, b)
     `);
@@ -881,7 +881,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       fast(b)
+       fast-porsche(b)
        porsche(b)
        own(a, b)
     `);
@@ -893,7 +893,7 @@ describe("DRS", function() {
        let a
        Jones(a)
        every (b: {
-         fast(b)
+         fast-porsche(b)
          porsche(b)
        }) {
          own(a, b)
@@ -907,7 +907,7 @@ describe("DRS", function() {
        let a
        Jones(a)
        every (b: {
-         beautiful(b)
+         beautiful-woman(b)
          woman(b)
        }) {
          love(b, a)
@@ -1123,7 +1123,7 @@ describe("DRS", function() {
        let a, b
        Mary(a)
        father(b, a)
-       brazilian(b)
+       brazilian-engineer(b)
        engineer(b)
     `);
   });
@@ -1143,7 +1143,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       brazilian(b)
+       brazilian-engineer(b)
        engineer(b)
        like(a, b)
     `);
@@ -1154,7 +1154,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       married(b)
+       married-brazilian(b)
        brazilian(b)
        like(a, b)
     `);
@@ -1802,7 +1802,7 @@ describe("Large Lexicon", () => {
       let a, b, c
       Mel(a)
       Yuji(b)
-      awesome(c)
+      awesome-girlfriend(c)
       girlfriend(c, b)
       like(a, c)
     `);
@@ -1813,7 +1813,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
       let a
       Yuji(a)
-      awesome(a)
+      awesome-person(a)
       person(a)
     `);
   });
@@ -1823,8 +1823,8 @@ describe("Large Lexicon", () => {
       .equalsTo(`
       let a
       Jones(a)
-      unhappy(a)
-      foolish(a)
+      unhappy-foolish-man(a)
+      foolish-man(a)
       man(a)
     `);
   });
@@ -1834,7 +1834,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
        let a, b
        Mel(a)
-       awesome(b)
+       awesome-country(b)
        country(b)
        to(e, b)
        < travel(a)
@@ -2037,7 +2037,7 @@ describe("Large Lexicon", () => {
         Brazil(a)
         Portuguese(b)
         c = b
-        official(c)
+        official-language(c)
         language(c, a)
       `);
   });
@@ -2049,7 +2049,7 @@ describe("Large Lexicon", () => {
         Portuguese(a)
         Brazil(b)
         c = a
-        official(c)
+        official-language(c)
         language(c)
         of(c, b)
       `);
@@ -2065,7 +2065,7 @@ describe("Large Lexicon", () => {
         Pedro Alvares Cabral(b)
         inhabited(a)
         landing(c)
-        tribal(d)
+        tribal-nation(d)
         nation(d)
         of(a, b)
         before(a, c)
@@ -2118,7 +2118,7 @@ describe("Large Lexicon", () => {
         Brazil(a)
         World Bank(b)
         classified(a)
-        industrialized(c)
+        industrialized-country(c)
         country(c)
         as(a, c)
         by(a, b)
@@ -2145,7 +2145,7 @@ describe("Large Lexicon", () => {
         let a, b
         Brazil(a)
         considered(a)
-        advanced(b)
+        advanced-economy(b)
         economy(b)
         as(a, b)
       `);
@@ -2212,13 +2212,13 @@ describe("Large Lexicon", () => {
        by(f, j)
        Portuguese(k)
        l = k
-       official(l)
+       official-language(l)
        language(l)
        of(l, f)
        Pedro Alvares Cabral(m)
        inhabited(l)
        landing(n)
-       tribal(o)
+       tribal-nation(o)
        nation(o)
        of(l, m)
        before(l, n)
@@ -2232,7 +2232,7 @@ describe("Large Lexicon", () => {
        from(s, r)
        World Bank(t)
        classified(l)
-       industrialized(u)
+       industrialized-country(u)
        country(u)
        as(l, u)
        by(l, t)
@@ -2240,7 +2240,7 @@ describe("Large Lexicon", () => {
        member(l)
        of(l, v)
        considered(l)
-       advanced(w)
+       advanced-economy(w)
        economy(w)
        as(l, w)
     `);
