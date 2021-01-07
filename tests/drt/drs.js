@@ -1939,31 +1939,36 @@ describe("Large Lexicon", () => {
     assertThat("Brazil borders all countries in South America but Chile and Ecuador.")
       .equalsTo();
   });
+
+  it("211M peoples live in Brazil.", () => {
+    assertThat("211M peoples live in Brazil.")
+      .equalsTo(`
+        let a
+        Brazil(a)
+        211m (b: {
+          peoples(b)
+        }) {
+          in(e, a)
+          live(b)
+        }
+    `);
+  });
+
   
-  it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
+  it.skip("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
+    // Things that I'd expect to be able to write:
+    //   - The capital of Brazil is Brasilia.
+    //   - Brazil's official language is Portuguese. // <- this is the problem with adjectives and nouns
+    //   - Brazil's population is 211 million people.
+    //   - 211 million people live in Brazil.
     assertThat(`
         Brazil is a country in South America. 
         Brazil borders all countries in South America.
+        Brazil's capital is Brasilia.
+        211M peoples live in Brazil.
+        Brazil's language is Portuguese.
         Every person from Brazil is a brazilian.
-    `).equalsTo(`
-        let a, b
-        Brazil(a)
-        South-America(b)
-        country(a)
-        in(a, b)
-        all (c: {
-          countries(c)
-          in(c, b)
-        }) {
-          border(a, c)
-        }
-        every (d: {
-          person(d)
-          from(d, a)
-        }) {
-          brazilian(d)
-        }
-    `);
+    `).equalsTo(``);
   });
 
   function assertThat(x) { 

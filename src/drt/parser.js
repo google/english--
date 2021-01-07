@@ -491,7 +491,7 @@ function match(type, types = {}, conditions = [], data, location, reject,
     }
   }
 
-  //console.log("Done!");
+  // console.log("Done!");
   
   return {
     "@type": type,

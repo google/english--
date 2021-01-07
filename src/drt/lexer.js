@@ -75,7 +75,7 @@ class Tokenizer {
 
     {
       // numbers.
-      let match = this.buffer.match(/^([0-9]+)/);
+      let match = this.buffer.match(/^([0-9]+[KM]?)/);
       if (match) {
         let [full, number] = match;
         this.eat(number);
@@ -147,7 +147,6 @@ class Tokenizer {
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
     this.loc += str.length;
-    // console.log(`eating [${str}]`);
     return this;
   }
   get(str) {

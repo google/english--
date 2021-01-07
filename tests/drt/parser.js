@@ -2649,6 +2649,22 @@ describe("large dictionary", () => {
                          ADJ("brazilian")))));
   });
 
+  it("They live in Brazil.", function() {
+    assertThat(parse("They live in Brazil."))
+      .equalsTo(S(NP(PRO("They")),
+                  VP_(VP(V(V("live"),
+                           PP(PREP("in"), NP(PN("Brazil")))
+                          )))));
+  });
+
+  it("3 peoples live in Brazil.", function() {
+    assertThat(parse("3 peoples live in Brazil."))
+      .equalsTo(S(NP(DET("3"), N("peoples")),
+                  VP_(VP(V(V("live"),
+                           PP(PREP("in"), NP(PN("Brazil")))
+                          )))));
+  });
+
   it("Every person who was born in Brazil is brazilian.", function() {
     assertThat(parse("Every person who was born in Brazil is brazilian."))
       .equalsTo(2);
