@@ -818,8 +818,8 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       happy(b)
        wife(b, a)
+       happy(b)
     `);
   });
 
@@ -828,8 +828,8 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b, c
        Jones(a)
-       happy(b)
        wife(b, a)
+       happy(b)
        Smith(c)
        like(b, c)
     `);
@@ -1112,8 +1112,8 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        c = d
-       husband(d, b)
        father(c, a)
+       husband(d, b)
     `);
   });
 
@@ -1122,9 +1122,9 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Mary(a)
+       father(b, a)
        brazilian(b)
        engineer(b)
-       father(b, a)
     `);
   });
 
@@ -1177,8 +1177,8 @@ describe("DRS", function() {
        let a, b, c, d
        Jones(a)
        Mary(b)
-       sister(d, b)
        wife(c, a)
+       sister(d, b)
        behind(c, d)
     `);
   });
@@ -2033,12 +2033,13 @@ describe("Large Lexicon", () => {
   it("Brazil's official language is Portuguese.", () => {
     // Brazil's official language is Portuguese runs into the
     // adj + noun problem.
-    assertThat("Brazil's language is Portuguese.")
+    assertThat("Brazil's official language is Portuguese.")
       .equalsTo(`
         let a, b, c
         Brazil(a)
         Portuguese(b)
         c = b
+        official(c)
         language(c, a)
       `);
   });

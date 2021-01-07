@@ -953,7 +953,10 @@ class CRSPOSS extends Rule {
     
     // console.log("hi");
     
-    let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
+    // let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
+    let s = clone(noun);
+    s.ref = [u, child(name, 0)];
+
     // console.log(noun.children[0]);
     // console.log(child(s, 1, 0, 0));
     
