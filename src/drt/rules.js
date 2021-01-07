@@ -374,10 +374,10 @@ class CRVPID extends Rule {
   
   apply({det, noun}, node, refs) {
     /// console.log("hi");
-    // throw new Error("hi");
-    if (!(det.children[0].value == "a" || det.children[0].value == "an")) {
-      return [[], [], [], []];
-    }
+    //throw new Error("hi");
+    //if (!(det.children[0].value == "a" || det.children[0].value == "an")) {
+    //  return [[], [], [], []];
+    //}
     
     // console.log("hi");
     

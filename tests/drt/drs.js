@@ -1719,16 +1719,14 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Mel is unhappy about Brazil", function() { 
-    // We need to allow prepositional phrases with adjectives.
+  it("Mel is unhappy about Brazil", function() { 
     assertThat("Mel is unhappy about Brazil.")
      .equalsTo(`
-       let a, b, c
-       Jones(a)
-       Italy(b)
-       Brazil(c)
-       < come(a, b)
-       < come-from(a, c)
+        let a, b
+        Mel(a)
+        Brazil(b)
+        unhappy(a)
+        about(a, b)
      `);
   });
 
@@ -1935,9 +1933,30 @@ describe("Large Lexicon", () => {
     `);    
   });
 
-  it.skip("Brazil borders all countries in South America but Chile and Ecuador.", () => {
-    assertThat("Brazil borders all countries in South America but Chile and Ecuador.")
-      .equalsTo();
+  it("Brazil is a country in South America.", () => {
+    assertThat("Brazil is a country in South America.")
+      .equalsTo(`
+        let a, b
+        Brazil(a)
+        South-America(b)
+        country(a)
+        in(a, b)
+      `);
+  });
+
+  it("Brazil borders most countries in South America.", () => {
+    assertThat("Brazil borders all countries in South America.")
+      .equalsTo(`
+        let a, b
+        Brazil(a)
+        South-America(b)
+        all (c: {
+          country(c)
+          in(c, b)
+        }) {
+          border(a, c)
+        }
+      `);
   });
 
   it("211M peoples live in Brazil.", () => {
@@ -1990,17 +2009,78 @@ describe("Large Lexicon", () => {
       `);
   });
 
-  it("Brazil is bounded by The-Atlantic-Ocean.", () => {
-    assertThat("Brazil is bounded by The-Atlantic-Ocean.")
+  it("26 states compose Brazil's federation.", () => {
+    assertThat("26 states compose Brazil's federation.")
       .equalsTo(`
-        let a, b
+        let a
         Brazil(a)
-        The-Atlantic-Ocean(b)
-        bounded(a)
-        by(a, b)
+        26 (b: {
+          state(b)
+        }) {
+          let c
+          compose(b, c)
+          federation(c, a)
+        }
       `);
   });
   
+  it("Brazil is bounded by The-Atlantic-Ocean on The-East.", () => {
+    assertThat("Brazil is bounded by The-Atlantic-Ocean on The-East .")
+      .equalsTo(`
+        let a, b, c
+        Brazil(a)
+        The-East(b)
+        The-Atlantic-Ocean(c)
+        bounded(a)
+        on(a, b)
+        by(a, c)
+      `);
+  });
+
+  it("Brazil's official language is Portuguese.", () => {
+    // Brazil's official language is Portuguese runs into the
+    // adj + noun problem.
+    assertThat("Brazil's language is Portuguese.")
+      .equalsTo(`
+        let a, b, c
+        Brazil(a)
+        Portuguese(b)
+        c = b
+        language(c, a)
+      `);
+  });
+
+  it("The official language of Brazil is Portuguese.", () => {
+    assertThat("The official language of Brazil is Portuguese.")
+      .equalsTo(`
+        let a, b, c
+        Portuguese(a)
+        Brazil(b)
+        c = a
+        official(c)
+        language(c)
+        of(c, b)
+      `);
+  });
+
+  it.skip("Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.", () => {
+    // The prepositional phrases aren't tied quite right, specially "the landing of" isn't
+    // tieing back the landing to Pedro Alvares Cabral.
+    assertThat("Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.")
+      .equalsTo(`
+        let a, b, c, d
+        Brazil(a)
+        Pedro-Alvares-Cabral(b)
+        inhabited(a)
+        landing(c)
+        tribal(d)
+        nation(d)
+        of(a, b)
+        before(a, c)
+        by(a, d)
+      `);        
+  });
+
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
     //   - The capital of Brazil is Brasilia.
@@ -2008,14 +2088,13 @@ describe("Large Lexicon", () => {
     //   - Brazil's population is 211 million people.
     //   - 211 million people live in Brazil.
     //   - 26 states compose the federation of Brazil: Sao Paulo, etc, etc.
-    //   - Brazil is bounded by the Atlantic Ocean [on the East].
     //   - "prior to a landing of explorer Pedro Alvarez Cabral.
     //   - Brazil remained a colony.
     //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     //   - Brazil is considered an advanced emerging economy.
     //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat(`
-        Brazil is a country in South America. 
+        
         Brazil borders most countries in South America.
         The capital of Brazil is Brasilia.
         211M peoples live in Brazil.
@@ -2028,7 +2107,7 @@ describe("Large Lexicon", () => {
         Brazil is classified by The-World-Bank and an industrialized country.
         Brazil is a member of The-United-Nations.
     `);
-      // .equalsTo("");
+     //.equalsTo("");
   });
 
   function assertThat(x) { 
