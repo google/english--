@@ -1966,15 +1966,14 @@ describe("Large Lexicon", () => {
       `);
   });
 
-  it.skip("Brasilia is the capital of Brazil.", () => {
+  it("Brasilia is the capital of Brazil.", () => {
     assertThat("Brasilia is a capital of Brazil.")
       .equalsTo(`
-        let a, b, c
+        let a, b
         Brasilia(a)
         Brazil(b)
-        c is a
-        capital(c)
-        of(c, b)
+        capital(a)
+        of(a, b)
       `);
   });
 
