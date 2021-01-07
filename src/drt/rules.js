@@ -154,17 +154,19 @@ function referent(name, types, value, loc) {
 }
 
 function predicate(name, args, types, infix = false) {
+  // throw new Error("");
   return {
     "@type": "Predicate",
     name: name,
     args: args,
     types: types,
     print() {
-      let args = this.args.map(arg => print(arg));
+      //console.log(args);
+      let params = this.args.map(arg => print(arg));
       if (infix) {
-        return args.join(` ${this.name} `);
+        return params.join(` ${this.name} `);
       }
-      return `${this.name}(${args.join(", ")})`;
+      return `${this.name}(${params.join(", ")})`;
     }
   }
 }
@@ -359,7 +361,7 @@ class CRSID extends Rule {
     }
 
     let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
-    noun.ref = ref;
+    noun.ref = [ref];
     node.children[0] = ref;
     
     return [[ref], [noun], [], []];
@@ -368,27 +370,16 @@ class CRSID extends Rule {
 
 class CRVPID extends Rule {
   constructor(ids) {
-    // super(ids, S(NP(), VP_(VP(V(), NP(DET(capture("det")), N(capture("noun")))))));
     super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
   }
   
   apply({det, noun}, node, refs) {
-    /// console.log("hi");
-    //throw new Error("hi");
-    //if (!(det.children[0].value == "a" || det.children[0].value == "an")) {
-    //  return [[], [], [], []];
-    //}
-    
-    // console.log("hi");
-    
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
     let ref = referent(this.id(), types, print(child(node, 1), refs));
-    noun.ref = ref;
+    noun.ref = [ref];
     node.children[1] = ref;
-    
-    // console.log(node);
     
     return [[ref], [noun], [], []];
   }
@@ -410,7 +401,8 @@ class CRNLIN extends Rule {
       return [[], [], [], []];
     }
 
-    let pred = predicate(noun.prop, [node.ref], node.types);
+    // console.log(node);
+    let pred = predicate(noun.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
   }
@@ -432,7 +424,7 @@ class CRPPLIN extends Rule {
     noun.ref = node.ref;
     body.push(noun);
 
-    let cond = S(node.ref, VP_(VP(V(child(prep, 0)), child(np, 1))));
+    let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
     return [[], body, [], [node]];
@@ -449,7 +441,9 @@ class CRADJLIN extends Rule {
       return [[], [], [], []];
     }
 
-    let pred = predicate(adj.prop, [node.ref], node.types);
+    //console.log(adj);
+    
+    let pred = predicate(adj.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
   }
@@ -471,7 +465,7 @@ class CRPPADJLIN extends Rule {
     adj.ref = node.ref;
     body.push(adj);
 
-    let cond = S(node.ref, VP_(VP(V(child(prep, 0)), child(np, 1))));
+    let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
 
     // throw new Error("hi");
@@ -529,18 +523,18 @@ class CRNRC extends Rule {
     
     if (match(g1, s)) {
       // console.log(child(s, 1, 2, 1));
-      child(s, 1, 2).children[1] = node.ref;
+      child(s, 1, 2).children[1] = node.ref[0];
     }
     
     // Binds gap to the referent.
     let object = child(s, 1, 0, 1);
     if (object && object.children && object.children[0]["@type"] == "GAP") {
-      child(s, 1, 0).children[1] = node.ref;
+      child(s, 1, 0).children[1] = node.ref[0];
     }
     
     let subject = s.children[0];
     if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
-      s.children[0] = node.ref;
+      s.children[0] = node.ref[0];
     }
     
     let noun = node.children.pop();
@@ -607,7 +601,7 @@ class CRPOSBE extends Rule {
     //let s = predicate(adj.prop, [ref.children[0]], node.types);
     // console.log(adj);
     // let s = clone(adj);
-    adj.ref = child(ref, 0);
+    adj.ref = [child(ref, 0)];
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
       adj.types.tense = node.types.tense;
@@ -658,7 +652,7 @@ class CRNBE extends Rule {
   }
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
-    np.ref = child(ref, 0);
+    np.ref = [child(ref, 0)];
     // console.log("hi");
     // throw new Error("hi");
     
@@ -683,12 +677,12 @@ class CRNEGNBE extends Rule {
     sub.head.forEach(ref => ref.closure = true);
     
     let np = clone(noun);
-    np.ref = child(ref, 0);
+    np.ref = [child(ref, 0)];
     
     //console.log(np);
     let prep = child(node, 1, 0, 2, 2);
     let cond;
-    noun.ref = child(ref, 0);
+    noun.ref = [child(ref, 0)];
     if (prep) {
       cond = S(NP(DET(), noun, prep));
       //cond.ref = child(ref, 0);
@@ -699,7 +693,7 @@ class CRNEGNBE extends Rule {
       //sub.push(np);
       cond = np;
     }
-    cond.ref = child(ref, 0);
+    cond.ref = [child(ref, 0)];
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
       cond.types = cond.types || {};
@@ -772,14 +766,14 @@ class CREVERY extends Rule {
 
     let prep = child(node, 0, 2);
     let cond;
-    noun.ref = ref;
+    noun.ref = [ref];
     if (prep) {
       cond = S(NP(DET(), noun, prep));
       // console.log(prep);
     } else {
       cond = noun;
     }
-    cond.ref = ref;
+    cond.ref = [ref];
     // console.log(child(cond, 0));
     n.push(cond);
     //if (prep && prep["@type"] == "PP") {
@@ -826,7 +820,7 @@ class CRVPEVERY extends Rule {
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
     // n.head.push(ref);
-    noun.ref = ref;
+    noun.ref = [ref];
     n.push(noun);
     // console.log(noun);
     
@@ -955,7 +949,7 @@ class CRSPOSS extends Rule {
   apply({name, noun, verb}, node, refs) {
     let u = referent(this.id(), noun.types, print(child(node, 0), refs));
     node.children[0] = u;
-    node.ref = u;
+    node.ref = [u];
     
     // console.log("hi");
     
@@ -1013,7 +1007,7 @@ class CRADJ extends Rule {
     // adj.ref = node.ref;
     noun.ref = node.ref;
     // console.log(adj);
-    let pred = predicate(adj.prop, [node.ref]);
+    let pred = predicate(adj.prop, node.ref);
     // console.log(pred);
     
     return [[], [noun, pred], [], [node]];
