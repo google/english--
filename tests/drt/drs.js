@@ -1993,65 +1993,17 @@ describe("Large Lexicon", () => {
     //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat(`
         Brazil is a country in South America. 
-        Brazil borders all countries in South America.
-        Brazil's capital is Brasilia.
+        Brazil borders most countries in South America.
+        The capital of Brazil is Brasilia.
         211M peoples live in Brazil.
         26 states compose Brazil's federation.
         Brazil is bounded by The-Atlantic-Ocean.
         Brazil's language is Portuguese.
-        Brazil was inhabited by a tribal nation before a landing of Pedro Alvares Cabral.
+        Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.
         Pedro Alvares Cabral claimed Brazil's area for The-Portuguese-Empire.
         The-Porguese-Empire's capital was transferred from Lisbon to Rio De Janeiro.
         Brazil is classified by The-World-Bank and an industrialized country.
         Brazil is a member of The-United-Nations.
-    `).equalsTo(`
-        let a, b, d, e, i, j, k, l, m, n, o, p, q, r, s, t
-        Brazil(a)
-        South-America(b)
-        country(a)
-        in(a, b)
-        all (c: {
-        countries(c)
-        in(c, b)
-        }) {
-        border(a, c)
-        }
-        Brasilia(d)
-        e is d(e)
-        capital(e, a)
-        211m (f: {
-        peoples(f)
-        }) {
-        in(e, e)
-        live(f)
-        }
-        26 (g: {
-        states(g)
-        }) {
-        let h
-        compose(g, h)
-        federation(h, e)
-        }
-        The-Atlantic-Ocean(i)
-        undefined(e)
-        Portuguese(j)
-        k is j(k)
-        language(k, e)
-        Pedro-Alvares-Cabral(l)
-        < undefined(k)
-        Pedro-undefined(m)
-        The-Portuguese-Empire(n)
-        < claim(m, o)
-        undefined(o, k)
-        The-Porguese-Empire(p)
-        Rio-De-Janeiro(q)
-        Lisbon(r)
-        < undefined(s)
-        capital(s, p)
-        undefined(k)
-        The-United-Nations(t)
-        member(k)
-        of(k, t)
     `);
   });
 

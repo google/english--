@@ -273,11 +273,13 @@ class CRPPPN extends Rule {
     let head = [];
     let body = [];
 
-    let ref = find(name.types, refs, name.children[0].value);
+    const pn = child(name, 0).value;
+    let ref = find(name.types, refs, pn);
     if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value);
+      // console.log(name);
+      ref = referent(this.id(), name.types, pn);
       head.push(ref);
-      let pred = predicate(child(name, 0).value, [ref], name.types);
+      let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
 
