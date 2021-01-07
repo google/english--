@@ -2092,13 +2092,13 @@ describe("Large Lexicon", () => {
       `);
   });
 
-  it("The Porguese Empire's capital was transferred from Lisbon to Rio De Janeiro.", () => {
+  it("The Portuguese Empire's capital was transferred from Lisbon to Rio De Janeiro.", () => {
     // TODO: this isn't quite right. First, the "was" is being ignored in its tense.
     // Second, this is probably the "passive" form of the to-transfer verb.
-    assertThat("The Porguese Empire's capital was transferred from Lisbon to Rio De Janeiro.")
+    assertThat("The Portuguese Empire's capital was transferred from Lisbon to Rio De Janeiro.")
       .equalsTo(`
         let a, b, c, d
-        Porguese Empire(a)
+        Portuguese Empire(a)
         Rio De Janeiro(b)
         Lisbon(c)
         capital(d, a)
@@ -2151,7 +2151,7 @@ describe("Large Lexicon", () => {
       `);
   });
 
-  it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
+  it("Brazil is a country in South America.", function() {
     // Things that I'd expect to be able to write:
     //   - Brazil's population is 211 million people.
     //   - 26 states compose the federation of Brazil: Sao Paulo, etc, etc.
@@ -2159,19 +2159,86 @@ describe("Large Lexicon", () => {
     //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     //   - Brazil is considered an advanced emerging economy.
     assertThat(`
-        Brazil borders most countries in South America.
-        The capital of Brazil is Brasilia.
-        211M peoples live in Brazil.
-        26 states compose Brazil's federation.
-        Brazil is bounded by The-Atlantic-Ocean.
-        Brazil's language is Portuguese.
-        Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.
-        Pedro Alvares Cabral claimed Brazil's area for The-Portuguese-Empire.
-        The-Porguese-Empire's capital was transferred from Lisbon to Rio De Janeiro.
-        Brazil is classified by The-World-Bank and an industrialized country.
-        Brazil is a member of The-United-Nations.
+      Brazil is a country in South America.
+      Brazil borders most countries in South America.
+      211M peoples live in Brazil.
+      The capital of Brazil is Brasilia.
+      26 states compose Brazil's federation.
+      Brazil is bounded by the Atlantic Ocean on the East.
+      The official language of Brazil is Portuguese.
+      Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.
+      The Portugese Empire's capital was transferred from Lisbon to Rio De Janeiro.
+      Brazil is classified by the World Bank as an industrialized country.
+      Brazil is a member of the United Nations.
+      Brazil is considered as an advanced economy.
+    `).equalsTo(`
+       let a, b, e, f, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w
+       Brazil(a)
+       South America(b)
+       country(a)
+       in(a, b)
+       most (c: {
+         country(c)
+         in(c, b)
+       }) {
+         border(a, c)
+       }
+       211m (d: {
+         people(d)
+       }) {
+         in(e, a)
+         live(d)
+       }
+       Brasilia(e)
+       f = e
+       capital(f)
+       of(f, a)
+       26 (g: {
+         state(g)
+       }) {
+         let h
+         federation(h, f)
+         compose(g, h)
+       }
+       East(i)
+       Atlantic Ocean(j)
+       bounded(f)
+       on(f, i)
+       by(f, j)
+       Portuguese(k)
+       l = k
+       official(l)
+       language(l)
+       of(l, f)
+       Pedro Alvares Cabral(m)
+       inhabited(l)
+       landing(n)
+       tribal(o)
+       nation(o)
+       of(l, m)
+       before(l, n)
+       by(l, o)
+       Portugese Empire(p)
+       Rio De Janeiro(q)
+       Lisbon(r)
+       capital(s, p)
+       transferred(s)
+       to(s, q)
+       from(s, r)
+       World Bank(t)
+       classified(l)
+       industrialized(u)
+       country(u)
+       as(l, u)
+       by(l, t)
+       United Nations(v)
+       member(l)
+       of(l, v)
+       considered(l)
+       advanced(w)
+       economy(w)
+       as(l, w)
     `);
-     //.equalsTo("");
   });
 
   function assertThat(x) { 
