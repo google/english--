@@ -1009,7 +1009,7 @@ class CRADJ extends Rule {
     noun = clone(noun);
     // adj.ref = node.ref;
     noun.ref = node.ref;
-    // console.log(adj);
+    //console.log(node);
     let pred = predicate(adj.prop, [node.ref[0]]);
     // console.log(pred);
     

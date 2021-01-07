@@ -2031,8 +2031,6 @@ describe("Large Lexicon", () => {
   });
 
   it("Brazil's official language is Portuguese.", () => {
-    // Brazil's official language is Portuguese runs into the
-    // adj + noun problem.
     assertThat("Brazil's official language is Portuguese.")
       .equalsTo(`
         let a, b, c
@@ -2057,14 +2055,14 @@ describe("Large Lexicon", () => {
       `);
   });
 
-  it.skip("Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.", () => {
+  it("Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.", () => {
     // The prepositional phrases aren't tied quite right, specially "the landing of" isn't
     // tieing back the landing to Pedro Alvares Cabral.
     assertThat("Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.")
       .equalsTo(`
         let a, b, c, d
         Brazil(a)
-        Pedro-Alvares-Cabral(b)
+        Pedro Alvares Cabral(b)
         inhabited(a)
         landing(c)
         tribal(d)
@@ -2075,6 +2073,55 @@ describe("Large Lexicon", () => {
       `);        
   });
 
+  it("Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.", () => {
+    // Pedro Alvares Cabral claimed Brazil's area for The-Portuguese-Empire.
+    // This isn't right because it binds "for" with "Brazil's area" rather than "claimed".
+    // Pedro Alvares Cabral claimed for The-Portuguese-Empire Brazil's area.
+    // This isn't grammatical because The Portuguese Empire binds to Brazil as a
+    // single proper name.
+    assertThat("Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.")
+      .equalsTo(`
+        let a, b, c, d
+        Pedro Alvares Cabral(a)
+        Portuguese Empire(b)
+        Brazil(c)
+        area(d)
+        for(e, b)
+        < claim(a, d)
+        of(d, c)
+      `);
+  });
+
+  it("The Porguese Empire's capital was transferred from Lisbon to Rio De Janeiro.", () => {
+    // TODO: this isn't quite right. First, the "was" is being ignored in its tense.
+    // Second, this is probably the "passive" form of the to-transfer verb.
+    assertThat("The Porguese Empire's capital was transferred from Lisbon to Rio De Janeiro.")
+      .equalsTo(`
+        let a, b, c, d
+        Porguese Empire(a)
+        Rio De Janeiro(b)
+        Lisbon(c)
+        capital(d, a)
+        transferred(d)
+        to(d, b)
+        from(d, c)
+      `);
+  });
+
+  it("Brazil is classified by the World Bank as an industrialized country.", () => {
+    assertThat("Brazil is classified by the World Bank as an industrialized country.")
+      .equalsTo(`
+        let a, b, c
+        Brazil(a)
+        World Bank(b)
+        classified(a)
+        industrialized(c)
+        country(c)
+        as(a, c)
+        by(a, b)
+      `);
+  });
+  
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
     //   - The capital of Brazil is Brasilia.

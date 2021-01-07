@@ -547,6 +547,7 @@ A "f" token based on:
         "about",
         "by",
         "on",
+        "as",
         "word",
         "has",
         "had",
