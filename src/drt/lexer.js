@@ -91,8 +91,10 @@ class Tokenizer {
     let next = this.longest(this.buffer);
 
     // proper names form.
-    let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)/);
-
+    let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)(\s[A-Z][A-Za-z\-]+)*/);
+    //console.log(this.buffer);
+    //console.log(match);
+    
     let pn = (name, loc) => {
       return {
         "@type": "%word",
@@ -112,7 +114,7 @@ class Tokenizer {
     //   - no match for an open word and a match for a proper name
     //   - no match for both
     //   - a match for both the open word and the proper name
-    let [name] = match || [];
+    let [name, first] = match || [];
     if (next && !name) {
       this.eat(next);
       return this.get(next);
@@ -123,7 +125,14 @@ class Tokenizer {
       return undefined;
     } else {
       // Both are defined.
-      if (name.length > next.length) {
+      const tok = this.get(next);
+      //console.log(name);
+      //console.log(next);
+      if (tok["@type"] != "%word" &&
+         first.length <= next.length) {
+        this.eat(next);
+        return this.get(next);
+      } else if (name.length > next.length) {
         // If the proper name is the longest string
         // it trumps the open word.
         this.eat(name);
@@ -147,6 +156,7 @@ class Tokenizer {
   eat(str) {
     this.buffer = this.buffer.substring(str.length);
     this.loc += str.length;
+    //console.log(`eating [${str}]`);
     return this;
   }
   get(str) {

@@ -2469,7 +2469,7 @@ describe("Backwards compatibility", function() {
 
   it("Sam Goto kissed Dani.", function() {
     assertThat(parse("Sam Goto kissed Dani."))
-      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
+      .equalsTo(S(NP(PN("Sam Goto")),
                   VP_(VP(V("kissed"),
                          NP(PN("Dani"))))));
   });
@@ -2492,7 +2492,7 @@ describe("Backwards compatibility", function() {
     // We are going to have to figure out a way to avoid
     // this ambiguity.
     assertThat(parse("Sam Goto kissed in Brazil her."))
-      .equalsTo(S(NP(PN(PN("Sam"), PN("Goto"))),
+      .equalsTo(S(NP(PN("Sam Goto")),
                   VP_(VP(V(V("kissed"),
                            PP(PREP("in"), NP(PN("Brazil")))),
                          NP(PRO("her"))))));
@@ -2577,7 +2577,7 @@ describe("large dictionary", () => {
       .equalsTo(S(NP(PN("Brazil")),
                   VP_(VP(BE("is"), NP(DET("a"),
                                       N(N("country"),
-                                        PP(PREP("in"), NP(PN(PN("South"), PN("America"))))))))));
+                                        PP(PREP("in"), NP(PN("South America")))))))));
   });
 
   it("Obama was a great president.", function() {

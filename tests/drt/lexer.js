@@ -879,17 +879,17 @@ describe("Lexer", function() {
       [".", "PERIOD"],
     ]);
     lexer.reset("Computer Science");
-    assertThat(lexer.next()).equalsTo(token("word", "Computer", 0, [{
+    assertThat(lexer.next()).equalsTo(token("word", "Computer Science", 0, [{
       "@type": "PN",
       "loc": 0,
       "types": {"gen": "?", "num": "?"}
     }]));
-    assertThat(lexer.next()).equalsTo(token("WS", " ", 8));
-    assertThat(lexer.next()).equalsTo(token("word", "Science", 9, [{
-      "@type": "PN",
-      "loc": 9,
-      "types": {"gen": "?", "num": "?"}
-    }]));
+    //assertThat(lexer.next()).equalsTo(token("WS", " ", 8));
+    //assertThat(lexer.next()).equalsTo(token("word", "Science", 9, [{
+    //  "@type": "PN",
+    //  "loc": 9,
+    //  "types": {"gen": "?", "num": "?"}
+    //}]));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -899,23 +899,24 @@ describe("Lexer", function() {
       [" ", "WS"],
     ]);
     lexer.reset("The United States");
-    assertThat(lexer.next()).equalsTo(token("the", "The", 0, [{
-      "@type": "PN",
-      "loc": 0,
-      "types": {"gen": "?", "num": "?"}
-    }]));
+    assertThat(lexer.next()).equalsTo(token("the", "The", 0));
+    // , [{
+    //  "@type": "PN",
+    //  "loc": 0,
+    //  "types": {"gen": "?", "num": "?"}
+    //}]
     assertThat(lexer.next()).equalsTo(token("WS", " ", 3));
-    assertThat(lexer.next()).equalsTo(token("word", "United", 4, [{
+    assertThat(lexer.next()).equalsTo(token("word", "United States", 4, [{
       "@type": "PN",
       "loc": 4,
       "types": {"gen": "?", "num": "?"}
     }]));
-    assertThat(lexer.next()).equalsTo(token("WS", " ", 10));
-    assertThat(lexer.next()).equalsTo(token("word", "States", 11, [{
-      "@type": "PN",
-      "loc": 11,
-      "types": {"gen": "?", "num": "?"}
-    }]));
+    //assertThat(lexer.next()).equalsTo(token("WS", " ", 10));
+    //assertThat(lexer.next()).equalsTo(token("word", "States", 11, [{
+    //  "@type": "PN",
+    //  "loc": 11,
+    //  "types": {"gen": "?", "num": "?"}
+    //}]));
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
@@ -929,6 +930,21 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(token("word", "Trump", 0, [{
       "@type": "V"
     }, {
+      "@type": "PN",
+      "loc": 0,
+      "types": {"num": "?", "gen": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("Brazil", () => {
+    let lexer = new Tokenizer([
+      ["bra", "word", [{"@type": "N"}]],
+      [" ", "WS"],
+    ]);
+    // Bra is a noun and the start of a proper name.
+    lexer.reset("Brazil");
+    assertThat(lexer.next()).equalsTo(token("word", "Brazil", 0, [{
       "@type": "PN",
       "loc": 0,
       "types": {"num": "?", "gen": "?"}
@@ -961,11 +977,7 @@ describe("Lexer", function() {
     }]));
 
     tokenizer.reset("He ");
-    assertThat(tokenizer.next()).equalsTo(token("he", "He", 5, [{ 
-      "@type": "PN",
-      "loc": 5,
-      "types": {"gen": "?", "num": "?"}     
-    }]));
+    assertThat(tokenizer.next()).equalsTo(token("he", "He", 5));
     assertThat(tokenizer.next()).equalsTo(token("WS", " ", 7));
 
     tokenizer.reset("Sam");

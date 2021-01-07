@@ -1129,13 +1129,14 @@ class CRQUESTION extends CompositeRule {
 
 class CRNAMED extends Rule {
   constructor(ids) {
-    super(ids, PN(PN(capture("first")), PN(capture("last"))));
+    super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
   }
-  apply({first, last}, node, refs) {
-    const value = first.children[0].value + "-" + last.children[0].value;
+  apply({name}, node, refs) {
+    // const value = first.children[0].value + "-" + last.children[0].value;
+    // console.log(name);;
     node.children = [{
       "type": "name",
-      "value": value
+      "value": child(name, 0).value
     }];
     
     return [[], [], [], []];

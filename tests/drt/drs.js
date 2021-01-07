@@ -1620,8 +1620,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("Jones kissed in Brazil Mary.", function() {
-    assertThat("Jones kissed in Brazil Mary.")
+  it.skip("Jones kissed Mary in Brazil.", function() {
+    assertThat("Jones kissed Mary to Brazil.")
      .equalsTo(`
        let a, b, c
        Jones(a)
@@ -1669,18 +1669,18 @@ describe("DRS", function() {
     assertThat("Sam Goto likes Computer Science.")
      .equalsTo(`
        let a, b
-       Sam-Goto(a)
-       Computer-Science(b)
+       Sam Goto(a)
+       Computer Science(b)
        like(a, b)
      `);
   });
 
-  it("Sam Goto likes The-United-States-Of-America.", function() { 
-    assertThat("Sam Goto likes The-United-States-Of-America.")
+  it("Sam Goto likes the United States Of America.", function() { 
+    assertThat("Sam Goto likes the United States Of America.")
      .equalsTo(`
        let a, b
-       Sam-Goto(a)
-       The-United-States-Of-America(b)
+       Sam Goto(a)
+       United States Of America(b)
        like(a, b)
      `);
   });
@@ -1700,7 +1700,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Sam(a)
-       Discourse-Representation-Theory(b)
+       Discourse Representation Theory(b)
        like(a, b)
      `);
   });
@@ -1938,7 +1938,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         let a, b
         Brazil(a)
-        South-America(b)
+        South America(b)
         country(a)
         in(a, b)
       `);
@@ -1949,7 +1949,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         let a, b
         Brazil(a)
-        South-America(b)
+        South America(b)
         all (c: {
           country(c)
           in(c, b)
@@ -2024,13 +2024,13 @@ describe("Large Lexicon", () => {
       `);
   });
   
-  it("Brazil is bounded by The-Atlantic-Ocean on The-East.", () => {
-    assertThat("Brazil is bounded by The-Atlantic-Ocean on The-East .")
+  it("Brazil is bounded by the Atlantic Ocean on the East.", () => {
+    assertThat("Brazil is bounded by the Atlantic Ocean on the East.")
       .equalsTo(`
         let a, b, c
         Brazil(a)
-        The-East(b)
-        The-Atlantic-Ocean(c)
+        East(b)
+        Atlantic Ocean(c)
         bounded(a)
         on(a, b)
         by(a, c)
@@ -2094,7 +2094,6 @@ describe("Large Lexicon", () => {
     //   - Brazil is considered an advanced emerging economy.
     //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat(`
-        
         Brazil borders most countries in South America.
         The capital of Brazil is Brasilia.
         211M peoples live in Brazil.
