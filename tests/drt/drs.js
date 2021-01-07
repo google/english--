@@ -2121,6 +2121,17 @@ describe("Large Lexicon", () => {
         by(a, b)
       `);
   });
+
+  it("Brazil is a member of the United Nations.", () => {
+    assertThat("Brazil is a member of the United Nations.")
+      .equalsTo(`
+        let a, b
+        Brazil(a)
+        United Nations(b)
+        member(a)
+        of(a, b)
+      `);
+  });
   
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
