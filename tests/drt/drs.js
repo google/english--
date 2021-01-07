@@ -306,8 +306,8 @@ describe("DRS", function() {
     assertThat("A man is happy.")
      .equalsTo(`
        let a
-       happy(a)
        man(a)
+       happy(a)
     `);
   });
 
@@ -1989,6 +1989,17 @@ describe("Large Lexicon", () => {
         }
       `);
   });
+
+  it("Brazil is bounded by The-Atlantic-Ocean.", () => {
+    assertThat("Brazil is bounded by The-Atlantic-Ocean.")
+      .equalsTo(`
+        let a, b
+        Brazil(a)
+        The-Atlantic-Ocean(b)
+        bounded(a)
+        by(a, b)
+      `);
+  });
   
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
@@ -2017,7 +2028,7 @@ describe("Large Lexicon", () => {
         Brazil is classified by The-World-Bank and an industrialized country.
         Brazil is a member of The-United-Nations.
     `);
-    // .equalsTo("");
+      // .equalsTo("");
   });
 
   function assertThat(x) { 

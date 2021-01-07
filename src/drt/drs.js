@@ -50,6 +50,8 @@ class DRS {
           skip = true;
           let i = this.body.indexOf(remove);
           if (i == -1) {
+            //console.log(remove);
+            //console.log(this.body);
             throw new Error("Ooops, deleting an invalid node.");
           }
           this.body.splice(i, 1);

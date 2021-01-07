@@ -439,9 +439,50 @@ class CRPPLIN extends Rule {
   }
 }
 
+class CRADJLIN extends Rule {
+  constructor(ids) {
+    super(ids, ADJ(capture("adj")));
+  }
+  
+  apply({adj}, node) {
+    if (!adj.ref || adj.children.length != 1) {
+      return [[], [], [], []];
+    }
+
+    let pred = predicate(adj.prop, [node.ref], node.types);
+    
+    return [[], [pred], [], [node]];
+  }
+}
+
+class CRPPADJLIN extends Rule {
+  constructor(ids) {
+    super(ids, ADJ(capture("adj"),
+                   PP(PREP(capture("prep")), capture("np"))));
+  }
+  apply({prep, np}, node) {
+    if (!node.ref) {
+      return [[], [], [], []];
+    }
+
+    const adj = child(node, 0);
+    
+    let body = [];
+    adj.ref = node.ref;
+    body.push(adj);
+
+    let cond = S(node.ref, VP_(VP(V(child(prep, 0)), child(np, 1))));
+    body.push(cond);
+
+    // throw new Error("hi");
+    
+    return [[], body, [], [node]];
+  }
+}
+
 class CRLIN extends CompositeRule {
   constructor(ids) {
-    super([new CRPPLIN(ids), new CRNLIN(ids)]);
+    super([new CRPPLIN(ids), new CRNLIN(ids), new CRPPADJLIN(ids), new CRADJLIN(ids)]);
   }
 }
 
@@ -558,15 +599,24 @@ class CRPOSBE extends Rule {
     super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
+    // throw new Error("hi");
     //let s = S(adj);
     //console.log(s);
     //console.log("hi");
     //console.log(node.types);
-    let s = predicate(adj.prop, [ref.children[0]], node.types);
+    //let s = predicate(adj.prop, [ref.children[0]], node.types);
+    // console.log(adj);
+    // let s = clone(adj);
+    adj.ref = child(ref, 0);
+    // Matches the DRS found in (3.57) on page 269.
+    if (node.types && node.types.tense) {
+      adj.types.tense = node.types.tense;
+    }
+    // let n = N();
     // console.log(s);
     //adj.ref = ref.children[0];
     //s.types = node.types;   
-    return [[], [s], [], [node]];
+    return [[], [adj], [], [node]];
   }
 }
 
@@ -615,7 +665,6 @@ class CRNBE extends Rule {
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
       np.types.tense = node.types.tense;
-      // console.log(np);
     }
     
     return [[], [np], [], [node]];
@@ -1001,15 +1050,6 @@ class CRWILL extends Rule {
   }
 }
 
-// Construction Rule described in page 543
-class CRTENSE extends Rule {
-  constructor(ids) {
-    super(ids, S(capture("sub"), VP_(capture("verb"))));
-  }
-  apply({verb}, node, refs) {
-  }
-}
-
 // Construction Rule described in page 589
 class CRASPECT extends Rule {
   constructor(ids) {
@@ -1199,7 +1239,8 @@ class CRPRED extends Rule {
     // console.log(args);
     // console.log(sub.name);
     let name = verb.prop || verb.children[0].value;
-    //console.log(verb);
+    //console.log(name);
+    //throw new Error(name);
     let pred = predicate(name, args, node.types);
     
     return [[], [pred], [], [node]];
@@ -1376,7 +1417,6 @@ module.exports = {
   CRAND: CRAND,
   CRPOSS: CRPOSS,
   CRADJ: CRADJ,
-  CRTENSE: CRTENSE,
   CRASPECT: CRASPECT,
   CRWILL: CRWILL,
   CRQUESTION: CRQUESTION,
