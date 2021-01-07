@@ -1934,21 +1934,35 @@ describe("Large Lexicon", () => {
        }
     `);    
   });
+
+  it.skip("Brazil borders all countries in South America but Chile and Ecuador.", () => {
+    assertThat("Brazil borders all countries in South America but Chile and Ecuador.")
+      .equalsTo();
+  });
   
-  it("Brazil is a country. Every person from Brazil is a brazilian.", function() { 
+  it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     assertThat(`
-        Brazil is a country. 
+        Brazil is a country in South America. 
+        Brazil borders all countries in South America.
         Every person from Brazil is a brazilian.
     `).equalsTo(`
-       let a
-       Brazil(a)
-       country(a)
-       every (b: {
-         person(b)
-         from(b, a)
-       }) {
-         brazilian(b)
-       }
+        let a, b
+        Brazil(a)
+        South-America(b)
+        country(a)
+        in(a, b)
+        all (c: {
+          countries(c)
+          in(c, b)
+        }) {
+          border(a, c)
+        }
+        every (d: {
+          person(d)
+          from(d, a)
+        }) {
+          brazilian(d)
+        }
     `);
   });
 

@@ -102,12 +102,14 @@ class CompositeRule extends Rule {
 }
 
 function find({gen, num}, refs, name, loc, exclude = []) {
+  // console.log(name);
   //console.log(refs);
   //console.log(loc);
+  // console.log(`Trying to find ${name}`);
   let match = (ref) => {
     let byName = name ? ref.value == name : true;
     let types = ref.types || {};
-    //console.log(`${JSON.stringify(types)} ${byName} ${types.num} preceeds? ${ref.loc} > ${loc}`);
+    // console.log(`Ref name? ${ref.value}. By name? ${byName}. ${JSON.stringify(types)} ${types.num} preceeds? ${ref.loc} > ${loc}`);
     //console.log(exclude);
     //console.log(exclude);
     if (ref.loc > loc) {
@@ -273,7 +275,7 @@ class CRPPPN extends Rule {
 
     let ref = find(name.types, refs, name.children[0].value);
     if (!ref) {
-      ref = referent(this.id(), name.types, print(name));
+      ref = referent(this.id(), name.types, name.children[0].value);
       head.push(ref);
       let pred = predicate(child(name, 0).value, [ref], name.types);
       body.push(pred);
@@ -734,9 +736,9 @@ class CREVERY extends Rule {
     s.children[0] = ref;
     v.push(s);
 
-    // console.log(v);
-    
     // console.log(n);
+    // throw new Error("hi");
+    // console.log(v);
     // console.log(det);
     let q = det.children.map((d) => d.value).join("-").toLowerCase();
     let result = quantifier(q, n, v, ref);
@@ -1075,9 +1077,10 @@ class CRNAMED extends Rule {
     super(ids, PN(PN(capture("first")), PN(capture("last"))));
   }
   apply({first, last}, node, refs) {
+    const value = first.children[0].value + "-" + last.children[0].value;
     node.children = [{
       "type": "name",
-      "value": first.children[0].value + "-" + last.children[0].value
+      "value": value
     }];
     
     return [[], [], [], []];
