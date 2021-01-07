@@ -1100,7 +1100,7 @@ describe("DRS", function() {
        let a, b, c
        Jones(a)
        Mary(b)
-       a is c
+       a = c
        husband(c, b)
     `);
   });
@@ -1111,7 +1111,7 @@ describe("DRS", function() {
        let a, b, c, d
        Jones(a)
        Mary(b)
-       c is d(c)
+       c = d
        father(c, a)
        husband(d, b)
     `);
@@ -1189,7 +1189,7 @@ describe("DRS", function() {
        let a, b, c
        Jones(a)
        Mary(b)
-       c is b(c)
+       c = b
        wife(c, a)
     `);
   });
@@ -1200,7 +1200,7 @@ describe("DRS", function() {
        let a, b, c
        Mary(a)
        Jones(b)
-       a is c
+       a = c
        wife(c, b)
     `);
   });
@@ -1211,7 +1211,7 @@ describe("DRS", function() {
        let a, b, c, d
        Jones(a)
        Smith(b)
-       a is c
+       a = c
        brother(c, b)
        Brazil(d)
        like(c, d)
@@ -1960,7 +1960,7 @@ describe("Large Lexicon", () => {
         let a, b, c
         Brasilia(a)
         Brazil(b)
-        c is a
+        c = a
         capital(c)
         of(c, b)
       `);

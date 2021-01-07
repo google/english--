@@ -153,15 +153,17 @@ function referent(name, types, value, loc) {
   }
 }
 
-function predicate(name, args, types) {
+function predicate(name, args, types, infix = false) {
   return {
     "@type": "Predicate",
     name: name,
     args: args,
     types: types,
     print() {
-      // console.log(this.args);
       let args = this.args.map(arg => print(arg));
+      if (infix) {
+        return args.join(` ${this.name} `);
+      }
       return `${this.name}(${args.join(", ")})`;
     }
   }
@@ -540,6 +542,17 @@ class CRNEG extends Rule {
   }
 }
 
+class CRREFBE extends Rule {
+  constructor(ids) {
+    super(ids, S({"@type": "Referent", children:[capture("a")]},
+                 VP_(VP(BE(), {"@type": "Referent", children: [capture("b")]}))));
+  }
+  apply({a, b}, node, refs) {
+    let s = predicate("=", [a, b], node.types, true);
+    return [[], [s], [], [node]];
+  }
+}
+
 class CRPOSBE extends Rule {
   constructor(ids) {
     super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
@@ -597,6 +610,7 @@ class CRNBE extends Rule {
     let np = clone(noun);
     np.ref = child(ref, 0);
     // console.log("hi");
+    // throw new Error("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -652,6 +666,7 @@ class CRNEGNBE extends Rule {
 class CRBE extends CompositeRule {
   constructor(ids) {
     super([
+      new CRREFBE(ids),
       new CRPOSBE(ids),
       new CRNEGBE(ids),
       new CRNBE(ids),
