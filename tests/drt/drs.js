@@ -2158,6 +2158,11 @@ describe("Large Lexicon", () => {
     //   - Brazil remained a colony.
     //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     //   - Brazil is considered an advanced emerging economy.
+    // Semantically, things I'd expect:
+    //   - "was transferred" is an adjective, but feels like the passive voice
+    //   - "was transferred" isn't maintaining the "tense" of "was"
+    //   - prepositions attached to verbs, nouns and adjectives should probably be
+    //     prefixed. e.g. instead of capital(u), of(u, v), we want capital(u), capital-of(u, v)
     assertThat(`
       Brazil is a country in South America.
       Brazil borders most countries in South America.
