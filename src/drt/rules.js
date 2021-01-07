@@ -420,12 +420,15 @@ class CRPPLIN extends Rule {
 
     const noun = child(node, 0);
 
-    // throw new Error("hi");
-    
     let body = [];
     noun.ref = node.ref;
     body.push(noun);
 
+    if (noun.prop) {
+      // TODO: we have to deal with the case where the noun is composite.
+      child(prep, 0).value = noun.prop + "-" + child(prep, 0).value;
+    }
+    
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
@@ -474,14 +477,11 @@ class CRPPADJLIN extends Rule {
         name.push(i.prop);
       } else if (child(i, 0).prop) {
         name.push(child(i, 0).prop);
-        // console.log(child(i, 0));
       }
-      //console.log(JSON.stringify(i));
       i = child(i, 1);
     }
 
     name.push(child(prep, 0).value);
-    //console.log(name.join("-"));
     child(prep, 0).value = name.join("-");
     
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));

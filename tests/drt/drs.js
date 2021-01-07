@@ -949,7 +949,7 @@ describe("DRS", function() {
        woman(b)
        donkey(c)
        love(a, b)
-       with(b, c)
+       woman-with(b, c)
     `);
   });
 
@@ -961,7 +961,7 @@ describe("DRS", function() {
        woman(b)
        donkey(c)
        love(b, a)
-       with(b, c)
+       woman-with(b, c)
     `);
   });
 
@@ -998,7 +998,7 @@ describe("DRS", function() {
          let c
          woman(b)
          donkey(c)
-         with(b, c)
+         woman-with(b, c)
        }) {
          love(b, a)
        }
@@ -1013,7 +1013,7 @@ describe("DRS", function() {
        Brazil(b)
        every (c: {
          man(c)
-         from(c, b)
+         man-from(c, b)
        }) {
          love(c, a)
        }
@@ -1396,7 +1396,7 @@ describe("DRS", function() {
       Brazil(b)
       not {
         engineer(a)
-        from(a, b)
+        engineer-from(a, b)
       }
     `);
   });
@@ -1715,7 +1715,7 @@ describe("DRS", function() {
        reservation(d)
        < make(a, d)
        for(d, b)
-       for(d, c)
+       reservation-for(d, c)
      `);
   });
 
@@ -1761,7 +1761,7 @@ describe("DRS", function() {
        woman(d)
        < make(a, b)
        with(b, c)
-       for(b, d)
+       reservation-for(b, d)
      `);
   });
   function assertThat(x) { 
@@ -1933,7 +1933,7 @@ describe("Large Lexicon", () => {
         Brazil(a)
         South America(b)
         country(a)
-        in(a, b)
+        country-in(a, b)
       `);
   });
 
@@ -1945,7 +1945,7 @@ describe("Large Lexicon", () => {
         South America(b)
         all (c: {
           country(c)
-          in(c, b)
+          country-in(c, b)
         }) {
           border(a, c)
         }
@@ -1974,7 +1974,7 @@ describe("Large Lexicon", () => {
         Brazil(b)
         c = a
         capital(c)
-        of(c, b)
+        capital-of(c, b)
       `);
   });
 
@@ -1985,7 +1985,7 @@ describe("Large Lexicon", () => {
         Brasilia(a)
         Brazil(b)
         capital(a)
-        of(a, b)
+        capital-of(a, b)
       `);
   });
 
@@ -2088,7 +2088,7 @@ describe("Large Lexicon", () => {
         area(d)
         for(e, b)
         < claim(a, d)
-        of(d, c)
+        area-of(d, c)
       `);
   });
 
@@ -2133,11 +2133,11 @@ describe("Large Lexicon", () => {
         Brazil(a)
         United Nations(b)
         member(a)
-        of(a, b)
+        member-of(a, b)
       `);
   });
   
-  it("Brazil is a member of the United Nations.", () => {
+  it("Brazil is considered as an advanced economy.", () => {
     // TODO: allow multiple adjectives to be used in front of nouns.
     // e.g. "Brazil is considered an advanced emerging economy."
     assertThat("Brazil is considered as an advanced economy.")
@@ -2181,10 +2181,10 @@ describe("Large Lexicon", () => {
        Brazil(a)
        South America(b)
        country(a)
-       in(a, b)
+       country-in(a, b)
        most (c: {
          country(c)
-         in(c, b)
+         country-in(c, b)
        }) {
          border(a, c)
        }
@@ -2197,7 +2197,7 @@ describe("Large Lexicon", () => {
        Brasilia(e)
        f = e
        capital(f)
-       of(f, a)
+       capital-of(f, a)
        26 (g: {
          state(g)
        }) {
@@ -2214,7 +2214,7 @@ describe("Large Lexicon", () => {
        l = k
        official-language(l)
        language(l)
-       of(l, f)
+       language-of(l, f)
        Pedro Alvares Cabral(m)
        inhabited(l)
        landing(n)
@@ -2238,7 +2238,7 @@ describe("Large Lexicon", () => {
        classified-by(l, t)
        United Nations(v)
        member(l)
-       of(l, v)
+       member-of(l, v)
        considered(l)
        advanced-economy(w)
        economy(w)
