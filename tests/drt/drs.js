@@ -1954,6 +1954,18 @@ describe("Large Lexicon", () => {
     `);
   });
   
+  it("The capital of Brazil is Brasilia.", () => {
+    assertThat("The capital of Brazil is Brasilia.")
+      .equalsTo(`
+        let a, b, c
+        Brasilia(a)
+        Brazil(b)
+        c is a
+        capital(c)
+        of(c, b)
+      `);
+  });
+
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
     //   - The capital of Brazil is Brasilia.

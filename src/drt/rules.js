@@ -350,20 +350,13 @@ class CRSID extends Rule {
   }
   
   apply({det, noun}, node, refs) {
-    // console.log("hi");
-    // console.log(det.children[0]);
-    if (typeof det.children[0].value != "string" ||
-        det.children[0].value.toLowerCase() != "a") {
+    if (child(det, 0)["@type"] == "Referent") {
       return [[], [], [], []];
     }
-    
-    // console.log();
-    
+
     let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
     noun.ref = ref;
     node.children[0] = ref;
-
-    // console.log(ref);
     
     return [[ref], [noun], [], []];
   }
@@ -599,6 +592,7 @@ class CRNBE extends Rule {
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
     np.ref = child(ref, 0);
+    // console.log("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
