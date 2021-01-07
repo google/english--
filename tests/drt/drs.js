@@ -2109,6 +2109,9 @@ describe("Large Lexicon", () => {
   });
 
   it("Brazil is classified by the World Bank as an industrialized country.", () => {
+    // TODO: allow conjugated noun phrases to allow Brazil to be classified as
+    // multiple things.
+    //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     assertThat("Brazil is classified by the World Bank as an industrialized country.")
       .equalsTo(`
         let a, b, c
@@ -2123,6 +2126,7 @@ describe("Large Lexicon", () => {
   });
 
   it("Brazil is a member of the United Nations.", () => {
+    //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat("Brazil is a member of the United Nations.")
       .equalsTo(`
         let a, b
@@ -2133,18 +2137,27 @@ describe("Large Lexicon", () => {
       `);
   });
   
+  it("Brazil is a member of the United Nations.", () => {
+    // TODO: allow multiple adjectives to be used in front of nouns.
+    // e.g. "Brazil is considered an advanced emerging economy."
+    assertThat("Brazil is considered as an advanced economy.")
+      .equalsTo(`
+        let a, b
+        Brazil(a)
+        considered(a)
+        advanced(b)
+        economy(b)
+        as(a, b)
+      `);
+  });
+
   it("Brazil is a country in South America. Every person from Brazil is a brazilian.", function() {
     // Things that I'd expect to be able to write:
-    //   - The capital of Brazil is Brasilia.
-    //   - Brazil's official language is Portuguese. // <- this is the problem with adjectives and nouns
     //   - Brazil's population is 211 million people.
-    //   - 211 million people live in Brazil.
     //   - 26 states compose the federation of Brazil: Sao Paulo, etc, etc.
-    //   - "prior to a landing of explorer Pedro Alvarez Cabral.
     //   - Brazil remained a colony.
     //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     //   - Brazil is considered an advanced emerging economy.
-    //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat(`
         Brazil borders most countries in South America.
         The capital of Brazil is Brasilia.
