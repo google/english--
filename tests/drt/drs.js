@@ -393,11 +393,7 @@ describe("DRS", function() {
       let a, b
       Smith(a)
       Mary(b)
-      if ({
-        let c
-        man(c)
-        love(c, b)
-      }) {
+      if (let c and man(c) and love(c, b)) {
         let d
         woman(d)
         like(a, d)
@@ -417,11 +413,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       if ({
-         let b
-         book(b)
-         own(a, b)
-       }) {
+       if (let b and book(b) and own(a, b)) {
          like(a, b)
        }
     `);
@@ -435,11 +427,7 @@ describe("DRS", function() {
        let a, b
        Jones(a)
        Smith(b)
-       if ({
-         let c
-         book(c)
-         own(a, c)
-       }) {
+       if (let c and book(c) and own(a, c)) {
          let d
          porsche(d)
          own(b, d)
@@ -454,11 +442,7 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        like(a, b)
-       if ({
-         let c
-         book(c)
-         like(b, c)
-       }) {
+       if (let c and book(c) and like(b, c)) {
          like(a, c)
        }
     `);
@@ -477,11 +461,7 @@ describe("DRS", function() {
       let a, b
       Mary(a)
       Jones(b)
-      if ({
-        let c
-        man(c)
-        like(a, c)
-      }) {
+      if (let c and man(c) and like(a, c)) {
         like(c, b)
       }
     `);
@@ -492,9 +472,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       every (b: {
-         man(b)
-       }) {
+       for every (b: man(b)) {
          love(b, a)
        }
     `);
@@ -503,9 +481,7 @@ describe("DRS", function() {
   it("Every man is happy.", function() {
     assertThat("Every man is happy.")
      .equalsTo(`
-       every (a: {
-         man(a)
-       }) {
+       for every (a: man(a)) {
          happy(a)
        }
     `);
@@ -538,9 +514,7 @@ describe("DRS", function() {
      .equalsTo(`
          let a
          Jones(a)
-         every (b: {
-           man(b)
-         }) {
+         for every (b: man(b)) {
            love(a, b)
          }
     `);
@@ -686,10 +660,7 @@ describe("DRS", function() {
        let a, b
        Jones(a)
        Smith(b)
-       every (c: {
-         woman(c)
-         love(b, c)
-       }) {
+       for every (c: woman(c) and love(b, c)) {
          like(a, c)
        }
      `);
@@ -892,10 +863,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       every (b: {
-         fast-porsche(b)
-         porsche(b)
-       }) {
+       for every (b: fast-porsche(b) and porsche(b)) {
          own(a, b)
        }
     `);
@@ -906,10 +874,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       every (b: {
-         beautiful-woman(b)
-         woman(b)
-       }) {
+       for every (b: beautiful-woman(b) and woman(b)) {
          love(b, a)
        }
     `);
@@ -994,12 +959,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       every (b: {
-         let c
-         woman(b)
-         donkey(c)
-         woman-with(b, c)
-       }) {
+       for every (b: let c and woman(b) and donkey(c) and woman-with(b, c)) {
          love(b, a)
        }
     `);
@@ -1011,10 +971,7 @@ describe("DRS", function() {
        let a, b
        Mary(a)
        Brazil(b)
-       every (c: {
-         man(c)
-         man-from(c, b)
-       }) {
+       for every (c: man(c) and man-from(c, b)) {
          love(c, a)
        }
     `);
@@ -1036,9 +993,7 @@ describe("DRS", function() {
     assertThat("Every man is mortal. Socrates is a man.")
      .equalsTo(`
        let b
-       every (a: {
-         man(a)
-       }) {
+       for every (a: man(a)) {
          mortal(a)
        }
        Socrates(b)
@@ -1405,9 +1360,7 @@ describe("DRS", function() {
     // Matches the DRS found in (3.57) on page 269.
     assertThat("every brazilian was happy.")
      .equalsTo(`
-         every (a: {
-           brazilian(a)
-         }) {
+         for every (a: brazilian(a)) {
            < happy(a)
          }
     `);
@@ -1416,9 +1369,7 @@ describe("DRS", function() {
   it("All brazilians are happy.", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
-         all (a: {
-           brazilian(a)
-         }) {
+         for all (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1427,9 +1378,7 @@ describe("DRS", function() {
   it("Most brazilians are happy.", function() {
     assertThat("Most brazilians are happy.")
      .equalsTo(`
-         most (a: {
-           brazilian(a)
-         }) {
+         for most (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1438,9 +1387,7 @@ describe("DRS", function() {
   it("Many brazilians are happy.", function() {
     assertThat("Many brazilians are happy.")
      .equalsTo(`
-       many (a: {
-         brazilian(a)
-       }) {
+       for many (a: brazilian(a)) {
          happy(a)
        }
     `);
@@ -1449,9 +1396,7 @@ describe("DRS", function() {
   it("3 brazilians are happy.", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
-         3 (a: {
-           brazilian(a)
-         }) {
+         for 3 (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1460,9 +1405,7 @@ describe("DRS", function() {
   it("More than 3 brazilians are happy.", function() {
     assertThat("More than 3 brazilians are happy.")
      .equalsTo(`
-         more-than-3 (a: {
-           brazilian(a)
-         }) {
+         for more-than-3 (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1471,9 +1414,7 @@ describe("DRS", function() {
   it("Fewer than 3 brazilians are happy.", function() {
     assertThat("Fewer than 3 brazilians are happy.")
      .equalsTo(`
-         fewer-than-3 (a: {
-           brazilian(a)
-         }) {
+         for fewer-than-3 (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1482,9 +1423,7 @@ describe("DRS", function() {
   it("At least 3 brazilians are happy.", function() {
     assertThat("At least 3 brazilians are happy.")
      .equalsTo(`
-         at-least-3 (a: {
-           brazilian(a)
-         }) {
+         for at-least-3 (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1493,9 +1432,7 @@ describe("DRS", function() {
   it("At most 3 brazilians are happy.", function() {
     assertThat("At most 3 brazilians are happy.")
      .equalsTo(`
-         at-most-3 (a: {
-           brazilian(a)
-         }) {
+         for at-most-3 (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1504,9 +1441,7 @@ describe("DRS", function() {
   it("Only brazilians are happy.", function() {
     assertThat("Only brazilians are happy.")
      .equalsTo(`
-         only (a: {
-           brazilian(a)
-         }) {
+         for only (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1515,9 +1450,7 @@ describe("DRS", function() {
   it("The majority of brazilians are happy.", function() {
     assertThat("The majority of brazilians are happy.")
      .equalsTo(`
-         the-majority-of (a: {
-           brazilian(a)
-         }) {
+         for the-majority-of (a: brazilian(a)) {
            happy(a)
          }
     `);
@@ -1528,9 +1461,7 @@ describe("DRS", function() {
     // who was brazilian 
     assertThat("Every engineer who was brazilian was happy.")
      .equalsTo(`
-       every (a: {
-         engineer(a)
-       }) {
+       for every (a: engineer(a)) {
          < happy(a)
        }
     `);
@@ -1539,12 +1470,8 @@ describe("DRS", function() {
   it("Most brazilians like most porsches.", function() {
     assertThat("Most brazilians like most porsches.")
      .equalsTo(`
-         most (a: {
-           brazilian(a)
-         }) {
-           most (b: {
-             porsche(b)
-           }) {
+         for most (a: brazilian(a)) {
+           for most (b: porsche(b)) {
              like(a, b)
            }
          }
@@ -1556,9 +1483,7 @@ describe("DRS", function() {
      .equalsTo(`
          let a
          Smith(a)
-         most (b: {
-           brazilian(b)
-         }) {
+         for most (b: brazilian(b)) {
            let c
            porsche(c)
            love(b, c)
@@ -1859,9 +1784,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
        let a
        Brazil(a)
-       most (b: {
-         brazilian(b)
-       }) {
+       for most (b: brazilian(b)) {
          live-in(e, a)
          live(b)
        }
@@ -1917,10 +1840,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
        let a
        Brazil(a)
-       every (b: {
-         person(b)
-         from(b, a)
-       }) {
+       for every (b: person(b) and from(b, a)) {
          brazilian(b)
        }
     `);    
@@ -1943,10 +1863,7 @@ describe("Large Lexicon", () => {
         let a, b
         Brazil(a)
         South America(b)
-        all (c: {
-          country(c)
-          country-in(c, b)
-        }) {
+        for all (c: country(c) and country-in(c, b)) {
           border(a, c)
         }
       `);
@@ -1957,9 +1874,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         let a
         Brazil(a)
-        211m (b: {
-          people(b)
-        }) {
+        for 211m (b: people(b)) {
           live-in(e, a)
           live(b)
         }
@@ -1994,9 +1909,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         let a
         Brazil(a)
-        most (b: {
-          country(b)
-        }) {
+        for most (b: country(b)) {
           border(a, b)
         }
       `);
@@ -2007,9 +1920,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         let a
         Brazil(a)
-        26 (b: {
-          state(b)
-        }) {
+        for 26 (b: state(b)) {
           let c
           federation(c, a)
           compose(b, c)
@@ -2181,15 +2092,10 @@ describe("Large Lexicon", () => {
        South America(b)
        country(a)
        country-in(a, b)
-       most (c: {
-         country(c)
-         country-in(c, b)
-       }) {
+       for most (c: country(c) and country-in(c, b)) {
          border(a, c)
        }
-       211m (d: {
-         people(d)
-       }) {
+       for 211m (d: people(d)) {
          live-in(e, a)
          live(d)
        }
@@ -2197,9 +2103,7 @@ describe("Large Lexicon", () => {
        f = e
        capital(f)
        capital-of(f, a)
-       26 (g: {
-         state(g)
-       }) {
+       for 26 (g: state(g)) {
          let h
          federation(h, f)
          compose(g, h)
@@ -2262,29 +2166,21 @@ describe("Large Lexicon", () => {
       The World Bank classifies all countries.
     `).equalsTo(`
        let c, e
-       every (a: {
-         country(a)
-       }) {
+       for every (a: country(a)) {
          political-territory(a)
          territory(a)
          controlled(a)
        }
-       every (b: {
-         country(b)
-       }) {
+       for every (b: country(b)) {
          independent-state(b)
          state(b)
        }
        United Nations(c)
-       all (d: {
-         country(d)
-       }) {
+       for all (d: country(d)) {
          classify(c, d)
        }
        World Bank(e)
-       all (f: {
-         country(f)
-       }) {
+       for all (f: country(f)) {
          classify(e, f)
        }
      `);
@@ -2307,14 +2203,10 @@ describe("Large Lexicon", () => {
       Some nations are not ethnic.
       Every nation is a cultural community which is aware of the autonomy.
     `).equalsTo(`
-       every (a: {
-         nation(a)
-       }) {
+       for every (a: nation(a)) {
          let c
          stable-community(a)
-         some (b: {
-           people(b)
-         }) {
+         for some (b: people(b)) {
            stable-community-of(a, b)
          }
          community(a)
@@ -2322,26 +2214,18 @@ describe("Large Lexicon", () => {
          language(c)
          with(a, c)
        }
-       every (d: {
-         nation(d)
-       }) {
+       for every (d: nation(d)) {
          political(d)
        }
-       some (e: {
-         nation(e)
-       }) {
+       for some (e: nation(e)) {
          ethnic(e)
        }
-       some (f: {
-         nation(f)
-       }) {
+       for some (f: nation(f)) {
          not {
          ethnic(f)
          }
        }
-       every (g: {
-         nation(g)
-       }) {
+       for every (g: nation(g)) {
          let h
          cultural-community(g)
          community(g)

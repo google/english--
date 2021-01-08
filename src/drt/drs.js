@@ -108,7 +108,7 @@ class DRS {
     return result;
   }
   
-  print() {
+  print(nl = "\n") {
     let result = [];
     let refs = [];
     let individuals = this.head
@@ -118,7 +118,7 @@ class DRS {
     }
     
     let args = refs.join(", ");
-    let neg = this.neg ? "~" : "";
+    //let neg = this.neg ? "~" : "";
     // result.push(`${neg}drs(${args}) \{`);
     // result.push(`{`);
     // console.log(this.neg);
@@ -133,7 +133,7 @@ class DRS {
           cond["@type"] == "Query" ||
           cond["@type"] == "Conjunction" ||
           cond["@type"] == "Disjunction") {
-        result.push(cond.print());
+        result.push(cond.print(nl));
       } else {
         // console.log(cond);
         result.push(print(cond));
@@ -141,8 +141,8 @@ class DRS {
     }
     
     // result.push("}");
-    
-    return result.join("\n");
+    // console.log("hi");
+    return result.join(nl);
   }
 }
 

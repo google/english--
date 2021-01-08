@@ -1331,9 +1331,11 @@ function quantifier(q, a, b, ref) {
     "ref": ref,
     print() {
       let result = [];
-      result.push(`${q} (${ref ? (ref.name + ": {") : "{"}`);
-      result.push(this.a.print());
-      result.push("}) {");
+      // result.push(`${q} (${ref ? (ref.name + ": {") : "{"}`);
+      let head = q == "if" ? q : `for ${q}`;
+      result.push(`${head} (${ref ? (ref.name + ": ") : ""}${this.a.print(" and ")}) {`);
+      //result.push();
+      //result.push("}) {");
       result.push(this.b.print());
       result.push("}");
       return result.join("\n");
