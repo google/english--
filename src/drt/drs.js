@@ -117,7 +117,7 @@ class DRS {
       refs.push(`${ref.print()}`);
     }
     
-    let args = refs.join(", ");
+    //let args = refs.join(", ");
     //let neg = this.neg ? "~" : "";
     // result.push(`${neg}drs(${args}) \{`);
     // result.push(`{`);
