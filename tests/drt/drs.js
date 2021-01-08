@@ -2290,6 +2290,68 @@ describe("Large Lexicon", () => {
      `);
   });
 
+  it("Every nation is a stable community of some peoples with a common language.", () => {
+    // Things I'd expect I'd be able to write:
+    //   - a stable community of peoples (probably need generics)
+    //   - some peoples with a common language, territory, history, ethnicity or culture.
+    //   - A nation is more overtly political than an ethnic group (needs comparatives)
+    //   - Some nations are ethnic groups. // possibly missing groups from the lexicon
+    //                                        or possibly it needs generics.
+    //   - Every nation is a cultural and political community.
+    //   - "aware of its autonomy"
+    // 
+    assertThat(`
+      Every nation is a stable community of some peoples with a common language.
+      Every nation is political.
+      Some nations are ethnic.
+      Some nations are not ethnic.
+      Every nation is a cultural community which is aware of the autonomy.
+    `).equalsTo(`
+       every (a: {
+         nation(a)
+       }) {
+         let c
+         stable-community(a)
+         some (b: {
+           people(b)
+         }) {
+           stable-community-of(a, b)
+         }
+         community(a)
+         common-language(c)
+         language(c)
+         with(a, c)
+       }
+       every (d: {
+         nation(d)
+       }) {
+         political(d)
+       }
+       some (e: {
+         nation(e)
+       }) {
+         ethnic(e)
+       }
+       some (f: {
+         nation(f)
+       }) {
+         not {
+         ethnic(f)
+         }
+       }
+       every (g: {
+         nation(g)
+       }) {
+         let h
+         cultural-community(g)
+         community(g)
+         aware(g)
+         autonomy(h)
+         of(g, h)
+       }
+     `);
+  });
+  
 
   function assertThat(x) { 
     return {
