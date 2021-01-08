@@ -1334,7 +1334,7 @@ function quantifier(q, a, b, ref) {
       // result.push(`${q} (${ref ? (ref.name + ": {") : "{"}`);
       //let head = q == "if" ? q : `for ${q}`;
       //console.log(q);
-      let letty = q == "if" ? "" : `let ${q} ${ref.name}: `;
+      let letty = q == "if" ? "" : `${q} ${ref.name}: `;
       let head = q == "if" ? "if" : "for";
       result.push(`${head} (${letty}${this.a.print(" and ")}) {`);
       //result.push();
