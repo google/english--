@@ -2150,7 +2150,7 @@ describe("Large Lexicon", () => {
         considered-as(a, b)
       `);
   });
-
+  
   it("Brazil is a country in South America.", function() {
     // Things that I'd expect to be able to write:
     //   - Brazil's population is 211 million people.
@@ -2246,8 +2246,50 @@ describe("Large Lexicon", () => {
        advanced-economy(x)
        economy(x)
        considered-as(l, x)
-    `);
+    `);    
   });
+
+  it("Every country is a political territory which is controlled.", () => {
+    // TODO: allow adjectives to apply to multiple nouns.
+    // A country is a political state, nation or territory which is controlled
+    // Things that I'd expect to be able to write:
+    //   - A country may be an independent sovereign state or part of a larger state,
+    //   - The United Nations and the World bank classify all countries.
+    assertThat(`
+      Every country is a political territory which is controlled.
+      Every country is an independent state.
+      The United Nations classifies all countries.
+      The World Bank classifies all countries.
+    `).equalsTo(`
+       let c, e
+       every (a: {
+         country(a)
+       }) {
+         political-territory(a)
+         territory(a)
+         controlled(a)
+       }
+       every (b: {
+         country(b)
+       }) {
+         independent-state(b)
+         state(b)
+       }
+       United Nations(c)
+       all (d: {
+         country(d)
+       }) {
+         classify(c, d)
+       }
+       World Bank(e)
+       all (f: {
+         country(f)
+       }) {
+         classify(e, f)
+       }
+     `);
+  });
+
 
   function assertThat(x) { 
     return {
