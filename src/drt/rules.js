@@ -520,9 +520,33 @@ class CRADV extends Rule {
     let cond = S(e, VP_(VP(V(child(prep, 0)), child(np, 1))));
     
     body.push(cond);
+
+    let name = [];
+    let i = verb;
+
+    //console.log(i);
+    while (i && i["@type"] == "V") {
+      if (i.prop) {
+        name.push(i.prop);
+      }
+      //else if (child(i, 0).prop) {
+      //  name.push(child(i, 0).prop);
+      //}
+      i = child(i, 0);
+    }
+    name.push(child(prep, 0).value);
+    //console.log(`verb: [${name.join("-")}]`);
+
+    //throw new Error("hi");
+    //console.log(JSON.stringify(verb, undefined, 2));
+    
+    //child(prep, 0).value = child(verb, 0).prop + "-" + child(prep, 0).value;
+    child(prep, 0).value = name.join("-");
+    //console.log();
     
     const s = clone(node);
     child(s, 1, 0).children[0] = child(verb, 0);
+
     body.push(s);
     
     return [[], body, [], [node]];

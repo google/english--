@@ -1615,7 +1615,7 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        porsche(c)
-       to(e, b)
+       give-to(e, b)
        < give(a, c)
      `);
   });
@@ -1740,8 +1740,8 @@ describe("DRS", function() {
        Jones(a)
        Italy(b)
        Brazil(c)
-       to(e, b)
-       from(e, c)
+       come-to(e, b)
+       come-from(e, c)
        < come(a)
      `);
   });
@@ -1836,7 +1836,7 @@ describe("Large Lexicon", () => {
        Mel(a)
        awesome-country(b)
        country(b)
-       to(e, b)
+       travel-to(e, b)
        < travel(a)
     `);
   });
@@ -1848,7 +1848,7 @@ describe("Large Lexicon", () => {
        Mel(a)
        Brazil(b)
        not {
-         in(e, b)
+         live-in(e, b)
          live(a)
        }
     `);
@@ -1862,7 +1862,7 @@ describe("Large Lexicon", () => {
        most (b: {
          brazilian(b)
        }) {
-         in(e, a)
+         live-in(e, a)
          live(b)
        }
     `);
@@ -1874,7 +1874,7 @@ describe("Large Lexicon", () => {
        let a, b
        Mel(a)
        Brazil(b)
-       in(e, b)
+       live-in(e, b)
        live(a)
     `);
   });
@@ -1885,7 +1885,7 @@ describe("Large Lexicon", () => {
        let a, b
        Mel(a)
        Brazil(b)
-       in(e, b)
+       live-in(e, b)
        < live(a)
     `);
   });
@@ -1896,7 +1896,7 @@ describe("Large Lexicon", () => {
        let a, b
        Mel(a)
        Brazil(b)
-       in(e, b)
+       live-in(e, b)
        live(a)
     `);
   });
@@ -1960,7 +1960,7 @@ describe("Large Lexicon", () => {
         211m (b: {
           people(b)
         }) {
-          in(e, a)
+          live-in(e, a)
           live(b)
         }
     `);
@@ -2086,7 +2086,7 @@ describe("Large Lexicon", () => {
         Portuguese Empire(b)
         Brazil(c)
         area(d)
-        for(e, b)
+        claim-for(e, b)
         < claim(a, d)
         area-of(d, c)
       `);
@@ -2172,12 +2172,13 @@ describe("Large Lexicon", () => {
       Brazil is bounded by the Atlantic Ocean on the East.
       The official language of Brazil is Portuguese.
       Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.
+      Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.
       The Portugese Empire's capital was transferred from Lisbon to Rio De Janeiro.
       Brazil is classified by the World Bank as an industrialized country.
       Brazil is a member of the United Nations.
       Brazil is considered as an advanced economy.
     `).equalsTo(`
-       let a, b, e, f, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w
+       let a, b, e, f, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y
        Brazil(a)
        South America(b)
        country(a)
@@ -2191,7 +2192,7 @@ describe("Large Lexicon", () => {
        211m (d: {
          people(d)
        }) {
-         in(e, a)
+         live-in(e, a)
          live(d)
        }
        Brasilia(e)
@@ -2214,35 +2215,40 @@ describe("Large Lexicon", () => {
        l = k
        official-language(l)
        language(l)
-       language-of(l, f)
+       official-language-of(l, f)
        Pedro Alvares Cabral(m)
        inhabited(l)
-       landing(n)
-       tribal-nation(o)
-       nation(o)
-       of(l, m)
-       inhabited-before(l, n)
-       inhabited-by(l, o)
-       Portugese Empire(p)
-       Rio De Janeiro(q)
-       Lisbon(r)
-       capital(s, p)
-       transferred(s)
-       transferred-to(s, q)
-       transferred-from(s, r)
-       World Bank(t)
+       tribal-nation(n)
+       nation(n)
+       landing(o)
+       inhabited-by(l, n)
+       nation-before(n, o)
+       landing-of(o, m)
+       Portuguese Empire(p)
+       area(q)
+       claim-for(e, p)
+       < claim(m, q)
+       area-of(q, l)
+       Portugese Empire(r)
+       Rio De Janeiro(s)
+       Lisbon(t)
+       capital(u, r)
+       transferred(u)
+       transferred-to(u, s)
+       transferred-from(u, t)
+       World Bank(v)
        classified(l)
-       industrialized-country(u)
-       country(u)
-       classified-as(l, u)
-       classified-by(l, t)
-       United Nations(v)
+       industrialized-country(w)
+       country(w)
+       classified-as(l, w)
+       classified-by(l, v)
+       United Nations(x)
        member(l)
-       member-of(l, v)
+       member-of(l, x)
        considered(l)
-       advanced-economy(w)
-       economy(w)
-       considered-as(l, w)
+       advanced-economy(y)
+       economy(y)
+       considered-as(l, y)
     `);
   });
 
