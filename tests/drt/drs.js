@@ -2155,14 +2155,12 @@ describe("Large Lexicon", () => {
     // Things that I'd expect to be able to write:
     //   - Brazil's population is 211 million people.
     //   - 26 states compose the federation of Brazil: Sao Paulo, etc, etc.
-    //   - Brazil remained a colony.
+    //   - Brazil remained a colony. // probablly missing remained in the lexicon.
     //   - Brazil is classified as an upper-midle income economy by The-World-Bank.
     //   - Brazil is considered an advanced emerging economy.
     // Semantically, things I'd expect:
     //   - "was transferred" is an adjective, but feels like the passive voice
     //   - "was transferred" isn't maintaining the "tense" of "was"
-    //   - prepositions attached to verbs, nouns and adjectives should probably be
-    //     prefixed. e.g. instead of capital(u), of(u, v), we want capital(u), capital-of(u, v)
     assertThat(`
       Brazil is a country in South America.
       Brazil borders most countries in South America.
@@ -2173,12 +2171,12 @@ describe("Large Lexicon", () => {
       The official language of Brazil is Portuguese.
       Brazil was inhabited by a tribal nation before the landing of Pedro Alvares Cabral.
       Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.
-      The Portugese Empire's capital was transferred from Lisbon to Rio De Janeiro.
+      The Portuguese Empire's capital was transferred from Lisbon to Rio De Janeiro.
       Brazil is classified by the World Bank as an industrialized country.
       Brazil is a member of the United Nations.
       Brazil is considered as an advanced economy.
     `).equalsTo(`
-       let a, b, e, f, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y
+       let a, b, e, f, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x
        Brazil(a)
        South America(b)
        country(a)
@@ -2229,26 +2227,25 @@ describe("Large Lexicon", () => {
        claim-for(e, p)
        < claim(m, q)
        area-of(q, l)
-       Portugese Empire(r)
-       Rio De Janeiro(s)
-       Lisbon(t)
-       capital(u, r)
-       transferred(u)
-       transferred-to(u, s)
-       transferred-from(u, t)
-       World Bank(v)
+       Rio De Janeiro(r)
+       Lisbon(s)
+       capital(t, p)
+       transferred(t)
+       transferred-to(t, r)
+       transferred-from(t, s)
+       World Bank(u)
        classified(l)
-       industrialized-country(w)
-       country(w)
-       classified-as(l, w)
-       classified-by(l, v)
-       United Nations(x)
+       industrialized-country(v)
+       country(v)
+       classified-as(l, v)
+       classified-by(l, u)
+       United Nations(w)
        member(l)
-       member-of(l, x)
+       member-of(l, w)
        considered(l)
-       advanced-economy(y)
-       economy(y)
-       considered-as(l, y)
+       advanced-economy(x)
+       economy(x)
+       considered-as(l, x)
     `);
   });
 
