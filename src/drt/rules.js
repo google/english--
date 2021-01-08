@@ -162,6 +162,7 @@ function predicate(name, args, types, infix = false) {
     types: types,
     print() {
       //console.log(args);
+      //console.log(this.time);
       let params = this.args.map(arg => print(arg));
       if (infix) {
         return params.join(` ${this.name} `);
@@ -516,8 +517,9 @@ class CRADV extends Rule {
   apply({subject, verb, prep, np}, node) {
     let body = [];
     let sub = child(node, 0);
-    let e = referent("e");
-    let cond = S(e, VP_(VP(V(child(prep, 0)), child(np, 1))));
+    // console.log(node.time);
+    // let e = referent("e");
+    let cond = S(node.time, VP_(VP(V(child(prep, 0)), child(np, 1))));
     
     body.push(cond);
 
@@ -1103,6 +1105,77 @@ class CRWILL extends Rule {
   }
 }
 
+// Construction Rule described in page 543
+class CRTENSE extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("sub"), VP_(capture("verb"))));
+  }
+  apply({verb}, node, refs) {
+    // TODO(goto): a lot of things are pushed as sentences
+    // artificially, so verbs aren't represented anymore.
+    // To fix that requires a bigger refactoring than we'd
+    // want right now, so we return early here if the tree
+    // Skip if a time was already assigned too.
+    let {types} = node;
+    let {tense, stat} = types || {};
+
+    if (!tense || node.time) {
+      return [[], [], [], []];
+    }
+
+    if (child(verb, 0, 0)["@type"] == "BE") {
+      // TODO: deal with adjectives.
+      return [[], [], [], []];
+    }
+
+    // Records the time relationship between the new
+    // discourse referent e and the utterance time @n.
+    
+    // node.tense = tense;
+
+    if (tense == "fut" &&
+        verb.children[0]["@type"] == "AUX" &&
+        verb.children[0].children[0] == "will") {
+      // page 541: 
+      //
+      //   We face a minor technical complication in this case, 
+      // which has to do with the auxiliary will. Will makes its 
+      // semantic contribution via the feature value "fut". 
+      //
+      //   Once it has made this contribution it can be discarded. 
+      // We account for this by pruning the auxiliary from the 
+      // sentence structure that remains after the first construction
+      // step, in the course of which the contribution of will is 
+      // explicitly represented, has been performed.
+      verb.children.shift();
+    }
+
+    if (stat == "-") {
+      // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+      // node.time = e;
+      // node.tense = tense;
+      // let conds = [];
+      //if (tense == "past") {
+      // conds.push(before(e, referent("@now")));
+      //} else if (tense == "fut") {
+      // conds.push(before(referent("@now"), e));
+      //}
+      return [[], [], [], []];
+    } else {
+      let s = referent(this.id("s"), {}, undefined, node.loc, true);
+      node.time = s;
+      //let op = tense == "pres" ? "=" : (tense == "past" ? "<" : ">");
+      let body = [];
+      if (tense == "past" || tense == "fut") {
+        let op = (tense == "past" ? "<" : ">");
+        body.push(predicate(op, [s, referent("@now")], {}, true));
+      }
+      return [[s], body, [], []];
+    }
+    return [[], [], [], []];
+  }
+}
+
 // Construction Rule described in page 589
 class CRASPECT extends Rule {
   constructor(ids) {
@@ -1285,7 +1358,11 @@ class CRPRED extends Rule {
     if (sub["@type"] != "Referent") {
       throw new Error("Expected referent, got " + sub["@type"] + ".");
     }
-    let args = [sub.name];
+    let args = [];
+    if (node.time) {
+      args.push(node.time);
+    }
+    args.push(sub.name);
     if (obj) {
       args.push(obj.name);
     }
@@ -1383,6 +1460,7 @@ function before(a, b) {
     "a": a,
     "b": b,
     print() {
+      // console.log("hi");
       return this.a.print() + " < " + this.b.print();
     }
   };
@@ -1430,6 +1508,7 @@ class Rules {
       new CREVERY(ids),
       new CRVPEVERY(ids),
       new CRASPECT(ids),
+      new CRTENSE(ids),
       new CRLIN(ids),
       new CRID(ids),
       new CRADV(ids),

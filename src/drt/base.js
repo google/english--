@@ -2,17 +2,6 @@ function clone(obj) {
  return JSON.parse(JSON.stringify(obj));
 }
 
-function time({types}) {
-    // let {types} = node;
-    let {tense} = types || {};
-    if (tense == "fut") {
-        return "> ";
-    } else if (tense == "past") {
-        return "< ";
-    }
-    return "";  
-};
-
 function print(node, refs) {
  // console.log(node);
  if (typeof node == "string") {
@@ -21,7 +10,7 @@ function print(node, refs) {
    // console.log(node);
    return node["value"];
  } else if (node["@type"] == "Predicate") {
-   return time(node) + node.print();
+   return node.print();
  } else  if (node["@type"] == "Referent") {
   if (refs) {
    // de-reference referents
@@ -35,9 +24,9 @@ function print(node, refs) {
  // result.push(print(child, refs));
  //}
 
- let prefix = node["@type"] == "S" ? time(node) : "";
+ // let prefix = node["@type"] == "S" ? time(node) : "";
  let suffix = node.ref ? `(${node.ref.name})` : "";
- return prefix + result.join(" ").trim() + suffix;
+ return result.join(" ").trim() + suffix;
 }
 
 function child(node, ...path) {
