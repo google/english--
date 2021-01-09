@@ -14,7 +14,8 @@ describe("DRS", function() {
        let s0, a, b
        man(a)
        woman(b)
-       admire(s0, a, b)
+       admire(s0, b)
+       admire-by(s0, a)
     `);
   });
 
@@ -24,8 +25,10 @@ describe("DRS", function() {
        let s0, a, b, s1
        man(a)
        woman(b)
-       admire(s0, a, b)
-       like(s1, b, a)
+       admire(s0, b)
+       admire-by(s0, a)
+       like(s1, a)
+       like-by(s1, b)
     `);
   });
 
@@ -35,8 +38,10 @@ describe("DRS", function() {
        let a, s0, b, s1
        Jones(a)
        woman(b)
-       admire(s0, a, b)
-       like(s1, b, a)
+       admire(s0, b)
+       admire-by(s0, a)
+       like(s1, a)
+       like-by(s1, b)
     `);
   });
 
@@ -46,7 +51,8 @@ describe("DRS", function() {
        let a, b, s0
        Jones(a)
        Mary(b)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
     `);
   });
 
@@ -56,7 +62,8 @@ describe("DRS", function() {
        let a, s0, b
        Mary(a)
        man(b)
-       love(s0, b, a)
+       love(s0, a)
+       love-by(s0, b)
      `);
   });
 
@@ -66,7 +73,8 @@ describe("DRS", function() {
        let a, s0, b
        Mary(a)
        man(b)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
      `);
   });
 
@@ -77,8 +85,10 @@ describe("DRS", function() {
        Smith(a)
        Mary(b)
        man(c)
-       fascinate(s0, c, a)
-       love(s1, c, b)
+       fascinate(s0, a)
+       fascinate-by(s0, c)
+       love(s1, b)
+       love-by(s1, c)
     `);
   });
 
@@ -89,8 +99,10 @@ describe("DRS", function() {
        Jones(a)
        Smith(b)
        book(c)
-       love(s0, a, c)
-       fascinate(s1, c, b)
+       love(s0, c)
+       love-by(s0, a)
+       fascinate(s1, b)
+       fascinate-by(s1, c)
      `);
   });
 
@@ -101,8 +113,10 @@ describe("DRS", function() {
        Jones(a)
        Smith(b)
        book(c)
-       own(s0, a, c)
-       love(s1, b, c)
+       own(s0, c)
+       own-by(s0, a)
+       love(s1, c)
+       love-by(s1, b)
      `);
   });
 
@@ -112,8 +126,10 @@ describe("DRS", function() {
        let a, s0, b, s1
        Jones(a)
        book(b)
-       own(s0, a, b)
-       fascinate(s1, b, a)
+       own(s0, b)
+       own-by(s0, a)
+       fascinate(s1, a)
+       fascinate-by(s1, b)
      `);
   });
 
@@ -125,9 +141,12 @@ describe("DRS", function() {
        Smith(b)
        man(c)
        book(d)
-       love(s0, c, d)
-       fascinate(s1, c, a)
-       fascinate(s2, d, b)
+       love(s0, d)
+       love-by(s0, c)
+       fascinate(s1, a)
+       fascinate-by(s1, c)
+       fascinate(s2, b)
+       fascinate-by(s2, d)
      `);
   });
 
@@ -137,8 +156,10 @@ describe("DRS", function() {
        let a, b, s0, s1
        Jones(a)
        Ulysses(b)
-       own(s0, a, b)
-       fascinate(s1, b, a)
+       own(s0, b)
+       own-by(s0, a)
+       fascinate(s1, a)
+       fascinate-by(s1, b)
      `);
   });
 
@@ -148,8 +169,10 @@ describe("DRS", function() {
        let a, s0, b, s1
        Jones(a)
        book(b)
-       own(s0, a, b)
-       fascinate(s1, b, a)
+       own(s0, b)
+       own-by(s0, a)
+       fascinate(s1, a)
+       fascinate-by(s1, b)
      `);
   });
 
@@ -159,10 +182,13 @@ describe("DRS", function() {
        let a, s0, b, s1, c, s2
        Jones(a)
        book(b)
-       own(s0, a, b)
-       fascinate(s1, b, a)
+       own(s0, b)
+       own-by(s0, a)
+       fascinate(s1, a)
+       fascinate-by(s1, b)
        Mary(c)
-       love(s2, c, a)
+       love(s2, a)
+       love-by(s2, c)
      `);
   });
 
@@ -174,7 +200,8 @@ describe("DRS", function() {
        not {
          let b
          porsche(b)
-         own(s0, a, b)
+         own(s0, b)
+         own-by(s0, a)
        }
      `);
   });
@@ -185,9 +212,11 @@ describe("DRS", function() {
        let a, s0, b, s1
        Jones(a)
        porsche(b)
-       own(s0, a, b)
+       own(s0, b)
+       own-by(s0, a)
        not {
-         like(s1, a, b)
+         like(s1, b)
+         like-by(s1, a)
        }
      `);
   });
@@ -228,13 +257,16 @@ describe("DRS", function() {
        Jones(a)
        woman(b)
        not {
-         love(s1, b, a)
+         love(s1, a)
+         love-by(s1, b)
        }
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
        not {
          let c
          man(c)
-         love(s2, b, c)
+         love(s2, c)
+         love-by(s2, b)
        }
      `);
   });
@@ -244,7 +276,8 @@ describe("DRS", function() {
      .equalsTo(`
        let s0, a
        not {
-         stink(s0, a)
+         stink(s0)
+         stink-by(s0, a)
        }
        porsche(a)
      `);
@@ -259,9 +292,11 @@ describe("DRS", function() {
          let b, s1
          porsche(b)
          not {
-           fascinate(s1, b, a)
+           fascinate(s1, a)
+           fascinate-by(s1, b)
          }
-         own(s0, a, b)
+         own(s0, b)
+         own-by(s0, a)
        }
      `);
   });
@@ -275,9 +310,11 @@ describe("DRS", function() {
          let b, s1
          porsche(b)
          not {
-           own(s1, a, b)
+           own(s1, b)
+           own-by(s1, a)
          }
-         like(s0, a, b)
+         like(s0, b)
+         like-by(s0, a)
        }
      `);
   });
@@ -338,7 +375,8 @@ describe("DRS", function() {
        Mary(b)
        happy-man(a)
        man(a)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
     `);
   });
 
@@ -350,7 +388,8 @@ describe("DRS", function() {
        man(a)
        happy(a)
        Mary(b)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
     `);
   });
 
@@ -361,7 +400,8 @@ describe("DRS", function() {
        Jones(a)
        woman(b)
        happy(b)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
     `);
   });
 
@@ -372,7 +412,8 @@ describe("DRS", function() {
        Jones(a)
        woman(b)
        happy(b)
-       love(s0, b, a)
+       love(s0, a)
+       love-by(s0, b)
     `);
   });
 
@@ -382,7 +423,8 @@ describe("DRS", function() {
        let a, s0, b
        Jones(a)
        porsche(b)
-       own(s0, a, b)
+       own(s0, b)
+       own-by(s0, a)
        happy(a)
     `);
   });
@@ -393,10 +435,11 @@ describe("DRS", function() {
       let a, b
       Smith(a)
       Mary(b)
-      if (let s0, c and man(c) and love(s0, c, b)) {
+      if (let s0, c and man(c) and love(s0, b) and love-by(s0, c)) {
         let s1, d
         woman(d)
-        like(s1, a, d)
+        like(s1, d)
+        like-by(s1, a)
       }
     `);
   });
@@ -413,9 +456,10 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Jones(a)
-       if (let s0, b and book(b) and own(s0, a, b)) {
+       if (let s0, b and book(b) and own(s0, b) and own-by(s0, a)) {
          let s1
-         like(s1, a, b)
+         like(s1, b)
+         like-by(s1, a)
        }
     `);
   });
@@ -428,10 +472,11 @@ describe("DRS", function() {
        let a, b
        Jones(a)
        Smith(b)
-       if (let s0, c and book(c) and own(s0, a, c)) {
+       if (let s0, c and book(c) and own(s0, c) and own-by(s0, a)) {
          let s1, d
          porsche(d)
-         own(s1, b, d)
+         own(s1, d)
+         own-by(s1, b)
        }
     `);
   });
@@ -442,10 +487,12 @@ describe("DRS", function() {
        let a, b, s0
        Jones(a)
        Mary(b)
-       like(s0, a, b)
-       if (let s1, c and book(c) and like(s1, b, c)) {
+       like(s0, b)
+       like-by(s0, a)
+       if (let s1, c and book(c) and like(s1, c) and like-by(s1, b)) {
          let s2
-         like(s2, a, c)
+         like(s2, c)
+         like-by(s2, a)
        }
     `);
   });
@@ -463,9 +510,10 @@ describe("DRS", function() {
       let a, b
       Mary(a)
       Jones(b)
-      if (let s0, c and man(c) and like(s0, a, c)) {
+      if (let s0, c and man(c) and like(s0, c) and like-by(s0, a)) {
         let s1
-        like(s1, c, b)
+        like(s1, b)
+        like-by(s1, c)
       }
     `);
   });
@@ -477,7 +525,8 @@ describe("DRS", function() {
        Jones(a)
        for (every b: man(b)) {
          let s0
-         love(s0, b, a)
+         love(s0, a)
+         love-by(s0, b)
        }
     `);
   });
@@ -520,7 +569,8 @@ describe("DRS", function() {
          Jones(a)
          for (every b: man(b)) {
            let s0
-           love(s0, a, b)
+           love(s0, b)
+           love-by(s0, a)
          }
     `);
   });
@@ -534,10 +584,12 @@ describe("DRS", function() {
        Mary(c)
        {
          let s0
-         love(s0, a, c)
+         love(s0, c)
+         love-by(s0, a)
        } or {
          let s1
-         love(s1, b, c)
+         love(s1, c)
+         love-by(s1, b)
        }
     `);
   });
@@ -550,10 +602,12 @@ describe("DRS", function() {
       {
         let s0, b
         porsche(b)
-        own(s0, a, b)
+        own(s0, b)
+        own-by(s0, a)
       } or {
         let s1
-        like(s1, a, b)
+        like(s1, b)
+        like-by(s1, a)
       }
     `);
   });
@@ -671,9 +725,10 @@ describe("DRS", function() {
        let a, b
        Jones(a)
        Smith(b)
-       for (every c: let s0 and woman(c) and love(s0, b, c)) {
+       for (every c: let s0 and woman(c) and love(s0, c) and love-by(s0, b)) {
          let s1
-         like(s1, a, c)
+         like(s1, c)
+         like-by(s1, a)
        }
      `);
   });
@@ -707,10 +762,12 @@ describe("DRS", function() {
        Smith(b)
        {
          let s0
-         love(s0, a, b) 
+         love(s0, b) 
+         love-by(s0, a) 
        } and {
          let s1
-         love(s1, b, a)
+         love(s1, a)
+         love-by(s1, b)
        }
     `);
   });
@@ -723,10 +780,12 @@ describe("DRS", function() {
        {
          let s0, b
          porsche(b)
-         own(s0, a, b) 
+         own(s0, b) 
+         own-by(s0, a) 
        } and { 
          let s1
-         love(s1, a, b)
+         love(s1, b)
+         love-by(s1, a)
        }
     `);
   });
@@ -817,7 +876,8 @@ describe("DRS", function() {
        wife(b, a)
        happy(b)
        Smith(c)
-       like(s0, b, c)
+       like(s0, c)
+       like-by(s0, b)
     `);
   });
 
@@ -828,7 +888,8 @@ describe("DRS", function() {
        Smith(a)
        Jones(b)
        wife(c, b)
-       like(s0, a, c)
+       like(s0, c)
+       like-by(s0, a)
     `);
   });
 
@@ -858,7 +919,8 @@ describe("DRS", function() {
        Jones(a)
        unhappy-donkey(b)
        donkey(b)
-       own(s0, a, b)
+       own(s0, b)
+       own-by(s0, a)
     `);
   });
 
@@ -869,7 +931,8 @@ describe("DRS", function() {
        Jones(a)
        fast-porsche(b)
        porsche(b)
-       own(s0, a, b)
+       own(s0, b)
+       own-by(s0, a)
     `);
   });
 
@@ -880,7 +943,8 @@ describe("DRS", function() {
        Jones(a)
        for (every b: fast-porsche(b) and porsche(b)) {
          let s0
-         own(s0, a, b)
+         own(s0, b)
+         own-by(s0, a)
        }
     `);
   });
@@ -892,7 +956,8 @@ describe("DRS", function() {
        Jones(a)
        for (every b: beautiful-woman(b) and woman(b)) {
          let s0
-         love(s0, b, a)
+         love(s0, a)
+         love-by(s0, b)
        }
     `);
   });
@@ -905,9 +970,11 @@ describe("DRS", function() {
        Jones(b)
        woman(c)
        not {
-         like(s1, c, b)
+         like(s1, b)
+         like-by(s1, c)
        }
-       love(s0, a, c)
+       love(s0, c)
+       love-by(s0, a)
     `);
   });
 
@@ -918,8 +985,10 @@ describe("DRS", function() {
        Jones(a)
        Smith(b)
        woman(c)
-       like(s0, a, c)
-       like(s1, c, b)
+       like(s0, c)
+       like-by(s0, a)
+       like(s1, b)
+       like-by(s1, c)
     `);
   });
 
@@ -930,12 +999,13 @@ describe("DRS", function() {
        Jones(a)
        woman(b)
        donkey(c)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
        woman-with(b, c)
     `);
   });
 
-  it("A woman with a donkey loves Jones.", function() {
+  it.skip("A woman with a donkey loves Jones.", function() {
     assertThat("a woman with a donkey loves Jones.")
      .equalsTo(`
        let a, s0, b, c
@@ -978,7 +1048,8 @@ describe("DRS", function() {
        Jones(a)
        for (every b: let c and woman(b) and donkey(c) and woman-with(b, c)) {
          let s0
-         love(s0, b, a)
+         love(s0, a)
+         love-by(s0, b)
        }
     `);
   });
@@ -991,7 +1062,8 @@ describe("DRS", function() {
        Brazil(b)
        for (every c: man(c) and man-from(c, b)) {
          let s0
-         love(s0, c, a)
+         love(s0, a)
+         love-by(s0, c)
        }
     `);
   });
@@ -1002,9 +1074,11 @@ describe("DRS", function() {
        let a, b, s0, c, s1
        Jones(a)
        Mary(b)
-       love(s0, a, b)
+       love(s0, b)
+       love-by(s0, a)
        Smith(c)
-       like(s1, a, c)
+       like(s1, c)
+       like-by(s1, a)
     `);
   });
 
@@ -1119,7 +1193,8 @@ describe("DRS", function() {
        Jones(a)
        brazilian-engineer(b)
        engineer(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
     `);
   });
   
@@ -1130,7 +1205,8 @@ describe("DRS", function() {
        Jones(a)
        married-brazilian(b)
        brazilian(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
     `);
   });
 
@@ -1188,7 +1264,8 @@ describe("DRS", function() {
        a = c
        brother(c, b)
        Brazil(d)
-       like(s0, c, d)
+       like(s0, d)
+       like-by(s0, c)
     `);
   });
 
@@ -1197,7 +1274,8 @@ describe("DRS", function() {
      .equalsTo(`
        let a, s0
        Jones(a)
-       love(s0, a, a)
+       love(s0, a)
+       love-by(s0, a)
     `);
   });
 
@@ -1208,7 +1286,8 @@ describe("DRS", function() {
        Jones(a)
        Mary(b)
        s0 < @now
-       kiss(s0, a, b)
+       kiss(s0, b)
+       kiss-by(s0, a)
     `);
   });
 
@@ -1238,7 +1317,8 @@ describe("DRS", function() {
        let a, b, s0
        Smith(a)
        Mary(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
     `);
   });
 
@@ -1250,7 +1330,8 @@ describe("DRS", function() {
        Mary(b)
        s0 > @now
        not {
-         kiss(s0, a, b)
+         kiss(s0, b)
+         kiss-by(s0, a)
        }
     `);
   });
@@ -1263,7 +1344,8 @@ describe("DRS", function() {
          Mary(b)
          s0 < @now
          not {
-           kiss(s0, a, b)
+           kiss(s0, b)
+           kiss-by(s0, a)
          }
     `);
   });
@@ -1274,7 +1356,8 @@ describe("DRS", function() {
        let a, b, s0
        Smith(a)
        Mary(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
     `);
   });
 
@@ -1288,7 +1371,8 @@ describe("DRS", function() {
        Smith(a)
        Mary(b)
        not {
-         like(s0, a, b)
+         like(s0, b)
+         like-by(s0, a)
        }
     `);
   });
@@ -1299,7 +1383,8 @@ describe("DRS", function() {
        let a, b, s0
        Smith(a)
        Mary(b)
-       kiss(s0, a, b)
+       kiss(s0, b)
+       kiss-by(s0, a)
     `);
   });
 
@@ -1319,7 +1404,8 @@ describe("DRS", function() {
        let a, s0, b
        Smith(a)
        porsche(b)
-       own(s0, a, b)
+       own(s0, b)
+       own-by(s0, a)
     `);
   });
 
@@ -1495,7 +1581,8 @@ describe("DRS", function() {
          for (most a: brazilian(a)) {
            for (most b: porsche(b)) {
              let s0
-             like(s0, a, b)
+             like(s0, b)
+             like-by(s0, a)
            }
          }
     `);
@@ -1509,8 +1596,10 @@ describe("DRS", function() {
          for (most b: brazilian(b)) {
            let s0, c, s1
            porsche(c)
-           love(s0, b, c)
-           like(s1, a, c)
+           love(s0, c)
+           love-by(s0, b)
+           like(s1, c)
+           like-by(s1, a)
          }
     `);
   });
@@ -1565,7 +1654,8 @@ describe("DRS", function() {
        s0 < @now
        porsche(c)
        give-to(s0, b)
-       give(s0, a, c)
+       give(s0, c)
+       give-by(s0, a)
      `);
   });
 
@@ -1590,7 +1680,8 @@ describe("DRS", function() {
        let a, b, s0
        Foo(a)
        XBar(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1600,7 +1691,8 @@ describe("DRS", function() {
        let a, b, s0
        Picachu(a)
        Charmander(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1610,7 +1702,8 @@ describe("DRS", function() {
        let a, b, s0
        Sam(a)
        Aristotle(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1620,7 +1713,8 @@ describe("DRS", function() {
        let a, b, s0
        Sam Goto(a)
        Computer Science(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1630,7 +1724,8 @@ describe("DRS", function() {
        let a, b, s0
        Sam Goto(a)
        United States Of America(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1640,7 +1735,8 @@ describe("DRS", function() {
        let a, b, s0
        Sam(a)
        DRT(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
   
@@ -1693,7 +1789,8 @@ describe("DRS", function() {
        let a, b, s0
        Sam(a)
        Discourse Representation Theory(b)
-       like(s0, a, b)
+       like(s0, b)
+       like-by(s0, a)
      `);
   });
 
@@ -1706,7 +1803,8 @@ describe("DRS", function() {
        Cascal(c)
        s0 < @now
        reservation(d)
-       make(s0, a, d)
+       make(s0, d)
+       make-by(s0, a)
        reservation-for(d, b)
        reservation-for(d, c)
      `);
@@ -1733,7 +1831,8 @@ describe("DRS", function() {
        s0 < @now
        come-to(s0, b)
        come-from(s0, c)
-       come(s0, a)
+       come(s0)
+       come-by(s0, a)
      `);
   });
 
@@ -1751,7 +1850,8 @@ describe("DRS", function() {
        reservation(b)
        porsche(c)
        woman(d)
-       make(s0, a, b)
+       make(s0, b)
+       make-by(s0, a)
        reservation-with(b, c)
        reservation-for(b, d)
      `);
@@ -1784,7 +1884,8 @@ describe("Large Lexicon", () => {
       Mel(a)
       Yuji(b)
       girlfriend(c, b)
-      like(s0, a, c)
+      like(s0, c)
+      like-by(s0, a)
     `);
   });
 
@@ -1796,7 +1897,8 @@ describe("Large Lexicon", () => {
       Yuji(b)
       awesome-girlfriend(c)
       girlfriend(c, b)
-      like(s0, a, c)
+      like(s0, c)
+      like-by(s0, a)
     `);
   });
 
@@ -1830,7 +1932,8 @@ describe("Large Lexicon", () => {
        awesome-country(b)
        country(b)
        travel-to(s0, b)
-       travel(s0, a)
+       travel(s0)
+       travel-by(s0, a)
     `);
   });
 
@@ -1842,7 +1945,8 @@ describe("Large Lexicon", () => {
        Brazil(b)
        not {
          live-in(s0, b)
-         live(s0, a)
+         live(s0)
+         live-by(s0, a)
        }
     `);
   });
@@ -1855,7 +1959,8 @@ describe("Large Lexicon", () => {
        for (most b: brazilian(b)) {
          let s0
          live-in(s0, a)
-         live(s0, b)
+         live(s0)
+         live-by(s0, b)
        }
     `);
   });
@@ -1867,7 +1972,8 @@ describe("Large Lexicon", () => {
        Mel(a)
        Brazil(b)
        live-in(s0, b)
-       live(s0, a)
+       live(s0)
+       live-by(s0, a)
     `);
   });
 
@@ -1879,7 +1985,8 @@ describe("Large Lexicon", () => {
        Brazil(b)
        s0 < @now
        live-in(s0, b)
-       live(s0, a)
+       live(s0)
+       live-by(s0, a)
     `);
   });
 
@@ -1890,7 +1997,8 @@ describe("Large Lexicon", () => {
        Mel(a)
        Brazil(b)
        live-in(s0, b)
-       live(s0, a)
+       live(s0)
+       live-by(s0, a)
     `);
   });
 
@@ -1935,7 +2043,8 @@ describe("Large Lexicon", () => {
         South America(b)
         for (all c: country(c) and country-in(c, b)) {
           let s0
-          border(s0, a, c)
+          border(s0, c)
+          border-by(s0, a)
         }
       `);
   });
@@ -1948,7 +2057,8 @@ describe("Large Lexicon", () => {
         for (211m b: people(b)) {
           let s0
           live-in(s0, a)
-          live(s0, b)
+          live(s0)
+          live-by(s0, b)
         }
     `);
   });
@@ -1983,7 +2093,8 @@ describe("Large Lexicon", () => {
         Brazil(a)
         for (most b: country(b)) {
           let s0
-          border(s0, a, b)
+          border(s0, b)
+          border-by(s0, a)
         }
       `);
   });
@@ -1996,7 +2107,8 @@ describe("Large Lexicon", () => {
         for (26 b: state(b)) {
           let s0, c
           federation(c, a)
-          compose(s0, b, c)
+          compose(s0, c)
+          compose-by(s0, b)
         }
       `);
   });
@@ -2072,7 +2184,8 @@ describe("Large Lexicon", () => {
         s0 < @now
         area(d)
         claim-for(s0, b)
-        claim(s0, a, d)
+        claim(s0, d)
+        claim-by(s0, a)
         area-of(d, c)
       `);
   });
@@ -2172,12 +2285,14 @@ describe("Large Lexicon", () => {
        country-in(a, b)
        for (most c: country(c) and country-in(c, b)) {
          let s0
-         border(s0, a, c)
+         border(s0, c)
+         border-by(s0, a)
        }
        for (211m d: people(d)) {
          let s1
          live-in(s1, a)
-         live(s1, d)
+         live(s1)
+         live-by(s1, d)
        }
        Brasilia(e)
        f = e
@@ -2186,7 +2301,8 @@ describe("Large Lexicon", () => {
        for (26 g: state(g)) {
          let s2, h
          federation(h, f)
-         compose(s2, g, h)
+         compose(s2, h)
+         compose-by(s2, g)
        }
        East(i)
        Atlantic Ocean(j)
@@ -2203,7 +2319,8 @@ describe("Large Lexicon", () => {
        s4 < @now
        area(o)
        claim-for(s4, n)
-       claim(s4, m, o)
+       claim(s4, o)
+       claim-by(s4, m)
        area-of(o, l)
        Rio De Janeiro(p)
        Lisbon(q)
@@ -2254,12 +2371,14 @@ describe("Large Lexicon", () => {
        United Nations(c)
        for (all d: country(d)) {
          let s1
-         classify(s1, c, d)
+         classify(s1, d)
+         classify-by(s1, c)
        }
        World Bank(e)
        for (all f: country(f)) {
          let s2
-         classify(s2, e, f)
+         classify(s2, f)
+         classify-by(s2, e)
        }
      `);
   });

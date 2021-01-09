@@ -1386,29 +1386,32 @@ class CRPRED extends Rule {
   apply({verb, object}, node, refs = []) {
     let sub = child(node, 0);
     let obj = child(node, 1, 0, 1);
-    // console.log(object);
-    // console.log(child(node, 1, 0).children.length);
-    // console.log(child(sub, 0));
     let args = [];
+
+    let body = [];
+    
     if (node.time) {
       args.push(node.time);
-    }
-    if (sub["@type"] == "Referent") {
-      args.push(sub.name);
-      // throw new Error("Expected referent, got " + sub["@type"] + ".");
     }
     if (obj) {
       args.push(obj.name);
     }
-    // console.log(child(obj, 0));
-    // console.log(args);
-    // console.log(sub.name);
-    let name = verb.prop || verb.children[0].value;
-    //console.log(name);
-    //throw new Error(name);
-    let pred = predicate(name, args, node.types);
+
+    //console.log("hi");
     
-    return [[], [pred], [], [node]];
+    let name = verb.prop || verb.children[0].value;
+
+    if (node.time) {
+      body.push(predicate(name, args, node.types));
+    } else {
+      body.push(predicate(name, [sub.name, obj.name], node.types));      
+    }
+
+    if (node.time && sub["@type"] == "Referent") {
+      body.push(predicate(name + "-by", [node.time, sub.name], node.types));
+    }
+    
+    return [[], body, [], [node]];
   }
 }
 
