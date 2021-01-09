@@ -2567,6 +2567,21 @@ describe("Backwards compatibility", function() {
                      )));
   });
 
+  it("Obama was the president of the United States.", function() {
+    assertThat(parse("Obama was the president of the United States."))
+      .equalsTo(S(NP(PN("Obama")),
+                  VP_(VP(BE("was"), NP(DET("the"),
+                                       N(N("president"),
+                                         PP(PREP("of"), NP(PN("the", PN("United States"))))
+                                        ))))));
+  });
+
+  it.skip("Brazilians like Italy.", function() {
+    assertThat(parse("Brazilians like Italy."))
+      .equalsTo(S(NP(DET("Most"), N("brazilians")),
+                  VP_(VP(V("like"), NP(PN("Italy"))))));
+  });
+
   // Not working:
   // Obama was the president of America. He was great.
 });

@@ -827,7 +827,7 @@ class CREVERY extends Rule {
   apply({det, noun, verb}, node, refs) {
     // console.log("crevery");
     // console.log(det.types);
-    if (!det.types.quantifier) {
+    if (!det.types.quant) {
       return [[], [], [], []];
     }
     //console.log("CREVERY");
@@ -889,7 +889,7 @@ class CRVPEVERY extends Rule {
   }
   apply({det, subject, noun}, node, refs) {
     
-    if (!det.types.quantifier) {
+    if (!det.types.quant) {
       return [[], [], [], []];
     }
     // console.log(det);
