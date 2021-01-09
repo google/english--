@@ -1003,11 +1003,21 @@ describe("Lexer", function() {
            adj_itr
           } = require("./lexicon.js");
 
-    const adjs = [];
+    const adjs = {};
     
     for (let [name] of adj_itr) {
-      adjs.push({name: name});
+      adjs[name] = {name: name};
     }
+
+    for (let [inflection, key] of tv_pp) {
+      //if (inflection == "controlled") {
+      // throw new Error("found it");
+      //}
+      delete adjs[inflection];
+    }
+
+    //console.log(adjs["controlled"]);
+    //throw new Error();
     
     const nouns = [];
     const genders = {
@@ -1066,7 +1076,7 @@ describe("Lexer", function() {
     const result = {
       verbs: dict,
       nouns: nouns,
-      adjs: adjs
+      adjs: Object.values(adjs)
     };
 
     let file = `

@@ -47,6 +47,7 @@ const dict = [
   ...V("admire", "+"),
   ...V("fascinate", "+"),
   ...V("surprise", "+"),
+  ...V("consider", "+"),
   ...V("like", "+"),
   ...V("love", ["+", "-"]),
   ...V("walk", "-"),

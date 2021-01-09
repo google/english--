@@ -2534,6 +2534,39 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V("cried")))));
   });
 
+  it("A porsche is owned by Smith.", function() {
+    // passive voice
+    assertThat(parse("a porsche was owned by Smith."))
+     .equalsTo(S(NP(DET("a"), N("porsche")),
+                 VP_(VP(BE("was"),
+                        VP(V(V("owned"), PP(PREP("by"), NP(PN("Smith")))),
+                           NP(GAP())
+                          ))
+                    )));
+  });
+
+  it("A porsche is liked by Smith.", function() {
+    // passive voice
+    assertThat(parse("a porsche was liked by Smith."))
+     .equalsTo(S(NP(DET("a"), N("porsche")),
+                 VP_(VP(BE("was"),
+                        VP(V(V("liked"), PP(PREP("by"), NP(PN("Smith")))),
+                           NP(GAP())
+                          ))
+                    )));
+  });
+
+  it("Smith is loved as a happy man.", function() {
+    // passive voice
+    assertThat(parse("Smith is considered as a happy man."))
+      .equalsTo(S(NP(PN("Smith")),
+                  VP_(VP(BE("is"),
+                         VP(V(V("considered"), PP(PREP("as"), NP(DET("a"), N(ADJ("happy"), N("man"))))),
+                            NP(GAP())
+                           ))
+                     )));
+  });
+
   // Not working:
   // Obama was the president of America. He was great.
 });

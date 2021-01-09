@@ -157,6 +157,7 @@ class Tokenizer {
     this.buffer = this.buffer.substring(str.length);
     this.loc += str.length;
     //console.log(`eating [${str}]`);
+    //console.log(JSON.stringify(this.get(str)));
     return this;
   }
   get(str) {

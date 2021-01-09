@@ -758,9 +758,37 @@ class CRNEGNBE extends Rule {
   }
 }
 
+class CRPASSIVEBE extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("obj"),
+                 VP_(VP(BE(capture("be")),
+                        VP(V(capture("verb")),
+                           NP(GAP()))))));
+  }
+  apply({obj, be, verb}, node, refs) {
+    //console.log(JSON.stringify(verb, undefined, 2));
+    //console.log(child(verb, 0, 1, 0));
+    //if (verb.children.length > 1) {
+    //  console.log(verb);
+    //  throw new Error("hi");
+    //  return [[], [], [], []];
+    //}
+    //console.log(verb);
+    // throw new Error("hi");
+    // let ref = referent(this.id());
+    let s = S(GAP(), VP_(VP(verb, child(obj, 0))));
+    // Matches the DRS found in (3.57) on page 269.
+    s.types = {
+      tense: be.types.tense
+    };
+    return [[], [s], [], [node]];
+  }
+}
+
 class CRBE extends CompositeRule {
   constructor(ids) {
     super([
+      new CRPASSIVEBE(ids),
       new CRREFBE(ids),
       new CRPOSBE(ids),
       new CRNEGBE(ids),
@@ -1057,6 +1085,10 @@ class CRADJ extends Rule {
     super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
   }
   apply({adj, noun}, node, refs) {
+    if (!node.ref) {
+      return [[], [], [], []];
+    }
+
     noun = clone(noun);
     noun.ref = node.ref;
     let name = [];
@@ -1069,6 +1101,8 @@ class CRADJ extends Rule {
       }
       i = child(i, 1);
     }
+    // console.log(name.join("-"));
+    //console.log(node);
     let pred = predicate(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], [], [node]];
@@ -1355,14 +1389,14 @@ class CRPRED extends Rule {
     // console.log(object);
     // console.log(child(node, 1, 0).children.length);
     // console.log(child(sub, 0));
-    if (sub["@type"] != "Referent") {
-      throw new Error("Expected referent, got " + sub["@type"] + ".");
-    }
     let args = [];
     if (node.time) {
       args.push(node.time);
     }
-    args.push(sub.name);
+    if (sub["@type"] == "Referent") {
+      args.push(sub.name);
+      // throw new Error("Expected referent, got " + sub["@type"] + ".");
+    }
     if (obj) {
       args.push(obj.name);
     }
