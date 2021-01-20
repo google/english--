@@ -515,10 +515,19 @@ class CRADV extends Rule {
                              capture("np")))))));
   }
   apply({subject, verb, prep, np}, node) {
+    if (child(subject, 0)["@type"] == "GAP" &&
+        child(prep, 0)["@type"] == "%by") {
+      let sub = child(np, 1);
+      let s = clone(node);
+      s.children[0] = sub;
+      let vp = child(s, 1, 0);
+      vp.children[0] = child(vp, 0, 0);
+      return [[], [s], [], [node]];
+    }
+    
     let body = [];
     let sub = child(node, 0);
-    // console.log(node.time);
-    // let e = referent("e");
+
     let cond = S(node.time, VP_(VP(V(child(prep, 0)), child(np, 1))));
     
     body.push(cond);
@@ -526,25 +535,14 @@ class CRADV extends Rule {
     let name = [];
     let i = verb;
 
-    //console.log(i);
     while (i && i["@type"] == "V") {
       if (i.prop) {
         name.push(i.prop);
       }
-      //else if (child(i, 0).prop) {
-      //  name.push(child(i, 0).prop);
-      //}
       i = child(i, 0);
     }
     name.push(child(prep, 0).value);
-    //console.log(`verb: [${name.join("-")}]`);
-
-    //throw new Error("hi");
-    //console.log(JSON.stringify(verb, undefined, 2));
-    
-    //child(prep, 0).value = child(verb, 0).prop + "-" + child(prep, 0).value;
     child(prep, 0).value = name.join("-");
-    //console.log();
     
     const s = clone(node);
     child(s, 1, 0).children[0] = child(verb, 0);
@@ -766,16 +764,6 @@ class CRPASSIVEBE extends Rule {
                            NP(GAP()))))));
   }
   apply({obj, be, verb}, node, refs) {
-    //console.log(JSON.stringify(verb, undefined, 2));
-    //console.log(child(verb, 0, 1, 0));
-    //if (verb.children.length > 1) {
-    //  console.log(verb);
-    //  throw new Error("hi");
-    //  return [[], [], [], []];
-    //}
-    //console.log(verb);
-    // throw new Error("hi");
-    // let ref = referent(this.id());
     let s = S(GAP(), VP_(VP(verb, child(obj, 0))));
     // Matches the DRS found in (3.57) on page 269.
     s.types = {
@@ -1388,16 +1376,22 @@ class CRPRED extends Rule {
     let obj = child(node, 1, 0, 1);
     let args = [];
 
+    let head = [];
     let body = [];
     
     if (node.time) {
       args.push(node.time);
     }
+    if (sub["@type"] == "Referent") {
+      args.push(sub.name);
+    } else if (sub["@type"] == "GAP") {
+      let u = referent(this.id(), {}, "", refs);
+      head.push(u);
+      args.push(u.name);
+    }
     if (obj) {
       args.push(obj.name);
     }
-
-    //console.log("hi");
     
     let name = verb.prop || verb.children[0].value;
 
@@ -1406,12 +1400,8 @@ class CRPRED extends Rule {
     } else {
       body.push(predicate(name, [sub.name, obj.name], node.types));      
     }
-
-    if (node.time && sub["@type"] == "Referent") {
-      body.push(predicate(name + "-by", [node.time, sub.name], node.types));
-    }
     
-    return [[], body, [], [node]];
+    return [head, body, [], [node]];
   }
 }
 
