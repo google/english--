@@ -1552,6 +1552,31 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Which countries border Brazil?", function() { 
+    assertThat("Which countries love Brazil?")
+     .equalsTo(`
+    `);
+  });
+
+  it("Who borders Brazil?", function() {
+    assertThat("Who borders Brazil?")
+     .equalsTo(`
+       let a, b
+       Brazil(a)
+       for (b) {
+         let b
+         border(b, a)
+       } ?
+    `);
+  });
+
+  it.skip("Does Argentina border Brazil?", function() {
+    // yes-no question
+    assertThat("Does Argentina border Brazil?")
+     .equalsTo(`
+    `);
+  });
+
   // Adverbs
   it("Jones gave to Mary a porsche.", function() { 
     // These aren't a correct representation of adverbs

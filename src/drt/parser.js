@@ -699,6 +699,15 @@ const DrtSyntax = `
       Sentence -> Question.      
 
       Statement -> S_ _ %PERIOD.
+      Question -> Q_ _ %QUESTION.
+
+      Q_ -> Q.
+
+      Q -> 
+          AUX[num=1, fin=+, tp=2, tense=3] __ 
+          NP[num=1, gen=4, case=+nom, gap=-] __
+          VP[num=1, fin=-, gap=-, tp=5, tense=3]
+          .
 
       Question ->
           %who __
@@ -991,6 +1000,7 @@ class Parser {
           .map(word => [word.match("^(__)?([a-z]+)(__)?")[2], word, []]);
     // keywords
     this.load(reserved);
+    // console.log(reserved);
     // punctuation
     this.load([
       [" ", "WS"],
@@ -1144,6 +1154,8 @@ module.exports = {
     "Question": node("Question"),
     "S": node("S"),
     "S_": node("S_"),
+    "Q": node("Q"),
+    "Q_": node("Q_"),
     "NP": node("NP"),
     "PN": node("PN"),
     "VP_": node("VP_"),

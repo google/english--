@@ -15,6 +15,8 @@ const {
   Question,
   S,
   S_,
+  Q,
+  Q_,
   NP,
   PN,
   VP_,
@@ -1515,6 +1517,48 @@ describe("Questions", function() {
      .equalsTo(Question("who", VP_(VP(V("liked"),
                                       NP(PN("Mary")))), "?"));
   });
+
+  it("Does Jones like Mary?", function() {
+    assertThat(parse("Does Jones like Mary?"))
+      .equalsTo(Q(AUX("Does"),
+                  NP(PN("Jones")),
+                  VP(V("like"), NP(PN("Mary")))));
+  });
+
+  it("Does he like Mary?", function() {
+    assertThat(parse("Does he like Mary?"))
+      .equalsTo(Q(AUX("Does"),
+                  NP(PRO("he")),
+                  VP(V("like"), NP(PN("Mary")))));
+  });
+
+  it("Do they like Mary?", function() {
+    assertThat(parse("Do they like Mary?"))
+      .equalsTo(Q(AUX("Do"),
+                  NP(PRO("they")),
+                  VP(V("like"), NP(PN("Mary")))));
+  });
+
+  it("Do they like the man who likes her?", function() {
+    assertThat(parse("Do they like the man who likes her?"))
+      .equalsTo(Q(AUX("Do"),
+                  NP(PRO("they")),
+                  VP(V("like"),
+                     NP(DET("the"), N(N("man"),
+                                      RC(RPRO("who"),
+                                         S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))
+                                          ))))
+                    )));
+  });
+
+  it("Do most countries in South America border Brazil?", function() {
+    assertThat(parse("Do most countries in South America border Brazil?"))
+      .equalsTo(Q(AUX("Do"),
+                  NP(DET("most"), N(N("countries"), PP(PREP("in"), NP(PN("South America"))))),
+                  VP(V("border"), NP(PN("Brazil")))
+                 ));
+  });
+
 });
 
 describe("Generalized Quantifiers", function() {
@@ -2718,7 +2762,8 @@ describe("large dictionary", () => {
       .equalsTo(2);
   });
 
-  function parse(s) {
+  
+  function parse(s, start = "Sentence") {
     const {dict} = require("../../src/drt/dict.js");
     let parser = new Parser("Sentence", dict);
 
@@ -2727,6 +2772,8 @@ describe("large dictionary", () => {
     if (result.length > 1) {
       return result.length;
     }
+
+    // console.log(JSON.stringify(result, undefined, 2));
     
     return clear(result[0].children[0].children[0].children[0]);
   }
