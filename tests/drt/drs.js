@@ -1518,7 +1518,7 @@ describe("DRS", function() {
   it("Is Jones happy?", function() {
     assertThat("Is Jones happy?")
      .equalsTo(`
-       for () {
+       question () {
          let a
          Jones(a) 
          happy(a)
@@ -1533,7 +1533,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Jones(a)
-       for (b) {
+       question (b) {
          let b
          love(b, a)
        } ?
@@ -1544,7 +1544,7 @@ describe("DRS", function() {
     assertThat("Who does Jones love?")
      .equalsTo(`
        let a
-       for (a) {
+       question (a) {
          let a, b
          Jones(b)
          love(b, a)
@@ -1563,7 +1563,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a, b
        Brazil(a)
-       for (b) {
+       question (b) {
          let b
          border(b, a)
        } ?
@@ -1575,7 +1575,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Mary(a)
-       for () {
+       question () {
          let b
          Jones(b)
          like(b, a)
@@ -1594,7 +1594,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        Brazil(a)
-       for () {
+       question () {
          let b
          Argentina(b)
          border(b, a)
@@ -1607,7 +1607,7 @@ describe("DRS", function() {
      .equalsTo(`
        let a
        South America(a)
-       for () {
+       question () {
          let b
          Brazil(b)
          for (most c: country(c) and country-in(c, a)) {

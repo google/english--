@@ -1535,7 +1535,7 @@ function query(drs, x) {
     "drs": drs,
     print() {
       let result = [];
-      result.push("for (" + `${x ? x.print() : ""}` + ") {");
+      result.push("question (" + `${x ? x.print() : ""}` + ") {");
       result.push(this.drs.print());;
       result.push("} ?");
       return result.join("\n");
