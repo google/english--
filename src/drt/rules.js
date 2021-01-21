@@ -946,7 +946,7 @@ class CRVPOR extends Rule {
 
 class CRNPOR extends Rule {
   constructor(ids) {
-    super(ids, S(NP(NP(capture("first")), "or", NP(capture("second"))), 
+    super(ids, S(NP("either", NP(capture("first")), "or", NP(capture("second"))), 
                  VP_(capture("vp"))));
   }
   apply({first, second, vp}, node, refs) {
@@ -959,6 +959,26 @@ class CRNPOR extends Rule {
     b.head.push(...clone(a.head));
     b.head.forEach(ref => ref.closure = true);
     b.push(S(second, clone(vp)));
+    
+    return [[], [disjunction(a, b)], [], [node]];
+  }
+}
+
+class CRVPNPOR extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("sub"), 
+                 VP_(VP(V(capture("verb")), NP("either", NP(capture("first")), "or", NP(capture("second")))))));
+  }
+  apply({sub, verb, first, second}, node, refs) {
+    let a = drs(this.ids);
+    a.head.push(...clone(refs));
+    a.head.forEach(ref => ref.closure = true);
+    a.push(S(child(sub, 0), VP_(VP(verb, first))));
+    
+    let b = drs(this.ids);
+    b.head.push(...clone(a.head));
+    b.head.forEach(ref => ref.closure = true);
+    b.push(S(child(sub, 0), VP_(VP(verb, second))));
     
     return [[], [disjunction(a, b)], [], [node]];
   }
@@ -1560,6 +1580,7 @@ class Rules {
       new CROR(ids),
       new CRVPOR(ids),
       new CRNPOR(ids),
+      new CRVPNPOR(ids),
       new CRAND(ids),
       new CRADJ(ids),
       new CRWILL(ids),

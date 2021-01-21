@@ -526,7 +526,6 @@ A "f" token based on:
         "WS",
         "POSS",
         "and",
-        "or",
         "does",
         "did",
         "will",

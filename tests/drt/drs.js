@@ -558,6 +558,40 @@ describe("DRS", function() {
     `);
   });
 
+  it("Either Jones or Smith loves Mary.", function() {
+    assertThat("Either Jones or Smith loves Mary.")
+     .equalsTo(`
+        let a, s0
+        Mary(a)
+        either {
+         let b
+         Jones(b)
+         love(b, a)
+        } or {
+         let c
+         Smith(c)
+         love(c, a)
+       }
+    `);
+  });
+
+  it("Mary loves either Jones or Smith.", function() {
+    assertThat("Mary loves either Jones or Smith.")
+     .equalsTo(`
+       let a, s0
+       Mary(a)
+       either {
+         let b
+         Jones(b)
+         love(a, b)
+       } or {
+         let c
+         Smith(c)
+         love(a, c)
+       }
+    `);
+  });
+
   it.skip("Either Mary loves Jones or likes Smith.", function() {
     assertThat("Mary either loves Jones or likes Smith.")
      .equalsTo(`

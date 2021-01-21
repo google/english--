@@ -804,6 +804,7 @@ const DrtSyntax = `
         NP[num=5, gen=6, case=2, gap=-].
 
       NP[num=3, gen=1, case=2, gap=-] -> 
+        %either __
         NP[num=3, gen=4, case=2, gap=-] __ 
         %or __ 
         NP[num=3, gen=6, case=2, gap=-].

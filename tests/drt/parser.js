@@ -929,8 +929,14 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
   let results = parser.feed(s);
 
   // console.log(dict);
+
+  if (results.length > 1) {
+    //assertThat(clear(results[0][0])).equalsTo(clear(results[1][0]));
+    //console.log(JSON.stringify(clear(results[0][0]), undefined, 2));
+    return results.length;
+  }
   
-  assertThat(results.length).equalsTo(1);
+  // assertThat(results.length).equalsTo(1);
   
   if (raw) {
     return results[0];
@@ -1470,13 +1476,12 @@ describe("Statements", function() {
                         ))));
    });
 
-  it.skip("Jones's wife or Smith's brother loves Mary.", function() {
-    assertThat(parse("Jones's wife or Smith's brother loves Mary."))
-     .equalsTo(S(NP(NP(DET(NP(PN("Jones")), "'s"), N("wife")), 
-                    "or", 
-                    NP(DET(NP(PN("Smith")), "'s"), N("brother"))),
-                 VP_(VP(V("loves"), NP(PN("Mary"))))
-                 ));
+  it("Either Jones's wife or Smith's brother loves Mary.", function() {
+    // This is ambiguous because it has the following interpretations:
+    // - [Either Jones's wife or Smith's brother] loves Mary. or
+    // - [Either Jones's wife or Smith]'s brother loves Mary.
+    assertThat(parse("Either Jones's wife or Smith's brother loves Mary."))
+      .equalsTo(2);
    });
 
 });
@@ -2072,10 +2077,10 @@ describe("Backwards compatibility", function() {
                         VP(V("likes"), NP(PN("Smith")))))));
    });
 
-  it("Jones or Smith loves her.", function() {
-    assertThat(parse("Jones or Smith loves her."))
-     .equalsTo(S(NP(NP(PN("Jones")), "or", NP(PN("Smith"))),
-                 VP_(VP(V("loves"), NP(PRO("her"))))));
+  it("Either Jones or Smith loves her.", function() {
+    assertThat(parse("Either Jones or Smith loves her."))
+      .equalsTo(S(NP("Either", NP(PN("Jones")), "or", NP(PN("Smith"))),
+                  VP_(VP(V("loves"), NP(PRO("her"))))));
   });
 
   it.skip("Jones likes and loves a porsche.", function() {
