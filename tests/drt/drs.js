@@ -1539,13 +1539,29 @@ describe("DRS", function() {
     `);
   });
 
-  it("Is Jones happy?", function() {
-    assertThat("Is Jones happy?")
+  it("Is Jones happy about Brazil?", function() {
+    assertThat("Is Jones happy about Brazil?")
      .equalsTo(`
+       let a
+       Brazil(a)
        question () {
-         let a
-         Jones(a) 
-         happy(a)
+         let b
+         Jones(b)
+         happy(b)
+         happy-about(b, a)
+       } ?
+    `);
+  });
+
+  it("Is Jones from Brazil?", function() {
+    assertThat("Is Jones from Brazil?")
+     .equalsTo(`
+       let a
+       Brazil(a)
+       question () {
+         let b
+         Jones(b)
+         from(b, a)
        } ?
     `);
   });
@@ -1576,9 +1592,41 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Which countries border Brazil?", function() { 
-    assertThat("Which countries love Brazil?")
+  it("Which country borders Brazil?", function() { 
+    assertThat("Which country borders Brazil?")
      .equalsTo(`
+       let a, b
+       Brazil(a)
+       question (b) {
+         let b
+         border(b, a)
+       } ?
+    `);
+  });
+
+  it("Which countries border Brazil?", function() { 
+    assertThat("Which countries border Brazil?")
+     .equalsTo(`
+       let a, b
+       Brazil(a)
+       question (b) {
+         let b
+         border(b, a)
+       } ?
+    `);
+  });
+
+  it("Which countries border Brazil?", function() { 
+    assertThat("Which country in Europe is happy about Brazil?")
+     .equalsTo(`
+       let a, b, c
+       Europe(a)
+       Brazil(b)
+       question (c) {
+       let c
+       happy(c)
+       happy-about(c, b)
+       } ?
     `);
   });
 

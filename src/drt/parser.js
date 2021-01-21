@@ -707,6 +707,14 @@ const DrtSyntax = `
            NP[num=1, gen=4, case=+nom, gap=-] __
            VP[num=1, fin=-, gap=-, tp=5, tense=3].
 
+      Q -> BE[num=1, fin=+, tp=2, tense=3] __
+           NP[num=1, gen=4, case=+nom, gap=-] __
+           ADJ.
+
+      Q -> BE[num=1, fin=2, tp=-past, tense=4] __
+           NP[num=1, gen=3, case=+nom, gap=-] __
+           PP.
+
       Q -> %who __ 
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
@@ -715,9 +723,9 @@ const DrtSyntax = `
            NP[num=1, gen=4, case=+nom, gap=-] __
            V[num=1, fin=-, trans=+].
 
-      Q -> BE[num=1, fin=+, tp=2, tense=3] __
-           NP[num=1, gen=4, case=+nom, gap=-] __
-           ADJ.
+      Q -> %which __ 
+           N[num=1, gen=2] __
+           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
@@ -879,7 +887,7 @@ const DrtSyntax = `
         PP.  
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
 
-      ADJ[] -> ADJ[] __ PP.
+      ADJ -> ADJ __ PP.
       
       PREP -> %behind.
       PREP -> %__in__.

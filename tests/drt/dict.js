@@ -21,6 +21,7 @@ const dict = [
   N("cancelation", "sing", "-hum"),
   N("person", "sing", ["male", "fem"]),
   N("relative", "sing", ["male", "fem"]),
+  N("country", "sing", "-hum"),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
