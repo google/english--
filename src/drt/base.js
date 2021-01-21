@@ -9,7 +9,7 @@ function print(node, refs) {
  } else if (node["type"] && node["type"] == node["value"]) {
    // console.log(node);
    return node["value"];
- } else if (node["@type"] == "Predicate") {
+ } else if (node["@type"] == "PRED") {
    return node.print();
  } else  if (node["@type"] == "REF") {
   if (refs) {

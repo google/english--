@@ -162,9 +162,9 @@ function REF(name, types, value, loc) {
   }
 }
 
-function predicate(name, args, types, infix = false) {
+function PRED(name, args, types, infix = false) {
   return {
-    "@type": "Predicate",
+    "@type": "PRED",
     name: name,
     args: args,
     types: types,
@@ -192,7 +192,7 @@ class CRPN1 extends Rule {
     if (!ref) {
       ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
-      let pred = predicate(pn, [ref], name.types);
+      let pred = PRED(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -216,7 +216,7 @@ class CRPN2 extends Rule {
     if (!ref) {
       ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
-      let pred = predicate(pn, [ref], name.types);
+      let pred = PRED(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -240,7 +240,7 @@ class CRPN4 extends Rule {
     if (!ref) {
       ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
-      let pred = predicate(pn, [ref], name.types);
+      let pred = PRED(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -358,7 +358,7 @@ class CRNLIN extends Rule {
       return [[], [], [], []];
     }
 
-    let pred = predicate(noun.prop, node.ref, node.types);
+    let pred = PRED(noun.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
   }
@@ -414,7 +414,7 @@ class CRADJLIN extends Rule {
 
     //console.log(adj);
     
-    let pred = predicate(adj.prop, node.ref, node.types);
+    let pred = PRED(adj.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
   }
@@ -589,7 +589,7 @@ class CRREFBE extends Rule {
                  VP_(VP(BE(), {"@type": "REF", children: [capture("b")]}))));
   }
   apply({a, b}, node, refs) {
-    let s = predicate("=", [a, b], node.types, true);
+    let s = PRED("=", [a, b], node.types, true);
     return [[], [s], [], [node]];
   }
 }
@@ -604,7 +604,7 @@ class CRPOSBE extends Rule {
     //console.log(s);
     //console.log("hi");
     //console.log(node.types);
-    //let s = predicate(adj.prop, [ref.children[0]], node.types);
+    //let s = PRED(adj.prop, [ref.children[0]], node.types);
     // console.log(adj);
     // let s = clone(adj);
     adj.ref = [child(ref, 0)];
@@ -1067,7 +1067,7 @@ class CRADJ extends Rule {
     }
     // console.log(name.join("-"));
     //console.log(node);
-    let pred = predicate(name.join("-"), [node.ref[0]]);
+    let pred = PRED(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], [], [node]];
   }
@@ -1166,7 +1166,7 @@ class CRTENSE extends Rule {
       let body = [];
       if (tense == "past" || tense == "fut") {
         let op = (tense == "past" ? "<" : ">");
-        body.push(predicate(op, [s, REF("@now")], {}, true));
+        body.push(PRED(op, [s, REF("@now")], {}, true));
       }
       return [[s], body, [], []];
     }
@@ -1420,7 +1420,7 @@ class CRPRED extends Rule {
     
     let name = verb.prop || verb.children[0].value;
 
-    body.push(predicate(name, args, node.types));
+    body.push(PRED(name, args, node.types));
 
     return [head, body, [], [node]];
   }
