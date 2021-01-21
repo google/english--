@@ -3,30 +3,31 @@ function clone(obj) {
 }
 
 function print(node, refs) {
- // console.log(node);
- if (typeof node == "string") {
-   return node;
- } else if (node["type"] && node["type"] == node["value"]) {
-   // console.log(node);
-   return node["value"];
- } else if (node["@type"] == "PRED") {
-   return node.print();
- } else  if (node["@type"] == "REF") {
-  if (refs) {
-   // de-reference referents
-   return refs.find(ref => ref.name == node.name).value;
+  // console.log(node);
+  if (typeof node == "string") {
+    return node;
+  } else if (node["type"] && node["type"] == node["value"]) {
+    // console.log(node);
+    return node["value"];
+  } else if (node["@type"] == "PRED") {
+    return node.print();
+  } else  if (node["@type"] == "REF") {
+    throw new Error();
+    if (refs) {
+      // de-reference referents
+      return refs.find(ref => ref.name == node.name).value;
+    }
+    return node.name;
   }
-  return node.name;
- }
 
- let result = (node.children || []).map(child => print(child, refs));
- //for (let child of node.children || []) {
- // result.push(print(child, refs));
- //}
+  let result = (node.children || []).map(child => print(child, refs));
+  //for (let child of node.children || []) {
+  // result.push(print(child, refs));
+  //}
 
- // let prefix = node["@type"] == "S" ? time(node) : "";
- let suffix = node.ref ? `(${node.ref.name})` : "";
- return result.join(" ").trim() + suffix;
+  // let prefix = node["@type"] == "S" ? time(node) : "";
+  let suffix = node.ref ? `(${node.ref.name})` : "";
+  return result.join(" ").trim() + suffix;
 }
 
 function child(node, ...path) {

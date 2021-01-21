@@ -2353,7 +2353,7 @@ describe("Large Lexicon", () => {
       `);
   });
   
-  it("Brazil is a country in South America.", function() {
+  it("Brazil.", function() {
     // Things that I'd expect to be able to write:
     //   - Brazil's population is 211 million people.
     //   - 26 states compose the federation of Brazil: Sao Paulo, etc, etc.
@@ -2397,25 +2397,25 @@ describe("Large Lexicon", () => {
        capital-of(f, a)
        for (26 g: state(g)) {
          let s2, h
-         federation(h, f)
+         federation(h, a)
          compose(s2, g, h)
        }
        East(i)
        Atlantic Ocean(j)
        bound-on(s3, i)
-       bound(s3, j, f)
+       bound(s3, j, a)
        Portuguese(k)
        l = k
        official-language(l)
        language(l)
-       language-of(l, f)
+       language-of(l, a)
        Pedro Alvares Cabral(m)
        Portuguese Empire(n)
        s4 < @now
        area(o)
        claim-for(s4, n)
        claim(s4, m, o)
-       area-of(o, l)
+       area-of(o, a)
        Rio De Janeiro(p)
        Lisbon(q)
        capital(r, n)
@@ -2427,14 +2427,14 @@ describe("Large Lexicon", () => {
        industrial-country(u)
        country(u)
        classify-as(s6, u)
-       classify(s6, t, l)
+       classify(s6, t, a)
        United Nations(v)
-       member(l)
-       member-of(l, v)
+       member(a)
+       member-of(a, v)
        upcoming-economy(w)
        economy(w)
        consider-as(s7, w)
-       consider(s7, x, l)
+       consider(s7, x, a)
     `);    
   });
 

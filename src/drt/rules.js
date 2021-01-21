@@ -150,6 +150,7 @@ function find({gen, num}, refs, name, loc, exclude = []) {
 }
 
 function REF(name, types, value, loc) {
+  // console.log(value);
   return {
     "@type": "REF",
     types: types,
@@ -169,7 +170,8 @@ function PRED(name, args, types, infix = false) {
     args: args,
     types: types,
     print() {
-      let params = this.args.map(arg => print(arg));
+      // console.log(this.args.filter(arg => !arg.name));
+      let params = this.args.map(arg => arg.name);
       if (infix) {
         return params.join(` ${this.name} `);
       }
@@ -289,6 +291,7 @@ class CRVPPRO extends Rule {
     // console.log(pro);
     let exclude = pro.types.refl != "+" ? [child(sub, 0)] : [];
     // console.log(exclude);
+    // console.log(refs);
     let ref = find(pro.types, refs, undefined, undefined, exclude);
     
     if (!ref) {
@@ -317,7 +320,7 @@ class CRSID extends Rule {
       return [[], [], [], []];
     }
 
-    let ref = REF(this.id(), noun.types, print(child(node, 0), refs));
+    let ref = REF(this.id(), noun.types);
     noun.ref = [ref];
     node.children[0] = ref;
     
@@ -334,7 +337,7 @@ class CRVPID extends Rule {
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
-    let ref = REF(this.id(), types, print(child(node, 1), refs));
+    let ref = REF(this.id(), types);
     noun.ref = [ref];
     node.children[1] = ref;
     
@@ -991,7 +994,7 @@ class CRSPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
-    let u = REF(this.id(), noun.types, print(child(node, 0), refs));
+    let u = REF(this.id(), noun.types);
     node.children[0] = u;
     node.ref = [u];
     
@@ -1020,9 +1023,9 @@ class CRVPPOSS extends Rule {
       // matching
       return [[], [], [], []];
     }
-    // console.log(node);
+    // console.log(child(node, 1));
     // throw new Error("hi");
-    let u = REF(this.id(), noun.types, print(child(node, 1), refs));
+    let u = REF(this.id(), noun.types);
     child(node, 1, 0).children[1] = u;
     // console.log(noun);
     // console.log(child(name, 0));
@@ -1408,14 +1411,14 @@ class CRPRED extends Rule {
       args.push(node.time);
     }
     if (sub["@type"] == "REF") {
-      args.push(sub.name);
+      args.push(sub);
     } else if (sub["@type"] == "GAP") {
       let u = REF(this.id(), {}, "", refs);
       head.push(u);
-      args.push(u.name);
+      args.push(u);
     }
     if (obj) {
-      args.push(obj.name);
+      args.push(obj);
     }
     
     let name = verb.prop || verb.children[0].value;

@@ -46,7 +46,7 @@ describe("Kinship", function() {
     `);
   });
 
-  it("If a man is a brother of a person's father then the man is the person's uncle.", function() {
+  it.skip("If a man is a brother of a person's father then the man is the person's uncle.", function() {
     assertThat("If a man is a brother of a person's father then the man is the person's uncle.")
       .equalsTo(`
        if (let a, b and a = b and man(a) and father(b, a a)) {
