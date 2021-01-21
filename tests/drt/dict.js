@@ -18,6 +18,7 @@ const dict = [
   N("engineer", "sing", ["male", "fem"]),
   N("reservation", "sing", "-hum"),
   N("president", "sing", ["male", "fem"]),
+  N("cancelation", "sing", "-hum"),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
@@ -43,6 +44,7 @@ const dict = [
   ADJ("beautiful"),
   ADJ("mortal"),
   ADJ("married"),
+  ADJ("rich"),
   
   // Verbs
   ...V("live", "-"),

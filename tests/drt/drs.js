@@ -1602,7 +1602,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("Does Argentina border Brazil?", function() {
+  it("Does Brazil border most countries in South America?", function() {
     assertThat("Does Brazil border most countries in South America?")
      .equalsTo(`
        let a
@@ -1612,6 +1612,57 @@ describe("DRS", function() {
          Brazil(b)
          for (most c: country(c) and country-in(c, a)) {
            border(b, c)
+         }
+       } ?
+    `);
+  });
+
+  it("Is every man mortal?", function() {
+    assertThat("Is every man mortal?")
+     .equalsTo(`
+       question () {
+       for (every a: man(a)) {
+         mortal(a)
+       }
+       } ?
+    `);
+  });
+  
+  it("Are most men mortal?", function() {
+    assertThat("Are most men mortal?")
+     .equalsTo(`
+       question () {
+         for (most a: man(a)) {
+           mortal(a)
+         }
+       } ?
+    `);
+  });
+
+  it("Are most countries in South America rich?", function() {
+    assertThat("Are most countries in South America rich?")
+     .equalsTo(`
+        let a
+        South America(a)
+        question () {
+          for (most b: country(b) and country-in(b, a)) {
+            rich(b)
+          }
+        } ?
+    `);
+  });
+
+  it("Are most countries in South America happy about the cancelation?", function() {
+    assertThat("Are most countries in South America happy about the cancelation?")
+     .equalsTo(`
+       let a
+       South America(a)
+       question () {
+         for (most b: country(b) and country-in(b, a)) {
+           let c
+           happy(b)
+           cancelation(c)
+           happy-about(b, c)
          }
        } ?
     `);
