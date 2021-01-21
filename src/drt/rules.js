@@ -1409,12 +1409,8 @@ class CRPRED extends Rule {
     
     let name = verb.prop || verb.children[0].value;
 
-    if (node.time) {
-      body.push(predicate(name, args, node.types));
-    } else {
-      body.push(predicate(name, [sub.name, obj.name], node.types));      
-    }
-    
+    body.push(predicate(name, args, node.types));
+
     return [head, body, [], [node]];
   }
 }

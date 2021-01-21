@@ -26,6 +26,7 @@ const dict = [
   N("men", "plur", "male", "man"),
   N("women", "plur", "fem", "woman"),
   N("countries", "plur", "-hum", "country"),
+  N("birds", "plur", "-hum", "bird"),
   
   // RNs  
   N("brother", "sing", "male"),
@@ -70,6 +71,7 @@ const dict = [
   ...V("travel", "-"),
   ...V("marry", ["+", "-"]),
   ...V("border", "+"),
+  ...V("fly", "-"),
 ];
 
 module.exports = {

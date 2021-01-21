@@ -1639,6 +1639,31 @@ describe("DRS", function() {
     `);
   });
 
+  it("Do most birds fly?", function() {
+    assertThat("Do most birds fly?")
+     .equalsTo(`
+        question () {
+          for (most a: bird(a)) {
+            fly(a)
+          }
+        } ?
+    `);
+  });
+
+  it("Is Sam married to Dani?", function() {
+    assertThat("Is Sam married to Dani?")
+     .equalsTo(`
+        let a
+        Dani(a)
+        question () {
+          let b
+          Sam(b)
+          married(b)
+          married-to(b, a)
+        } ?
+    `);
+  });
+
   it("Are most countries in South America rich?", function() {
     assertThat("Are most countries in South America rich?")
      .equalsTo(`
