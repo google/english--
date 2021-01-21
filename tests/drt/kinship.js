@@ -58,6 +58,36 @@ describe("Kinship", function() {
     `);
   });
 
+  it.skip("Every uncle is a male relative who is a sibling of a parent.", function() {
+    assertThat("Every uncle is a male relative who is a sibling of a parent.")
+      .equalsTo(`
+        for (every a: uncle(a)) {
+          let b
+          male-relative(a)
+          relative(a)
+          sibling(a)
+          parent(b)
+          of(a, b)
+       }
+    `);
+  });
+  
+  it("Every uncle is a male relative who is married.", function() {
+    assertThat("Every uncle is a male relative who is married to a sibling of a parent.")
+      .equalsTo(`
+        for (every a: uncle(a)) {
+          let b, c
+          male-relative(a)
+          relative(a)
+          married(a)
+          parent(b)
+          sibling(c)
+          of(a, b)
+          to(a, c)
+        }
+    `);
+  });
+
   it("Mel is married to Dani.", function() {
     assertThat(`
       Mel is married to Dani. 

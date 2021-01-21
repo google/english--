@@ -20,6 +20,7 @@ const dict = [
   N("president", "sing", ["male", "fem"]),
   N("cancelation", "sing", "-hum"),
   N("person", "sing", ["male", "fem"]),
+  N("relative", "sing", ["male", "fem"]),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
@@ -39,6 +40,8 @@ const dict = [
   N("wife", "sing", "fem"),
   N("uncle", "sing", "male"),
   N("aunt", "sing", "fem"),
+  N("sibling", "sing", ["male", "fem"]),
+  N("parent", "sing", ["male", "fem"]),
 
   // Adjectives
   ADJ("brazilian"),
@@ -50,6 +53,7 @@ const dict = [
   ADJ("mortal"),
   ADJ("married"),
   ADJ("rich"),
+  ADJ("male"),
   
   // Verbs
   ...V("live", "-"),
