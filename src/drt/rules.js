@@ -149,9 +149,9 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   return undefined;
 }
 
-function referent(name, types, value, loc) {
+function REF(name, types, value, loc) {
   return {
-    "@type": "Referent",
+    "@type": "REF",
     types: types,
     name: name,
     value: value,
@@ -163,15 +163,12 @@ function referent(name, types, value, loc) {
 }
 
 function predicate(name, args, types, infix = false) {
-  // throw new Error("");
   return {
     "@type": "Predicate",
     name: name,
     args: args,
     types: types,
     print() {
-      // console.log(args);
-      // console.log(this.time);
       let params = this.args.map(arg => print(arg));
       if (infix) {
         return params.join(` ${this.name} `);
@@ -193,7 +190,7 @@ class CRPN1 extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
 
     if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
+      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
       let pred = predicate(pn, [ref], name.types);
       body.push(pred);
@@ -217,7 +214,7 @@ class CRPN2 extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
 
     if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
+      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
       let pred = predicate(pn, [ref], name.types);
       body.push(pred);
@@ -241,7 +238,7 @@ class CRPN4 extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
 
     if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
+      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
       let pred = predicate(pn, [ref], name.types);
       body.push(pred);
@@ -316,11 +313,11 @@ class CRSID extends Rule {
   }
   
   apply({det, noun}, node, refs) {
-    if (child(det, 0)["@type"] == "Referent") {
+    if (child(det, 0)["@type"] == "REF") {
       return [[], [], [], []];
     }
 
-    let ref = referent(this.id(), noun.types, print(child(node, 0), refs));
+    let ref = REF(this.id(), noun.types, print(child(node, 0), refs));
     noun.ref = [ref];
     node.children[0] = ref;
     
@@ -337,7 +334,7 @@ class CRVPID extends Rule {
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
-    let ref = referent(this.id(), types, print(child(node, 1), refs));
+    let ref = REF(this.id(), types, print(child(node, 1), refs));
     noun.ref = [ref];
     node.children[1] = ref;
     
@@ -588,8 +585,8 @@ class CRNEG extends Rule {
 
 class CRREFBE extends Rule {
   constructor(ids) {
-    super(ids, S({"@type": "Referent", children:[capture("a")]},
-                 VP_(VP(BE(), {"@type": "Referent", children: [capture("b")]}))));
+    super(ids, S({"@type": "REF", children:[capture("a")]},
+                 VP_(VP(BE(), {"@type": "REF", children: [capture("b")]}))));
   }
   apply({a, b}, node, refs) {
     let s = predicate("=", [a, b], node.types, true);
@@ -781,7 +778,7 @@ class CREVERY extends Rule {
     //console.log(child(node, 0));
     // console.log(det);
     
-    let ref = referent(this.id(), noun.types);
+    let ref = REF(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -842,7 +839,7 @@ class CRVPEVERY extends Rule {
     // console.log(det);
 
     // throw new Error("hi");
-    let ref = referent(this.id(), noun.types);
+    let ref = REF(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -994,7 +991,7 @@ class CRSPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
-    let u = referent(this.id(), noun.types, print(child(node, 0), refs));
+    let u = REF(this.id(), noun.types, print(child(node, 0), refs));
     node.children[0] = u;
     node.ref = [u];
     
@@ -1025,7 +1022,7 @@ class CRVPPOSS extends Rule {
     }
     // console.log(node);
     // throw new Error("hi");
-    let u = referent(this.id(), noun.types, print(child(node, 1), refs));
+    let u = REF(this.id(), noun.types, print(child(node, 1), refs));
     child(node, 1, 0).children[1] = u;
     // console.log(noun);
     // console.log(child(name, 0));
@@ -1152,24 +1149,24 @@ class CRTENSE extends Rule {
     }
 
     if (stat == "-") {
-      // let e = referent(this.id("e"), {}, undefined, node.loc, true);
+      // let e = REF(this.id("e"), {}, undefined, node.loc, true);
       // node.time = e;
       // node.tense = tense;
       // let conds = [];
       //if (tense == "past") {
-      // conds.push(before(e, referent("@now")));
+      // conds.push(before(e, REF("@now")));
       //} else if (tense == "fut") {
-      // conds.push(before(referent("@now"), e));
+      // conds.push(before(REF("@now"), e));
       //}
       return [[], [], [], []];
     } else {
-      let s = referent(this.id("s"), {}, undefined, node.loc, true);
+      let s = REF(this.id("s"), {}, undefined, node.loc, true);
       node.time = s;
       //let op = tense == "pres" ? "=" : (tense == "past" ? "<" : ">");
       let body = [];
       if (tense == "past" || tense == "fut") {
         let op = (tense == "past" ? "<" : ">");
-        body.push(predicate(op, [s, referent("@now")], {}, true));
+        body.push(predicate(op, [s, REF("@now")], {}, true));
       }
       return [[s], body, [], []];
     }
@@ -1250,7 +1247,7 @@ class CRQUESTIONWHO extends Rule {
   apply({vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = REF(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1267,7 +1264,7 @@ class CRQUESTIONWHICH extends Rule {
   apply({noun, vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = REF(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1284,7 +1281,7 @@ class CRQUESTIONWHOM extends Rule {
   apply({sub, verb}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = REF(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1410,10 +1407,10 @@ class CRPRED extends Rule {
     if (node.time) {
       args.push(node.time);
     }
-    if (sub["@type"] == "Referent") {
+    if (sub["@type"] == "REF") {
       args.push(sub.name);
     } else if (sub["@type"] == "GAP") {
-      let u = referent(this.id(), {}, "", refs);
+      let u = REF(this.id(), {}, "", refs);
       head.push(u);
       args.push(u.name);
     }
@@ -1588,7 +1585,6 @@ class Rules {
 module.exports = {
   match: match,
   capture: capture,
-  referent: referent,
   Ids: Ids,
   Rules: Rules,
   CRPN: CRPN,

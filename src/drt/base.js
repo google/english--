@@ -11,7 +11,7 @@ function print(node, refs) {
    return node["value"];
  } else if (node["@type"] == "Predicate") {
    return node.print();
- } else  if (node["@type"] == "Referent") {
+ } else  if (node["@type"] == "REF") {
   if (refs) {
    // de-reference referents
    return refs.find(ref => ref.name == node.name).value;
