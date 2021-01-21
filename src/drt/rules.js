@@ -3,7 +3,7 @@ const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {
-  S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
+  S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB, WH,
   Discourse, Sentence, Statement, Question
 } = nodes;
 
@@ -1286,7 +1286,7 @@ class CRQUESTIONYESNO extends Rule {
 
 class CRQUESTIONWHO extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q("Who", VP_(capture("vp_")))), "?"));
+    super(ids, Question(Q_(Q(WH(), VP_(capture("vp_")))), "?"));
   }
   apply({vp_}, node, refs = []) {
     let q = drs(this.ids);
@@ -1303,7 +1303,7 @@ class CRQUESTIONWHO extends Rule {
 
 class CRQUESTIONWHICH extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q("Which", N(capture("noun")), VP_(capture("vp_")))), "?"));
+    super(ids, Question(Q_(Q(WH(), N(capture("noun")), VP_(capture("vp_")))), "?"));
   }
   apply({noun, vp_}, node, refs = []) {
     let q = drs(this.ids);
@@ -1320,7 +1320,7 @@ class CRQUESTIONWHICH extends Rule {
 
 class CRQUESTIONWHOM extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q("Who", AUX(), NP(capture("sub")), V(capture("verb")))), "?"));
+    super(ids, Question(Q_(Q(WH(), AUX(), NP(capture("sub")), V(capture("verb")))), "?"));
   }
   apply({sub, verb}, node, refs = []) {
     let q = drs(this.ids);

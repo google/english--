@@ -715,17 +715,21 @@ const DrtSyntax = `
            NP[num=1, gen=3, case=+nom, gap=-] __
            PP.
 
-      Q -> %who __ 
+      Q -> WH __ 
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
-      Q -> %who __ 
+      Q -> WH __ 
            AUX[num=1, fin=+, tp=2, tense=3] __
            NP[num=1, gen=4, case=+nom, gap=-] __
            V[num=1, fin=-, trans=+].
 
-      Q -> %which __ 
+      Q -> WH __ 
            N[num=1, gen=2] __
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
+
+      WH -> %who.
+      WH -> %what.
+      WH -> %which.
 
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
@@ -1174,5 +1178,6 @@ module.exports = {
     "VERB": node("VERB"),
     "HAVE": node("HAVE"),
     "RN": node("RN"),
+    "WH": node("WH"),
   }
 }

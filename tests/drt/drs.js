@@ -1592,6 +1592,18 @@ describe("DRS", function() {
     `);
   });
 
+  it("What does Jones love?", function() { 
+    assertThat("What does Jones love?")
+     .equalsTo(`
+       let a
+       question (a) {
+         let a, b
+         Jones(b)
+         love(b, a)
+       } ?
+    `);
+  });
+
   it("Which country borders Brazil?", function() { 
     assertThat("Which country borders Brazil?")
      .equalsTo(`

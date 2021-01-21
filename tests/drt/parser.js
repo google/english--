@@ -35,7 +35,8 @@ const {
   PP,
   VERB,
   HAVE,
-  RN} = nodes;
+  RN,
+  WH} = nodes;
 
 const {dict} = require("./dict.js");
 
@@ -1489,18 +1490,18 @@ describe("Statements", function() {
 describe("Questions", function() {
   it("Who walks?", function() {
     assertThat(parse("Who walks?"))
-     .equalsTo(Q("Who", VP_(VP(V("walks")))));
+      .equalsTo(Q(WH("Who"), VP_(VP(V("walks")))));
   });
 
   it("Who likes Mary?", function() {
     assertThat(parse("Who likes Mary?"))
-      .equalsTo(Q("Who", VP_(VP(V("likes"),
+      .equalsTo(Q(WH("Who"), VP_(VP(V("likes"),
                                 NP(PN("Mary"))))));
   });
 
   it("Who does not love Mary?", function() {
     assertThat(parse("Who does not love Mary?"))
-      .equalsTo(Q("Who", VP_(AUX("does"), 
+      .equalsTo(Q(WH("Who"), VP_(AUX("does"), 
                              "not", 
                              VP(V("love"),
                                 NP(PN("Mary"))))));
@@ -1508,20 +1509,20 @@ describe("Questions", function() {
 
   it("Who will walk?", function() {
     assertThat(parse("Who will walk?"))
-      .equalsTo(Q("Who", VP_(AUX("will"), 
+      .equalsTo(Q(WH("Who"), VP_(AUX("will"), 
                             VP(V("walk")))));
   });
 
   it("Who will love Mary?", function() {
     assertThat(parse("Who will love Mary?"))
-     .equalsTo(Q("Who", VP_(AUX("will"), 
+      .equalsTo(Q(WH("Who"), VP_(AUX("will"), 
                                    VP(V("love"),
                                       NP(PN("Mary"))))));
   });
 
   it("Who liked Mary?", function() {
     assertThat(parse("Who liked Mary?"))
-     .equalsTo(Q("Who", VP_(VP(V("liked"),
+      .equalsTo(Q(WH("Who"), VP_(VP(V("liked"),
                                NP(PN("Mary"))))));
   });
 
@@ -2174,23 +2175,23 @@ describe("Backwards compatibility", function() {
 
   it("Who likes Mary?", function() {
     assertThat(parse("Who likes Mary?"))
-      .equalsTo(Q("Who", VP_(VP(V("likes"), NP(PN("Mary"))))));
+      .equalsTo(Q(WH("Who"), VP_(VP(V("likes"), NP(PN("Mary"))))));
   });
 
   it("Who is happy?", function() {
     assertThat(parse("Who is happy?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   VP_(VP(BE("is"), ADJ("happy")))));
   });
 
   it("Who does Mary like?", function() {
     assertThat(parse("Who does Mary like?"))
-      .equalsTo(Q("Who", AUX("does"), NP(PN("Mary")), V("like")));
+      .equalsTo(Q(WH("Who"), AUX("does"), NP(PN("Mary")), V("like")));
   });
 
   it("Who will Mary like?", function() {
     assertThat(parse("Who will Mary like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("will"),
                   NP(PN("Mary")), 
                   V("like")));
@@ -2198,7 +2199,7 @@ describe("Backwards compatibility", function() {
 
   it("Who would Mary like?", function() {
     assertThat(parse("Who would Mary like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("would"),
                   NP(PN("Mary")), 
                   V("like")));
@@ -2206,7 +2207,7 @@ describe("Backwards compatibility", function() {
 
   it("Who would they like?", function() {
     assertThat(parse("Who do they like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("do"),
                   NP(PRO("they")), 
                   V("like")));
@@ -2214,7 +2215,7 @@ describe("Backwards compatibility", function() {
 
   it("Who did they like?", function() {
     assertThat(parse("Who did they like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("did"),
                   NP(PRO("they")), 
                   V("like")));
@@ -2222,7 +2223,7 @@ describe("Backwards compatibility", function() {
 
   it("Who does the man like?", function() {
     assertThat(parse("Who does the man like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("does"),
                   NP(DET("the"), N("man")), 
                   V("like")));
@@ -2230,7 +2231,7 @@ describe("Backwards compatibility", function() {
 
   it("Who does Smith's brother like?", function() {
     assertThat(parse("Who does Smith's brother like?"))
-      .equalsTo(Q("Who", 
+      .equalsTo(Q(WH("Who"), 
                   AUX("does"),
                   NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
                   V("like")));
