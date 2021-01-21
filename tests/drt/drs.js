@@ -561,16 +561,14 @@ describe("DRS", function() {
   it("Either Jones or Smith loves Mary.", function() {
     assertThat("Either Jones or Smith loves Mary.")
      .equalsTo(`
-        let a, s0
-        Mary(a)
+        let a, b, c, s0
+        Jones(a)
+        Smith(b)
+        Mary(c)
         either {
-         let b
-         Jones(b)
-         love(b, a)
+         love(a, c)
         } or {
-         let c
-         Smith(c)
-         love(c, a)
+         love(b, c)
        }
     `);
   });
@@ -578,15 +576,13 @@ describe("DRS", function() {
   it("Mary loves either Jones or Smith.", function() {
     assertThat("Mary loves either Jones or Smith.")
      .equalsTo(`
-       let a, s0
+       let a, b, c, s0
        Mary(a)
+       Jones(b)
+       Smith(c)
        either {
-         let b
-         Jones(b)
          love(a, b)
        } or {
-         let c
-         Smith(c)
          love(a, c)
        }
     `);
@@ -1542,13 +1538,12 @@ describe("DRS", function() {
   it("Is Jones happy about Brazil?", function() {
     assertThat("Is Jones happy about Brazil?")
      .equalsTo(`
-       let a
-       Brazil(a)
+       let a, b
+       Jones(a)
+       Brazil(b)
        question () {
-         let b
-         Jones(b)
-         happy(b)
-         happy-about(b, a)
+         happy(a)
+         happy-about(a, b)
        } ?
     `);
   });
@@ -1556,12 +1551,11 @@ describe("DRS", function() {
   it("Is Jones from Brazil?", function() {
     assertThat("Is Jones from Brazil?")
      .equalsTo(`
-       let a
-       Brazil(a)
+       let a, b
+       Jones(a)
+       Brazil(b)
        question () {
-         let b
-         Jones(b)
-         from(b, a)
+         from(a, b)
        } ?
     `);
   });
@@ -1657,12 +1651,11 @@ describe("DRS", function() {
   it("Does Jones like Mary?", function() {
     assertThat("Does Jones like Mary?")
      .equalsTo(`
-       let a
-       Mary(a)
+       let a, b
+       Jones(a)
+       Mary(b)
        question () {
-         let b
-         Jones(b)
-         like(b, a)
+         like(a, b)
        } ?
     `);
   });
@@ -1676,12 +1669,11 @@ describe("DRS", function() {
   it("Does Argentina border Brazil?", function() {
     assertThat("Does Argentina border Brazil?")
      .equalsTo(`
-       let a
-       Brazil(a)
+       let a, b
+       Argentina(a)
+       Brazil(b)
        question () {
-         let b
-         Argentina(b)
-         border(b, a)
+         border(a, b)
        } ?
     `);
   });
@@ -1689,13 +1681,12 @@ describe("DRS", function() {
   it("Does Brazil border most countries in South America?", function() {
     assertThat("Does Brazil border most countries in South America?")
      .equalsTo(`
-       let a
-       South America(a)
+       let a, b
+       Brazil(a)
+       South America(b)
        question () {
-         let b
-         Brazil(b)
-         for (most c: country(c) and country-in(c, a)) {
-           border(b, c)
+         for (most c: country(c) and country-in(c, b)) {
+           border(a, c)
          }
        } ?
     `);
@@ -1737,13 +1728,12 @@ describe("DRS", function() {
   it("Is Sam married to Dani?", function() {
     assertThat("Is Sam married to Dani?")
      .equalsTo(`
-        let a
-        Dani(a)
+        let a, b
+        Sam(a)
+        Dani(b)
         question () {
-          let b
-          Sam(b)
-          married(b)
-          married-to(b, a)
+          married(a)
+          married-to(a, b)
         } ?
     `);
   });
@@ -1991,6 +1981,8 @@ describe("DRS", function() {
         let drs = new DRS(Rules.from());
         let parser = new Parser("Discourse", dict);
         let sentences = parser.feed(x);
+        // console.log(JSON.stringify(sentences, undefined, 2));
+        // Assert.deepEqual(sentences.length, 1);
         drs.feed(sentences);
         Assert.deepEqual(drs.print(), this.trim(y));
       }
@@ -2549,7 +2541,7 @@ describe("Large Lexicon", () => {
         let parser = new Parser("Discourse", dict);
         parser.load(dict);
         let sentences = parser.feed(x);
-        // console.log(sentences);
+        // console.log(JSON.stringify(sentences, undefined, 2));
         drs.feed(sentences);
         Assert.deepEqual(drs.print(), this.trim(y));
       }

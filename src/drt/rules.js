@@ -8,16 +8,20 @@ const {
 } = nodes;
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
-  
+
+let ANY = (...children) => { return {"@type": "ANY", "children": children} };
+
 function match(a, b) {
   if (!a || !b) {
     return false;
   }
 
-  if (a["@type"] != b["@type"]) {
+  if (a["@type"] != "ANY" &&
+      b["@type"] != "ANY" &&
+      a["@type"] != b["@type"]) {
     return false;
   }
- 
+
   let result = {};
  
   for (let i = 0; i < a.children.length; i++) {
@@ -29,6 +33,11 @@ function match(a, b) {
       result[a.children[i].name] = b;
       continue;
     } else {
+      if (!a.children || !b.children) {
+        //console.log(a);
+        //console.log(b);
+        return false;
+      }
       let capture = match(a.children[i], b.children[i]);
       if (!capture) {
         return false;
@@ -161,8 +170,8 @@ function predicate(name, args, types, infix = false) {
     args: args,
     types: types,
     print() {
-      //console.log(args);
-      //console.log(this.time);
+      // console.log(args);
+      // console.log(this.time);
       let params = this.args.map(arg => print(arg));
       if (infix) {
         return params.join(` ${this.name} `);
@@ -172,131 +181,81 @@ function predicate(name, args, types, infix = false) {
   }
 }
 
-class CRSPN extends Rule {
+class CRPN1 extends Rule {
   constructor(ids) {
-    super(ids, S(NP(PN(capture("name"))), VP_()));
+    super(ids, ANY(NP(PN(capture("name")))));
   }
-  
-  apply({name}, node, refs = []) {
+  apply({name}, node, refs) {
+    const pn = child(name, 0).value;
     let head = [];
     let body = [];
-    
+
     let ref = find(name.types, refs, name.children[0].value, name.loc);
-    // console.log(refs);
-    // console.log(ref);
-    //console.log(child(node, 0, 0));
+
     if (!ref) {
       ref = referent(this.id(), name.types, name.children[0].value, name.loc);
-      // console.log(name.types);
       head.push(ref);
-      
-      let pred = predicate(child(name, 0).value, [ref], name.types);
+      let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
-    
+
     node.children[0] = ref;
-    
+
     return [head, body, [], []];
   }
 }
 
-class CRVPPN extends Rule {
+class CRPN2 extends Rule {
   constructor(ids) {
-    super(ids, VP(capture("v"), NP(PN(capture("name")))));
-  }
-  apply({name}, node, refs = []) {
-    let last = node.children.length - 1;
-    //let name = child(node, last);
-    
-    ///if (name["@type"] != "NP" && child(name, 0)["@type"] != "PN") {
-    // return [[], [], [], []];
-    //}
-    
-    // console.log("hi");
-    let head = [];
-    let body = [];
-    let ref = find(name.types, refs, name.children[0].value, name.loc);
-    //console.log(ref);
-    if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0], name.loc);
-      head.push(ref);
-      let pred = predicate(child(name, 0).value, [ref], name.types);
-      body.push(pred);
-    }
-    node.children[last] = ref;
-    // console.log(JSON.stringify(node, undefined, 2));
-    
-    return [head, body, [], []];
-  }
-}
-
-class CRDETPN extends Rule {
-  constructor(ids) {
-    super(ids, DET(NP(PN(capture("name"))), "'s"));
+    super(ids, ANY(ANY(), NP(PN(capture("name")))));
   }
   apply({name}, node, refs) {
-    let head = [];
-    let body = [];
-
-    // console.log("hi");
-    // console.log(node);
-
-    // throw new Error(name.children[0].value);
-
-    //console.log("hi");
-    //console.log(name);
-    // console.log(name.children[0].value);
-    
-    let ref = find(name.types, refs, name.children[0].value);
-    //console.log(name.children[0].value);
-    // console.log(ref);
-    if (!ref) {
-      ref = referent(this.id(), name.types, print(name));
-      head.push(ref);
-      let pred = predicate(child(name, 0).value, [ref], name.types);
-      body.push(pred);
-      // console.log(pred);
-      //let pn = name;
-      //pn.ref = ref;
-      //body.push(pn);
-    }
-    // console.log(body);
-    
-    node.children[0] = ref;
-    
-    // console.log(node);
-    
-    return [head, body, [], []];
-  }
-}
-
-class CRPPPN extends Rule {
-  constructor(ids) {
-    super(ids, PP(PREP(), NP(PN(capture("name")))));
-  }
-  apply({name}, node, refs) {
-    let head = [];
-    let body = [];
-
     const pn = child(name, 0).value;
-    let ref = find(name.types, refs, pn);
+    let head = [];
+    let body = [];
+
+    let ref = find(name.types, refs, name.children[0].value, name.loc);
+
     if (!ref) {
-      // console.log(name);
-      ref = referent(this.id(), name.types, pn);
+      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
       let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
 
     node.children[1] = ref;
-    
+
+    return [head, body, [], []];
+  }
+}
+
+class CRPN4 extends Rule {
+  constructor(ids) {
+    super(ids, ANY(ANY(), ANY(), ANY(), NP(PN(capture("name")))));
+  }
+  apply({name}, node, refs) {
+    const pn = child(name, 0).value;
+    let head = [];
+    let body = [];
+
+    let ref = find(name.types, refs, name.children[0].value, name.loc);
+
+    if (!ref) {
+      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
+      head.push(ref);
+      let pred = predicate(pn, [ref], name.types);
+      body.push(pred);
+    }
+
+    node.children[3] = ref;
+
     return [head, body, [], []];
   }
 }
 
 class CRPN extends CompositeRule {
   constructor(ids) {
-    super([new CRSPN(ids), new CRVPPN(ids), new CRDETPN(ids), new CRPPPN(ids)]);
+    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids)]);
   }
 }
 
@@ -946,7 +905,7 @@ class CRVPOR extends Rule {
 
 class CRNPOR extends Rule {
   constructor(ids) {
-    super(ids, S(NP("either", NP(capture("first")), "or", NP(capture("second"))), 
+    super(ids, S(NP("either", ANY(capture("first")), "or", ANY(capture("second"))), 
                  VP_(capture("vp"))));
   }
   apply({first, second, vp}, node, refs) {
@@ -967,7 +926,7 @@ class CRNPOR extends Rule {
 class CRVPNPOR extends Rule {
   constructor(ids) {
     super(ids, S(capture("sub"), 
-                 VP_(VP(V(capture("verb")), NP("either", NP(capture("first")), "or", NP(capture("second")))))));
+                 VP_(VP(V(capture("verb")), NP("either", ANY(capture("first")), "or", ANY(capture("second")))))));
   }
   apply({sub, verb, first, second}, node, refs) {
     let a = drs(this.ids);
@@ -1244,7 +1203,7 @@ class CRQUESTIONIS extends Rule {
   constructor(ids) {
     super(ids, Question(Q_(Q(
       BE(capture("be")),
-      NP(capture("sub")),
+      ANY(capture("sub")),
       ADJ(capture("adj"))))));
   }
   apply({be, sub, adj}, node) {
@@ -1260,7 +1219,7 @@ class CRQUESTIONBEPP extends Rule {
   constructor(ids) {
     super(ids, Question(Q_(Q(
       BE(capture("be")),
-      NP(capture("sub")),
+      ANY(capture("sub")),
       PP(capture("pp"))))));
   }
   apply({be, sub, pp}, node) {
@@ -1274,12 +1233,12 @@ class CRQUESTIONBEPP extends Rule {
 
 class CRQUESTIONYESNO extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q(AUX(), NP(capture("np")), VP(capture("vp")), "?"))));
+    super(ids, Question(Q_(Q(AUX(), ANY(capture("sub")), VP(capture("vp")), "?"))));
   }
-  apply({np, vp}, node) {
+  apply({sub, vp}, node) {
     let q = drs(this.ids);
     
-    q.push(S(np, VP_(vp)));
+    q.push(S(sub, VP_(vp)));
     return [[], [query(q)], [], [node]];
   }
 }
@@ -1351,8 +1310,6 @@ class CRNAMED extends Rule {
     super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
   }
   apply({name}, node, refs) {
-    // const value = first.children[0].value + "-" + last.children[0].value;
-    // console.log(name);;
     node.children = [{
       "type": "name",
       "value": child(name, 0).value

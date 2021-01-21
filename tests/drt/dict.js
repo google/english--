@@ -22,6 +22,7 @@ const dict = [
   N("person", "sing", ["male", "fem"]),
   N("relative", "sing", ["male", "fem"]),
   N("country", "sing", "-hum"),
+  N("someone", "sing", ["male", "fem"]),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
