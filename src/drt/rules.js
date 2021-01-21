@@ -1222,7 +1222,10 @@ class CRASPECT extends Rule {
 
 class CRQUESTIONIS extends Rule {
   constructor(ids) {
-    super(ids, Question(BE(capture("be")), NP(capture("sub")), ADJ(capture("adj")), "?"));
+    super(ids, Question(Q_(Q(
+      BE(capture("be")),
+      NP(capture("sub")),
+      ADJ(capture("adj"))))));
   }
   apply({be, sub, adj}, node) {
     let q = drs(this.ids);
@@ -1241,14 +1244,13 @@ class CRQUESTIONYESNO extends Rule {
     let q = drs(this.ids);
     
     q.push(S(np, VP_(vp)));
-    // console.log("hi");
     return [[], [query(q)], [], [node]];
   }
 }
 
 class CRQUESTIONWHO extends Rule {
   constructor(ids) {
-    super(ids, Question("Who", VP_(capture("vp_")), "?"));
+    super(ids, Question(Q_(Q("Who", VP_(capture("vp_")))), "?"));
   }
   apply({vp_}, node, refs = []) {
     let q = drs(this.ids);
@@ -1265,7 +1267,7 @@ class CRQUESTIONWHO extends Rule {
 
 class CRQUESTIONWHOM extends Rule {
   constructor(ids) {
-    super(ids, Question("Who", AUX(), NP(capture("sub")), V(capture("verb")), "?"));
+    super(ids, Question(Q_(Q("Who", AUX(), NP(capture("sub")), V(capture("verb")))), "?"));
   }
   apply({sub, verb}, node, refs = []) {
     let q = drs(this.ids);

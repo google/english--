@@ -928,6 +928,8 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
   let parser = new Parser(start, dict);
   let results = parser.feed(s);
 
+  // console.log(dict);
+  
   assertThat(results.length).equalsTo(1);
   
   if (raw) {
@@ -1480,42 +1482,42 @@ describe("Statements", function() {
 });
 
 describe("Questions", function() {
-  it("who walks?", function() {
-    assertThat(parse("who walks?", "Question", false, false))
-     .equalsTo(Question("who", VP_(VP(V("walks"))), "?"));
+  it("Who walks?", function() {
+    assertThat(parse("Who walks?"))
+     .equalsTo(Q("Who", VP_(VP(V("walks")))));
   });
 
-  it("who likes Mary?", function() {
-    assertThat(parse("who likes Mary?", "Question", false, false))
-     .equalsTo(Question("who", VP_(VP(V("likes"),
-                                      NP(PN("Mary")))), "?"));
+  it("Who likes Mary?", function() {
+    assertThat(parse("Who likes Mary?"))
+      .equalsTo(Q("Who", VP_(VP(V("likes"),
+                                NP(PN("Mary"))))));
   });
 
-  it("who does not love Mary?", function() {
-    assertThat(parse("who does not love Mary?", "Question", false, false))
-     .equalsTo(Question("who", VP_(AUX("does"), 
-                                   "not", 
+  it("Who does not love Mary?", function() {
+    assertThat(parse("Who does not love Mary?"))
+      .equalsTo(Q("Who", VP_(AUX("does"), 
+                             "not", 
+                             VP(V("love"),
+                                NP(PN("Mary"))))));
+  });
+
+  it("Who will walk?", function() {
+    assertThat(parse("Who will walk?"))
+      .equalsTo(Q("Who", VP_(AUX("will"), 
+                            VP(V("walk")))));
+  });
+
+  it("Who will love Mary?", function() {
+    assertThat(parse("Who will love Mary?"))
+     .equalsTo(Q("Who", VP_(AUX("will"), 
                                    VP(V("love"),
-                                      NP(PN("Mary")))), "?"));
+                                      NP(PN("Mary"))))));
   });
 
-  it("who will walk?", function() {
-    assertThat(parse("who will walk?", "Question", false, false))
-     .equalsTo(Question("who", VP_(AUX("will"), 
-                                   VP(V("walk"))), "?"));
-  });
-
-  it("who will love Mary?", function() {
-    assertThat(parse("who will love Mary?", "Question", false, false))
-     .equalsTo(Question("who", VP_(AUX("will"), 
-                                   VP(V("love"),
-                                      NP(PN("Mary")))), "?"));
-  });
-
-  it("who liked Mary?", function() {
-    assertThat(parse("who liked Mary?", "Question", false, false))
-     .equalsTo(Question("who", VP_(VP(V("liked"),
-                                      NP(PN("Mary")))), "?"));
+  it("Who liked Mary?", function() {
+    assertThat(parse("Who liked Mary?"))
+     .equalsTo(Q("Who", VP_(VP(V("liked"),
+                               NP(PN("Mary"))))));
   });
 
   it("Does Jones like Mary?", function() {
@@ -2166,113 +2168,96 @@ describe("Backwards compatibility", function() {
                  VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
   });
 
-  it("who likes Mary?", function() {
-    assertThat(parse("who likes Mary?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        VP_(VP(V("likes"), NP(PN("Mary")))), 
-                        "?"));
+  it("Who likes Mary?", function() {
+    assertThat(parse("Who likes Mary?"))
+      .equalsTo(Q("Who", VP_(VP(V("likes"), NP(PN("Mary"))))));
   });
 
-  it("who is happy?", function() {
-    assertThat(parse("who is happy?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        VP_(VP(BE("is"), ADJ("happy"))), 
-                        "?"));
+  it("Who is happy?", function() {
+    assertThat(parse("Who is happy?"))
+      .equalsTo(Q("Who", 
+                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
-  it("who does Mary like?", function() {
-    assertThat(parse("who does Mary like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("does"),
-                        NP(PN("Mary")), 
-                        V("like"), 
-                        "?"));
+  it("Who does Mary like?", function() {
+    assertThat(parse("Who does Mary like?"))
+      .equalsTo(Q("Who", AUX("does"), NP(PN("Mary")), V("like")));
   });
 
-  it("who will Mary like?", function() {
-    assertThat(parse("who will Mary like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("will"),
-                        NP(PN("Mary")), 
-                        V("like"), 
-                        "?"));
+  it("Who will Mary like?", function() {
+    assertThat(parse("Who will Mary like?"))
+      .equalsTo(Q("Who", 
+                  AUX("will"),
+                  NP(PN("Mary")), 
+                  V("like")));
   });
 
-  it("who would Mary like?", function() {
-    assertThat(parse("who would Mary like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("would"),
-                        NP(PN("Mary")), 
-                        V("like"), 
-                        "?"));
+  it("Who would Mary like?", function() {
+    assertThat(parse("Who would Mary like?"))
+      .equalsTo(Q("Who", 
+                  AUX("would"),
+                  NP(PN("Mary")), 
+                  V("like")));
   });
 
-  it("who would they like?", function() {
-    assertThat(parse("who do they like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("do"),
-                        NP(PRO("they")), 
-                        V("like"), 
-                        "?"));
+  it("Who would they like?", function() {
+    assertThat(parse("Who do they like?"))
+      .equalsTo(Q("Who", 
+                  AUX("do"),
+                  NP(PRO("they")), 
+                  V("like")));
   });
 
-  it("who did they like?", function() {
-    assertThat(parse("who did they like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("did"),
-                        NP(PRO("they")), 
-                        V("like"), 
-                        "?"));
+  it("Who did they like?", function() {
+    assertThat(parse("Who did they like?"))
+      .equalsTo(Q("Who", 
+                  AUX("did"),
+                  NP(PRO("they")), 
+                  V("like")));
   });
 
-  it("who does the man like?", function() {
-    assertThat(parse("who does the man like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("does"),
-                        NP(DET("the"), N("man")), 
-                        V("like"), 
-                        "?"));
+  it("Who does the man like?", function() {
+    assertThat(parse("Who does the man like?"))
+      .equalsTo(Q("Who", 
+                  AUX("does"),
+                  NP(DET("the"), N("man")), 
+                  V("like")));
   });
 
-  it("who does Smith's brother like?", function() {
-    assertThat(parse("who does Smith's brother like?", "Question", false, false))
-     .equalsTo(Question("who", 
-                        AUX("does"),
-                        NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
-                        V("like"), 
-                        "?"));
+  it("Who does Smith's brother like?", function() {
+    assertThat(parse("Who does Smith's brother like?"))
+      .equalsTo(Q("Who", 
+                  AUX("does"),
+                  NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
+                  V("like")));
   });
 
-  it("is Mary happy?", function() {
-    assertThat(parse("is Mary happy?", "Question", false, false))
-     .equalsTo(Question(BE("is"), 
-                        NP(PN("Mary")), 
-                        ADJ("happy"), 
-                        "?"));
+  it("Is Mary happy?", function() {
+    assertThat(parse("Is Mary happy?"))
+      .equalsTo(Q(BE("Is"), 
+                  NP(PN("Mary")), 
+                  ADJ("happy")));
   });
 
-  it("was Mary happy?", function() {
-    assertThat(parse("was Mary happy?", "Question", false, false))
-     .equalsTo(Question(BE("was"), 
-                        NP(PN("Mary")), 
-                        ADJ("happy"), 
-                        "?"));
+  it("Was Mary happy?", function() {
+    assertThat(parse("Was Mary happy?"))
+     .equalsTo(Q(BE("Was"), 
+                 NP(PN("Mary")), 
+                 ADJ("happy")));
   });
 
-  it("are they happy?", function() {
-    assertThat(parse("are they happy?", "Question", false, false))
-     .equalsTo(Question(BE("are"), 
-                        NP(PRO("they")), 
-                        ADJ("happy"), 
-                        "?"));
+  it("Are they happy?", function() {
+    assertThat(parse("Are they happy?"))
+     .equalsTo(Q(BE("Are"), 
+                 NP(PRO("they")), 
+                 ADJ("happy")));
   });
 
-  it("were they happy?", function() {
-    assertThat(parse("were they happy?", "Question", false, false))
-     .equalsTo(Question(BE("were"), 
-                        NP(PRO("they")), 
-                        ADJ("happy"), 
-                        "?"));
+  it("Were they happy?", function() {
+    assertThat(parse("Were they happy?"))
+     .equalsTo(Q(BE("Were"), 
+                 NP(PRO("they")), 
+                 ADJ("happy")));
   });
 
   it("Jones's wife is Mary.", function() {

@@ -703,32 +703,21 @@ const DrtSyntax = `
 
       Q_ -> Q.
 
-      Q -> 
-          AUX[num=1, fin=+, tp=2, tense=3] __ 
-          NP[num=1, gen=4, case=+nom, gap=-] __
-          VP[num=1, fin=-, gap=-, tp=5, tense=3]
-          .
+      Q -> AUX[num=1, fin=+, tp=2, tense=3] __ 
+           NP[num=1, gen=4, case=+nom, gap=-] __
+           VP[num=1, fin=-, gap=-, tp=5, tense=3].
 
-      Question ->
-          %who __
-          VP_[num=1, fin=+, gap=-, tp=3, tense=4] _
-          %QUESTION
-          .
+      Q -> %who __ VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
-      Question ->
-          %who __ 
-          AUX[num=1, fin=+, tp=2, tense=3] __
-          NP[num=1, gen=4, case=+nom, gap=-] __
-          V[num=1, fin=-, trans=+] _
-          %QUESTION
-          .
+      Q -> %who __ 
+           AUX[num=1, fin=+, tp=2, tense=3] __
+           NP[num=1, gen=4, case=+nom, gap=-] __
+           V[num=1, fin=-, trans=+].
 
-      Question ->
-          BE[num=1, fin=+, tp=2, tense=3] __
-          NP[num=1, gen=4, case=+nom, gap=-] __
-          ADJ _
-          %QUESTION
-          .
+      Q -> BE[num=1, fin=+, tp=2, tense=3] __
+           NP[num=1, gen=4, case=+nom, gap=-] __
+           ADJ
+           .
 
       S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
 
