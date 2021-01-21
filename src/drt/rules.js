@@ -3,7 +3,7 @@ const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {
-  S, S_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
+  S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB,
   Discourse, Sentence, Statement, Question
 } = nodes;
 
@@ -1233,6 +1233,19 @@ class CRQUESTIONIS extends Rule {
   }
 }
 
+class CRQUESTIONYESNO extends Rule {
+  constructor(ids) {
+    super(ids, Question(Q_(Q(AUX(), NP(capture("np")), VP(capture("vp")), "?"))));
+  }
+  apply({np, vp}, node) {
+    let q = drs(this.ids);
+    
+    q.push(S(np, VP_(vp)));
+    // console.log("hi");
+    return [[], [query(q)], [], [node]];
+  }
+}
+
 class CRQUESTIONWHO extends Rule {
   constructor(ids) {
     super(ids, Question("Who", VP_(capture("vp_")), "?"));
@@ -1269,7 +1282,8 @@ class CRQUESTIONWHOM extends Rule {
 
 class CRQUESTION extends CompositeRule {
   constructor(ids) {
-    super([new CRQUESTIONIS(ids), 
+    super([new CRQUESTIONYESNO(ids),
+           new CRQUESTIONIS(ids), 
            new CRQUESTIONWHO(ids), 
            new CRQUESTIONWHOM(ids)]);
   }

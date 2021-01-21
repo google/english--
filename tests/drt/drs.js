@@ -1570,10 +1570,50 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Does Argentina border Brazil?", function() {
-    // yes-no question
+  it("Does Jones like Mary?", function() {
+    assertThat("Does Jones like Mary?")
+     .equalsTo(`
+       let a
+       Mary(a)
+       for () {
+         let b
+         Jones(b)
+         like(b, a)
+       } ?
+    `);
+  });
+
+  it.skip("Does Jones like a woman from Brazil?", function() {
+    assertThat("Does Jones like a woman from Brazil?")
+     .equalsTo(`
+    `);
+  });
+
+  it("Does Argentina border Brazil?", function() {
     assertThat("Does Argentina border Brazil?")
      .equalsTo(`
+       let a
+       Brazil(a)
+       for () {
+         let b
+         Argentina(b)
+         border(b, a)
+       } ?
+    `);
+  });
+
+  it("Does Argentina border Brazil?", function() {
+    assertThat("Does Brazil border most countries in South America?")
+     .equalsTo(`
+       let a
+       South America(a)
+       for () {
+         let b
+         Brazil(b)
+         for (most c: country(c) and country-in(c, a)) {
+           border(b, c)
+         }
+       } ?
     `);
   });
 
