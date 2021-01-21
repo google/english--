@@ -2056,14 +2056,13 @@ describe("Backwards compatibility", function() {
                  VP_(VP(V("likes"), NP(PRO("it"))))));
    });
 
-  it("Jones loves her or Mary loves her.", function() {
-    assertThat(parse("Jones loves her or Mary loves her."))
-     .equalsTo(S(S(NP(PN("Jones")), 
-                   VP_(VP(V("loves"), NP(PRO("her"))))), 
-                 "or", 
-                 S(NP(PN("Mary")), 
-                   VP_(VP(V("loves"), NP(PRO("her")))))));
-   });
+  it("Either Jones loves her or Mary loves her.", function() {
+    assertThat(parse("Either Jones loves her or Mary loves her."))
+      .equalsTo(S("Either",
+                  S(NP(PN("Jones")), VP_(VP(V("loves"), NP(PRO("her"))))), 
+                  "or", 
+                  S(NP(PN("Mary")), VP_(VP(V("loves"), NP(PRO("her")))))));
+  });
 
   it.skip("Mary loves Jones or likes Smith.", function() {
     assertThat(parse("Mary loves Jones or likes Brazil."))

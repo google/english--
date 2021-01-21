@@ -909,7 +909,7 @@ class CRVPEVERY extends Rule {
 
 class CROR extends Rule {
   constructor(ids) {
-    super(ids, S(S(capture("a")), "or", S(capture("b"))));
+    super(ids, S("either", S(capture("a")), "or", S(capture("b"))));
   }
   apply({a, b}, node, refs) {
     let first = drs(this.ids);
@@ -1428,7 +1428,7 @@ function disjunction(a, b) {
     "b": b,
     print() {
       let result = [];
-      result.push("{");
+      result.push("either {");
       result.push(this.a.print());
       result.push("} or {");
       result.push(this.b.print());

@@ -525,14 +525,14 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones loves Mary or Smith loves her.", function() {
-    assertThat("Jones loves Mary or Smith loves her.")
+  it("Either Jones loves Mary or Smith loves her.", function() {
+    assertThat("Either Jones loves Mary or Smith loves her.")
      .equalsTo(`
        let a, b, c
        Jones(a)
        Smith(b)
        Mary(c)
-       {
+       either {
          let s0
          love(s0, a, c)
        } or {
@@ -542,12 +542,12 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones owns a porsche or he likes it.", function() {
-    assertThat("Jones owns a porsche or he likes it.")
+  it("Either Jones owns a porsche or he likes it.", function() {
+    assertThat("Either Jones owns a porsche or he likes it.")
      .equalsTo(`
       let a
       Jones(a)
-      {
+      either {
         let s0, b
         porsche(b)
         own(s0, a, b)
@@ -558,19 +558,9 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Mary loves Jones or likes Smith.", function() {
-    assertThat("Mary loves Jones or likes Smith.")
+  it.skip("Either Mary loves Jones or likes Smith.", function() {
+    assertThat("Mary either loves Jones or likes Smith.")
      .equalsTo(`
-       drs(a, b, c) {
-         Mary(a)
-         Jones(b)
-         Smith(c)
-         drs() {
-           a love b
-         } or drs() {
-           a like c
-         }
-       }
     `);
   });
 

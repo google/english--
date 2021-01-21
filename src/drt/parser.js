@@ -733,6 +733,7 @@ const DrtSyntax = `
           S[num=5, gap=-, tp=2, tense=3].
 
       S[num=1, gap=-, tp=2, tense=3] -> 
+          %either __
           S[num=4, gap=-, tp=2, tense=3] __ 
           %or __ 
           S[num=5, gap=-, tp=2, tense=3].

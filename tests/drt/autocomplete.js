@@ -448,6 +448,7 @@ A "f" token based on:
     assertThat(Object.keys(tokens)).equalsTo([
       // conditionals
       "__if__",
+      "either",
       // quantifiers
       "a",
       "an",
