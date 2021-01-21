@@ -19,6 +19,7 @@ const dict = [
   N("reservation", "sing", "-hum"),
   N("president", "sing", ["male", "fem"]),
   N("cancelation", "sing", "-hum"),
+  N("person", "sing", ["male", "fem"]),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
@@ -27,6 +28,7 @@ const dict = [
   N("women", "plur", "fem", "woman"),
   N("countries", "plur", "-hum", "country"),
   N("birds", "plur", "-hum", "bird"),
+  N("people", "plur", ["male", "fem"], "person"),
   
   // RNs  
   N("brother", "sing", "male"),
@@ -35,6 +37,8 @@ const dict = [
   N("sister", "sing", "fem"),
   N("mother", "sing", "fem"),
   N("wife", "sing", "fem"),
+  N("uncle", "sing", "male"),
+  N("aunt", "sing", "fem"),
 
   // Adjectives
   ADJ("brazilian"),
