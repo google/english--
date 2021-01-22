@@ -17,41 +17,47 @@ class DRS {
     }
     return this;    
   }
-  
+
+  apply(p, rules) {
+    let result = [];
+
+    for (let rule of rules) {
+      let [head, body, remove] = rule.match(p, this.head);
+      this.head.push(...head);
+      this.body.push(...body);
+      
+      result.push(...body.filter(c => !(c instanceof DRS)));
+
+      if (remove) {
+        return [result, remove];
+      }
+    }
+    return [result];
+  }
+
   process(nodes, rules = []) {
     let queue = [...nodes];
-
+    
     while (queue.length > 0) {
       let p = queue.shift();
-      // breadth first search: iterate over
-      // this level first ...
-      let skip = false;
-      for (let rule of rules) {
-        let [head, body, remove] = rule.match(p, this.head);
-        this.head.push(...head);
-        this.body.push(...body);
+      // Breadth first search: apply all rules for this node
+      // until we get asked to remove it.
+      let [next, remove] = this.apply(p, rules);
 
-        if (remove) {
-          skip = true;
-          let i = this.body.indexOf(remove);
-          if (i == -1) {
-            throw new Error("Ooops, deleting an invalid node.");
-          }
-          this.body.splice(i, 1);
+      // Queue up new roots that are introduced to the body.
+      queue.push(...next);
+
+      // If this is a node that we want to replace, remove it.
+      if (remove) {
+        let i = this.body.indexOf(p);
+        if (i == -1) {
+          throw new Error("Ooops, deleting an invalid node.");
         }
-        
-        queue.push(...body.filter(c => !(c instanceof DRS)));
-        
-        if (skip) {
-          break;
-        }
-      }
-      
-      if (skip) {
+        this.body.splice(i, 1);
         continue;
       }
-      
-      // ... and recurse.
+
+      // If not, queue up all of its children to descend.
       queue.push(...(p.children || []).flat(2));
     }
     
