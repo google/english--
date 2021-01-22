@@ -162,7 +162,7 @@ describe("DRS", function() {
        own(s0, a, b)
        fascinate(s1, b, a)
        Mary(c)
-       love(s2, c, a)
+       love(s2, c, c)
      `);
   });
 
@@ -202,7 +202,7 @@ describe("DRS", function() {
       drs.feed(new Parser("Discourse", dict).feed("He likes it."));
       throw new Error("expected exception");
     } catch (e) {
-      Assert.deepEqual(e.message, "Invalid Reference: it");
+      Assert.deepEqual(e.message, "Invalid reference: it");
     }
   });
 
@@ -763,7 +763,7 @@ describe("DRS", function() {
       // She can't bind to "Mary" because Mary is introduced
       // lexically after She, regardless of "Mary" being a
       // proper noun and being visible globally.
-      Assert.deepEqual(e.message, "Invalid Reference: it");
+      Assert.deepEqual(e.message, "Invalid reference: it");
     }
   });
 
@@ -1968,6 +1968,22 @@ describe("DRS", function() {
        reservation-for(b, d)
      `);
   });
+
+  it("Either every man or every woman is mortal.", function() {
+    assertThat("either every man or every woman is mortal.")
+     .equalsTo(`
+       either {
+         for (every a: man(a)) {
+           mortal(a)
+         }
+       } or {
+         for (every b: woman(b)) {
+           mortal(b)
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

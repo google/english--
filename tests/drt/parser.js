@@ -2616,6 +2616,15 @@ describe("Backwards compatibility", function() {
                   VP_(VP(V("like"), NP(PN("Italy"))))));
   });
 
+  it("Either every man or every woman is happy.", function() {
+    assertThat(parse("Either every man or every woman is happy."))
+      .equalsTo(S(NP("Either",
+                     NP(DET("every"), N("man")),
+                     "or",
+                     NP(DET("every"), N("woman"))),
+                  VP_(VP(BE("is"), ADJ("happy")))));
+  });
+
   // Not working:
   // Obama was the president of America. He was great.
 });

@@ -10,6 +10,7 @@ const {
 let capture = (name) => { return {"@type": "Match", "name": name} };
 
 let ANY = (...children) => { return {"@type": "ANY", "children": children} };
+let REFFY = (...children) => { return {"@type": "REF", "children": children} };
 
 function match(a, b) {
   if (!a || !b) {
@@ -257,48 +258,41 @@ class CRPN extends CompositeRule {
   }
 }
 
-class CRSPRO extends Rule {
+class CRPRO1 extends Rule {
   constructor(ids) {
-    super(ids, S(NP(PRO(capture("pronoun"))), VP_(capture("obj"))));
+    super(ids, ANY(NP(PRO(capture("pro")))));
   }
   
-  apply({pronoun, obj}, node, refs) {
-    let u = find(pronoun.types, refs, undefined, child(pronoun, 0).loc);
+  apply({pro}, node, refs) {
+    let u = find(pro.types, refs, undefined, child(pro, 0).loc);
     
     if (!u) {
-      throw new Error("Invalid reference: " + pronoun.children[0].value);
+      throw new Error("Invalid reference: " + pro.children[0].value);
     }
     
     node.children[0] = u;
   }
 }
 
-class CRVPPRO extends Rule {
+class CRPRO2 extends Rule {
   constructor(ids) {
-    super(ids, S(capture("sub"),
-                 VP_(VP(V(), NP(PRO(capture("pro")))))
-                ));
+    super(ids, ANY(ANY(), NP(PRO(capture("pro")))));
   }
   
-  apply({sub, pro}, node, refs) {
-    // Exclude the subject if the pronoun is non-reflexive.
-    // console.log(pro);
-    let exclude = pro.types.refl != "+" ? [child(sub, 0)] : [];
-    // console.log(exclude);
-    // console.log(refs);
-    let ref = find(pro.types, refs, undefined, undefined, exclude);
+  apply({pro}, node, refs) {
+    let u = find(pro.types, refs, undefined, child(pro, 0).loc);
     
-    if (!ref) {
-      throw new Error("Invalid Reference: " + pro.children[0].value);
+    if (!u) {
+      throw new Error("Invalid reference: " + pro.children[0].value);
     }
     
-    child(node, 1, 0).children[1] = ref;
+    node.children[1] = u;
   }
 }
 
 class CRPRO extends CompositeRule {
   constructor(ids) {
-    super([new CRSPRO(ids), new CRVPPRO(ids)]);
+    super([new CRPRO1(ids), new CRPRO2(ids)]);
   }
 }
 
@@ -309,6 +303,8 @@ class CRSID extends Rule {
   
   apply({det, noun}, node, refs) {
     if (child(det, 0)["@type"] == "REF") {
+      // console.log(det);
+      // throw new Error("hi");
       return;
     }
 
@@ -407,8 +403,6 @@ class CRADJLIN extends Rule {
       return [[], [], [], []];
     }
 
-    //console.log(adj);
-    
     let pred = PRED(adj.prop, node.ref, node.types);
     
     return [[], [pred], [], [node]];
@@ -512,18 +506,14 @@ class CRNRC extends Rule {
   apply(m, node) {
     let head = [];
     let body = [];
-    let remove = [];
     
     let rc = node.children.pop();
     
     let s = rc.children[1];
     
-    // console.log(child(s, 1, 0));
-    
     const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
     
     if (match(g1, s)) {
-      // console.log(child(s, 1, 2, 1));
       child(s, 1, 2).children[1] = node.ref[0];
     }
     
@@ -541,15 +531,10 @@ class CRNRC extends Rule {
     let noun = node.children.pop();
     noun.ref = node.ref;
     body.push(noun);
-    remove.push(node);
     
     body.push(s);
     
-    // console.log(child(s, 1, 2, 1));
-    
-    // console.log(child(s, 1, 0, 1));
-    
-    return [head, body, [], remove];
+    return [head, body, [], [node]];
   }
 }
 
@@ -562,17 +547,11 @@ class CRNEG extends Rule {
     let sub = drs(this.ids);
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
-    // sub.neg = true;
     
     let s = clone(node);
-    // console.log(s);
     child(s, 1).children.splice(0, 2);
-    // console.log(child(node, 1));
     
     sub.push(s);
-    // console.log(sub);
-    //console.log(sub.print());
-    //console.log(sub instanceof DRS);
     
     return [[], [negation(sub)], [], [node]];
   }
@@ -580,8 +559,8 @@ class CRNEG extends Rule {
 
 class CRREFBE extends Rule {
   constructor(ids) {
-    super(ids, S({"@type": "REF", children:[capture("a")]},
-                 VP_(VP(BE(), {"@type": "REF", children: [capture("b")]}))));
+    super(ids, S(REFFY(capture("a")),
+                 VP_(VP(BE(), REFFY(capture("b"))))));
   }
   apply({a, b}, node, refs) {
     let s = PRED("=", [a, b], node.types, true);
@@ -591,26 +570,14 @@ class CRREFBE extends Rule {
 
 class CRPOSBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"), VP_(VP(BE(), ADJ(capture("adj"))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
-    // throw new Error("hi");
-    //let s = S(adj);
-    //console.log(s);
-    //console.log("hi");
-    //console.log(node.types);
-    //let s = PRED(adj.prop, [ref.children[0]], node.types);
-    // console.log(adj);
-    // let s = clone(adj);
-    adj.ref = [child(ref, 0)];
+    adj.ref = [ref];
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
       adj.types.tense = node.types.tense;
     }
-    // let n = N();
-    // console.log(s);
-    //adj.ref = ref.children[0];
-    //s.types = node.types;   
     return [[], [adj], [], [node]];
   }
 }
@@ -642,7 +609,6 @@ class CRNEGBE extends Rule {
     let s = S(ref.children[0], VP_(VP(BE(), adj)));
     s.types = node.types;   
     sub.push(s);
-    // console.log(sub);
     return [[], [negation(sub)], [], [node]];
   }
 }
@@ -654,8 +620,6 @@ class CRNBE extends Rule {
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
     np.ref = [child(ref, 0)];
-    // console.log("hi");
-    // throw new Error("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -680,18 +644,12 @@ class CRNEGNBE extends Rule {
     let np = clone(noun);
     np.ref = [child(ref, 0)];
     
-    //console.log(np);
     let prep = child(node, 1, 0, 2, 2);
     let cond;
     noun.ref = [child(ref, 0)];
     if (prep) {
       cond = S(NP(DET(), noun, prep));
-      //cond.ref = child(ref, 0);
-      //noun.ref = child(ref, 0);
-      // console.log(cond);
-      //sub.push(cond);
     } else {
-      //sub.push(np);
       cond = np;
     }
     cond.ref = [child(ref, 0)];
@@ -747,8 +705,6 @@ class CRCOND extends Rule {
     antecedent.head.push(...clone(refs));
     antecedent.head.forEach(ref => ref.closure = true);
     antecedent.push(head.children[1]);
-    // let ref = head.children[1];
-    // console.log(ref);
     
     let consequent = drs(this.ids);
     consequent.head.push(...clone(antecedent.head));
@@ -764,43 +720,25 @@ class CREVERY extends Rule {
     super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
-    // console.log("crevery");
-    // console.log(det.types);
     if (!det.types.quant) {
-      return [[], [], [], []];
+      return;
     }
-    //console.log("CREVERY");
-    //console.log(child(node, 0));
-    // console.log(det);
     
     let ref = REF(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
 
-    // const s = S();
-    
-    // n.head.push(ref);
-    // n.push(noun);
-
     let prep = child(node, 0, 2);
     let cond;
     noun.ref = [ref];
     if (prep) {
       cond = S(NP(DET(), noun, prep));
-      // console.log(prep);
     } else {
       cond = noun;
     }
     cond.ref = [ref];
-    // console.log(child(cond, 0));
     n.push(cond);
-    //if (prep && prep["@type"] == "PP") {
-    //  console.log(child(prep, 0));
-   // }
-    // console.log(noun);
-    
-    // console.log(ref);
     
     let v = drs(this.ids);
     v.head.push(...clone(n.head));
@@ -811,10 +749,6 @@ class CREVERY extends Rule {
     s.children[0] = ref;
     v.push(s);
 
-    // console.log(n);
-    // throw new Error("hi");
-    // console.log(v);
-    // console.log(det);
     let q = det.children.map((d) => d.value).join("-").toLowerCase();
     let result = quantifier(q, n, v, ref);
     
@@ -901,6 +835,7 @@ class CRNPOR extends Rule {
                  VP_(capture("vp"))));
   }
   apply({first, second, vp}, node, refs) {
+    // throw new Error("hi");
     let a = drs(this.ids);
     a.head.push(...clone(refs));
     a.head.forEach(ref => ref.closure = true);
