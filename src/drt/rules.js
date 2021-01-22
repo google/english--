@@ -264,9 +264,6 @@ class CRSPRO extends Rule {
   }
   
   apply({pronoun, obj}, node, refs) {
-    //let exclude = pronoun.types.refl != "+" ? [child(obj, 0, 1)] : [];
-    //console.log(obj);
-    //console.log(pronoun);
     let u = find(pronoun.types, refs, undefined, child(pronoun, 0).loc);
     
     if (!u) {

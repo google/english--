@@ -117,11 +117,6 @@ class DRS {
       refs.push(`${ref.print()}`);
     }
     
-    //let args = refs.join(", ");
-    //let neg = this.neg ? "~" : "";
-    // result.push(`${neg}drs(${args}) \{`);
-    // result.push(`{`);
-    // console.log(this.neg);
     if (refs.length > 0) {
       result.push(`let ${refs.join(", ")}`);
     }
@@ -135,13 +130,10 @@ class DRS {
           cond["@type"] == "Disjunction") {
         result.push(cond.print(nl));
       } else {
-        // console.log(cond);
-        result.push(print(cond));
+        result.push(cond.print());
       }
     }
     
-    // result.push("}");
-    // console.log("hi");
     return result.join(nl);
   }
 }
