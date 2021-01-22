@@ -8,9 +8,133 @@ const {
 } = nodes;
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
-
 let ANY = (...children) => { return {"@type": "ANY", "children": children} };
 let REFFY = (...children) => { return {"@type": "REF", "children": children} };
+
+function drs(ids) {
+  return new DRS(Rules.from(ids));
+}
+
+function REF(name, types, value, loc) {
+  return {
+    "@type": "REF",
+    types: types,
+    name: name,
+    value: value,
+    loc: loc,
+    print() {
+      return `${this.name}`;
+    }
+  }
+}
+
+function PRED(name, args, types, infix = false) {
+  return {
+    "@type": "PRED",
+    name: name,
+    args: args,
+    types: types,
+    print() {
+      let params = this.args.map(arg => arg.name);
+      if (infix) {
+        return params.join(` ${this.name} `);
+      }
+      return `${this.name}(${params.join(", ")})`;
+    }
+  }
+}
+
+function disjunction(a, b) {
+  return {
+    "@type": "Disjunction",
+    "a": a,
+    "b": b,
+    print() {
+      let result = [];
+      result.push("either {");
+      result.push(this.a.print());
+      result.push("} or {");
+      result.push(this.b.print());
+      result.push("}");
+      return result.join("\n");
+    }
+  };
+}
+
+function quantifier(q, a, b, ref) {
+  return {
+    "@type": "Quantifier",
+    "q": q,
+    "a": a,
+    "b": b,
+    "ref": ref,
+    print() {
+      let result = [];
+      let letty = q == "if" ? "" : `${q} ${ref.name}: `;
+      let head = q == "if" ? "if" : "for";
+      result.push(`${head} (${letty}${this.a.print(" and ")}) {`);
+      result.push(this.b.print());
+      result.push("}");
+      return result.join("\n");
+    }
+  };
+}
+
+function negation(a) {
+  return {
+    "@type": "Negation",
+    "a": a,
+    print() {
+      let result = [];
+      result.push("not {");
+      result.push(this.a.print());
+      result.push("}");
+     return result.join("\n");
+    }
+  };
+}
+
+function conjunction(a, b) {
+  return {
+    "@type": "Conjunction",
+    "a": a,
+    "b": b,
+    print() {
+      let result = [];
+      result.push("{");
+      result.push(this.a.print());
+      result.push("} and {");
+      result.push(this.b.print());
+      result.push("}");
+      return result.join("\n");
+    }
+  };
+}
+
+function equals(a, b) {
+  return {
+    "@type": "Equals",
+    "a": a,
+    "b": b,
+    print() {
+      return this.a.print() + " == " + this.b.print();
+    }
+  };
+}
+
+function query(drs, x) {
+  return {
+    "@type": "Query",
+    "a": drs,
+    print() {
+      let result = [];
+      result.push("question (" + `${x ? x.print() : ""}` + ") {");
+      result.push(this.a.print());;
+      result.push("} ?");
+      return result.join("\n");
+    }
+  };
+}
 
 function match(a, b) {
   if (!a || !b) {
@@ -35,8 +159,6 @@ function match(a, b) {
       continue;
     } else {
       if (!a.children || !b.children) {
-        //console.log(a);
-        //console.log(b);
         return false;
       }
       let capture = match(a.children[i], b.children[i]);
@@ -121,14 +243,10 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   let match = (ref) => {
     let byName = name ? ref.value == name : true;
     let types = ref.types || {};
-    // console.log(`Ref name? ${ref.value}. By name? ${byName}. ${JSON.stringify(types)} ${types.num} preceeds? ${ref.loc} > ${loc}`);
-    //console.log(exclude);
-    //console.log(exclude);
     if (ref.loc > loc) {
       // A referent can never make a reference to a previous location.
       return false;
     } else if (name) {
-      //console.log(name);
       return name == ref.value;
     } else if (exclude.map(x => x.name).includes(ref.name)) {
       return false;
@@ -149,35 +267,6 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   }
 
   return undefined;
-}
-
-function REF(name, types, value, loc) {
-  return {
-    "@type": "REF",
-    types: types,
-    name: name,
-    value: value,
-    loc: loc,
-    print() {
-      return `${this.name}`;
-    }
-  }
-}
-
-function PRED(name, args, types, infix = false) {
-  return {
-    "@type": "PRED",
-    name: name,
-    args: args,
-    types: types,
-    print() {
-      let params = this.args.map(arg => arg.name);
-      if (infix) {
-        return params.join(` ${this.name} `);
-      }
-      return `${this.name}(${params.join(", ")})`;
-    }
-  }
 }
 
 class CRPN1 extends Rule {
@@ -454,26 +543,24 @@ class CRLIN extends CompositeRule {
 
 class CRADV extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"),
+    super(ids, S(ANY(capture("subject")),
                  VP_(VP(V(capture("verb"),
                           PP(PREP(capture("prep")),
-                             capture("np")))))));
+                             ANY(capture("np"))))))));
   }
   apply({subject, verb, prep, np}, node) {
-    if (child(subject, 0)["@type"] == "GAP" &&
+    if (subject["@type"] == "GAP" &&
         child(prep, 0)["@type"] == "%by") {
-      let sub = child(np, 1);
       let s = clone(node);
-      s.children[0] = sub;
+      s.children[0] =  np;
       let vp = child(s, 1, 0);
       vp.children[0] = child(vp, 0, 0);
       return [[], [s], [], [node]];
     }
     
     let body = [];
-    let sub = child(node, 0);
 
-    let cond = S(node.time, VP_(VP(V(child(prep, 0)), child(np, 1))));
+    let cond = S(node.time, VP_(VP(V(child(prep, 0)), np)));
     
     body.push(cond);
 
@@ -1080,12 +1167,6 @@ class CRASPECT extends Rule {
     }
     
     child(node, 1).children[0] = child(node, 1, 0, 1);
-    
-    if (stat == "-") {
-      return;
-    } else if (stat == "+") {
-      return;
-    }
   }
 }
 
@@ -1195,7 +1276,7 @@ class CRQUESTION extends CompositeRule {
   }
 }
 
-class CRNAMED extends Rule {
+class CRNAME extends Rule {
   constructor(ids) {
     super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
   }
@@ -1204,48 +1285,6 @@ class CRNAMED extends Rule {
       "type": "name",
       "value": child(name, 0).value
     }];
-  }
-}
-
-class CRNAMET extends Rule {
-  constructor(ids) {
-    super(ids, PN(PN(capture("first")), PN(capture("middle")), PN(capture("last"))));
-  }
-  apply({first, middle, last}, node, refs) {
-    let name = first.children[0].value +
-        "-" +
-        middle.children[0].value +
-        "-" +
-        last.children[0].value;
-
-    node.children = [{
-      "type": "name",
-      "value": name
-    }];
-  }
-}
-
-class CRNAME extends CompositeRule {
-  constructor(ids) {
-    super([
-      new CRNAMET(ids),
-      new CRNAMED(ids), 
-    ]);
-  }
-}
-
-class CRPLURAL extends Rule {
-  constructor(ids) {
-    super(ids, N(N(capture("stem"))));
-  }
-  apply({stem}, node, refs) {
-    let root = stem.children[0].value;
-    
-    if (node.children.length > 1) {
-      root += node.children[1].value;
-    }
-    
-    node.children = [root];
   }
 }
 
@@ -1278,13 +1317,12 @@ class CRPUNCT extends CompositeRule {
 
 class CRPRED extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"),
+    super(ids, S(ANY(capture("sub")),
                  VP_(VP(V(capture("verb")),
-                        capture("object")))));
+                        capture("obj")))));
   }
   
-  apply({verb, object}, node, refs = []) {
-    let sub = child(node, 0);
+  apply({sub, verb}, node, refs = []) {
     let obj = child(node, 1, 0, 1);
     let args = [];
 
@@ -1313,102 +1351,6 @@ class CRPRED extends Rule {
   }
 }
 
-function drs(ids) {
-  return new DRS(Rules.from(ids));
-}
-
-function disjunction(a, b) {
-  return {
-    "@type": "Disjunction",
-    "a": a,
-    "b": b,
-    print() {
-      let result = [];
-      result.push("either {");
-      result.push(this.a.print());
-      result.push("} or {");
-      result.push(this.b.print());
-      result.push("}");
-      return result.join("\n");
-    }
-  };
-}
-
-function quantifier(q, a, b, ref) {
-  return {
-    "@type": "Quantifier",
-    "q": q,
-    "a": a,
-    "b": b,
-    "ref": ref,
-    print() {
-      let result = [];
-      let letty = q == "if" ? "" : `${q} ${ref.name}: `;
-      let head = q == "if" ? "if" : "for";
-      result.push(`${head} (${letty}${this.a.print(" and ")}) {`);
-      result.push(this.b.print());
-      result.push("}");
-      return result.join("\n");
-    }
-  };
-}
-
-function negation(a) {
-  return {
-    "@type": "Negation",
-    "a": a,
-    print() {
-      let result = [];
-      result.push("not {");
-      result.push(this.a.print());
-      result.push("}");
-     return result.join("\n");
-    }
-  };
-}
-
-function conjunction(a, b) {
-  return {
-    "@type": "Conjunction",
-    "a": a,
-    "b": b,
-    print() {
-      let result = [];
-      result.push("{");
-      result.push(this.a.print());
-      result.push("} and {");
-      result.push(this.b.print());
-      result.push("}");
-      return result.join("\n");
-    }
-  };
-}
-
-function equals(a, b) {
-  return {
-    "@type": "Equals",
-    "a": a,
-    "b": b,
-    print() {
-      return this.a.print() + " == " + this.b.print();
-    }
-  };
-}
-
-function query(drs, x) {
-  return {
-    "@type": "Query",
-    "a": drs,
-    print() {
-      let result = [];
-      result.push("question (" + `${x ? x.print() : ""}` + ") {");
-      result.push(this.a.print());;
-      result.push("} ?");
-      return result.join("\n");
-    }
-  };
-}
-
 class Rules {
   static from(ids = new Ids()) {
     let rules = [
@@ -1432,7 +1374,6 @@ class Rules {
       new CRAND(ids),
       new CRADJ(ids),
       new CRQUESTION(ids),
-      new CRPLURAL(ids),
       new CRPUNCT(ids),
     ];
     return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
