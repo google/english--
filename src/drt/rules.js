@@ -78,13 +78,19 @@ class Rule {
   }
   
   match(node, refs) {
-    let result = match(this.trigger, node);
+    let m = match(this.trigger, node);
     
+    if (!m) {
+      return [[], [], [], []];
+    }
+    
+    let result = this.apply(m, node, refs);
+
     if (!result) {
       return [[], [], [], []];
     }
     
-    return this.apply(result, node, refs);
+    return result;
   }
   
   id(prefix) {
@@ -111,10 +117,6 @@ class CompositeRule extends Rule {
 }
 
 function find({gen, num}, refs, name, loc, exclude = []) {
-  // console.log(name);
-  //console.log(refs);
-  //console.log(loc);
-  // console.log(`Trying to find ${name}`);
   let match = (ref) => {
     let byName = name ? ref.value == name : true;
     let types = ref.types || {};
@@ -140,7 +142,6 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   };
   
   for (let i = refs.length - 1; i >= 0; i--) {
-    // console.log(refs[i]);
     if (match(refs[i])) {
       return refs[i];
     }
@@ -150,7 +151,6 @@ function find({gen, num}, refs, name, loc, exclude = []) {
 }
 
 function REF(name, types, value, loc) {
-  // console.log(value);
   return {
     "@type": "REF",
     types: types,
@@ -170,7 +170,6 @@ function PRED(name, args, types, infix = false) {
     args: args,
     types: types,
     print() {
-      // console.log(this.args.filter(arg => !arg.name));
       let params = this.args.map(arg => arg.name);
       if (infix) {
         return params.join(` ${this.name} `);
@@ -271,8 +270,6 @@ class CRSPRO extends Rule {
     }
     
     node.children[0] = u;
-    
-    return [[], [], [], []];
   }
 }
 
@@ -296,8 +293,6 @@ class CRVPPRO extends Rule {
     }
     
     child(node, 1, 0).children[1] = ref;
-    
-    return [[], [], [], []];
   }
 }
 
@@ -314,7 +309,7 @@ class CRSID extends Rule {
   
   apply({det, noun}, node, refs) {
     if (child(det, 0)["@type"] == "REF") {
-      return [[], [], [], []];
+      return;
     }
 
     let ref = REF(this.id(), noun.types);
@@ -355,7 +350,7 @@ class CRNLIN extends Rule {
   
   apply({noun}, node) {
     if (!node.ref || node.children.length != 1) {
-      return [[], [], [], []];
+      return;
     }
 
     let pred = PRED(noun.prop, node.ref, node.types);
@@ -371,7 +366,7 @@ class CRPPLIN extends Rule {
   }
   apply({noun, prep, np}, node) {
     if (!node.ref) {
-      return [[], [], [], []];
+      return;
     }
 
     const n = child(node, 0);
@@ -427,7 +422,7 @@ class CRPPADJLIN extends Rule {
   }
   apply({prep, np}, node) {
     if (!node.ref) {
-      return [[], [], [], []];
+      return;
     }
 
     const adj = child(node, 0);
@@ -834,7 +829,7 @@ class CRVPEVERY extends Rule {
   apply({det, subject, noun}, node, refs) {
     
     if (!det.types.quant) {
-      return [[], [], [], []];
+      return;
     }
     // console.log(det);
 
@@ -995,15 +990,9 @@ class CRSPOSS extends Rule {
     node.children[0] = u;
     node.ref = [u];
     
-    // console.log("hi");
-    
-    // let s = S(u, VP_(VP(V(noun.children[0]), name.children[0])));
     let s = clone(noun);
     s.ref = [u, child(name, 0)];
 
-    // console.log(noun.children[0]);
-    // console.log(child(s, 1, 0, 0));
-    
     return [[u], [s], [], []];
   }
 }
@@ -1018,7 +1007,7 @@ class CRVPPOSS extends Rule {
     if (!poss) {
       // TODO(goto): figure out why the "'s" isn't preventing this from
       // matching
-      return [[], [], [], []];
+      return;
     }
     // console.log(child(node, 1));
     // throw new Error("hi");
@@ -1050,7 +1039,7 @@ class CRADJ extends Rule {
   }
   apply({adj, noun}, node, refs) {
     if (!node.ref) {
-      return [[], [], [], []];
+      return;
     }
 
     noun = clone(noun);
@@ -1083,7 +1072,7 @@ class CRWILL extends Rule {
     let {tense} = types || {};
     
     if (tense != "fut") {
-      return [[], [], [], []];
+      return;
     }
     
     // page 541: 
@@ -1098,8 +1087,6 @@ class CRWILL extends Rule {
     // step, in the course of which the contribution of will is 
     // explicitly represented, has been performed.
     node.children.shift();
-    
-    return [[], [], [], []];
   }
 }
 
@@ -1118,12 +1105,12 @@ class CRTENSE extends Rule {
     let {tense, stat} = types || {};
 
     if (!tense || node.time) {
-      return [[], [], [], []];
+      return;
     }
 
     if (child(verb, 0, 0)["@type"] == "BE") {
       // TODO: deal with adjectives.
-      return [[], [], [], []];
+      return;
     }
 
     // Records the time relationship between the new
@@ -1158,7 +1145,7 @@ class CRTENSE extends Rule {
       //} else if (tense == "fut") {
       // conds.push(before(REF("@now"), e));
       //}
-      return [[], [], [], []];
+      return;
     } else {
       let s = REF(this.id("s"), {}, undefined, node.loc, true);
       node.time = s;
@@ -1170,7 +1157,7 @@ class CRTENSE extends Rule {
       }
       return [[s], body, [], []];
     }
-    return [[], [], [], []];
+    return;
   }
 }
 
@@ -1183,15 +1170,15 @@ class CRASPECT extends Rule {
     let stat = (verb.types || {}).stat;
     
     if (!stat) {
-      return [[], [], [], []];
+      return;
     }
     
     child(node, 1).children[0] = child(node, 1, 0, 1);
     
     if (stat == "-") {
-      return [[], [], [], []];
+      return;
     } else if (stat == "+") {
-      return [[], [], [], []];
+      return;
     }
   }
 }
@@ -1311,8 +1298,6 @@ class CRNAMED extends Rule {
       "type": "name",
       "value": child(name, 0).value
     }];
-    
-    return [[], [], [], []];
   }
 }
 
@@ -1331,8 +1316,6 @@ class CRNAMET extends Rule {
       "type": "name",
       "value": name
     }];
-    
-    return [[], [], [], []];
   }
 }
 
@@ -1357,8 +1340,6 @@ class CRPLURAL extends Rule {
     }
     
     node.children = [root];
-    
-    return [[], [], [], []];
   }
 }
 
@@ -1456,14 +1437,9 @@ function quantifier(q, a, b, ref) {
     "ref": ref,
     print() {
       let result = [];
-      // result.push(`${q} (${ref ? (ref.name + ": {") : "{"}`);
-      //let head = q == "if" ? q : `for ${q}`;
-      //console.log(q);
       let letty = q == "if" ? "" : `${q} ${ref.name}: `;
       let head = q == "if" ? "if" : "for";
       result.push(`${head} (${letty}${this.a.print(" and ")}) {`);
-      //result.push();
-      //result.push("}) {");
       result.push(this.b.print());
       result.push("}");
       return result.join("\n");
@@ -1502,29 +1478,6 @@ function conjunction(a, b) {
   };
 }
 
-function before(a, b) {
-  return {
-  "@type": "Before",
-    "a": a,
-    "b": b,
-    print() {
-      // console.log("hi");
-      return this.a.print() + " < " + this.b.print();
-    }
-  };
-}
-
-function included(a, b) {
- return {
-   "@type": "Included",
-   "a": a,
-   "b": b,
-   print() {
-     return this.a.print() + " <> " + this.b.print();
-   }
- };
-}
-
 function equals(a, b) {
   return {
     "@type": "Equals",
@@ -1539,11 +1492,11 @@ function equals(a, b) {
 function query(drs, x) {
   return {
     "@type": "Query",
-    "drs": drs,
+    "a": drs,
     print() {
       let result = [];
       result.push("question (" + `${x ? x.print() : ""}` + ") {");
-      result.push(this.drs.print());;
+      result.push(this.a.print());;
       result.push("} ?");
       return result.join("\n");
     }
@@ -1575,7 +1528,6 @@ class Rules {
       new CRWILL(ids),
       new CRQUESTION(ids),
       new CRPLURAL(ids),
-      // new CRSTEM(ids),
       new CRPUNCT(ids),
     ];
     return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
