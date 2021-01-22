@@ -439,6 +439,10 @@ class CRNLIN extends Rule {
       return;
     }
 
+    // console.log(noun);
+    
+    // throw new Error("hi");
+    
     let pred = PRED(noun.prop, node.ref, node.types);
     
     return [[], [pred], node];
@@ -455,6 +459,8 @@ class CRPPLIN extends Rule {
       return;
     }
 
+    //throw new Error("hi");
+    
     const n = child(node, 0);
 
     let body = [];
@@ -1029,12 +1035,15 @@ class CRVPPOSS extends Rule {
       // matching
       return;
     }
+    // throw new Error("hio");
     // console.log(child(node, 1));
     // throw new Error("hi");
     let u = REF(this.id(), noun.types);
     child(node, 1, 0).children[1] = u;
     // console.log(noun);
     // console.log(child(name, 0));
+    // console.log(child(name, 0));
+    // console.log(JSON.stringify(name, undefined, 2));
     let s = clone(noun);
     s.ref = [u, child(name, 0)];
     // console.log(child(name, 0));
