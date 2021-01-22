@@ -42,7 +42,7 @@ class DRS {
       // console.log(p);
       let skip = false;
       for (let rule of rules) {
-        let [head, body, drs, [remove]] = rule.match(p, this.head);
+        let [head, body, remove] = rule.match(p, this.head);
         this.head.push(...head);
         this.body.push(...body);
 
