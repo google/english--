@@ -69,13 +69,13 @@ class DRS {
       }
       
       // ... and recurse.
-      let next = (p && p.children || [])
-          .filter(c => typeof c != "string");
+      //let next = (p && p.children || [])
+      //    .filter(c => typeof c != "string");
 
       //next = next.map(x => Array.isArray(x) ? x.flat(3) : x);
       
       // console.log(next.flat(2));
-      queue.push(...next.flat(2));
+      queue.push(...(p.children || []).flat(2));
     }
     
     return this;
