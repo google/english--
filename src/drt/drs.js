@@ -18,20 +18,6 @@ class DRS {
     return this;    
   }
   
-  bind(node) {
-    let queue = [node];
-    while (queue.length > 0) {
-      let p = queue.shift();
-      let [refs, names] = this.names.match(p, this.head);
-      this.head.push(...refs);
-      this.body.push(...names);
-      // ... and recurse.
-      let next = (p.children || [])
-          .filter(c => typeof c != "string");
-      queue.push(...next);
-    }
-  }
-
   process(nodes, rules = []) {
     let queue = [...nodes];
 
@@ -39,7 +25,6 @@ class DRS {
       let p = queue.shift();
       // breadth first search: iterate over
       // this level first ...
-      // console.log(p);
       let skip = false;
       for (let rule of rules) {
         let [head, body, remove] = rule.match(p, this.head);
@@ -50,8 +35,6 @@ class DRS {
           skip = true;
           let i = this.body.indexOf(remove);
           if (i == -1) {
-            //console.log(remove);
-            //console.log(this.body);
             throw new Error("Ooops, deleting an invalid node.");
           }
           this.body.splice(i, 1);
@@ -69,12 +52,6 @@ class DRS {
       }
       
       // ... and recurse.
-      //let next = (p && p.children || [])
-      //    .filter(c => typeof c != "string");
-
-      //next = next.map(x => Array.isArray(x) ? x.flat(3) : x);
-      
-      // console.log(next.flat(2));
       queue.push(...(p.children || []).flat(2));
     }
     
@@ -94,14 +71,9 @@ class DRS {
     // Resolve all proper names.
     this.process([node], this.before);
 
-    // return;
-    
     this.body.push(node);
 
-    // console.log("Applying all the rules");
     let result = this.process([node], this.rules);
-
-    // console.log(this.body);
 
     this.process(this.body, this.after);
 
@@ -122,16 +94,7 @@ class DRS {
     }
     
     for (let cond of this.body) {
-      if (cond instanceof DRS ||
-          cond["@type"] == "Quantifier" ||
-          cond["@type"] == "Negation" ||
-          cond["@type"] == "Query" ||
-          cond["@type"] == "Conjunction" ||
-          cond["@type"] == "Disjunction") {
-        result.push(cond.print(nl));
-      } else {
-        result.push(cond.print());
-      }
+      result.push(cond.print(nl));
     }
     
     return result.join(nl);
