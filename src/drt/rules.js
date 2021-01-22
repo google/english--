@@ -584,14 +584,14 @@ class CRPOSBE extends Rule {
 
 class CRPREPBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"),
-                 VP_(VP(BE("is"), PP(PREP(capture("prep")), capture("np"))))
+    super(ids, S(REFFY(capture("ref")),
+                 VP_(VP(BE("is"), PP(PREP(capture("prep")), ANY(capture("np")))))
                 ));
   }
   apply({ref, prep, np}, node, refs) {
     let body = [];
 
-    let s = S(child(ref, 0), VP_(VP(V(child(prep, 0)), child(np, 1))));
+    let s = S(ref, VP_(VP(V(child(prep, 0)), np)));
     body.push(s);
     
     return [[], body, [], [node]];
@@ -600,13 +600,13 @@ class CRPREPBE extends Rule {
 
 class CRNEGBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
     let sub = drs(this.ids);
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
-    let s = S(ref.children[0], VP_(VP(BE(), adj)));
+    let s = S(ref, VP_(VP(BE(), adj)));
     s.types = node.types;   
     sub.push(s);
     return [[], [negation(sub)], [], [node]];
@@ -615,11 +615,11 @@ class CRNEGBE extends Rule {
 
 class CRNBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"), VP_(VP(BE(), NP(DET(capture("det")), N(capture("noun")))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
     let np = clone(noun);
-    np.ref = [child(ref, 0)];
+    np.ref = [ref];
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -632,27 +632,26 @@ class CRNBE extends Rule {
 
 class CRNEGNBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("ref"), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
-    // console.log("hi");
     let sub = drs(this.ids);
     
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
     
     let np = clone(noun);
-    np.ref = [child(ref, 0)];
+    np.ref = [ref];
     
     let prep = child(node, 1, 0, 2, 2);
     let cond;
-    noun.ref = [child(ref, 0)];
+    noun.ref = [ref];
     if (prep) {
       cond = S(NP(DET(), noun, prep));
     } else {
       cond = np;
     }
-    cond.ref = [child(ref, 0)];
+    cond.ref = [ref];
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
       cond.types = cond.types || {};
@@ -667,13 +666,13 @@ class CRNEGNBE extends Rule {
 
 class CRPASSIVEBE extends Rule {
   constructor(ids) {
-    super(ids, S(capture("obj"),
+    super(ids, S(ANY(capture("obj")),
                  VP_(VP(BE(capture("be")),
                         VP(V(capture("verb")),
                            NP(GAP()))))));
   }
   apply({obj, be, verb}, node, refs) {
-    let s = S(GAP(), VP_(VP(verb, child(obj, 0))));
+    let s = S(GAP(), VP_(VP(verb, obj)));
     // Matches the DRS found in (3.57) on page 269.
     s.types = {
       tense: be.types.tense
@@ -994,34 +993,6 @@ class CRADJ extends Rule {
     let pred = PRED(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], [], [node]];
-  }
-}
-
-
-class CRWILL extends Rule {
-  constructor(ids) {
-    super(ids, VP_(AUX("will"), VP(capture("verb"))));
-  }
-  apply({verb, aux}, node, refs) {
-    let {types} = node;
-    let {tense} = types || {};
-    
-    if (tense != "fut") {
-      return;
-    }
-    
-    // page 541: 
-    //
-    // We face a minor technical complication in this case, 
-    // which has to do with the auxiliary will. Will makes its 
-    // semantic contribution via the feature value "fut". 
-    //
-    // Once it has made this contribution it can be discarded. 
-    // We account for this by pruning the auxiliary from the 
-    // sentence structure that remains after the first construction
-    // step, in the course of which the contribution of will is 
-    // explicitly represented, has been performed.
-    node.children.shift();
   }
 }
 
@@ -1460,7 +1431,6 @@ class Rules {
       new CRVPNPOR(ids),
       new CRAND(ids),
       new CRADJ(ids),
-      new CRWILL(ids),
       new CRQUESTION(ids),
       new CRPLURAL(ids),
       new CRPUNCT(ids),
@@ -1491,6 +1461,5 @@ module.exports = {
   CRPOSS: CRPOSS,
   CRADJ: CRADJ,
   CRASPECT: CRASPECT,
-  CRWILL: CRWILL,
   CRQUESTION: CRQUESTION,
 };

@@ -1984,6 +1984,42 @@ describe("DRS", function() {
     `);
   });
 
+  it("Either every man or every woman is not mortal.", function() {
+    assertThat("either every man or every woman is not mortal.")
+     .equalsTo(`
+       either {
+         for (every a: man(a)) {
+           not {
+             mortal(a)
+           }
+         }
+       } or {
+         for (every b: woman(b)) {
+           not {
+             mortal(b)
+           }
+         }
+       }
+    `);
+  });
+
+  it("Either every man or every woman is from Brazil.", function() {
+    assertThat("either every man or every woman is from Brazil.")
+     .equalsTo(`
+       let a
+       Brazil(a)
+       either {
+         for (every b: man(b)) {
+           from(b, a)
+         }
+       } or {
+         for (every c: woman(c)) {
+           from(c, a)
+         }
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {
