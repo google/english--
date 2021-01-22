@@ -592,10 +592,8 @@ class CRNRC extends Rule {
   
   apply(m, node) {
     let head = [];
-    let body = [];
-    
+    let body = [];    
     let rc = node.children.pop();
-    
     let s = rc.children[1];
     
     const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
@@ -627,10 +625,10 @@ class CRNRC extends Rule {
 
 class CRNEG extends Rule {
   constructor(ids) {
-    super(ids, S(capture("np"), VP_(AUX(), "not", VP(capture("vp")))));
+    super(ids, S(ANY(), VP_(AUX(), "not", VP())));
   }
   
-  apply({np, vp}, node, refs) {
+  apply({}, node, refs) {
     let sub = drs(this.ids);
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
