@@ -21,7 +21,12 @@ function arrayEquals(a, b) {
   return true;
 }
 
-describe("REPL", function() {
+function equalsTo(a, b) {
+  return a[0] == b[0] &&
+    arrayEquals(a[1], b[1]);
+}
+
+describe.only("REPL", function() {
   class Engine {
     constructor() {
       this.kb = [];
@@ -39,31 +44,21 @@ describe("REPL", function() {
       }
       return result;
     }
+    entails(q) {
+      for (const s of this.kb) {
+        if (equalsTo(s, q)) {
+          return true;
+        }
+      }
+    }
     query(list) {
-      // console.log(list);
-      //console.log(this.kb);
-      //console.log("hi");
-      let success;
       for (const q of list) {
-        success = false;
-        for (const statement of this.kb) {
-          //console.log(statement);
-          //console.log(q);
-          if (statement[0] == q[0] &&
-              arrayEquals(statement[1], q[1])) {
-            success = true;
-            break;
-          }
-        }
-        // console.log(success);
-        if (!success) {
-          return undefined;
+        let result = this.entails(q);
+        if (!result) {
+          return result;
         }
       }
-      // console.log(success);
-      if (success) {
-        return true;
-      }
+      return true;
     }
   }
   
@@ -136,6 +131,12 @@ describe("REPL", function() {
     const engine = new Engine();
     assertThat(engine.read("P(A). Q(B).")).equalsTo(undefined);
     assertThat(engine.read("question() {P(A). R(B).}?")).equalsTo(undefined);
+  });
+  
+  it.skip("P(A). P(a)?", function() {
+    const engine = new Engine();
+    assertThat(engine.read("P(A).")).equalsTo(undefined);
+    assertThat(engine.read("P(a)?")).equalsTo(true);
   });
   
   function assertThat(x) {
