@@ -57,8 +57,8 @@ function bind([name, args], bindings) {
 
 describe("REPL", function() {
   class Engine {
-    constructor() {
-      this.kb = [];
+    constructor(kb = []) {
+      this.kb = kb;
     }
     read(code) {
       const [program] = new Parser().parse(code);
@@ -78,6 +78,10 @@ describe("REPL", function() {
         const binding = unify(s, q);
         if (binding) {
           return binding;
+        }
+        const [op, vars, head, body] = s;
+        if (op == "every") {
+          console.log(body);
         }
       }
     }
@@ -293,6 +297,13 @@ describe("REPL", function() {
     assertThat(engine.read("question() { Dani(b). loves(a, b). }?"))
       .equalsTo({"u": "a", "v": "b"});
   });
+
+  it.skip("for (every a: P(a)) Q(a). Q(A)?", function() {
+    const engine = new Engine();
+    assertThat(engine.read("for (every a: P(a)) Q(a).")).equalsTo(undefined);
+    assertThat(engine.read("P(A)?")).equalsTo({});
+  });
+
 
   function assertThat(x) {
     return {
