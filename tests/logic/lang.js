@@ -314,10 +314,10 @@ describe.only("REPL", function() {
       .equalsTo({"u": "a", "v": "b"});
   });
 
-  it("P(A). for (every a: P(a)) Q(a). Q(A)?", function() {
+  it("P(u). for (every a: P(a)) Q(a). Q(v)?", function() {
     const kb = new KB();
-    assertThat(kb.read("P(A). for (every a: P(a)) Q(a).")).equalsTo(undefined);
-    assertThat(kb.read("Q(A)?")).equalsTo({});
+    assertThat(kb.read("P(u). for (every a: P(a)) Q(a).")).equalsTo(undefined);
+    assertThat(kb.read("Q(v)?")).equalsTo({"u": "v"});
   });
 
   it("for (every a: man(a)) mortal(a). Socrates(u). man(u). Socrates(v) mortal(v)?", function() {
@@ -333,13 +333,21 @@ describe.only("REPL", function() {
     `)).equalsTo({"u": "v"});
   });
 
-  it("for (every a: P(a)) Q(a). for (every a: Q(a)) R(a). P(A). R(A)?", function() {
+  it("for (every a: P(a)) Q(a). for (every a: Q(a)) R(a). P(u). R(v)?", function() {
     assertThat(new KB().read(`
       for (every a: P(a)) Q(a).
       for (every a: Q(a)) R(a).
-      P(A).
-      R(A)?
-    `)).equalsTo({});
+      P(u).
+      R(v)?
+    `)).equalsTo({"u": "v"});
+  });
+
+  it("for (every a: P(a)) { Q(a). R(a).} P(u). R(v)?", function() {
+    assertThat(new KB().read(`
+      for (every a: P(a)) { Q(a). R(a). }
+      P(u).
+      R(v)?
+    `)).equalsTo({"u": "v"});
   });
 
   function assertThat(x) {
