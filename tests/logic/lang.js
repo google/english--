@@ -321,15 +321,26 @@ describe.only("REPL", function() {
   });
 
   it("for (every a: man(a)) mortal(a). Socrates(u). man(u). Socrates(v) mortal(v)?", function() {
-    const kb = new KB();
-    // Every man is mortal.
-    assertThat(kb.read("for (every a: man(a)) mortal(a).")).equalsTo(undefined);
-    // There is a man u, whose name is Socrates.
-    assertThat(kb.read("Socrates(u). man(u).")).equalsTo(undefined);
-    // Is there a man v, whose name is Socrates and who is mortal?
-    assertThat(kb.read("Socrates(v) mortal(v)?")).equalsTo({"u": "v"});
+    assertThat(new KB().read(`
+      // Every man is mortal.
+      for (every a: man(a)) mortal(a).
+
+      // There is a man u, whose name is Socrates.
+      Socrates(u). man(u).
+
+      // Is there a man v, whose name is Socrates and who is mortal?
+      Socrates(v) mortal(v)?
+    `)).equalsTo({"u": "v"});
   });
 
+  it("for (every a: P(a)) Q(a). for (every a: Q(a)) R(a). P(A). R(A)?", function() {
+    assertThat(new KB().read(`
+      for (every a: P(a)) Q(a).
+      for (every a: Q(a)) R(a).
+      P(A).
+      R(A)?
+    `)).equalsTo({});
+  });
 
   function assertThat(x) {
     return {
