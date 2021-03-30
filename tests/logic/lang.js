@@ -55,8 +55,8 @@ function bind([name, args], bindings) {
   return [name, result];
 }
 
-describe("REPL", function() {
-  class Engine {
+describe.only("REPL", function() {
+  class KB {
     constructor(kb = []) {
       this.kb = kb;
     }
@@ -68,10 +68,13 @@ describe("REPL", function() {
         if (head == "?") {
           result = this.query(typeof body[0] == "string" ? [body] : body);
         } else {
-          this.kb.push(statement);
+          this.push(statement);
         }
       }
       return result;
+    }
+    push(s) {
+      this.kb.push(s);
     }
     entails(q) {
       for (const s of this.kb) {
@@ -99,74 +102,74 @@ describe("REPL", function() {
   }
   
   it("P(). P()?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P().")).equalsTo(undefined);
-    assertThat(engine.read("P()?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("P().")).equalsTo(undefined);
+    assertThat(kb.read("P()?")).equalsTo({});
   });
     
   it("P()?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P()?")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("P()?")).equalsTo(undefined);
   });
     
   it("P(). Q()?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P().")).equalsTo(undefined);
-    assertThat(engine.read("Q()?")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("P().")).equalsTo(undefined);
+    assertThat(kb.read("Q()?")).equalsTo(undefined);
   });
     
   it("P(). Q(). P()?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(). Q().")).equalsTo(undefined);
-    assertThat(engine.read("P()?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("P(). Q().")).equalsTo(undefined);
+    assertThat(kb.read("P()?")).equalsTo({});
   });
     
   it("P(). Q(). Q()?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(). Q().")).equalsTo(undefined);
-    assertThat(engine.read("Q()?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("P(). Q().")).equalsTo(undefined);
+    assertThat(kb.read("Q()?")).equalsTo({});
   });
   
   it("P(A). P(A)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A).")).equalsTo(undefined);
-    assertThat(engine.read("P(A)?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("P(A).")).equalsTo(undefined);
+    assertThat(kb.read("P(A)?")).equalsTo({});
   });
   
   it("P(A). P(B)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A).")).equalsTo(undefined);
-    assertThat(engine.read("P(B)?")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("P(A).")).equalsTo(undefined);
+    assertThat(kb.read("P(B)?")).equalsTo(undefined);
   });
     
   it("P(A, B). P(A, B)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A, B).")).equalsTo(undefined);
-    assertThat(engine.read("P(A, B)?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("P(A, B).")).equalsTo(undefined);
+    assertThat(kb.read("P(A, B)?")).equalsTo({});
   });
   
-  it("P(). question() { P(). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P().")).equalsTo(undefined);
-    assertThat(engine.read("question() {P().}?")).equalsTo({});
+  it("P(). P()?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P().")).equalsTo(undefined);
+    assertThat(kb.read("P()?")).equalsTo({});
   });
   
-  it("P(). Q(). question() { P(). Q(). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(). Q().")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(). Q().}?")).equalsTo({});
+  it("P(). Q(). P() Q()?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(). Q().")).equalsTo(undefined);
+    assertThat(kb.read("P() Q()?")).equalsTo({});
   });
   
-  it("P(A). Q(B). question() { P(A). Q(B). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A). Q(B).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(A). Q(B).}?")).equalsTo({});
+  it("P(A). Q(B). P(A) Q(B)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A). Q(B).")).equalsTo(undefined);
+    assertThat(kb.read("P(A) Q(B)?")).equalsTo({});
   });
   
-  it("P(A). Q(B). question() { P(A). R(B). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A). Q(B).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(A). R(B).}?")).equalsTo(undefined);
+  it("P(A). Q(B). P(A) R(B)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A). Q(B).")).equalsTo(undefined);
+    assertThat(kb.read("P(A) R(B)?")).equalsTo(undefined);
   });
 
   it("P() + P() = P()", () => {
@@ -233,75 +236,75 @@ describe("REPL", function() {
   });
 
   it("P(A). P(a)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A).")).equalsTo(undefined);
-    assertThat(engine.read("P(a)?")).equalsTo({"a": "A"});
+    const kb = new KB();
+    assertThat(kb.read("P(A).")).equalsTo(undefined);
+    assertThat(kb.read("P(a)?")).equalsTo({"a": "A"});
   });
 
   it("P(A, B). P(a, b)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A, B).")).equalsTo(undefined);
-    assertThat(engine.read("P(a, b)?")).equalsTo({"a": "A", "b": "B"});
+    const kb = new KB();
+    assertThat(kb.read("P(A, B).")).equalsTo(undefined);
+    assertThat(kb.read("P(a, b)?")).equalsTo({"a": "A", "b": "B"});
   });
 
   it("P(A, B). P(A, b)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A, B).")).equalsTo(undefined);
-    assertThat(engine.read("P(A, b)?")).equalsTo({"b": "B"});
+    const kb = new KB();
+    assertThat(kb.read("P(A, B).")).equalsTo(undefined);
+    assertThat(kb.read("P(A, b)?")).equalsTo({"b": "B"});
   });
 
-  it("P(A). Q(A). question() {P(a). Q(a).}?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A). Q(A).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(a). Q(a).}?")).equalsTo({"a": "A"});
+  it("P(A). Q(A). P(a) Q(a)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A). Q(A).")).equalsTo(undefined);
+    assertThat(kb.read("P(a) Q(a)?")).equalsTo({"a": "A"});
   });
 
-  it("P(A). question() {P(a). Q(a).}?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(a). Q(a).}?")).equalsTo(undefined);
+  it("P(A). P(a) Q(a)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A).")).equalsTo(undefined);
+    assertThat(kb.read("P(a) Q(a)?")).equalsTo(undefined);
   });
 
-  it("P(A). Q(B). question() {P(a). Q(a).}?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A). Q(B).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(a). Q(a).}?")).equalsTo(undefined);
+  it("P(A). Q(B). P(a) Q(a)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A). Q(B).")).equalsTo(undefined);
+    assertThat(kb.read("P(a) Q(a)?")).equalsTo(undefined);
   });
 
-  it("P(A). Q(B). question() {P(a). Q(b).}?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("P(A). Q(B).")).equalsTo(undefined);
-    assertThat(engine.read("question() {P(a). Q(b).}?")).equalsTo({"a": "A", "b": "B"});
+  it("P(A). Q(B). P(a) Q(b)?", function() {
+    const kb = new KB();
+    assertThat(kb.read("P(A). Q(B).")).equalsTo(undefined);
+    assertThat(kb.read("P(a) Q(b)?")).equalsTo({"a": "A", "b": "B"});
   });
 
   it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). Dani(b). loves(a, b). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Does Sam love Dani?
-    assertThat(engine.read("question() { Sam(a). Dani(b). loves(a, b). }?"))
+    assertThat(kb.read("Sam(a) Dani(b) loves(a, b)?"))
       .equalsTo({"u": "a", "v": "b"});
   });
 
   it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). loves(a, b). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Who does Sam love?
-    assertThat(engine.read("question() { Sam(a). loves(a, b). }?"))
+    assertThat(kb.read("Sam(a) loves(a, b)?"))
       .equalsTo({"u": "a", "v": "b"});
   });
 
   it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). loves(a, b). }?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
+    const kb = new KB();
+    assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Who loves Dani?
-    assertThat(engine.read("question() { Dani(b). loves(a, b). }?"))
+    assertThat(kb.read("Dani(b) loves(a, b)?"))
       .equalsTo({"u": "a", "v": "b"});
   });
 
   it.skip("for (every a: P(a)) Q(a). Q(A)?", function() {
-    const engine = new Engine();
-    assertThat(engine.read("for (every a: P(a)) Q(a).")).equalsTo(undefined);
-    assertThat(engine.read("P(A)?")).equalsTo({});
+    const kb = new KB();
+    assertThat(kb.read("for (every a: P(a)) Q(a).")).equalsTo(undefined);
+    assertThat(kb.read("P(A)?")).equalsTo({});
   });
 
 
