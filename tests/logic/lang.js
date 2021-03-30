@@ -55,7 +55,7 @@ function bind([name, args], bindings) {
   return [name, result];
 }
 
-describe("REPL", function() {
+describe.only("REPL", function() {
   class KB {
     constructor(kb = []) {
       this.kb = kb;
@@ -84,11 +84,24 @@ describe("REPL", function() {
         }
         const [op, vars, head, body] = s;
         if (op == "every") {
-          console.log(body);
+          // console.log(body);
+          // console.log(q);
+          const match = new KB(body).entails(q);
+          // console.log(match);
+          if (!match) {
+            continue;
+          }
+          let result = this.query(head.map((s) => bind(s, match)));
+          if (result) {
+            return result;
+          }
+          // console.log(result);
+          // console.log(body);
         }
       }
     }
     query(list) {
+      // console.log(list);
       const result = {};
       for (const q of list) {
         let binding = this.entails(bind(q, result));
@@ -277,7 +290,7 @@ describe("REPL", function() {
     assertThat(kb.read("P(a) Q(b)?")).equalsTo({"a": "A", "b": "B"});
   });
 
-  it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). Dani(b). loves(a, b). }?", function() {
+  it("Sam(u). Dani(v). loves(u, v). Sam(a) Dani(b) loves(a, b)?", function() {
     const kb = new KB();
     assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Does Sam love Dani?
@@ -285,7 +298,7 @@ describe("REPL", function() {
       .equalsTo({"u": "a", "v": "b"});
   });
 
-  it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). loves(a, b). }?", function() {
+  it("Sam(u). Dani(v). loves(u, v). Sam(a) loves(a, b) ?", function() {
     const kb = new KB();
     assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Who does Sam love?
@@ -293,7 +306,7 @@ describe("REPL", function() {
       .equalsTo({"u": "a", "v": "b"});
   });
 
-  it("Sam(u). Dani(v). loves(u, v). question() { Sam(a). loves(a, b). }?", function() {
+  it("Sam(u). Dani(v). loves(u, v). Sam(a) loves(a, b) ?", function() {
     const kb = new KB();
     assertThat(kb.read("Sam(u). Dani(v). loves(u, v).")).equalsTo(undefined);
     // Who loves Dani?
@@ -301,10 +314,10 @@ describe("REPL", function() {
       .equalsTo({"u": "a", "v": "b"});
   });
 
-  it.skip("for (every a: P(a)) Q(a). Q(A)?", function() {
+  it("for (every a: P(a)) Q(a). Q(A)?", function() {
     const kb = new KB();
-    assertThat(kb.read("for (every a: P(a)) Q(a).")).equalsTo(undefined);
-    assertThat(kb.read("P(A)?")).equalsTo({});
+    assertThat(kb.read("P(A). for (every a: P(a)) Q(a).")).equalsTo(undefined);
+    assertThat(kb.read("Q(A)?")).equalsTo({});
   });
 
 
