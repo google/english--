@@ -55,7 +55,7 @@ function bind([name, args], bindings) {
   return [name, result];
 }
 
-describe.only("REPL", function() {
+describe("REPL", function() {
   class KB {
     constructor(kb = []) {
       this.kb = kb;
@@ -66,7 +66,7 @@ describe.only("REPL", function() {
       for (const statement of program) {
         const [head, body] = statement;
         if (head == "?") {
-          result = this.query(typeof body[0] == "string" ? [body] : body);
+          result = this.query(body);
         } else {
           this.push(statement);
         }
