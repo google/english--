@@ -34,12 +34,13 @@ function PRED(name, args, types, infix = false) {
     name: name,
     args: args,
     types: types,
-    print() {
+    print(separator = ".") {
       let params = this.args.map(arg => arg.name);
       if (infix) {
-        return params.join(` ${this.name} `);
+        return params.join(` ${this.name} `) + separator;
       }
-      return `${this.name}(${params.join(", ")})`;
+      // console.log(separator);
+      return `${this.name}(${params.join(", ")})${separator}`;
     }
   }
 }
@@ -52,10 +53,10 @@ function disjunction(a, b) {
     print() {
       let result = [];
       result.push("either {");
-      result.push(this.a.print());
-      result.push("} or {");
-      result.push(this.b.print());
-      result.push("}");
+      result.push(this.a.print() + "} or {");
+      // result.push();
+      result.push(this.b.print() + "}");
+      // result.push("}");
       return result.join("\n");
     }
   };
@@ -72,10 +73,10 @@ function quantifier(q, a, b, ref) {
       let result = [];
       let letty = q == "if" ? "" : `${q} ${ref.name}: `;
       let head = q == "if" ? "if" : "for";
-      result.push(`${head} (${letty}${this.a.print(" and ")}) {`);
-      result.push(this.b.print());
-      result.push("}");
-      return result.join("\n");
+      result.push(`${head} (${letty}${this.a.print(" ", true)}) {`);
+      result.push(this.b.print() + "}");
+      // result.push("}");
+      return result.join("\n") + "\n";
     }
   };
 }
@@ -85,11 +86,14 @@ function negation(a) {
     "@type": "Negation",
     "a": a,
     print() {
-      let result = [];
-      result.push("not {");
-      result.push(this.a.print());
-      result.push("}");
-     return result.join("\n");
+      return `not {
+        ${this.a.print(".\n")} }
+      `;
+      //let result = [];
+      //result.push("not {");
+      //result.push(this.a.print(".\n"));
+      //result.push("}");
+      //return result.join("\n");
     }
   };
 }
@@ -102,10 +106,10 @@ function conjunction(a, b) {
     print() {
       let result = [];
       result.push("{");
-      result.push(this.a.print());
-      result.push("} and {");
-      result.push(this.b.print());
-      result.push("}");
+      result.push(this.a.print() + "} and {");
+      // result.push();
+      result.push(this.b.print() + "}");
+      // result.push("}");
       return result.join("\n");
     }
   };
@@ -128,10 +132,16 @@ function query(drs, x) {
     "a": drs,
     print() {
       let result = [];
-      result.push("question (" + `${x ? x.print() : ""}` + ") {");
-      result.push(this.a.print());;
-      result.push("} ?");
-      return result.join("\n");
+      if (x) {
+        result.push(`let ${x.print()}: `);
+      }
+      result.push(this.a.print(" ", true));
+      //result.push(``);
+      //result.push("question (" + `${x ? x.print() : ""}` + ") {");
+      //result.push(this.a.print());;
+      //result.push("} ?");
+      result.push("?");
+      return result.join("");
     }
   };
 }

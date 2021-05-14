@@ -86,24 +86,31 @@ class DRS {
     return result;
   }
   
-  print(nl = "\n") {
+  print(nl = ".\n", inner = false) {
     let result = [];
     let refs = [];
     let individuals = this.head
         .filter(ref => !ref.closure);
-    for (let ref of individuals) {
-      refs.push(`${ref.print()}`);
-    }
+    //for (let ref of individuals) {
+    //  refs.push(`${ref.print()}`);
+    //}
     
-    if (refs.length > 0) {
-      result.push(`let ${refs.join(", ")}`);
-    }
+    //if (refs.length > 0) {
+    //  result.push(`let ${refs.join(", ")}`);
+    //}
     
     for (let cond of this.body) {
-      result.push(cond.print(nl));
+      //let suffix = "";
+      //if (cond["@type"] == "PRED") {
+      //  suffix = ".";
+      //} else if (cond["@type"] == "Question") {
+      //  suffix = "?";
+      //}
+      // console.log(cond);
+      result.push(cond.print(inner ? "" : nl));
     }
     
-    return result.join(nl);
+    return result.join(inner ? nl : "");
   }
 }
 

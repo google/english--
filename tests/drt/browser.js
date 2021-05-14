@@ -13,11 +13,11 @@ describe("Browser", function() {
       });
     });
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
-      .equalsTo("let a, b, s0\nBrian(a)\nMary(b)\nlike(s0, a, b)");
+    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print(".\n", false))
+      .equalsTo("Brian(a).\nMary(b).\nlike(s0, a, b).\n");
   });
 
-  it("compiled", async function() {
+  it.skip("compiled", async function() {
     const {load, parse, DRS, Parser, Rules} = require("../../bin/bundle.js");
     await load("bin/", async (path) => {
       let content = require("fs").readFileSync(path).toString();
@@ -29,7 +29,7 @@ describe("Browser", function() {
     });
     let drs = new DRS(Rules.from());
     assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
-      .equalsTo("let a, b, s0\nBrian(a)\nMary(b)\nlike(s0, a, b)");
+      .equalsTo("nBrian(a).\nMary(b).\nlike(s0, a, b).");
   });
 });
 

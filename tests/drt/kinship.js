@@ -36,12 +36,11 @@ describe("Kinship", function() {
   it("If a woman is a man's wife then the woman is married to the man.", function() {
     assertThat("If a woman is married to a man then the man is married to the woman.")
       .equalsTo(`
-       if (let a, b and woman(a) and married(a) and man(b) and married-to(a, b)) {
-         let c, d
-         man(c)
-         married(c)
-         woman(d)
-         married-to(c, d)
+       if (woman(a) married(a) man(b) married-to(a, b)) {
+         man(c).
+         married(c).
+         woman(d).
+         married-to(c, d).
        }
     `);
   });
@@ -76,14 +75,13 @@ describe("Kinship", function() {
     assertThat("Every uncle is a male relative who is married to a sibling of a parent.")
       .equalsTo(`
         for (every a: uncle(a)) {
-          let b, c
-          male-relative(a)
-          relative(a)
-          married(a)
-          parent(b)
-          sibling(c)
-          of(a, b)
-          to(a, c)
+          male-relative(a).
+          relative(a).
+          married(a).
+          parent(b).
+          sibling(c).
+          of(a, b).
+          to(a, c).
         }
     `);
   });
@@ -113,7 +111,7 @@ function assertThat(x) {
       let parser = new Parser("Discourse", dict);
       let sentences = parser.feed(x);
       drs.feed(sentences);
-      Assert.deepEqual(drs.print(), this.trim(y));
+      Assert.deepEqual(this.trim(drs.print()), this.trim(y));
     }
   }
 }
