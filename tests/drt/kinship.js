@@ -60,7 +60,7 @@ describe("Kinship", function() {
   it.skip("Every uncle is a male relative who is a sibling of a parent.", function() {
     assertThat("Every uncle is a male relative who is either a sibling of a parent or a person who is married to a sibling of a parent.")
       .equalsTo(`
-        for (every a: uncle(a)) {
+        for (let every a: uncle(a)) {
           let b
           male-relative(a)
           relative(a)
@@ -74,7 +74,7 @@ describe("Kinship", function() {
   it("Every uncle is a male relative who is married.", function() {
     assertThat("Every uncle is a male relative who is married to a sibling of a parent.")
       .equalsTo(`
-        for (every a: uncle(a)) {
+        for (let every a: uncle(a)) {
           male-relative(a).
           relative(a).
           married(a).

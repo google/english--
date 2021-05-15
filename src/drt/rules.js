@@ -71,7 +71,7 @@ function quantifier(q, a, b, ref) {
     "ref": ref,
     print() {
       let result = [];
-      let letty = q == "if" ? "" : `${q} ${ref.name}: `;
+      let letty = q == "if" ? "" : `let ${q} ${ref.name}: `;
       let head = q == "if" ? "if" : "for";
       result.push(`${head} (${letty}${this.a.print(" ", true)}) {`);
       result.push(this.b.print() + "}");
