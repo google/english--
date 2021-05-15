@@ -66,7 +66,29 @@ describe("REPL", () => {
     `, true);
   });
 
-
+  it("What is the capital of Brazil?", () => {
+    const code = `
+      Brasilia is the capital of Brazil.
+      What is the capital of Brazil?
+      // Brazil borders all countries in South-America.
+      // Every country in South-America is beautiful.
+      // Argentina is a country in South-America.
+      // NOTES: 
+      // - Does Brazil border Argentina? is missing the eventuality
+      // - South America can't be used because of the spaces
+      // - Which countries border Brazil?
+    `;
+    assertThat(transpile(code)).equalsTo(`
+      Brasilia(a).
+      Brazil(b).
+      capital(a).
+      capital-of(a, b).
+      let c: capital(c) capital-of(c, b)?
+    `, true);
+    assertThat(new KB().read(transpile(code))).equalsTo([{"c": "a"}]);
+  });
+  
+    
   function assertThat(x) {
     return {
       trim (str) {
