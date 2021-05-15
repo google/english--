@@ -1,19 +1,19 @@
 const Assert = require("assert");
-const {REPL, transpile} = require("../../src/drt/repl.js");
+const {Console, transpile} = require("../../src/drt/repl.js");
 
-describe("REPL", () => {
+describe("Console", () => {
   
   it("Sam is happy. Is Sam happy?", () => {
     const code = `
       Sam is happy. Is Sam happy?
     `;
-    assertThat(transpile(code))
+    assertThat(new Console().transpile(code))
       .equalsTo(`
        Sam(a).
        happy(a).
        happy(a)?
     `, true);
-    assertThat(new REPL().read(code))
+    assertThat(new Console().load(code))
       .equalsTo([{}]);
   });
 
@@ -24,7 +24,7 @@ describe("REPL", () => {
       Sam is a person.
       Is Sam happy about Brazil?
     `;
-    assertThat(transpile(code)).equalsTo(`
+    assertThat(new Console().transpile(code)).equalsTo(`
        Brazil(a).
        for (let every b: person(b) brazilian(b)) {
          happy(b).
@@ -35,12 +35,12 @@ describe("REPL", () => {
        person(c).
        happy(c) happy-about(c, a)?
     `, true);
-    assertThat(new REPL().read(code)).equalsTo([{}]);
+    assertThat(new Console().load(code)).equalsTo([{}]);
   });
 
   it("Sam is happy. Is Sam happy?", () => {
     // We are missing the eventuality parameter inside the question.
-    assertThat(transpile(`
+    assertThat(new Console().transpile(`
       Sam loves Dani.
       Who loves Dani?
     `)).equalsTo(`
@@ -63,16 +63,21 @@ describe("REPL", () => {
       // - South America can't be used because of the spaces
       // - Which countries border Brazil?
     `;
-    assertThat(transpile(code)).equalsTo(`
+    assertThat(new Console().transpile(code)).equalsTo(`
       Brasilia(a).
       Brazil(b).
       capital(a).
       capital-of(a, b).
       let c: capital(c) capital-of(c, b)?
     `, true);
-    assertThat(new REPL().read(code)).equalsTo([{"c": "a"}]);
+    assertThat(new Console().load(code)).equalsTo([{"c": "a"}]);
   });
   
+  it("What is the capital of Brazil?", () => {
+    const console = new Console();
+    assertThat(console.load(`Brasilia is the capital of Brazil.`)).equalsTo([]);
+    assertThat(console.load(`What is the capital of Brazil?`)).equalsTo([{"c": "a"}]);
+  });
     
   function assertThat(x) {
     return {
