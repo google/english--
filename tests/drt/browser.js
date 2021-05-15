@@ -13,22 +13,7 @@ describe("Browser", function() {
       });
     });
     let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print(".\n", false))
-      .equalsTo("Brian(a).\nMary(b).\nlike(s0, a, b).\n");
-  });
-
-  it("compiled", async function() {
-    const {load, parse, DRS, Parser, Rules} = require("../../bin/bundle.js");
-    await load("bin/", async (path) => {
-      let content = require("fs").readFileSync(path).toString();
-      return Promise.resolve({
-        text() {
-          return Promise.resolve(content);
-        }
-      });
-    });
-    let drs = new DRS(Rules.from());
-    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")).print())
+    assertThat(drs.feed(new Parser().load(dict).feed("Brian likes Mary.")))
       .equalsTo("Brian(a).\nMary(b).\nlike(s0, a, b).\n");
   });
 });

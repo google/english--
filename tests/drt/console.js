@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Console, transpile} = require("../../src/drt/repl.js");
+const {Console, transpile} = require("../../src/drt/console.js");
 
 describe("Console", () => {
   
@@ -72,11 +72,13 @@ describe("Console", () => {
     `, true);
     assertThat(new Console().load(code)).equalsTo([{"c": "a"}]);
   });
-  
+
   it("What is the capital of Brazil?", () => {
     const console = new Console();
+    assertThat(console.load(`Sam is a brazilian engineer.`)).equalsTo([]);
+    assertThat(console.load(`Who is an engineer?`)).equalsTo([{"b": "a"}]);
     assertThat(console.load(`Brasilia is the capital of Brazil.`)).equalsTo([]);
-    assertThat(console.load(`What is the capital of Brazil?`)).equalsTo([{"c": "a"}]);
+    assertThat(console.load(`What is the capital of Brazil?`)).equalsTo([{"e": "c"}]);
   });
     
   function assertThat(x) {
