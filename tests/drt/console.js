@@ -1,5 +1,6 @@
 const Assert = require("assert");
 const {Console, transpile} = require("../../src/drt/console.js");
+const {dict} = require("./dict.js");
 
 describe("Console", () => {
   
@@ -7,13 +8,13 @@ describe("Console", () => {
     const code = `
       Sam is happy. Is Sam happy?
     `;
-    assertThat(new Console().transpile(code))
+    assertThat(new Console(dict).transpile(code))
       .equalsTo(`
        Sam(a).
        happy(a).
        happy(a)?
     `, true);
-    assertThat(new Console().load(code))
+    assertThat(new Console(dict).load(code))
       .equalsTo([{}]);
   });
 
@@ -24,7 +25,7 @@ describe("Console", () => {
       Sam is a person.
       Is Sam happy about Brazil?
     `;
-    assertThat(new Console().transpile(code)).equalsTo(`
+    assertThat(new Console(dict).transpile(code)).equalsTo(`
        Brazil(a).
        for (let every b: person(b) brazilian(b)) {
          happy(b).
@@ -35,12 +36,12 @@ describe("Console", () => {
        person(c).
        happy(c) happy-about(c, a)?
     `, true);
-    assertThat(new Console().load(code)).equalsTo([{}]);
+    assertThat(new Console(dict).load(code)).equalsTo([{}]);
   });
 
   it("Sam is happy. Is Sam happy?", () => {
     // We are missing the eventuality parameter inside the question.
-    assertThat(new Console().transpile(`
+    assertThat(new Console(dict).transpile(`
       Sam loves Dani.
       Who loves Dani?
     `)).equalsTo(`
@@ -63,18 +64,18 @@ describe("Console", () => {
       // - South America can't be used because of the spaces
       // - Which countries border Brazil?
     `;
-    assertThat(new Console().transpile(code)).equalsTo(`
+    assertThat(new Console(dict).transpile(code)).equalsTo(`
       Brasilia(a).
       Brazil(b).
       capital(a).
       capital-of(a, b).
       let c: capital(c) capital-of(c, b)?
     `, true);
-    assertThat(new Console().load(code)).equalsTo([{"c": "a"}]);
+    assertThat(new Console(dict).load(code)).equalsTo([{"c": "a"}]);
   });
 
   it("What is the capital of Brazil?", () => {
-    const console = new Console();
+    const console = new Console(dict);
     assertThat(console.load(`Sam is a brazilian engineer.`)).equalsTo([]);
     assertThat(console.load(`Who is an engineer?`)).equalsTo([{"b": "a"}]);
     assertThat(console.load(`Brasilia is the capital of Brazil.`)).equalsTo([]);
