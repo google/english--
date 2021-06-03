@@ -21,7 +21,7 @@
   "homepage": "https://github.com/samuelgoto/logic",
   "dependencies": {
     "en-inflectors": "^1.0.12",
-    "logic": "git+https://github.com/samuelgoto/logic.git",
+    "logic": "git+ssh://git@github.com/samuelgoto/logic.git",
     "nearley": "^2.18.0",
     "pegjs": "^0.10.0"
   },

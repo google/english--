@@ -9,8 +9,9 @@ class Console {
     this.kb = new KB();
     this.dict = dict;
   }
-  load(code) {
-    return this.kb.read(this.transpile(code))
+
+  *load(code) {
+    yield * this.kb.read(this.transpile(code))
   }
 
   transpile(code) {
@@ -20,11 +21,6 @@ class Console {
       throw new Error("Ambiguous input: " + code);
     }
     return this.drs.feed(sentences);
-    // console.log(result);
-    //console.log(code);
-    //console.log(sentences);
-    //console.log(result.map((drs) => drs.print()));
-    // return this.drs.print();
   }
 }
 

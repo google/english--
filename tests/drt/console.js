@@ -3,6 +3,14 @@ const {Console, transpile} = require("../../src/drt/console.js");
 const {dict} = require("./dict.js");
 
 describe("Console", () => {
+
+  function unroll(gen) {
+    const result = [];
+    for (const item of gen) {
+      result.push(item);
+    }
+    return result;
+  }
   
   it("Sam is happy. Is Sam happy?", () => {
     const code = `
@@ -14,7 +22,7 @@ describe("Console", () => {
        happy(a).
        happy(a)?
     `, true);
-    assertThat(new Console(dict).load(code))
+    assertThat(unroll(new Console(dict).load(code)))
       .equalsTo([{}]);
   });
 
@@ -36,7 +44,7 @@ describe("Console", () => {
        person(c).
        happy(c) happy-about(c, a)?
     `, true);
-    assertThat(new Console(dict).load(code)).equalsTo([{}]);
+    assertThat(unroll(new Console(dict).load(code))).equalsTo([{}]);
   });
 
   it("Sam is happy. Is Sam happy?", () => {
@@ -71,15 +79,15 @@ describe("Console", () => {
       capital-of(a, b).
       let c: capital(c) capital-of(c, b)?
     `, true);
-    assertThat(new Console(dict).load(code)).equalsTo([{"c": "a"}]);
+    assertThat(unroll(new Console(dict).load(code))).equalsTo([{"c": "a"}]);
   });
 
   it("What is the capital of Brazil?", () => {
     const console = new Console(dict);
-    assertThat(console.load(`Sam is a brazilian engineer.`)).equalsTo([]);
-    assertThat(console.load(`Who is an engineer?`)).equalsTo([{"b": "a"}]);
-    assertThat(console.load(`Brasilia is the capital of Brazil.`)).equalsTo([]);
-    assertThat(console.load(`What is the capital of Brazil?`)).equalsTo([{"e": "c"}]);
+    assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
+    assertThat(unroll(console.load(`Who is an engineer?`))).equalsTo([{"b": "a"}]);
+    assertThat(unroll(console.load(`Brasilia is the capital of Brazil.`))).equalsTo([]);
+    assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo([{"e": "c"}]);
   });
     
   function assertThat(x) {
