@@ -681,11 +681,11 @@ describe("DRS", function() {
      .equalsTo(`
        Mary(a).
        Smith(b).
-       {
+       (
          love(s0, a, b).
-       } and {
+       ) and (
          love(s1, b, a).
-       }
+       ).
     `);
   });
 
@@ -694,12 +694,12 @@ describe("DRS", function() {
     assertThat("Mary owns a porsche and she loves it.")
      .equalsTo(`
        Mary(a).
-       {
+       (
          porsche(b).
          own(s0, a, b).
-       } and { 
+       ) and (
          love(s1, a, b).
-       }
+       ).
     `);
   });
 

@@ -106,10 +106,10 @@ function conjunction(a, b) {
     "b": b,
     print() {
       let result = [];
-      result.push("{");
-      result.push(this.a.print() + "} and {");
+      result.push("(");
+      result.push(this.a.print() + ") and (");
       // result.push();
-      result.push(this.b.print() + "}");
+      result.push(this.b.print() + ").");
       // result.push("}");
       return result.join("\n");
     }
