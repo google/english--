@@ -40,7 +40,8 @@ function PRED(name, args, types, infix = false) {
         return params.join(` ${this.name} `) + separator;
       }
       // console.log(separator);
-      return `${this.name}(${params.join(", ")})${separator}`;
+      const name = this.name.split(" ").join("-");
+      return `${name}(${params.join(", ")})${separator}`;
     }
   }
 }
@@ -289,10 +290,14 @@ class CRPN1 extends Rule {
     let head = [];
     let body = [];
 
-    let ref = find(name.types, refs, name.children[0].value, name.loc);
+    // console.log(name);
+    const value = name.children[0].value; //.split(" ").join("-");
+    // console.log(value);
+    
+    let ref = find(name.types, refs, value, name.loc);
 
     if (!ref) {
-      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
+      ref = REF(this.id(), name.types, value, name.loc);
       head.push(ref);
       let pred = PRED(pn, [ref], name.types);
       body.push(pred);
@@ -1164,7 +1169,7 @@ class CRTENSE extends Rule {
       let body = [];
       if (tense == "past" || tense == "fut") {
         let op = (tense == "past" ? "<" : ">");
-        body.push(PRED(op, [s, REF("@now")], {}, true));
+        body.push(PRED(op, [s, REF("__now__")], {}, true));
       }
       return [[s], body];
     }

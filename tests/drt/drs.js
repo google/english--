@@ -1141,7 +1141,7 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        Mary(b).
-       s0 < @now.
+       s0 < __now__.
        kiss(s0, a, b).
     `);
   });
@@ -1179,7 +1179,7 @@ describe("DRS", function() {
      .equalsTo(`
        Smith(a).
        Mary(b).
-       s0 > @now.
+       s0 > __now__.
        not (
          kiss(s0, a, b).
        ).
@@ -1191,7 +1191,7 @@ describe("DRS", function() {
      .equalsTo(`
          Smith(a).
          Mary(b).
-         s0 < @now.
+         s0 < __now__.
          not (
            kiss(s0, a, b).
          ).
@@ -1538,7 +1538,7 @@ describe("DRS", function() {
     assertThat("Does Brazil border most countries in South America?")
      .equalsTo(`
        Brazil(a).
-       South America(b).
+       South-America(b).
        for (let most c: country(c) country-in(c, b)) {
          border(a, c).
        }
@@ -1588,7 +1588,7 @@ describe("DRS", function() {
   it("Are most countries in South America rich?", function() {
     assertThat("Are most countries in South America rich?")
      .equalsTo(`
-        South America(a).
+        South-America(a).
         for (let most b: country(b) country-in(b, a)) {
           rich(b).
         } 
@@ -1599,7 +1599,7 @@ describe("DRS", function() {
   it("Are most countries in South America happy about the cancelation?", function() {
     assertThat("Are most countries in South America happy about the cancelation?")
      .equalsTo(`
-       South America(a).
+       South-America(a).
        for (let most b: country(b) country-in(b, a)) {
          happy(b).
          cancelation(c).
@@ -1618,7 +1618,7 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        Mary(b).
-       s0 < @now.
+       s0 < __now__.
        porsche(c).
        give-to(s0, b).
        give(s0, a, c).
@@ -1670,8 +1670,8 @@ describe("DRS", function() {
   it("Sam Goto likes Computer Science.", function() { 
     assertThat("Sam Goto likes Computer Science.")
      .equalsTo(`
-       Sam Goto(a).
-       Computer Science(b).
+       Sam-Goto(a).
+       Computer-Science(b).
        like(s0, a, b).
      `);
   });
@@ -1679,8 +1679,8 @@ describe("DRS", function() {
   it("Sam Goto likes the United States Of America.", function() { 
     assertThat("Sam Goto likes the United States Of America.")
      .equalsTo(`
-       Sam Goto(a).
-       United States Of America(b).
+       Sam-Goto(a).
+       United-States-Of-America(b).
        like(s0, a, b).
      `);
   });
@@ -1716,7 +1716,7 @@ describe("DRS", function() {
      .equalsTo(`
        DRT(a).
        Sam(b).
-       s0 < @now.
+       s0 < __now__.
        like(s0, b, a).
      `);
   });
@@ -1734,7 +1734,7 @@ describe("DRS", function() {
     assertThat("Sam likes Discourse Representation Theory.")
      .equalsTo(`
        Sam(a).
-       Discourse Representation Theory(b).
+       Discourse-Representation-Theory(b).
        like(s0, a, b).
      `);
   });
@@ -1745,7 +1745,7 @@ describe("DRS", function() {
        Sam(a).
        Dani(b).
        Cascal(c).
-       s0 < @now.
+       s0 < __now__.
        reservation(d).
        make(s0, a, d).
        reservation-for(d, b).
@@ -1769,7 +1769,7 @@ describe("DRS", function() {
        Jones(a).
        Italy(b).
        Brazil(c).
-       s0 < @now.
+       s0 < __now__.
        come-to(s0, b).
        come-from(s0, c).
        come(s0, a).
@@ -1869,10 +1869,10 @@ describe("DRS", function() {
         // const console = new Console();
         // console.log(drs.print());
         //console.log(KB.read);
-        // const kb = new KB();
         // console.log(kb.read);
-        // const gen = kb.read(drs.print());
-        // gen.next();
+        //const kb = new KB();
+        //const gen = kb.read(drs.print());
+        //gen.next();
         // console.log(kb);
         Assert.deepEqual(this.trim(drs.print()), this.trim(y));
       }
@@ -1925,7 +1925,7 @@ describe("Large Lexicon", () => {
     assertThat("Mel travelled to an awesome country.")
       .equalsTo(`
        Mel(a).
-       s0 < @now.
+       s0 < __now__.
        awesome-country(b).
        country(b).
        travel-to(s0, b).
@@ -1971,7 +1971,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
        Mel(a).
        Brazil(b).
-       s0 < @now.
+       s0 < __now__.
        live-in(s0, b).
        live(s0, a).
     `);
@@ -2011,7 +2011,7 @@ describe("Large Lexicon", () => {
     assertThat("Brazil is a country in South America.")
       .equalsTo(`
         Brazil(a).
-        South America(b).
+        South-America(b).
         country(a).
         country-in(a, b).
       `);
@@ -2021,7 +2021,7 @@ describe("Large Lexicon", () => {
     assertThat("Brazil borders all countries in South America.")
       .equalsTo(`
         Brazil(a).
-        South America(b).
+        South-America(b).
         for (let all c: country(c) country-in(c, b)) {
           border(s0, a, c).
         }
@@ -2086,7 +2086,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         Brazil(a).
         East(b).
-        Atlantic Ocean(c).
+        Atlantic-Ocean(c).
         bound-on(s0, b).
         bound(s0, c, a).
       `);
@@ -2140,10 +2140,10 @@ describe("Large Lexicon", () => {
     // single proper name.
     assertThat("Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.")
       .equalsTo(`
-        Pedro Alvares Cabral(a).
-        Portuguese Empire(b).
+        Pedro-Alvares-Cabral(a).
+        Portuguese-Empire(b).
         Brazil(c).
-        s0 < @now.
+        s0 < __now__.
         area(d).
         claim-for(s0, b).
         claim(s0, a, d).
@@ -2154,11 +2154,11 @@ describe("Large Lexicon", () => {
   it("The Portuguese Empire's capital was transferred from Lisbon to Rio De Janeiro.", () => {
     assertThat("The Portuguese Empire's capital was transferred from Lisbon to Rio De Janeiro.")
       .equalsTo(`
-        Portuguese Empire(a).
-        Rio De Janeiro(b).
+        Portuguese-Empire(a).
+        Rio-De-Janeiro(b).
         Lisbon(c).
         capital(d, a).
-        s0 < @now.
+        s0 < __now__.
         transfer-to(s0, b).
         transfer-from(s0, c).
         transfer(s0, e, d).
@@ -2174,7 +2174,7 @@ describe("Large Lexicon", () => {
     assertThat("Brazil is classified by the World Bank as an industrial country.")
       .equalsTo(`
         Brazil(a).
-        World Bank(b).
+        World-Bank(b).
         industrial-country(c).
         country(c).
         classify-as(s0, c).
@@ -2187,7 +2187,7 @@ describe("Large Lexicon", () => {
     assertThat("Brazil is a member of the United Nations.")
       .equalsTo(`
         Brazil(a).
-        United Nations(b).
+        United-Nations(b).
         member(a).
         member-of(a, b).
       `);
@@ -2235,7 +2235,7 @@ describe("Large Lexicon", () => {
       Brazil is considered as an upcoming economy.
     `).equalsTo(`
        Brazil(a).
-       South America(b).
+       South-America(b).
        country(a).
        country-in(a, b).
        for (let most c: country(c) country-in(c, b)) {
@@ -2254,7 +2254,7 @@ describe("Large Lexicon", () => {
          compose(s2, g, h).
        }
        East(i).
-       Atlantic Ocean(j).
+       Atlantic-Ocean(j).
        bound-on(s3, i).
        bound(s3, j, a).
        Portuguese(k).
@@ -2262,26 +2262,26 @@ describe("Large Lexicon", () => {
        official-language(l).
        language(l).
        language-of(l, a).
-       Pedro Alvares Cabral(m).
-       Portuguese Empire(n).
-       s4 < @now.
+       Pedro-Alvares-Cabral(m).
+       Portuguese-Empire(n).
+       s4 < __now__.
        area(o).
        claim-for(s4, n).
        claim(s4, m, o).
        area-of(o, a).
-       Rio De Janeiro(p).
+       Rio-De-Janeiro(p).
        Lisbon(q).
        capital(r, n).
-       s5 < @now.
+       s5 < __now__.
        transfer-to(s5, p).
        transfer-from(s5, q).
        transfer(s5, s, r).
-       World Bank(t).
+       World-Bank(t).
        industrial-country(u).
        country(u).
        classify-as(s6, u).
        classify(s6, t, a).
-       United Nations(v).
+       United-Nations(v).
        member(a).
        member-of(a, v).
        upcoming-economy(w).
@@ -2312,11 +2312,11 @@ describe("Large Lexicon", () => {
          independent-state(c).
          state(c).
        }
-       United Nations(d).
+       United-Nations(d).
        for (let all e: country(e)) {
          classify(s1, d, e).
        }
-       World Bank(f).
+       World-Bank(f).
        for (let all g: country(g)) {
          classify(s2, f, g).
        }
