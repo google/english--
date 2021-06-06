@@ -1340,7 +1340,7 @@ describe("DRS", function() {
   it("3 brazilians are happy.", function() {
     assertThat("3 brazilians are happy.")
      .equalsTo(`
-         for (let 3 a: brazilian(a)) {
+         for (let exactly(3) a: brazilian(a)) {
            happy(a).
          }
     `);
@@ -1349,7 +1349,7 @@ describe("DRS", function() {
   it("More than 3 brazilians are happy.", function() {
     assertThat("More than 3 brazilians are happy.")
      .equalsTo(`
-         for (let more-than-3 a: brazilian(a)) {
+         for (let more-than(3) a: brazilian(a)) {
            happy(a).
          }
     `);
@@ -1358,7 +1358,7 @@ describe("DRS", function() {
   it("Fewer than 3 brazilians are happy.", function() {
     assertThat("Fewer than 3 brazilians are happy.")
      .equalsTo(`
-         for (let fewer-than-3 a: brazilian(a)) {
+         for (let fewer-than(3) a: brazilian(a)) {
            happy(a).
          }
     `);
@@ -1367,7 +1367,7 @@ describe("DRS", function() {
   it("At least 3 brazilians are happy.", function() {
     assertThat("At least 3 brazilians are happy.")
      .equalsTo(`
-         for (let at-least-3 a: brazilian(a)) {
+         for (let at-least(3) a: brazilian(a)) {
            happy(a).
          }
     `);
@@ -1376,7 +1376,7 @@ describe("DRS", function() {
   it("At most 3 brazilians are happy.", function() {
     assertThat("At most 3 brazilians are happy.")
      .equalsTo(`
-         for (let at-most-3 a: brazilian(a)) {
+         for (let at-most(3) a: brazilian(a)) {
            happy(a).
          }
     `);
@@ -1391,7 +1391,7 @@ describe("DRS", function() {
     `);
   });
 
-  it("The majority of brazilians are happy.", function() {
+  it.skip("The majority of brazilians are happy.", function() {
     assertThat("The majority of brazilians are happy.")
      .equalsTo(`
          for (let the-majority-of a: brazilian(a)) {
@@ -1870,9 +1870,9 @@ describe("DRS", function() {
         // console.log(drs.print());
         //console.log(KB.read);
         // console.log(kb.read);
-        //const kb = new KB();
-        //const gen = kb.read(drs.print());
-        //gen.next();
+        const kb = new KB();
+        const gen = kb.read(drs.print());
+        gen.next();
         // console.log(kb);
         Assert.deepEqual(this.trim(drs.print()), this.trim(y));
       }
@@ -2032,7 +2032,7 @@ describe("Large Lexicon", () => {
     assertThat("211M peoples live in Brazil.")
       .equalsTo(`
         Brazil(a).
-        for (let 211m b: people(b)) {
+        for (let exactly(211M) b: people(b)) {
           live-in(s0, a).
           live(s0, b).
         }
@@ -2074,7 +2074,7 @@ describe("Large Lexicon", () => {
     assertThat("26 states compose Brazil's federation.")
       .equalsTo(`
         Brazil(a).
-        for (let 26 b: state(b)) {
+        for (let exactly(26) b: state(b)) {
           federation(c, a).
           compose(s0, b, c).
         }
@@ -2241,7 +2241,7 @@ describe("Large Lexicon", () => {
        for (let most c: country(c) country-in(c, b)) {
          border(s0, a, c).
        }
-       for (let 211m d: people(d)) {
+       for (let exactly(211M) d: people(d)) {
          live-in(s1, a).
          live(s1, d).
        }
@@ -2249,7 +2249,7 @@ describe("Large Lexicon", () => {
        f = e.
        capital(f).
        capital-of(f, a).
-       for (let 26 g: state(g)) {
+       for (let exactly(26) g: state(g)) {
          federation(h, a).
          compose(s2, g, h).
        }

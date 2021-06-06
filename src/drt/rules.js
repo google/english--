@@ -855,7 +855,18 @@ class CREVERY extends Rule {
     s.children[0] = ref;
     v.push(s);
 
-    let q = det.children.map((d) => d.value).join("-").toLowerCase();
+    let q = det.children
+        .filter((d) => d["@type"] != "%UNSIGNED_INT")
+        .map((d) => d.value)
+        .join("-")
+        .toLowerCase();
+    if (det.children[det.children.length - 1]["@type"]
+        == "%UNSIGNED_INT") {
+      if (det.children.length == 1) {
+        q = "exactly";
+      }
+      q += `(${det.children[det.children.length - 1].value})`;
+    }
     let result = quantifier(q, n, v, ref);
     
     return [[], [result], node];
