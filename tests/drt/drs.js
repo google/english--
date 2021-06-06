@@ -5,6 +5,8 @@ const {DRS} = require("../../src/drt/drs.js");
 const {Parser} = require("../../src/drt/parser.js");
 const {dict} = require("./dict.js");
 const {Tokenizer} = require("../../src/drt/lexer.js");
+const {Console} = require("../../src/drt/console.js");
+const {KB} = require("logic/src/solver.js");
 
 describe("DRS", function() {
 
@@ -156,10 +158,10 @@ describe("DRS", function() {
     assertThat("Jones does not own a porsche.")
      .equalsTo(`
        Jones(a).
-       not {
+       not (
          porsche(b).
          own(s0, a, b).
-       }
+       ).
      `);
   });
 
@@ -169,9 +171,9 @@ describe("DRS", function() {
        Jones(a).
        porsche(b).
        own(s0, a, b).
-       not {
+       not (
          like(s1, a, b).
-       }
+       ).
      `);
   });
 
@@ -209,23 +211,23 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        woman(b).
-       not {
+       not (
          love(s1, b, a).
-       }
+       ).
        love(s0, a, b).
-       not {
+       not (
          man(c).
          love(s2, b, c).
-       }
+       ).
      `);
   });
 
   it("A porsche does not stink", function() {
     assertThat("A porsche does not stink.")
      .equalsTo(`
-       not {
+       not (
          stink(s0, a).
-       }
+       ).
        porsche(a).
      `);
   });
@@ -234,13 +236,13 @@ describe("DRS", function() {
     assertThat("Jones does not own a porsche which does not fascinate him.")
      .equalsTo(`
        Jones(a).
-       not {
+       not (
          porsche(b).
-         not {
+         not (
            fascinate(s1, b, a).
-         }
+         ).
          own(s0, a, b).
-       }
+       ).
      `);
   });
 
@@ -248,13 +250,13 @@ describe("DRS", function() {
     assertThat("Jones does not like a porsche which he does not own.")
      .equalsTo(`
        Jones(a).
-       not {
+       not (
          porsche(b).
-         not {
+         not (
            own(s1, a, b).
-         }
+         ).
          like(s0, a, b).
-       }
+       ).
      `);
   });
 
@@ -270,9 +272,9 @@ describe("DRS", function() {
     assertThat("Jones is not happy.")
      .equalsTo(`
        Jones(a).
-       not {
+       not (
          happy(a).
-       }
+       ).
     `);
   });
 
@@ -415,13 +417,13 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        Mary(b).
-       not {
+       not (
          like(s0, a, b).
-       }
+       ).
        if (book(c) like(s1, b, c)) {
-         not {
+         not (
            like(s2, a, c).
-         }
+         ).
        }
     `);
   });
@@ -494,11 +496,11 @@ describe("DRS", function() {
        Jones(a).
        Smith(b).
        Mary(c).
-       either {
+       either (
          love(s0, a, c).
-       } or {
+       ) or (
          love(s1, b, c).
-       }
+       ).
     `);
   });
 
@@ -506,12 +508,12 @@ describe("DRS", function() {
     assertThat("Either Jones owns a porsche or he likes it.")
      .equalsTo(`
       Jones(a).
-      either {
+      either (
         porsche(b).
         own(s0, a, b).
-      } or {
+      ) or (
         like(s1, a, b).
-      }
+      ).
     `);
   });
 
@@ -523,11 +525,11 @@ describe("DRS", function() {
         Jones(a).
         Smith(b).
         Mary(c).
-        either {
+        either (
          love(a, c).
-        } or {
+        ) or (
          love(b, c).
-       }
+        ).
     `);
   });
 
@@ -537,11 +539,11 @@ describe("DRS", function() {
        Mary(a).
        Jones(b).
        Smith(c).
-       either {
+       either (
          love(a, b).
-       } or {
+       ) or (
          love(a, c).
-       }
+       ).
     `);
   });
 
@@ -864,9 +866,9 @@ describe("DRS", function() {
        Smith(a).
        Jones(b).
        woman(c).
-       not {
+       not (
          like(s1, c, b).
-       }
+       ).
        love(s0, a, c).
     `);
   });
@@ -1178,9 +1180,9 @@ describe("DRS", function() {
        Smith(a).
        Mary(b).
        s0 > @now.
-       not {
+       not (
          kiss(s0, a, b).
-       }
+       ).
     `);
   });
 
@@ -1190,9 +1192,9 @@ describe("DRS", function() {
          Smith(a).
          Mary(b).
          s0 < @now.
-         not {
+         not (
            kiss(s0, a, b).
-         }
+         ).
     `);
   });
 
@@ -1213,9 +1215,9 @@ describe("DRS", function() {
      .equalsTo(`
        Smith(a).
        Mary(b).
-       not {
+       not (
          like(s0, a, b).
-       }
+       ).
     `);
   });
 
@@ -1269,9 +1271,9 @@ describe("DRS", function() {
     assertThat("Smith was not an engineer.")
      .equalsTo(`
        Smith(a).
-       not {
+       not (
          engineer(a).
-       }
+       ).
     `);
   });
 
@@ -1291,10 +1293,10 @@ describe("DRS", function() {
      .equalsTo(`
       Smith(a).
       Brazil(b).
-      not {
+      not (
         engineer(a).
         engineer-from(a, b).
-      }
+      ).
     `);
   });
 
@@ -1798,34 +1800,34 @@ describe("DRS", function() {
   it("Either every man or every woman is mortal.", function() {
     assertThat("either every man or every woman is mortal.")
      .equalsTo(`
-       either {
+       either (
          for (let every a: man(a)) {
            mortal(a).
          }
-       } or {
+       ) or (
          for (let every b: woman(b)) {
            mortal(b).
          }
-       }
+       ).
     `);
   });
 
   it("Either every man or every woman is not mortal.", function() {
     assertThat("either every man or every woman is not mortal.")
      .equalsTo(`
-       either {
+       either (
          for (let every a: man(a)) {
-           not {
+           not (
              mortal(a).
-           }
+           ).
          }
-       } or {
+       ) or (
          for (let every b: woman(b)) {
-           not {
+           not (
              mortal(b).
-           }
+           ).
          }
-       }
+       ).
     `);
   });
 
@@ -1833,15 +1835,15 @@ describe("DRS", function() {
     assertThat("either every man or every woman is from Brazil.")
      .equalsTo(`
        Brazil(a).
-       either {
+       either (
          for (let every b: man(b)) {
            from(b, a).
          }
-       } or {
+       ) or (
          for (let every c: woman(c)) {
            from(c, a).
          }
-       }
+       ).
     `);
   });
 
@@ -1864,6 +1866,14 @@ describe("DRS", function() {
           return sentences.length;
         }
         drs.feed(sentences);
+        // const console = new Console();
+        // console.log(drs.print());
+        //console.log(KB.read);
+        // const kb = new KB();
+        // console.log(kb.read);
+        // const gen = kb.read(drs.print());
+        // gen.next();
+        // console.log(kb);
         Assert.deepEqual(this.trim(drs.print()), this.trim(y));
       }
     }
@@ -1928,10 +1938,10 @@ describe("Large Lexicon", () => {
       .equalsTo(`
        Mel(a).
        Brazil(b).
-       not {
+       not (
          live-in(s0, b).
          live(s0, a).
-       }
+       ).
     `);
   });
 
@@ -2347,9 +2357,9 @@ describe("Large Lexicon", () => {
          ethnic(e).
        }
        for (let some f: nation(f)) {
-         not {
+         not (
            ethnic(f).
-         }
+         ).
        }
        for (let every g: nation(g)) {
          cultural-community(g).

@@ -52,10 +52,10 @@ function disjunction(a, b) {
     "b": b,
     print() {
       let result = [];
-      result.push("either {");
-      result.push(this.a.print() + "} or {");
+      result.push("either (");
+      result.push(this.a.print() + ") or (");
       // result.push();
-      result.push(this.b.print() + "}");
+      result.push(this.b.print() + ").");
       // result.push("}");
       return result.join("\n");
     }
@@ -86,9 +86,9 @@ function negation(a) {
     "@type": "Negation",
     "a": a,
     print() {
-      return `not {
-        ${this.a.print(".\n")} }
-      `;
+      return `not (
+        ${this.a.print(".\n")}).
+`;
       //let result = [];
       //result.push("not {");
       //result.push(this.a.print(".\n"));
