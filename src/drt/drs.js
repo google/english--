@@ -12,17 +12,12 @@ class DRS {
   }
 
   feed([sentences]) {
-    // let result = [];
-    //return sentences.map((s) => this.push(s));
     const start = this.body.length;
     for (let s of sentences) {
       this.push(s);
     }
     const end = this.body.length;
-    return this.print(undefined, undefined, [start, end])
-    // console.log(`${end - start} predicates added`);
-    // return this.body.slice(start, end);
-    // return this;
+    return this.body.slice(start, end);
   }
 
   apply(p, rules) {
@@ -93,32 +88,15 @@ class DRS {
     return result;
   }
   
-  print(nl = ".\n", inner = false, slice) {
+  print(nl = ".\n", inner = false, nodes) {
     let result = [];
     let refs = [];
     let individuals = this.head
         .filter(ref => !ref.closure);
-    //for (let ref of individuals) {
-    //  refs.push(`${ref.print()}`);
-    //}
-    
-    //if (refs.length > 0) {
-    //  result.push(`let ${refs.join(", ")}`);
-    //}
 
-    let body = this.body;
-    if (slice) {
-      body = this.body.slice(slice[0], slice[1]);
-    }
+    let body = nodes || this.body;
     
     for (let cond of body) {
-      //let suffix = "";
-      //if (cond["@type"] == "PRED") {
-      //  suffix = ".";
-      //} else if (cond["@type"] == "Question") {
-      //  suffix = "?";
-      //}
-      // console.log(cond);
       result.push(cond.print(inner ? "" : nl));
     }
     

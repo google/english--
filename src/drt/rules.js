@@ -127,15 +127,19 @@ function equals(a, b) {
   };
 }
 
-function query(drs, x) {
+function query(drs, x, resolve) {
   return {
     "@type": "Query",
     "a": drs,
+    resolve() {
+      return "Yes.";
+    },
     print() {
       let result = [];
       if (x) {
         result.push(`let ${x.print()}: `);
       }
+      // console.log();
       result.push(this.a.print(" ", true));
       //result.push(``);
       //result.push("question (" + `${x ? x.print() : ""}` + ") {");
@@ -1204,6 +1208,17 @@ class CRASPECT extends Rule {
   }
 }
 
+function unwrap({["@type"]: type, value, children = []}) {
+  if (value) {
+    return type == "REF" ? value : value.toLowerCase();
+  }
+  const result = [];
+  for (let child of children) {
+    result.push(unwrap(child));
+  }
+  return result.join(" ");
+}
+
 class CRQUESTIONIS extends Rule {
   constructor(ids) {
     super(ids, Question(Q_(Q(
@@ -1213,10 +1228,9 @@ class CRQUESTIONIS extends Rule {
   }
   apply({be, sub, adj}, node) {
     let q = drs(this.ids);
-    
     q.push(S(sub, VP_(VP(be, adj))));
-    
-    return [[], [query(q)], node];
+    // const n = S(sub, VP_(VP(be, adj)));
+    return [[], [query(q, undefined)], node];
   }
 }
 

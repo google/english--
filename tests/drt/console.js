@@ -23,7 +23,13 @@ describe("Console", () => {
        happy(a)?
     `, true);
     assertThat(unroll(new Console(dict).load(code)))
-      .equalsTo([{}]);
+      .equalsTo(["Yes."]);
+  });
+
+  it("Sam is happy. Is Dani happy?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Sam is happy. Is Dani happy?
+    `))).equalsTo(["I don't know."]);
   });
 
   it("Is Sam happy about Brazil?", () => {
@@ -44,7 +50,7 @@ describe("Console", () => {
        person(c).
        happy(c) happy-about(c, a)?
     `, true);
-    assertThat(unroll(new Console(dict).load(code))).equalsTo([{}]);
+    assertThat(unroll(new Console(dict).load(code))).equalsTo(["Yes."]);
   });
 
   it("Sam is happy. Is Sam happy?", () => {
@@ -79,15 +85,22 @@ describe("Console", () => {
       capital-of(a, b).
       let c: capital(c) capital-of(c, b)?
     `, true);
-    assertThat(unroll(new Console(dict).load(code))).equalsTo([{"c": "a"}]);
+    assertThat(unroll(new Console(dict).load(code))).equalsTo(["Brasilia."]);
+  });
+
+  it("Mel is the father of Leo?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Mel is the father of Leo.
+      What is the father of Leo?
+    `))).equalsTo(["Mel."]);
   });
 
   it("What is the capital of Brazil?", () => {
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
-    assertThat(unroll(console.load(`Who is an engineer?`))).equalsTo([{"b": "a"}]);
+    assertThat(unroll(console.load(`Who is an engineer?`))).equalsTo(["Sam."]);
     assertThat(unroll(console.load(`Brasilia is the capital of Brazil.`))).equalsTo([]);
-    assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo([{"e": "c"}]);
+    assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo(["Brasilia."]);
   });
     
   function assertThat(x) {
