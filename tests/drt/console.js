@@ -99,7 +99,7 @@ describe("Console", () => {
     assertThat(unroll(new Console(dict).load(`
       Brazil is a country in South America.
       Brazil borders Argentina.
-      Is Brazil a country?
+      Is Brazil a country which borders Argentina?
     `))).equalsTo(["Yes."]);
   });
 

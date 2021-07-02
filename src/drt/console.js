@@ -26,7 +26,6 @@ class Console {
         this.kb.read(statement).next();
       } else if (type == "Question") {
         const q = this.drs.print(undefined, undefined, nodes);
-        // console.log(q);
         const result = this.kb.read(q);
         const first = result.next();
         if (first.done) {
@@ -36,11 +35,12 @@ class Console {
         } else {
           const [key] = Object.values(first.value)[0];
           const ref = this.drs.head.find((el) => el.name == key);
-          yield `${ref.value}.`;
+          const value = ref.value || "Yes";
+          yield `${value}.`;
           for (let answer of result) {
             const key = Object.values(answer)[0];
             const ref = this.drs.head.find((el) => el.name == key);
-            yield `${ref.value}.`;
+            yield `${value}.`;
           }
         }
       }
