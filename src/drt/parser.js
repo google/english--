@@ -915,6 +915,7 @@ const DrtSyntax = `
       PREP -> %by.  
       PREP -> %on.  
       PREP -> %as.  
+      PREP -> %at.  
 
       AUX[num=sing, fin=+, tp=-past, tense=pres] -> %does.
       AUX[num=plur, fin=+, tp=-past, tense=pres] -> %__do__.

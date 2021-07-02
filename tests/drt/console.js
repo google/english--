@@ -95,7 +95,7 @@ describe("Console", () => {
     `))).equalsTo(["Mel."]);
   });
 
-  it("Is Brazil a country?", () => {
+  it("Is Brazil a country which borders Argentina?", () => {
     assertThat(unroll(new Console(dict).load(`
       Brazil is a country in South America.
       Brazil borders Argentina.
@@ -103,10 +103,59 @@ describe("Console", () => {
     `))).equalsTo(["Yes."]);
   });
 
+  it("", () => {
+    const {dict} = require("../../src/drt/dict.js");
+    const console = new Console(dict);
+    // Does Sam work? <- wrong bindings
+    // What is Sam interested in? <- syntax error
+    assertThat(console.transpile(`
+      Sam is a brazilian engineer.
+      He works at Google on the Web Platform.
+      He is interested in Compilers.
+      He likes every area of Computer Science.
+    `)).equalsTo(`
+      Sam(a).
+      brazilian-engineer(a).
+      engineer(a).
+      Web-Platform(b).
+      Google(c).
+      work-on(s0, b).
+      work-at(s0, c).
+      work(s0, a).
+      Compilers(d).
+      interest-in(s1, d).
+      interest(s1, e, c).
+      Computer-Science(f).
+      for (let every g: area(g) area-of(g, f)) {
+        like(s2, f, g).
+      }
+    `, true);        
+  });
+  
   it("What is the capital of Brazil?", () => {
+    const {dict} = require("../../src/drt/dict.js");
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
+    // We should be able to write "Sam is brazilian and an engineer".
+    // We should be able to write "Sam is brazilian engineer who works at Google".
+    assertThat(console.transpile(`Sam is a brazilian engineer.`)).equalsTo(`
+      brazilian-engineer(a).
+      engineer(a).
+    `, true);
+    assertThat(console.transpile(`Sam works at Google on the Web Platform.`)).equalsTo(`
+      Web-Platform(b).
+      Google(c).
+      work-on(s0, b).
+      work-at(s0, c).
+      work(s0, a).
+    `, true);        
     assertThat(unroll(console.load(`Who is an engineer?`))).equalsTo(["Sam."]);
+    assertThat(unroll(console.load(`Is Sam an engineer?`))).equalsTo(["Yes."]);
+    assertThat(unroll(console.load(`Is Sam brazilian?`))).equalsTo(["I don't know."]);
+    assertThat(console.transpile(`Is Sam brazilian?`)).equalsTo(`
+      brazilian(a)?
+    `, true);    
+    assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo(["I don't know."]);
     assertThat(unroll(console.load(`Brasilia is the capital of Brazil.`))).equalsTo([]);
     assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo(["Brasilia."]);
   });
