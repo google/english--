@@ -1313,7 +1313,7 @@ describe("DRS", function() {
   it("All brazilians are happy.", function() {
     assertThat("All brazilians are happy.")
      .equalsTo(`
-         for (let all a: brazilian(a)) {
+         for (let every a: brazilian(a)) {
            happy(a).
          }
     `);

@@ -871,6 +871,10 @@ class CREVERY extends Rule {
       }
       q += `(${det.children[det.children.length - 1].value})`;
     }
+    // console.log(q);
+    if (q == "all") {
+      q = "every";
+    }
     let result = quantifier(q, n, v, ref);
     
     return [[], [result], node];

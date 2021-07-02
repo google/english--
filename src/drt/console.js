@@ -34,7 +34,7 @@ class Console {
         } else if (Object.keys(first.value).length == 0) {
           yield "Yes.";
         } else {
-          const key = Object.values(first.value)[0];
+          const [key] = Object.values(first.value)[0];
           const ref = this.drs.head.find((el) => el.name == key);
           yield `${ref.value}.`;
           for (let answer of result) {
