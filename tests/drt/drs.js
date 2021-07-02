@@ -1465,14 +1465,14 @@ describe("DRS", function() {
   it("Who does Jones love?", function() { 
     assertThat("Who does Jones love?")
      .equalsTo(`
-       let a: Jones(b) love(b, a)?
+       let a, b: Jones(b) love(b, a)?
     `);
   });
 
   it("What does Jones love?", function() { 
     assertThat("What does Jones love?")
      .equalsTo(`
-       let a: Jones(b) love(b, a)?
+       let a, b: Jones(b) love(b, a)?
     `);
   });
 
@@ -1489,7 +1489,7 @@ describe("DRS", function() {
      .equalsTo(`
        Brazil(a).
        Argentina(b).
-       country(a) border(s0, a, b)?
+       let s0: country(a) border(s0, a, b)?
     `);
   });
 

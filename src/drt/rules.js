@@ -136,10 +136,19 @@ function query(drs, x, resolve) {
     },
     print() {
       let result = [];
-      if (x) {
-        result.push(`let ${x.print()}: `);
+      //if (x) {
+      //  result.push(`let ${x.print()}: `);
+      //}
+      //console.log(x);
+      let refs = [];
+      let names = this.a.head
+          .filter(ref => !ref.closure)
+          .map((ref) => ref.print());
+
+      if (names.length > 0) {
+        result.push(`let ${names.join(", ")}: `);
       }
-      // console.log();
+      
       result.push(this.a.print(" ", true));
       //result.push(``);
       //result.push("question (" + `${x ? x.print() : ""}` + ") {");
