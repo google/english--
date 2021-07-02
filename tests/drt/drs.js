@@ -1476,6 +1476,23 @@ describe("DRS", function() {
     `);
   });
 
+  it("Is Brazil a country?", function() { 
+    assertThat("Is Brazil a country?")
+     .equalsTo(`
+       Brazil(a).
+       country(a)?
+    `);
+  });
+
+  it("Is Brazil a country which borders Argentina?", function() { 
+    assertThat("Is Brazil a country which borders Argentina?")
+     .equalsTo(`
+       Brazil(a).
+       Argentina(b).
+       country(a) border(s0, a, b)?
+    `);
+  });
+
   it("Which country borders Brazil?", function() { 
     assertThat("Which country borders Brazil?")
      .equalsTo(`

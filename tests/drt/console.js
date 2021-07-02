@@ -95,6 +95,14 @@ describe("Console", () => {
     `))).equalsTo(["Mel."]);
   });
 
+  it("Is Brazil a country?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Brazil is a country in South America.
+      Brazil borders Argentina.
+      Is Brazil a country?
+    `))).equalsTo(["Yes."]);
+  });
+
   it("What is the capital of Brazil?", () => {
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);

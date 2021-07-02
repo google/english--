@@ -715,6 +715,11 @@ const DrtSyntax = `
            NP[num=1, gen=3, case=+nom, gap=-] __
            PP.
 
+      Q -> BE[num=1, fin=2, tp=-past, tense=4] __
+           NP[num=1, gen=3, case=+nom, gap=-] __
+           DET[num=1] __ 
+           N[num=1, gen=5].
+
       Q -> WH __ 
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 

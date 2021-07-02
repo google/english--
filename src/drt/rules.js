@@ -1254,6 +1254,24 @@ class CRQUESTIONBEPP extends Rule {
   }
 }
 
+class CRQUESTIONBEDETN extends Rule {
+  constructor(ids) {
+    super(ids, Question(Q_(Q(
+      BE(capture("be")),
+      ANY(capture("sub")),
+      DET(capture("det")),
+      N(capture("noun")),
+    ))));
+  }
+  apply({be, sub, det, noun}, node) {
+    let q = drs(this.ids);
+
+    q.push(S(sub, VP_(VP(be, NP(det, noun)))));
+    
+    return [[], [query(q)], node];
+  }
+}
+
 class CRQUESTIONYESNO extends Rule {
   constructor(ids) {
     super(ids, Question(Q_(Q(AUX(), ANY(capture("sub")), VP(capture("vp")), "?"))));
@@ -1322,6 +1340,7 @@ class CRQUESTION extends CompositeRule {
     super([new CRQUESTIONYESNO(ids),
            new CRQUESTIONIS(ids),
            new CRQUESTIONBEPP(ids),
+           new CRQUESTIONBEDETN(ids),
            new CRQUESTIONWHICH(ids), 
            new CRQUESTIONWHO(ids), 
            new CRQUESTIONWHOM(ids)]);
