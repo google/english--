@@ -2,9 +2,9 @@ const Assert = require("assert");
 const moo = require("moo");
 const {Parser, Grammar} = require("nearley");
 const grammar = require("./attempto.js");
-const {Nearley, FeaturedNearley} = require("../../src/drt/parser.js");
-const {Tokenizer} = require("../../src/drt/lexer.js");
-const DRT = require("../../src/drt/parser.js");
+const {Nearley, FeaturedNearley} = require("../src/parser.js");
+const {Tokenizer} = require("../src/lexer.js");
+const DRT = require("../src/parser.js");
 const {dict} = require("./dict.js"); 
 
 const {
@@ -639,7 +639,7 @@ describe("Lexer", function() {
   });
   
   it("Brian loves an awesome woman.", function() {
-    const {dict} = require("../../src/drt/dict.js"); 
+    const {dict} = require("../src/dict.js"); 
     const {Parser} = DRT;
     let parser = new Parser("Statement", dict);
     

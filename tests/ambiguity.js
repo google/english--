@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {child} = require("../../src/drt/base.js");
+const {child} = require("../src/base.js");
 
 const {
   Nearley, 
@@ -7,7 +7,7 @@ const {
   FeaturedNearley, 
   Parser, 
   nodes,
-  DrtSyntax} = require("../../src/drt/parser.js");
+  DrtSyntax} = require("../src/parser.js");
 
 const {
   Sentence,
@@ -35,7 +35,7 @@ const {
   HAVE,
   RN} = nodes;
 
-const {dict} = require("../../src/drt/dict.js");
+const {dict} = require("../src/dict.js");
 
 function clear(root) {
   if (!root) {

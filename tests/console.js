@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Console, transpile} = require("../../src/drt/console.js");
+const {Console, transpile} = require("../src/console.js");
 const {dict} = require("./dict.js");
 
 describe("Console", () => {
@@ -104,7 +104,7 @@ describe("Console", () => {
   });
 
   it("", () => {
-    const {dict} = require("../../src/drt/dict.js");
+    const {dict} = require("../src/dict.js");
     const console = new Console(dict);
     // Does Sam work? <- wrong bindings
     // What is Sam interested in? <- syntax error
@@ -133,7 +133,7 @@ describe("Console", () => {
   });
   
   it("What is the capital of Brazil?", () => {
-    const {dict} = require("../../src/drt/dict.js");
+    const {dict} = require("../src/dict.js");
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
     // We should be able to write "Sam is brazilian and an engineer".

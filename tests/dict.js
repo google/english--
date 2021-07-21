@@ -1,4 +1,4 @@
-const {ADJ, N, V} = require("../../src/drt/dict.js");
+const {ADJ, N, V} = require("../src/dict.js");
 
 const dict = [  
   // Singular Nouns

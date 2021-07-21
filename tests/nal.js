@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {Nearley} = require("../../src/drt/parser.js");
+const {Nearley} = require("../src/parser.js");
 
 describe("Non Axiomatic Logic", function() {
 

@@ -1,11 +1,11 @@
 const Assert = require("assert");
 
-const {Rules} = require("../../src/drt/rules.js");
-const {DRS} = require("../../src/drt/drs.js");
-const {Parser} = require("../../src/drt/parser.js");
+const {Rules} = require("../src/rules.js");
+const {DRS} = require("../src/drs.js");
+const {Parser} = require("../src/parser.js");
 const {dict} = require("./dict.js");
-const {Tokenizer} = require("../../src/drt/lexer.js");
-const {Console} = require("../../src/drt/console.js");
+const {Tokenizer} = require("../src/lexer.js");
+const {Console} = require("../src/console.js");
 const {KB} = require("logic/src/solver.js");
 
 describe("DRS", function() {
@@ -2399,7 +2399,7 @@ describe("Large Lexicon", () => {
           .join("\n");
       },
       equalsTo(y) {
-        const {dict} = require("../../src/drt/dict.js");
+        const {dict} = require("../src/dict.js");
 
         let drs = new DRS(Rules.from());
         let parser = new Parser("Discourse", dict);

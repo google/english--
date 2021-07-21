@@ -1,5 +1,5 @@
 const Assert = require("assert");
-const {child} = require("../../src/drt/base.js");
+const {child} = require("../src/base.js");
 
 const {
   Nearley, 
@@ -7,7 +7,7 @@ const {
   FeaturedNearley, 
   Parser, 
   nodes,
-  DrtSyntax} = require("../../src/drt/parser.js");
+  DrtSyntax} = require("../src/parser.js");
 
 const {
   Sentence,
@@ -2763,7 +2763,7 @@ describe("large dictionary", () => {
 
   
   function parse(s, start = "Sentence") {
-    const {dict} = require("../../src/drt/dict.js");
+    const {dict} = require("../src/dict.js");
     let parser = new Parser("Sentence", dict);
 
     const result = parser.feed(s);

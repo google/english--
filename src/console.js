@@ -1,7 +1,7 @@
 const {KB} = require("logic/src/solver.js");
-const {DRS} = require("../../src/drt/drs.js");
-const {Rules} = require("../../src/drt/rules.js");
-const {Parser} = require("../../src/drt/parser.js");
+const {DRS} = require("./drs.js");
+const {Rules} = require("./rules.js");
+const {Parser} = require("./parser.js");
 
 class Console {
   constructor(dict) {

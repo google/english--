@@ -90,7 +90,7 @@ const dict = [
   // Verbs
 ];
 
-const {verbs, nouns, adjs} = require("../../src/drt/wordlist.js");
+const {verbs, nouns, adjs} = require("./wordlist.js");
 
 for (let {inf, trans, pp} of verbs) {
   dict.push(...V(inf, trans, pp));

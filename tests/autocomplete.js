@@ -4,7 +4,7 @@ const {
   autocomplete, ancestors, valid, continuous,
   Nearley,
   FeaturedNearley,
-  Parser} = require("../../src/drt/parser.js");
+  Parser} = require("../src/parser.js");
 
 const {dict} = require("./dict.js");
 
