@@ -24,6 +24,7 @@ const dict = [
   N("country", "sing", "-hum"),
   N("capital", "sing", "-hum"),
   N("someone", "sing", ["male", "fem"]),
+  N("bird", "sing", "-hum"),
 
   // Plural Nouns
   N("brazilians", "plur", 1, "brazilian"),
@@ -32,6 +33,7 @@ const dict = [
   N("women", "plur", "fem", "woman"),
   N("countries", "plur", "-hum", "country"),
   N("birds", "plur", "-hum", "bird"),
+  N("animals", "plur", "-hum", "animal"),
   N("people", "plur", ["male", "fem"], "person"),
   
   // RNs  
@@ -57,6 +59,7 @@ const dict = [
   ADJ("married"),
   ADJ("rich"),
   ADJ("male"),
+  ADJ("interested"),
   
   // Verbs
   ...V("live", "-"),

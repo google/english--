@@ -1485,6 +1485,81 @@ describe("Statements", function() {
       .equalsTo(2);
    });
 
+  it("Every man is mortal.", function() {
+    assertThat(parse("Every man is mortal."))
+      .equalsTo(S(NP(DET("Every"), N("man")),
+                  VP_(VP(BE("is"), ADJ("mortal")))));
+  });
+
+  it("Men are mortal.", function() {
+    assertThat(parse("Men are mortal."))
+      .equalsTo(S(NP(N("Men")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Birds are mortal.", function() {
+    assertThat(parse("Birds are mortal."))
+      .equalsTo(S(NP(N("Birds")),
+                  VP_(VP(BE("are"), ADJ("mortal")))));
+  });
+
+  it("Animals live.", function() {
+    assertThat(parse("Animals live."))
+      .equalsTo(S(NP(N("Animals")),
+                  VP_(VP(V("live")))));
+  });
+
+  it("Animals live.", function() {
+    assertThat(parse("Animals live."))
+      .equalsTo(S(NP(N("Animals")),
+                  VP_(VP(V("live")))));
+  });
+
+  it("Brazilians love Brazil.", function() {
+    assertThat(parse("Brazilians love Brazil."))
+      .equalsTo(S(NP(N("Brazilians")),
+                  VP_(VP(V("love"), NP(PN("Brazil"))))));
+  });
+
+  it("He loves brazilians.", function() {
+    assertThat(parse("He loves brazilians."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(V("loves"), NP(N("brazilians"))))));
+  });
+
+  it("People love brazilians.", function() {
+    assertThat(parse("People love brazilians."))
+      .equalsTo(S(NP(N("People")),
+                  VP_(VP(V("love"), NP(N("brazilians"))))));
+  });
+
+  it("He loves Brazilians.", function() {
+    assertThat(parse("He loves Brazilians."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(V("loves"), NP(PN("Brazilians"))))));
+  });
+
+  it("He is interested in brazilians.", function() {
+    assertThat(parse("He is interested in brazilians."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(BE("is"),
+                         ADJ(ADJ("interested"),
+                             PP(PREP("in"),
+                                NP(N("brazilians"))))))));
+  });
+
+  it("He is interested in Brazilians.", function() {
+    // Brazilians can resolve to be either a proper noun
+    // or a bare plural, so we need to disambiguate here.
+    // The lexer resolves that ambiguity disallowing
+    // content words to be capitalized mid sentence.
+    assertThat(parse("He is interested in Brazilians."))
+      .equalsTo(S(NP(PRO("He")),
+                  VP_(VP(BE("is"),
+                         ADJ(ADJ("interested"),
+                             PP(PREP("in"),
+                                NP(PN("Brazilians"))))))));
+  });
 });
 
 describe("Questions", function() {
@@ -2760,7 +2835,6 @@ describe("large dictionary", () => {
     assertThat(parse("Every person who was born in Brazil is brazilian."))
       .equalsTo(2);
   });
-
   
   function parse(s, start = "Sentence") {
     const {dict} = require("../src/dict.js");

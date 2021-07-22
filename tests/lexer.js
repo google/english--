@@ -952,6 +952,43 @@ describe("Lexer", function() {
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
+  it("Brazilians", () => {
+    let lexer = new Tokenizer([
+      ["brazilians", "word", [{"@type": "N"}]],
+      [" ", "WS"],
+    ]);
+    lexer.reset("Brazilians");
+    assertThat(lexer.next()).equalsTo(token("word", "Brazilians", 0, [{
+      "@type": "N",
+    }, {
+      "@type": "PN",
+      "loc": 0,
+      "types": {"num": "?", "gen": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
+  it("foo Brazilians", () => {
+    let lexer = new Tokenizer([
+      ["foo", "word", [{"@type": "N"}]],
+      ["brazilians", "word", [{"@type": "N"}]],
+      [" ", "WS"],
+    ]);
+    lexer.reset("foo Brazilians");
+    assertThat(lexer.next()).equalsTo(token("word", "foo", 0, [{
+      "@type": "N",
+    }]));
+    assertThat(lexer.next()).equalsTo(token("WS", " ", 3));
+    // Brazilians is parsed unambiguously as a proper name because
+    // open words cannot be capitalized mid sentence.
+    assertThat(lexer.next()).equalsTo(token("word", "Brazilians", 4, [{
+      "@type": "PN",
+      "loc": 4,
+      "types": {"num": "?", "gen": "?"}
+    }]));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
   it("numbers", () => {
     let lexer = new Tokenizer([
       ["foo", "WORD"],

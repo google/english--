@@ -115,6 +115,8 @@ class Tokenizer {
     //   - no match for both
     //   - a match for both the open word and the proper name
     let [name, first] = match || [];
+    // console.log(first);
+    // console.log(this.loc);
     if (next && !name) {
       this.eat(next);
       return this.get(next);
@@ -138,6 +140,12 @@ class Tokenizer {
         this.eat(name);
         return pn(name, this.loc);
       } else if (name == next) {
+        if (this.loc != 0) {
+          // If this isn't the beginning of the sentence,
+          // this is a proper name.
+          this.eat(name);
+          return pn(name, this.loc);
+        }
         // If they are the same, they can be
         // interpreted multiple ways.
         this.eat(name);

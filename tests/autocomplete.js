@@ -466,12 +466,14 @@ A "f" token based on:
       "fewer",
       "exactly",
       "UNSIGNED_INT",
+      // word is any word from the lexer
       "word",
       // pronouns.
       "he",
       "she",
       "it",
       "they",
+      // whitespace
       "WS",
     ]);;
     

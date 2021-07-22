@@ -810,6 +810,8 @@ const DrtSyntax = `
       NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
 
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
+
+      NP[num=plur, gen=2, case=3, gap=-] -> N[num=plur].
  
       PN -> %the __ PN.
 
@@ -950,7 +952,7 @@ const DrtSyntax = `
       V[fin=+] -> %word.
       PN[] -> %word.
       ADJ[] -> %word.
-      N[num=1, gen=2] -> %word.      
+      N[num=1, gen=2] -> %word.
 `;
 
 let DRTGrammar;

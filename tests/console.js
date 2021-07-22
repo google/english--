@@ -103,7 +103,7 @@ describe("Console", () => {
     `))).equalsTo(["Yes."]);
   });
 
-  it("", () => {
+  it.skip("", () => {
     const {dict} = require("../src/dict.js");
     const console = new Console(dict);
     // Does Sam work? <- wrong bindings
