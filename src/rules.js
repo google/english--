@@ -76,7 +76,6 @@ function quantifier(q, a, b, ref) {
       let head = q == "if" ? "if" : "for";
       result.push(`${head} (${letty}${this.a.print(" ", true)}) {`);
       result.push(this.b.print() + "}");
-      // result.push("}");
       return result.join("\n") + "\n";
     }
   };
@@ -834,6 +833,62 @@ class CRCOND extends Rule {
   }
 }
 
+class CRGENERIC extends Rule {
+  constructor(ids) {
+    super(ids, S(NP(N(capture("noun"))), VP_(capture("verb"))));
+  }
+  apply({noun, verb}, node, refs) {
+    //console.log(noun);
+    let ref = REF(this.id(), noun.types);
+    let n = drs(this.ids);
+    n.head.push(...clone(refs));
+    n.head.forEach(ref => ref.closure = true);
+
+    //let prep = child(node, 0, 2);
+    //let cond;
+    noun.ref = [ref];
+    //if (prep) {
+    //  cond = S(NP(DET(), noun, prep));
+    //} else {
+    //  cond = noun;
+    //}
+    //cond.ref = [ref];
+    n.push(noun);
+
+    //console.log(n.print());
+    //throw new Error("hi");
+
+    let v = drs(this.ids);
+    v.head.push(...clone(n.head));
+    v.head.forEach(ref => ref.closure = true);
+
+    let s = clone(node);
+    
+    s.children[0] = ref;
+    v.push(s);
+
+    //let q = det.children
+    //    .filter((d) => d["@type"] != "%UNSIGNED_INT")
+    //    .map((d) => d.value)
+    //    .join("-")
+    //    .toLowerCase();
+    //if (det.children[det.children.length - 1]["@type"]
+    //    == "%UNSIGNED_INT") {
+    //  if (det.children.length == 1) {
+    //    q = "exactly";
+    //  }
+    //  q += `(${det.children[det.children.length - 1].value})`;
+    //}
+    // console.log(q);
+    //if (q == "all") {
+    //  q = "every";
+    //}
+    let result = quantifier("every", n, v, ref);
+    
+    return [[], [result], node];
+  }
+}
+
 class CREVERY extends Rule {
   constructor(ids) {
     super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
@@ -1436,6 +1491,7 @@ class Rules {
     let rules = [
       new CREVERY(ids),
       new CRVPEVERY(ids),
+      new CRGENERIC(ids),
       new CRASPECT(ids),
       new CRTENSE(ids),
       new CRLIN(ids),

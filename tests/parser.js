@@ -1560,6 +1560,21 @@ describe("Statements", function() {
                              PP(PREP("in"),
                                 NP(PN("Brazilians"))))))));
   });
+
+  it("Birds are happy.", function() {
+    assertThat(parse("Birds are happy."))
+      .equalsTo(S(NP(N("Birds")),
+                  VP_(VP(BE("are"), ADJ("happy")))));
+  });
+
+  it("Birds which like Sam are happy.", function() {
+    assertThat(parse("Birds which like Sam are happy."))
+      .equalsTo(S(NP(N(N("Birds"), RC(RPRO("which"),
+                                      S(NP(GAP()), VP_(VP(V("like"), NP(PN("Sam")))))
+                                     ))),
+                  VP_(VP(BE("are"), ADJ("happy")))));
+  });
+
 });
 
 describe("Questions", function() {

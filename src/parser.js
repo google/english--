@@ -811,7 +811,7 @@ const DrtSyntax = `
 
       NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
 
-      NP[num=plur, gen=2, case=3, gap=-] -> N[num=plur].
+      NP[num=plur, gen=2, case=3, gap=-] -> N[num=plur, gen=2].
  
       PN -> %the __ PN.
 

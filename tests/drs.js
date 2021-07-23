@@ -1864,6 +1864,54 @@ describe("DRS", function() {
     `);
   });
 
+  it("Brazilians are happy.", function() { 
+    assertThat("Brazilians are happy.")
+     .equalsTo(`
+       for (let every a: brazilian(a)) {
+         happy(a).
+       }
+     `);
+  });
+
+  it("Brazilians who like Sam are happy.", function() { 
+    assertThat("Brazilians who like Sam are happy.")
+     .equalsTo(`
+       Sam(a).
+       for (let every b: brazilian(b) like(s0, b, a)) {
+         happy(b).
+       }
+    `);
+  });
+
+  it("Birds are happy.", function() { 
+    assertThat("Birds are happy.")
+     .equalsTo(`
+       for (let every a: bird(a)) {
+         happy(a).
+       }
+    `);
+  });
+
+  it("Birds which like Sam are happy.", function() { 
+    assertThat("Birds which like Sam are happy.")
+     .equalsTo(`
+       Sam(a).
+       for (let every b: bird(b) like(s0, b, a)) {
+         happy(b).
+       }
+    `);
+  });
+
+  it("Birds which fly are happy.", function() { 
+    assertThat("Birds which fly are happy.")
+     .equalsTo(`
+       for (let every a: bird(a) fly(s0, a)) {
+         happy(a).
+       }
+    `);
+  });
+
+
   function assertThat(x) { 
     return {
       trim (str) {
