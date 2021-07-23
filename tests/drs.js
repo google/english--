@@ -1954,6 +1954,27 @@ describe("DRS", function() {
     `);
   });
 
+  it("Birds are animals.", function() { 
+    assertThat("Birds are animals.")
+     .equalsTo(`
+       for (let every a: bird(a)) {
+         animal(a).
+       }
+    `);
+  });
+
+  it("Penguins are birds that do not fly.", function() { 
+    assertThat("Penguins are birds that do not fly.")
+     .equalsTo(`
+       for (let every a: penguin(a)) {
+         bird(a).
+         not (
+           fly(s0, a).
+         ).
+       }
+    `);
+  });
+
   function assertThat(x) { 
     return {
       trim (str) {

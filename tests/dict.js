@@ -33,6 +33,7 @@ const dict = [
   N("women", "plur", "fem", "woman"),
   N("countries", "plur", "-hum", "country"),
   N("birds", "plur", "-hum", "bird"),
+  N("penguins", "plur", "-hum", "penguin"),
   N("animals", "plur", "-hum", "animal"),
   N("people", "plur", ["male", "fem"], "person"),
   

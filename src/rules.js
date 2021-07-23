@@ -749,6 +749,23 @@ class CRNBE extends Rule {
   }
 }
 
+class CRGENERICBE extends Rule {
+  constructor(ids) {
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(N(capture("noun")))))));
+  }
+  apply({ref, noun}, node, refs) {
+    let np = clone(noun);
+    np.ref = [ref];
+    
+    // Matches the DRS found in (3.57) on page 269.
+    if (node.types && node.types.tense) {
+      np.types.tense = node.types.tense;
+    }
+    
+    return [[], [np], node];
+  }
+}
+
 class CRNEGNBE extends Rule {
   constructor(ids) {
     super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
@@ -808,6 +825,7 @@ class CRBE extends CompositeRule {
       new CRPOSBE(ids),
       new CRNEGBE(ids),
       new CRNBE(ids),
+      new CRGENERICBE(ids),
       new CRNEGNBE(ids),
       new CRPREPBE(ids)
     ]);

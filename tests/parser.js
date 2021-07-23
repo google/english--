@@ -1581,6 +1581,12 @@ describe("Statements", function() {
                   VP_(VP(BE("are"), ADJ("happy")))));
   });
 
+  it("Birds are animals.", function() {
+    assertThat(parse("Birds are animals."))
+      .equalsTo(S(NP(N("Birds")),
+                  VP_(VP(BE("are"), NP(N("animals"))))));
+  });
+
 });
 
 describe("Questions", function() {
