@@ -160,6 +160,26 @@ describe("Console", () => {
     assertThat(unroll(console.load(`What is the capital of Brazil?`))).equalsTo(["Brasilia."]);
   });
     
+  it("Penguins are birds that do not fly. Do penguins fly?", () => {
+    const {dict} = require("../src/dict.js");
+    // NOTE(goto): the state of "flying" messes up the question.
+    assertThat(new Console(dict).transpile(`
+      Penguins are birds that do not fly. Do penguins fly?
+    `.trim()))
+      .equalsTo(`
+       for (let every a: penguin(a)) {
+         bird(a).
+         not (
+           fly(s0, a).
+         ).
+       }
+       for (let every b: penguin(b)) {
+         fly(b).
+       }
+       ?
+    `, true);
+  });
+
   function assertThat(x) {
     return {
       trim (str) {

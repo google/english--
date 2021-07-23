@@ -1593,6 +1593,16 @@ describe("DRS", function() {
     `);
   });
 
+  it("Do birds fly?", function() {
+    assertThat("Do birds fly?")
+     .equalsTo(`
+        for (let every a: bird(a)) {
+          fly(a).
+        } 
+        ?
+    `);
+  });
+
   it("Is Sam married to Dani?", function() {
     assertThat("Is Sam married to Dani?")
      .equalsTo(`
@@ -1888,6 +1898,15 @@ describe("DRS", function() {
      .equalsTo(`
        for (let every a: bird(a)) {
          happy(a).
+       }
+    `);
+  });
+
+  it("Birds fly.", function() { 
+    assertThat("Birds fly.")
+     .equalsTo(`
+       for (let every a: bird(a)) {
+         fly(s0, a).
        }
     `);
   });
