@@ -838,25 +838,13 @@ class CRGENERIC extends Rule {
     super(ids, S(NP(N(capture("noun"))), VP_(capture("verb"))));
   }
   apply({noun, verb}, node, refs) {
-    //console.log(noun);
     let ref = REF(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
 
-    //let prep = child(node, 0, 2);
-    //let cond;
     noun.ref = [ref];
-    //if (prep) {
-    //  cond = S(NP(DET(), noun, prep));
-    //} else {
-    //  cond = noun;
-    //}
-    //cond.ref = [ref];
     n.push(noun);
-
-    //console.log(n.print());
-    //throw new Error("hi");
 
     let v = drs(this.ids);
     v.head.push(...clone(n.head));
@@ -867,22 +855,35 @@ class CRGENERIC extends Rule {
     s.children[0] = ref;
     v.push(s);
 
-    //let q = det.children
-    //    .filter((d) => d["@type"] != "%UNSIGNED_INT")
-    //    .map((d) => d.value)
-    //    .join("-")
-    //    .toLowerCase();
-    //if (det.children[det.children.length - 1]["@type"]
-    //    == "%UNSIGNED_INT") {
-    //  if (det.children.length == 1) {
-    //    q = "exactly";
-    //  }
-    //  q += `(${det.children[det.children.length - 1].value})`;
-    //}
-    // console.log(q);
-    //if (q == "all") {
-    //  q = "every";
-    //}
+    let result = quantifier("every", n, v, ref);
+    
+    return [[], [result], node];
+  }
+}
+
+class CRVPGENERIC extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("subject"), VP_(VP(V(), NP(N(capture("noun")))))));
+  }
+  apply({subject, noun}, node, refs) {
+    let ref = REF(this.id(), noun.types);
+    let n = drs(this.ids);
+    n.head.push(...clone(refs));
+    n.head.forEach(ref => ref.closure = true);
+
+    noun.ref = [ref];
+    n.push(noun);
+
+    let v = drs(this.ids);
+    v.head.push(...clone(n.head));
+    v.head.forEach(ref => ref.closure = true);
+
+    let s = clone(node);
+    
+    child(s, 1, 0).children[1] = ref;
+
+    v.push(s);
+
     let result = quantifier("every", n, v, ref);
     
     return [[], [result], node];
@@ -950,13 +951,11 @@ class CRVPEVERY extends Rule {
     super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N(capture("noun")))))));
   }
   apply({det, subject, noun}, node, refs) {
-    
     if (!det.types.quant) {
       return;
     }
     // console.log(det);
 
-    // throw new Error("hi");
     let ref = REF(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
@@ -1459,6 +1458,8 @@ class CRPRED extends Rule {
   
   apply({sub, verb}, node, refs = []) {
     let obj = child(node, 1, 0, 1);
+    //console.log(obj);
+    //throw new Error();
     let args = [];
 
     let head = [];
@@ -1492,6 +1493,7 @@ class Rules {
       new CREVERY(ids),
       new CRVPEVERY(ids),
       new CRGENERIC(ids),
+      new CRVPGENERIC(ids),
       new CRASPECT(ids),
       new CRTENSE(ids),
       new CRLIN(ids),

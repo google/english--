@@ -1527,6 +1527,12 @@ describe("Statements", function() {
                   VP_(VP(V("loves"), NP(N("brazilians"))))));
   });
 
+  it("Sam loves birds.", function() {
+    assertThat(parse("Sam loves birds."))
+      .equalsTo(S(NP(PN("Sam")),
+                  VP_(VP(V("loves"), NP(N("birds"))))));
+  });
+
   it("People love brazilians.", function() {
     assertThat(parse("People love brazilians."))
       .equalsTo(S(NP(N("People")),

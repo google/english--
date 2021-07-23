@@ -929,6 +929,7 @@ const DrtSyntax = `
 
       RPRO[num=[sing, plur], gen=[male, fem]] -> %who.
       RPRO[num=[sing, plur], gen=-hum] -> %which.
+      RPRO[num=[sing, plur], gen=1] -> %that.
 
       BE[num=sing, fin=+, tp=-past, tense=pres] -> %is.
       BE[num=plur, fin=+, tp=-past, tense=pres] -> %are.

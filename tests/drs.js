@@ -1892,8 +1892,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Birds which like Sam are happy.", function() { 
-    assertThat("Birds which like Sam are happy.")
+  it("Birds that like Sam are happy.", function() { 
+    assertThat("Birds that like Sam are happy.")
      .equalsTo(`
        Sam(a).
        for (let every b: bird(b) like(s0, b, a)) {
@@ -1902,8 +1902,8 @@ describe("DRS", function() {
     `);
   });
 
-  it("Birds which fly are happy.", function() { 
-    assertThat("Birds which fly are happy.")
+  it("Birds that fly are happy.", function() { 
+    assertThat("Birds that fly are happy.")
      .equalsTo(`
        for (let every a: bird(a) fly(s0, a)) {
          happy(a).
@@ -1911,6 +1911,48 @@ describe("DRS", function() {
     `);
   });
 
+  it("Sam loves birds.", function() { 
+    assertThat("Sam loves birds.")
+     .equalsTo(`
+       Sam(a).
+       for (let every b: bird(b)) {
+         love(s0, a, b).
+       }
+    `);
+  });
+
+  it("People love birds.", function() { 
+    assertThat("People love birds.")
+     .equalsTo(`
+       for (let every a: person(a)) {
+         for (let every b: bird(b)) {
+           love(s0, a, b).
+         }
+       }
+    `);
+  });
+
+  it("Every person loves birds.", function() { 
+    assertThat("Every person loves birds.")
+     .equalsTo(`
+       for (let every a: person(a)) {
+         for (let every b: bird(b)) {
+           love(s0, a, b).
+         }
+       }
+    `);
+  });
+
+  it("People love birds that fly.", function() { 
+    assertThat("People love birds that fly.")
+     .equalsTo(`
+       for (let every a: person(a)) {
+         for (let every b: bird(b) fly(s0, b)) {
+           love(s1, a, b).
+         }
+       }
+    `);
+  });
 
   function assertThat(x) { 
     return {
