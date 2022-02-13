@@ -98,6 +98,10 @@ describe("Ambiguity", () => {
   });
 
   it("Sam made a reservation for a woman with a porsche.", () => {
+    //assertThat(new Parser("N", dict).feed("woman").length).equalsTo(1);
+
+    //return;
+
     let parser = new Parser("Sentence", dict);
     let results = parser.feed("Sam made a reservation for a woman with a porsche.");
     // The following are the two interpretations:

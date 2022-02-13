@@ -892,10 +892,12 @@ const DrtSyntax = `
       PRO[num=sing, gen=fem, case=-nom, refl=+] -> %herself.
       PRO[num=sing, gen=-hum, case=-nom, refl=+] -> %itself.
 
-      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
       V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] -> 
         V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] __ 
         PP.  
+
+      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+
       PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
 
       ADJ -> ADJ __ PP.
