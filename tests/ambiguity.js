@@ -131,10 +131,23 @@ describe("Ambiguity", () => {
   });
 
   it("They have walked.", () => {
-    // Because walked can be transitive and intransitive, this VP_
-    // can either be one with a GAP or one without.
-    assertThat(new Parser("VP_", dict).feed("have walked").length).equalsTo(2);
-    assertThat(new Parser("Statement", dict).feed("They have walked.").length).equalsTo(1);
+      // Because walked can be transitive and intransitive, this VP_
+      // can either be one with a GAP or one without.
+      assertThat(new Parser("VP_", dict).feed("have walked").length).equalsTo(2);
+
+      // The statement, on the other hand, isn't ambiguous because the "." ends the
+      // statement without a NP.
+      assertThat(new Parser("Statement", dict).feed("They have walked.").length).equalsTo(1);
+  });
+
+  it("Sam loved.", () => {
+      // Because love can be transitive and intransitive, this VP_
+      // can either be one with a GAP or one without.
+      assertThat(new Parser("VP_", dict).feed("loved").length).equalsTo(2);
+
+      // The statement, on the other hand, isn't ambiguous because the "." ends the
+      // statement without a NP.
+      assertThat(new Parser("Statement", dict).feed("Sam loved.").length).equalsTo(1);
   });
 
   it("Jones did not walk.", () => {
