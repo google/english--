@@ -47,6 +47,7 @@ function clear(root) {
   }
   delete root.types;
   delete root.loc;
+  delete root.prop;
   for (let i = 0; i < (root.children || []).length; i++) {
     let child = root.children[i];
     if (child["value"]) {
@@ -96,38 +97,43 @@ describe("Ambiguity", () => {
     assertThat(results.length).equalsTo(1);
   });
 
-  it.skip("Sam made a reservation for a woman with a porsche.", () => {
+  it("Sam made a reservation for a woman with a porsche.", () => {
     let parser = new Parser("Sentence", dict);
     let results = parser.feed("Sam made a reservation for a woman with a porsche.");
     // The following are the two interpretations:
-    // - Sam made a reservation for [a woman] with a porsche.
-    // - Sam made a reservation for [a woman with a porsche].
+    // - Sam made [a reservation for [a woman] with a porsche].
+    // - Sam made [a reservation for [a woman with a porsche]].
     assertThat(results.length).equalsTo(2);
+
     assertThat(clear(results[0]))
       .equalsTo(Sentence(Statement(S_(
         S(NP(PN("Sam")),
-          VP_(VP(V(VERB("made")),
+          VP_(VP(V("made"),
                  NP(DET("a"),
-                    N("reservation"),
-                    PP([
-                      [PREP("for"), NP(DET("a"), N("woman"))],
-                      [PREP("with"), NP(DET("a"), N("porsche"))]
-                    ])))))), ".")));
-    
+                    N(
+                      N("reservation"),
+                      PP(PREP("for"), NP(DET("a"),
+                                         N(
+                                           N("woman"),
+                                           PP(PREP("with"), NP(DET("a"), N("porsche")))
+                                         )))
+                     )
+                   ))))), ".")));
+
     assertThat(clear(results[1]))
       .equalsTo(Sentence(Statement(S_(
         S(NP(PN("Sam")),
-          VP_(VP(V(VERB("made")),
+          VP_(VP(V("made"),
                  NP(DET("a"),
-                    N("reservation"),
-                    PP([
-                      [PREP("for"),
-                       NP(DET("a"),
-                          N("woman"),
-                          PP([
-                            [PREP("with"), NP(DET("a"), N("porsche"))]
-                          ]))],
-                    ])))))), ".")));
+                    N(
+                      N(
+                        N("reservation"),
+                        PP(PREP("for"), NP(DET("a"), N("woman")))
+                      ),
+                      PP(PREP("with"), NP(DET("a"), N("porsche")))
+                    )
+                   )
+                )))), ".")));
   });
 
   it("They have walked.", () => {
