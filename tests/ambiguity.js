@@ -35,7 +35,7 @@ const {
   HAVE,
   RN} = nodes;
 
-const {dict} = require("../src/dict.js");
+const {dict} = require("../src/large.js");
 
 function clear(root) {
   if (!root) {

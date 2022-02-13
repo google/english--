@@ -104,7 +104,7 @@ describe("Console", () => {
   });
 
   it.skip("", () => {
-    const {dict} = require("../src/dict.js");
+    const {dict} = require("../src/large.js");
     const console = new Console(dict);
     // Does Sam work? <- wrong bindings
     // What is Sam interested in? <- syntax error
@@ -133,7 +133,7 @@ describe("Console", () => {
   });
   
   it("What is the capital of Brazil?", () => {
-    const {dict} = require("../src/dict.js");
+    const {dict} = require("../src/large.js");
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
     // We should be able to write "Sam is brazilian and an engineer".
@@ -161,7 +161,7 @@ describe("Console", () => {
   });
     
   it("Penguins are birds that do not fly. Do penguins fly?", () => {
-    const {dict} = require("../src/dict.js");
+    const {dict} = require("../src/large.js");
     // NOTE(goto): the state of "flying" messes up the question.
     assertThat(new Console(dict).transpile(`
       Penguins are birds that do not fly. Do penguins fly?

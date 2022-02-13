@@ -2881,7 +2881,7 @@ describe("large dictionary", () => {
   });
   
   function parse(s, start = "Sentence") {
-    const {dict} = require("../src/dict.js");
+    const {dict} = require("../src/large.js");
     let parser = new Parser("Sentence", dict);
 
     const result = parser.feed(s);

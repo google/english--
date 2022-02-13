@@ -2529,7 +2529,7 @@ describe("Large Lexicon", () => {
           .join("\n");
       },
       equalsTo(y) {
-        const {dict} = require("../src/dict.js");
+        const {dict} = require("../src/large.js");
 
         let drs = new DRS(Rules.from());
         let parser = new Parser("Discourse", dict);

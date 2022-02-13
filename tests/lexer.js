@@ -639,7 +639,7 @@ describe("Lexer", function() {
   });
   
   it("Brian loves an awesome woman.", function() {
-    const {dict} = require("../src/dict.js"); 
+    const {dict} = require("../src/large.js"); 
     const {Parser} = DRT;
     let parser = new Parser("Statement", dict);
     
