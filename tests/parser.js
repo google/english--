@@ -955,6 +955,23 @@ function parse(s, start = "Discourse", raw = false, skip = true) {
 
 describe("Statements", function() {
 
+  it("Jones is liked by Mary.", function() {
+    assertThat(parse("Jones is liked by Mary."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"),
+			VP(V(V("liked"), PP(PREP("by"), NP(PN("Mary")))),
+			   NP(GAP()))
+		       ))));
+  });
+
+  it("Jones is liked.", function() {
+    assertThat(parse("Jones is liked."))
+     .equalsTo(S(NP(PN("Jones")),
+                 VP_(VP(BE("is"),
+			VP(V("liked"), NP(GAP()),
+			  )))));
+  });
+
   it("Jones likes Mary.", function() {
     assertThat(parse("Jones likes Mary."))
      .equalsTo(S(NP(PN("Jones")),

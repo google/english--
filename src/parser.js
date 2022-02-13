@@ -801,7 +801,7 @@ const DrtSyntax = `
 
       VP[num=1, fin=+, gap=2, stat=7, tp=4, tense=5] ->
           BE[num=1, fin=+, tp=-past, tense=5] __
-          VP[num=1, fin=part, gap=np, stat=6, tp=4, tense=5].
+          VP[num=1, fin=part, gap=np, stat=6, tp=8, tense=5].
 
       NP[num=1, gen=2, case=3, gap=np] -> GAP.
 
