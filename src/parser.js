@@ -718,18 +718,18 @@ const DrtSyntax = `
       Q -> BE[num=1, fin=2, tp=-past, tense=4] __
            NP[num=1, gen=3, case=+nom, gap=-, prep=+] __
            DET[num=1] __ 
-           N[num=1, gen=5].
+           N_[num=1, gen=5, prep=6].
 
       Q -> WH __ 
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
       Q -> WH __ 
            AUX[num=1, fin=+, tp=2, tense=3] __
-           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=5] __
            V[num=1, fin=-, trans=+].
 
       Q -> WH __ 
-           N[num=1, gen=2] __
+           N_[num=1, gen=2, prep=5] __
            VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
       WH -> %who.
@@ -807,13 +807,13 @@ const DrtSyntax = `
 
       GAP -> null.
 
-      NP[num=1, gen=2, case=3, gap=-, prep=-] -> DET[num=1] __ N[num=1, gen=2].
+      NP[num=1, gen=2, case=3, gap=-, prep=-] -> DET[num=1] __ N_[num=1, gen=2, prep=-].
 
       NP[num=1, gen=2, case=3, gap=-, prep=+] -> DET[num=1] __ N_[num=1, gen=2, prep=+].
 
       NP[num=sing, gen=2, case=3, gap=-, prep=4] -> PN[gen=2].
 
-      NP[num=plur, gen=2, case=3, gap=-, prep=4] -> N[num=plur, gen=2].
+      NP[num=plur, gen=2, case=3, gap=-, prep=4] -> N_[num=plur, gen=2, prep=4].
  
       PN -> %the __ PN.
 
@@ -894,9 +894,9 @@ const DrtSyntax = `
         V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] __ 
         PP.  
 
-      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
+      N_[num=1, gen=2, prep=3] -> ADJ __ N_[num=1, gen=2, prep=3].
       
-      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
+      N_[num=1, gen=2, prep=+] -> N_[num=1, gen=2, prep=3] __ RC[num=1, gen=2].
 
       N_[num=1, gen=2, prep=+] -> N_[num=1, gen=2, prep=3] __ PP.
 

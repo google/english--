@@ -1067,31 +1067,31 @@ describe("Statements", function() {
   it("he likes a book.", function() {
     assertThat(parse("he likes a book."))
      .equalsTo(S(NP(PRO("he")),
-                 VP_(VP(V("likes"), NP(DET("a"), N("book"))))));
+                 VP_(VP(V("likes"), NP(DET("a"), N_(N("book")))))));
    });
 
   it("he likes every book.", function() {
     assertThat(parse("he likes every book."))
      .equalsTo(S(NP(PRO("he")),
-                 VP_(VP(V("likes"), NP(DET("every"), N("book"))))));
+                 VP_(VP(V("likes"), NP(DET("every"), N_(N("book")))))));
    });
 
   it("every man likes him.", function() {
     assertThat(parse("every man likes him."))
-     .equalsTo(S(NP(DET("every"), N("man")),
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
                  VP_(VP(V("likes"), NP(PRO("him"))))));
    });
 
   it("a woman likes him.", function() {
     assertThat(parse("a woman likes him."))
-     .equalsTo(S(NP(DET("a"), N("woman")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+      .equalsTo(S(NP(DET("a"), N_(N("woman"))),
+                  VP_(VP(V("likes"), NP(PRO("him"))))));
   });
 
   it("the woman likes him.", function() {
     assertThat(parse("the woman likes him."))
-     .equalsTo(S(NP(DET("the"), N("woman")),
-                 VP_(VP(V("likes"), NP(PRO("him"))))));
+      .equalsTo(S(NP(DET("the"), N_(N("woman"))),
+                  VP_(VP(V("likes"), NP(PRO("him"))))));
   });
 
   it("Jones and Mary like him.", function() {
@@ -1114,13 +1114,13 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"), 
                         NP(DET("a"), 
-                           N(N("book"), 
-                             RC(RPRO("which"),
-                                S(NP(PN("Mary")), 
-                                  VP_(VP(V("likes"), 
-                                         NP(GAP()))))
+                           N_(N_(N("book")), 
+                              RC(RPRO("which"),
+                                 S(NP(PN("Mary")), 
+                                   VP_(VP(V("likes"), 
+                                          NP(GAP()))))
                                 )))
-                        ))));
+                       ))));
    });
 
   it("Jones likes a woman which likes Mary.", function() {
@@ -1128,7 +1128,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"), 
                         NP(DET("a"), 
-                           N(N("book"), 
+                           N_(N_(N("book")), 
                              RC(RPRO("which"),
                                 S(NP(GAP()), 
                                   VP_(VP(V("likes"), 
@@ -1139,21 +1139,21 @@ describe("Statements", function() {
 
   it("every man who likes Brazil likes a woman which likes Jones.", function() {
     assertThat(parse("every man who likes Brazil likes a woman who likes Jones."))
-     .equalsTo(S(NP(DET("every"), 
-                    N(N("man"), 
-                      RC(RPRO("who"),
-                         S(NP(GAP()),
-                           VP_(VP(V("likes"), NP(PN("Brazil")))))
+      .equalsTo(S(NP(DET("every"), 
+                     N_(N_(N("man")), 
+                       RC(RPRO("who"),
+                          S(NP(GAP()),
+                            VP_(VP(V("likes"), NP(PN("Brazil")))))
                          ))),
                  VP_(VP(V("likes"), 
                         NP(DET("a"), 
-                           N(N("woman"), 
-                             RC(RPRO("who"),
-                                S(NP(GAP()), 
-                                  VP_(VP(V("likes"), 
-                                         NP(PN("Jones")))))
+                           N_(N_(N("woman")), 
+                              RC(RPRO("who"),
+                                 S(NP(GAP()), 
+                                   VP_(VP(V("likes"), 
+                                          NP(PN("Jones")))))
                                 )))
-                        ))));
+                       ))));
    });
 
   it("Jones is unhappy.", function() {
@@ -1166,8 +1166,8 @@ describe("Statements", function() {
     assertThat(parse("Jones is an unhappy foolish man."))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(BE("is"), NP(DET("an"),
-                                      N(ADJ("unhappy"),
-                                        N(ADJ("foolish"), N("man"))))))));
+                                      N_(ADJ("unhappy"),
+                                         N_(ADJ("foolish"), N_(N("man")))))))));
   });
 
   it("they are happy.", function() {
@@ -1181,7 +1181,7 @@ describe("Statements", function() {
       .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"), 
                         NP(DET("a"), 
-                           N(N("woman"), 
+                           N_(N_(N("woman")), 
                              RC(RPRO("who"),
                                 S(NP(GAP()), 
                                   VP_(VP(BE("is"), ADJ("happy"))))
@@ -1193,7 +1193,7 @@ describe("Statements", function() {
     assertThat(parse("Jones is a man."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"), 
-                        NP(DET("a"), N("man"))))));
+                        NP(DET("a"), N_(N("man")))))));
   });
 
   it("Jones is not a woman.", function() {
@@ -1201,7 +1201,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(BE("is"),
                         "not",
-                        NP(DET("a"), N("woman"))))));
+                        NP(DET("a"), N_(N("woman")))))));
   });
 
   it("if Mary is happy then Jones is happy.", function() {
@@ -1216,7 +1216,7 @@ describe("Statements", function() {
   it("Jones and Mary like a book.", function() {
     assertThat(parse("Jones and Mary like a book."))
      .equalsTo(S(NP(NP(PN("Jones")), "and", NP(PN("Mary"))),
-                 VP_(VP(V("like"), NP(DET("a"), N("book"))))));
+                 VP_(VP(V("like"), NP(DET("a"), N_(N("book")))))));
   });
 
   it("Jones likes Mary and Brazil.", function() {
@@ -1246,14 +1246,14 @@ describe("Statements", function() {
 
   it("Jones's book is foolish", function() {
     assertThat(parse("Jones's book is foolish."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("book")),
-                 VP_(VP(BE("is"), ADJ("foolish")))));
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("book"))),
+                  VP_(VP(BE("is"), ADJ("foolish")))));
   });
 
   it("Mary likes Jones's book", function() {
     assertThat(parse("Mary likes Jones's book."))
      .equalsTo(S(NP(PN("Mary")),
-                 VP_(VP(V("likes"), NP(DET(NP(PN("Jones")), "'s"), N("book"))))));
+                 VP_(VP(V("likes"), NP(DET(NP(PN("Jones")), "'s"), N_(N("book")))))));
   });
 
   it("Jones likes a book about Brazil", function() {
@@ -1280,7 +1280,7 @@ describe("Statements", function() {
                  VP_(VP(V("likes"),
                         NP(DET("a"), 
                            N_(N_(N("girl")), 
-                              PP(PREP("with"), NP(DET("a"), N("telescope")))))
+                              PP(PREP("with"), NP(DET("a"), N_(N("telescope"))))))
                        ))));
   });
 
@@ -1303,7 +1303,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"), 
                         NP(DET("a"), 
-                           N(N("girl"), 
+                           N_(N_(N("girl")), 
                              RC(RPRO("who"),
                                 S(NP(GAP()),
                                   VP_(VP(BE("is"), 
@@ -1316,13 +1316,13 @@ describe("Statements", function() {
 
   it("Jones's sister is Mary", function() {
     assertThat(parse("Jones's sister is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("sister"))),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's sister is not Mary", function() {
     assertThat(parse("Jones's sister is not Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("sister")),
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("sister"))),
                  VP_(VP(BE("is"), "not", NP(PN("Mary"))))));
   });
 
@@ -1491,7 +1491,7 @@ describe("Statements", function() {
     assertThat(parse("he likes Jones's brother."))
      .equalsTo(S(NP(PRO("he")),
                  VP_(VP(V("likes"), 
-                        NP(DET(NP(PN("Jones")), "'s"), N("brother"))
+                        NP(DET(NP(PN("Jones")), "'s"), N_(N("brother")))
                         ))));
    });
 
@@ -1503,65 +1503,65 @@ describe("Statements", function() {
     // rather than the latter.
     assertThat(parse("Either Jones's wife or Smith's brother loves Mary."))
       .equalsTo(S(NP("Either",
-                     NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+                     NP(DET(NP(PN("Jones")), "'s"), N_(N("wife"))),
                      "or",
-                     NP(DET(NP(PN("Smith")), "'s"), N("brother"))
+                     NP(DET(NP(PN("Smith")), "'s"), N_(N("brother")))
                     ),
                   VP_(VP(V("loves"), NP(PN("Mary"))))));
    });
 
   it("Every man is mortal.", function() {
     assertThat(parse("Every man is mortal."))
-      .equalsTo(S(NP(DET("Every"), N("man")),
+      .equalsTo(S(NP(DET("Every"), N_(N("man"))),
                   VP_(VP(BE("is"), ADJ("mortal")))));
   });
 
   it("Men are mortal.", function() {
     assertThat(parse("Men are mortal."))
-      .equalsTo(S(NP(N("Men")),
+      .equalsTo(S(NP(N_(N("Men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("Birds are mortal.", function() {
     assertThat(parse("Birds are mortal."))
-      .equalsTo(S(NP(N("Birds")),
+      .equalsTo(S(NP(N_(N("Birds"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("Animals live.", function() {
     assertThat(parse("Animals live."))
-      .equalsTo(S(NP(N("Animals")),
+      .equalsTo(S(NP(N_(N("Animals"))),
                   VP_(VP(V("live")))));
   });
 
   it("Animals live.", function() {
     assertThat(parse("Animals live."))
-      .equalsTo(S(NP(N("Animals")),
+      .equalsTo(S(NP(N_(N("Animals"))),
                   VP_(VP(V("live")))));
   });
 
   it("Brazilians love Brazil.", function() {
     assertThat(parse("Brazilians love Brazil."))
-      .equalsTo(S(NP(N("Brazilians")),
+      .equalsTo(S(NP(N_(N("Brazilians"))),
                   VP_(VP(V("love"), NP(PN("Brazil"))))));
   });
 
   it("He loves brazilians.", function() {
     assertThat(parse("He loves brazilians."))
       .equalsTo(S(NP(PRO("He")),
-                  VP_(VP(V("loves"), NP(N("brazilians"))))));
+                  VP_(VP(V("loves"), NP(N_(N("brazilians")))))));
   });
 
   it("Sam loves birds.", function() {
     assertThat(parse("Sam loves birds."))
       .equalsTo(S(NP(PN("Sam")),
-                  VP_(VP(V("loves"), NP(N("birds"))))));
+                  VP_(VP(V("loves"), NP(N_(N("birds")))))));
   });
 
   it("People love brazilians.", function() {
     assertThat(parse("People love brazilians."))
-      .equalsTo(S(NP(N("People")),
-                  VP_(VP(V("love"), NP(N("brazilians"))))));
+      .equalsTo(S(NP(N_(N("People"))),
+                  VP_(VP(V("love"), NP(N_(N("brazilians")))))));
   });
 
   it("He loves Brazilians.", function() {
@@ -1576,7 +1576,7 @@ describe("Statements", function() {
                   VP_(VP(BE("is"),
                          ADJ(ADJ("interested"),
                              PP(PREP("in"),
-                                NP(N("brazilians"))))))));
+                                NP(N_(N("brazilians")))))))));
   });
 
   it("He is interested in Brazilians.", function() {
@@ -1594,22 +1594,22 @@ describe("Statements", function() {
 
   it("Birds are happy.", function() {
     assertThat(parse("Birds are happy."))
-      .equalsTo(S(NP(N("Birds")),
+      .equalsTo(S(NP(N_(N("Birds"))),
                   VP_(VP(BE("are"), ADJ("happy")))));
   });
 
   it("Birds which like Sam are happy.", function() {
     assertThat(parse("Birds which like Sam are happy."))
-      .equalsTo(S(NP(N(N("Birds"), RC(RPRO("which"),
-                                      S(NP(GAP()), VP_(VP(V("like"), NP(PN("Sam")))))
-                                     ))),
+      .equalsTo(S(NP(N_(N_(N("Birds")), RC(RPRO("which"),
+                                           S(NP(GAP()), VP_(VP(V("like"), NP(PN("Sam")))))
+                                          ))),
                   VP_(VP(BE("are"), ADJ("happy")))));
   });
 
   it("Birds are animals.", function() {
     assertThat(parse("Birds are animals."))
-      .equalsTo(S(NP(N("Birds")),
-                  VP_(VP(BE("are"), NP(N("animals"))))));
+      .equalsTo(S(NP(N_(N("Birds"))),
+                  VP_(VP(BE("are"), NP(N_(N("animals")))))));
   });
 
 });
@@ -1679,7 +1679,7 @@ describe("Questions", function() {
       .equalsTo(Q(AUX("Do"),
                   NP(PRO("they")),
                   VP(V("like"),
-                     NP(DET("the"), N(N("man"),
+                     NP(DET("the"), N_(N_(N("man")),
                                       RC(RPRO("who"),
                                          S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her"))))
                                           ))))
@@ -1689,7 +1689,7 @@ describe("Questions", function() {
   it("Do most countries in South America border Brazil?", function() {
     assertThat(parse("Do most countries in South America border Brazil?"))
       .equalsTo(Q(AUX("Do"),
-                  NP(DET("most"), N(N("countries"), PP(PREP("in"), NP(PN("South America"))))),
+                  NP(DET("most"), N_(N_(N("countries")), PP(PREP("in"), NP(PN("South America"))))),
                   VP(V("border"), NP(PN("Brazil")))
                  ));
   });
@@ -1699,97 +1699,97 @@ describe("Questions", function() {
 describe("Generalized Quantifiers", function() {
   it("every man is happy.", function() {
     assertThat(parse("every man is happy."))
-      .equalsTo(S(NP(DET("every"), N("man")),
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
                   VP_(VP(BE("is"), ADJ("happy")))));
   });
 
   it("all men are mortal.", function() {
     assertThat(parse("all men are mortal."))
-      .equalsTo(S(NP(DET("all"), N("men")),
+      .equalsTo(S(NP(DET("all"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("no engineer is happy.", function() {
     assertThat(parse("no engineer is happy."))
-      .equalsTo(S(NP(DET("no"), N("engineer")),
+      .equalsTo(S(NP(DET("no"), N_(N("engineer"))),
                   VP_(VP(BE("is"), ADJ("happy")))));
   });
 
   it("most men are mortal.", function() {
     assertThat(parse("most men are mortal."))
-      .equalsTo(S(NP(DET("most"), N("men")),
+      .equalsTo(S(NP(DET("most"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("some men are mortal.", function() {
     assertThat(parse("some men are mortal."))
-      .equalsTo(S(NP(DET("some"), N("men")),
+      .equalsTo(S(NP(DET("some"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("not all men are mortal.", function() {
     assertThat(parse("not all men are mortal."))
-      .equalsTo(S(NP(DET("not", "all"), N("men")),
+      .equalsTo(S(NP(DET("not", "all"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("many men are mortal.", function() {
     assertThat(parse("many men are mortal."))
-      .equalsTo(S(NP(DET("many"), N("men")),
+      .equalsTo(S(NP(DET("many"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("only men are mortal.", function() {
     assertThat(parse("only men are mortal."))
-      .equalsTo(S(NP(DET("only"), N("men")),
+      .equalsTo(S(NP(DET("only"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("the majority of men are mortal.", function() {
     assertThat(parse("the majority of men are mortal."))
-      .equalsTo(S(NP(DET("the", "majority", "of"), N("men")),
+      .equalsTo(S(NP(DET("the", "majority", "of"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("the minority of men are mortal.", function() {
     assertThat(parse("the minority of men are mortal."))
-      .equalsTo(S(NP(DET("the", "minority", "of"), N("men")),
+      .equalsTo(S(NP(DET("the", "minority", "of"), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("at least 5 men are mortal.", function() {
     assertThat(parse("at least 5 men are mortal."))
-      .equalsTo(S(NP(DET("at", "least", 5), N("men")),
+      .equalsTo(S(NP(DET("at", "least", 5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("at most 5 men are mortal.", function() {
     assertThat(parse("at most 5 men are mortal."))
-      .equalsTo(S(NP(DET("at", "most", 5), N("men")),
+      .equalsTo(S(NP(DET("at", "most", 5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("more than 5 men are mortal.", function() {
     assertThat(parse("more than 5 men are mortal."))
-      .equalsTo(S(NP(DET("more", "than", 5), N("men")),
+      .equalsTo(S(NP(DET("more", "than", 5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("fewer than 5 men are mortal.", function() {
     assertThat(parse("fewer than 5 men are mortal."))
-      .equalsTo(S(NP(DET("fewer", "than", 5), N("men")),
+      .equalsTo(S(NP(DET("fewer", "than", 5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("exactly 5 men are mortal.", function() {
     assertThat(parse("exactly 5 men are mortal."))
-      .equalsTo(S(NP(DET("exactly", 5), N("men")),
+      .equalsTo(S(NP(DET("exactly", 5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 
   it("5 men are mortal.", function() {
     assertThat(parse("5 men are mortal."))
-      .equalsTo(S(NP(DET(5), N("men")),
+      .equalsTo(S(NP(DET(5), N_(N("men"))),
                   VP_(VP(BE("are"), ADJ("mortal")))));
   });
 });
@@ -1915,19 +1915,19 @@ describe("Backwards compatibility", function() {
 
   it("a man loves.", function() {
     assertThat(parse("a man loves."))
-     .equalsTo(S(NP(DET("a"), N("man")),
-                 VP_(VP(V("loves")))));
+      .equalsTo(S(NP(DET("a"), N_(N("man"))),
+                  VP_(VP(V("loves")))));
   });
 
   it("every donkey stinks.", function() {
     assertThat(parse("every book stinks."))
-     .equalsTo(S(NP(DET("every"), N("book")),
-                 VP_(VP(V("stinks")))));
+      .equalsTo(S(NP(DET("every"), N_(N("book"))),
+                  VP_(VP(V("stinks")))));
   });
 
   it("the woman loves.", function() {
     assertThat(parse("the woman loves."))
-     .equalsTo(S(NP(DET("the"), N("woman")),
+      .equalsTo(S(NP(DET("the"), N_(N("woman"))),
                  VP_(VP(V("loves")))));
   });
 
@@ -1957,7 +1957,7 @@ describe("Backwards compatibility", function() {
 
   it("the book does not stink.", function() {
     assertThat(parse("the book does not stink."))
-     .equalsTo(S(NP(DET("the"), N("book")),
+      .equalsTo(S(NP(DET("the"), N_(N("book"))),
                  VP_(AUX("does"), "not", VP(V("stink")))));
   });
 
@@ -1970,19 +1970,19 @@ describe("Backwards compatibility", function() {
   it("she loves the book.", function() {
     assertThat(parse("she loves the book."))
      .equalsTo(S(NP(PRO("she")),
-                 VP_(VP(V("loves"), NP(DET("the"), N("book"))))));
+                 VP_(VP(V("loves"), NP(DET("the"), N_(N("book")))))));
   });
 
   it("every man loves her.", function() {
     assertThat(parse("every man loves her."))
-     .equalsTo(S(NP(DET("every"), N("man")),
-                 VP_(VP(V("loves"), NP(PRO("her"))))));
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
+                  VP_(VP(V("loves"), NP(PRO("her"))))));
   });
 
   it("every man loves Jones.", function() {
     assertThat(parse("every man loves Jones."))
-     .equalsTo(S(NP(DET("every"), N("man")),
-                 VP_(VP(V("loves"), NP(PN("Jones"))))));
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
+                  VP_(VP(V("loves"), NP(PN("Jones"))))));
   });
 
   it("she does not love.", function() {
@@ -2002,7 +2002,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Jones does not like the book."))
      .equalsTo(S(NP(PN("Jones")),
                  VP_(AUX("does"), "not", 
-                     VP(V("like"), NP(DET("the"), N("book"))))));
+                     VP(V("like"), NP(DET("the"), N_(N("book")))))));
   });
 
   it("they love him.", function() {
@@ -2027,7 +2027,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("they do not love the book."))
      .equalsTo(S(NP(PRO("they")),
                  VP_(AUX("do"), "not", 
-                     VP(V("love"), NP(DET("the"), N("book"))))
+                     VP(V("love"), NP(DET("the"), N_(N("book")))))
                  ));
   });
 
@@ -2052,9 +2052,9 @@ describe("Backwards compatibility", function() {
 
   it("every man loves a book and a woman.", function() {
     assertThat(parse("every man loves a book and a woman."))
-     .equalsTo(S(NP(DET("every"), N("man")),
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
                  VP_(VP(V("loves"), 
-                        NP(NP(DET("a"), N("book")), "and", NP(DET("a"), N("woman")))
+                        NP(NP(DET("a"), N_(N("book"))), "and", NP(DET("a"), N_(N("woman"))))
                         ))));
   });
 
@@ -2072,9 +2072,9 @@ describe("Backwards compatibility", function() {
 
   it("every man loves Italy and Brazil", function() {
     assertThat(parse("every man loves Mary and Brazil."))
-     .equalsTo(S(NP(DET("every"), N("man")),
-                 VP_(VP(V("loves"), 
-                        NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
+                  VP_(VP(V("loves"), 
+                         NP(NP(PN("Mary")), "and", NP(PN("Brazil")))
                         ))));
   });
 
@@ -2083,7 +2083,7 @@ describe("Backwards compatibility", function() {
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(V("loves"),
                         NP(DET("a"), 
-                           N(N("man"), 
+                           N_(N_(N("man")), 
                              RC(RPRO("who"), 
                                 S(NP(GAP()), VP_(VP(V("loves"), 
                                                     NP(PRO("her")))))
@@ -2095,7 +2095,7 @@ describe("Backwards compatibility", function() {
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(V("loves"),
                         NP(DET("a"), 
-                           N(N("book"), 
+                           N_(N_(N("book")), 
                              RC(RPRO("which"), 
                                 S(NP(GAP()), VP_(VP(V("likes"), NP(PRO("her")))))
                                 )))))));
@@ -2103,8 +2103,8 @@ describe("Backwards compatibility", function() {
 
   it("every book which she loves surprises him.", function() {
     assertThat(parse("every book which she loves surprises him."))
-     .equalsTo(S(NP(DET("every"), 
-                    N(N("book"), RC(RPRO("which"), 
+      .equalsTo(S(NP(DET("every"), 
+                     N_(N_(N("book")), RC(RPRO("which"), 
                                     S(NP(PRO("she")),
                                       VP_(VP(V("loves"), NP(GAP()))))
                                     ))),
@@ -2116,7 +2116,7 @@ describe("Backwards compatibility", function() {
   it("every man who knows her loves her.", function() {
     assertThat(parse("every man who loves her likes him."))
      .equalsTo(S(NP(DET("every"), 
-                    N(N("man"), RC(RPRO("who"), 
+                    N_(N_(N("man")), RC(RPRO("who"), 
                                    S(NP(GAP()),
                                      VP_(VP(V("loves"), NP(PRO("her")))))
                                    ))),
@@ -2127,7 +2127,7 @@ describe("Backwards compatibility", function() {
   it("a man who does not love her watches him.", function() {
     assertThat(parse("a man who does not love her watches him."))
      .equalsTo(S(NP(DET("a"),
-                    N(N("man"), RC(RPRO("who"), 
+                    N_(N_(N("man")), RC(RPRO("who"), 
                                    S(NP(GAP()),
                                      VP_(AUX("does"), "not", VP(V("love"), NP(PRO("her")))))
                                    ))),
@@ -2150,9 +2150,9 @@ describe("Backwards compatibility", function() {
 
   it("a book does not stink.", function() {
     assertThat(parse("a man does not stink."))
-     .equalsTo(S(NP(DET("a"), N("man")),
-                 VP_(AUX("does"), "not", 
-                     VP(V("stink")))));
+      .equalsTo(S(NP(DET("a"), N_(N("man"))),
+                  VP_(AUX("does"), "not", 
+                      VP(V("stink")))));
   });
 
   it("Jones loves a woman who does not admire him.", function() {
@@ -2160,7 +2160,7 @@ describe("Backwards compatibility", function() {
    .equalsTo(S(NP(PN("Jones")),
                VP_(VP(V("loves"),
                       NP(DET("a"), 
-                         N(N("woman"), 
+                         N_(N_(N("woman")), 
                            RC(RPRO("who"), 
                               S(NP(GAP()), 
                                 VP_(AUX("does"), "not", 
@@ -2173,7 +2173,7 @@ describe("Backwards compatibility", function() {
   it("if Jones owns a book then he likes it.", function() {
     assertThat(parse("if Jones loves a book then he likes it."))
      .equalsTo(S("if", 
-                 S(NP(PN("Jones")), VP_(VP(V("loves"), NP(DET("a"), N("book"))))), 
+                 S(NP(PN("Jones")), VP_(VP(V("loves"), NP(DET("a"), N_(N("book")))))), 
                  "then", 
                  S(NP(PRO("he")), VP_(VP(V("likes"), NP(PRO("it")))))));
   });
@@ -2181,11 +2181,11 @@ describe("Backwards compatibility", function() {
   it("every man who loves a book likes it.", function() {
     assertThat(parse("every man who loves a book likes it."))
      .equalsTo(S(NP(DET("every"), 
-                    N(N("man"), 
+                    N_(N_(N("man")), 
                       RC(RPRO("who"), 
                          S(NP(GAP()), 
                            VP_(VP(V("loves"), 
-                                  NP(DET("a"), N("book")))))))), 
+                                  NP(DET("a"), N_(N("book"))))))))), 
                  VP_(VP(V("likes"), NP(PRO("it"))))));
    });
 
@@ -2248,7 +2248,7 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is happy.", function() {
     assertThat(parse("Jones's wife is happy."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("wife"))),
                  VP_(VP(BE("is"), ADJ("happy")))));
   });
 
@@ -2281,7 +2281,7 @@ describe("Backwards compatibility", function() {
 
   it("Jones owns an unhappy donkey.", function() {
     assertThat(parse("Jones owns an unhappy donkey."))
-     .equalsTo(S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("an"), N(ADJ("unhappy"), N("donkey")))))));
+      .equalsTo(S(NP(PN("Jones")), VP_(VP(V("owns"), NP(DET("an"), N_(ADJ("unhappy"), N_(N("donkey"))))))));
   });
 
   it("Jones likes a woman with a donkey.", function() {
@@ -2289,15 +2289,16 @@ describe("Backwards compatibility", function() {
      .equalsTo(S(NP(PN("Jones")), 
                  VP_(VP(V("likes"), 
                         NP(DET("a"),
-                           N(N("woman"), 
-                             PP(PREP("with"), NP(DET("a"), N("donkey"))))
+                           N_(
+                             N_(N("woman")), 
+                             PP(PREP("with"), NP(DET("a"), N_(N("donkey")))))
                           )))));
   });
 
   it("Jones is a man.", function() {
     assertThat(parse("Jones is a man."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), NP(DET("a"), N("man"))))));
+                 VP_(VP(BE("is"), NP(DET("a"), N_(N("man")))))));
   });
 
   it("Who likes Mary?", function() {
@@ -2352,7 +2353,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Who does the man like?"))
       .equalsTo(Q(WH("Who"), 
                   AUX("does"),
-                  NP(DET("the"), N("man")), 
+                  NP(DET("the"), N_(N("man"))), 
                   V("like")));
   });
 
@@ -2360,7 +2361,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Who does Smith's brother like?"))
       .equalsTo(Q(WH("Who"), 
                   AUX("does"),
-                  NP(DET(NP(PN("Smith")), "'s"), N("brother")), 
+                  NP(DET(NP(PN("Smith")), "'s"), N_(N("brother"))), 
                   V("like")));
   });
 
@@ -2394,20 +2395,20 @@ describe("Backwards compatibility", function() {
 
   it("Jones's wife is Mary.", function() {
     assertThat(parse("Jones's wife is Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("wife"))),
                  VP_(VP(BE("is"), NP(PN("Mary"))))));
   });
 
   it("Jones's wife was Mary.", function() {
     assertThat(parse("Jones's wife was Mary."))
-     .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N("wife")),
-                 VP_(VP(BE("was"), NP(PN("Mary"))))));
+      .equalsTo(S(NP(DET(NP(PN("Jones")), "'s"), N_(N("wife"))),
+                  VP_(VP(BE("was"), NP(PN("Mary"))))));
   });
 
   it("John is a happy man", function() {
     assertThat(parse("Jones is a happy man."))
      .equalsTo(S(NP(PN("Jones")),
-                 VP_(VP(BE("is"), NP(DET("a"), N(ADJ("happy"), N("man")))))));
+                 VP_(VP(BE("is"), NP(DET("a"), N_(ADJ("happy"), N_(N("man"))))))));
   });
 
   it("Mary loves Jones and Smith.", function() {
@@ -2427,8 +2428,8 @@ describe("Backwards compatibility", function() {
 
   it("every brazilian is from Brazil", function() {
     assertThat(parse("every brazilian is from Brazil."))
-     .equalsTo(S(NP(DET("every"), N("brazilian")),
-                 VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
+      .equalsTo(S(NP(DET("every"), N_(N("brazilian"))),
+                  VP_(VP(BE("is"), PP(PREP("from"), NP(PN("Brazil")))
                         ))));
   });
 
@@ -2473,7 +2474,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Smith likes a porsche."))
      .equalsTo(S(NP(PN("Smith")),
                  VP_(VP(V("likes"),
-                        NP(DET("a"), N("porsche"))
+                        NP(DET("a"), N_(N("porsche")))
                         ))));
   });
 
@@ -2618,14 +2619,14 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Mary was an engineer."))
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(BE("was"),
-                        NP(DET("an"), N("engineer"))))));
+                        NP(DET("an"), N_(N("engineer")))))));
   });
 
   it("Mary was not an engineer.", function() {
     assertThat(parse("Mary was not an engineer."))
      .equalsTo(S(NP(PN("Mary")),
                  VP_(VP(BE("was"), "not",
-                        NP(DET("an"), N("engineer"))))));
+                        NP(DET("an"), N_(N("engineer")))))));
   });
 
   it("Sam Goto kissed Dani.", function() {
@@ -2664,8 +2665,11 @@ describe("Backwards compatibility", function() {
       .equalsTo(S(NP(PN("Sam")),
                   VP_(VP(V("made"),
                          NP(DET("a"),
-                            N(N(N("reservation"),
-                                PP(PREP("for"), NP(PN("Cascal")))),
+                            N_(
+                              N_(
+                                N_(N("reservation")),
+                                PP(PREP("for"), NP(PN("Cascal")))
+                              ),
                               PP(PREP("for"), NP(PN("Dani")))
                              ))))));
 
@@ -2698,7 +2702,7 @@ describe("Backwards compatibility", function() {
   it("A porsche is owned by Smith.", function() {
     // passive voice
     assertThat(parse("a porsche was owned by Smith."))
-     .equalsTo(S(NP(DET("a"), N("porsche")),
+      .equalsTo(S(NP(DET("a"), N_(N("porsche"))),
                  VP_(VP(BE("was"),
                         VP(V(V("owned"), PP(PREP("by"), NP(PN("Smith")))),
                            NP(GAP())
@@ -2709,12 +2713,12 @@ describe("Backwards compatibility", function() {
   it("A porsche is liked by Smith.", function() {
     // passive voice
     assertThat(parse("a porsche was liked by Smith."))
-     .equalsTo(S(NP(DET("a"), N("porsche")),
-                 VP_(VP(BE("was"),
-                        VP(V(V("liked"), PP(PREP("by"), NP(PN("Smith")))),
-                           NP(GAP())
-                          ))
-                    )));
+      .equalsTo(S(NP(DET("a"), N_(N("porsche"))),
+                  VP_(VP(BE("was"),
+                         VP(V(V("liked"), PP(PREP("by"), NP(PN("Smith")))),
+                            NP(GAP())
+                           ))
+                     )));
   });
 
   it("Smith is loved as a happy man.", function() {
@@ -2722,7 +2726,7 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Smith is considered as a happy man."))
       .equalsTo(S(NP(PN("Smith")),
                   VP_(VP(BE("is"),
-                         VP(V(V("considered"), PP(PREP("as"), NP(DET("a"), N(ADJ("happy"), N("man"))))),
+                         VP(V(V("considered"), PP(PREP("as"), NP(DET("a"), N_(ADJ("happy"), N_(N("man")))))),
                             NP(GAP())
                            ))
                      )));
@@ -2732,7 +2736,8 @@ describe("Backwards compatibility", function() {
     assertThat(parse("Obama was the president of the United States."))
       .equalsTo(S(NP(PN("Obama")),
                   VP_(VP(BE("was"), NP(DET("the"),
-                                       N(N("president"),
+                                       N_(
+                                         N_(N("president")),
                                          PP(PREP("of"), NP(PN("the", PN("United States"))))
                                         ))))));
   });
@@ -2746,9 +2751,9 @@ describe("Backwards compatibility", function() {
   it("Either every man or every woman is happy.", function() {
     assertThat(parse("Either every man or every woman is happy."))
       .equalsTo(S(NP("Either",
-                     NP(DET("every"), N("man")),
+                     NP(DET("every"), N_(N("man"))),
                      "or",
-                     NP(DET("every"), N("woman"))),
+                     NP(DET("every"), N_(N("woman")))),
                   VP_(VP(BE("is"), ADJ("happy")))));
   });
 
@@ -2759,20 +2764,20 @@ describe("Backwards compatibility", function() {
 describe("large dictionary", () => {
   it("Most brazilians like Italy.", function() {
     assertThat(parse("Most brazilians like Italy."))
-      .equalsTo(S(NP(DET("Most"), N("brazilians")),
+      .equalsTo(S(NP(DET("Most"), N_(N("brazilians"))),
                   VP_(VP(V("like"), NP(PN("Italy"))))));
   });
 
   it("Trump is the president.", function() {
     assertThat(parse("Trump is the president."))
       .equalsTo(S(NP(PN("Trump")),
-                  VP_(VP(BE("is"), NP(DET("the"), N("president"))))));
+                  VP_(VP(BE("is"), NP(DET("the"), N_(N("president")))))));
   });
 
   it("Trump is a person.", function() {
     assertThat(parse("Trump is a person."))
       .equalsTo(S(NP(PN("Trump")),
-                  VP_(VP(BE("is"), NP(DET("a"), N("person"))))));
+                  VP_(VP(BE("is"), NP(DET("a"), N_(N("person")))))));
   });
 
   it("Sam married Dani.", function() {
@@ -2794,20 +2799,21 @@ describe("large dictionary", () => {
     assertThat(parse("Brazil is a country in South America."))
       .equalsTo(S(NP(PN("Brazil")),
                   VP_(VP(BE("is"), NP(DET("a"),
-                                      N(N("country"),
+                                      N_(
+                                        N_(N("country")),
                                         PP(PREP("in"), NP(PN("South America")))))))));
   });
 
   it("Obama was a great president.", function() {
     assertThat(parse("Obama was a great president."))
       .equalsTo(S(NP(PN("Obama")),
-                  VP_(VP(BE("was"), NP(DET("a"), N(ADJ("great"), N("president")))))));
+                  VP_(VP(BE("was"), NP(DET("a"), N_(ADJ("great"), N_(N("president"))))))));
   });
 
   it("Obama was the president.", function() {
     assertThat(parse("Obama was the president."))
       .equalsTo(S(NP(PN("Obama")),
-                  VP_(VP(BE("was"), NP(DET("the"), N("president"))))));
+                  VP_(VP(BE("was"), NP(DET("the"), N_(N("president")))))));
   });
 
   it("He has abandoned her.", function() {
@@ -2819,20 +2825,20 @@ describe("large dictionary", () => {
   it("They rented the car.", function() {
     assertThat(parse("They rented the car."))
       .equalsTo(S(NP(PRO("They")),
-                  VP_(VP(V("rented"), NP(DET("the"), N("car"))))));
+                  VP_(VP(V("rented"), NP(DET("the"), N_(N("car")))))));
   });
 
   it("He has married many peoples.", function() {
     assertThat(parse("He has married many peoples."))
       .equalsTo(S(NP(PRO("He")),
-                  VP_(VP(HAVE("has"), VP(V("married"), NP(DET("many"), N("peoples")))))));
+                  VP_(VP(HAVE("has"), VP(V("married"), NP(DET("many"), N_(N("peoples"))))))));
   });
 
   it("Mel likes Yuji's girlfriend.", function() {
     assertThat(parse("Mel likes Yuji's girlfriend."))
       .equalsTo(S(NP(PN("Mel")),
                   VP_(VP(V("likes"),
-                         NP(DET(NP(PN("Yuji")), "'s"), N("girlfriend"))))));
+                         NP(DET(NP(PN("Yuji")), "'s"), N_(N("girlfriend")))))));
   });
 
   it("Mary knows Jones.", function() {
@@ -2860,7 +2866,7 @@ describe("large dictionary", () => {
   it("Every person who was born is brazilian.", function() {
     assertThat(parse("Every person who was born is brazilian."))
       .equalsTo(S(NP(DET("Every"),
-                     N(N("person"), RC(RPRO("who"),
+                     N_(N_(N("person")), RC(RPRO("who"),
                                        S(NP(GAP()), VP_(VP(BE("was"), ADJ("born"))))
                                       ))),
                   VP_(VP(BE("is"),
@@ -2877,7 +2883,7 @@ describe("large dictionary", () => {
 
   it("3 peoples live in Brazil.", function() {
     assertThat(parse("3 peoples live in Brazil."))
-      .equalsTo(S(NP(DET("3"), N("peoples")),
+      .equalsTo(S(NP(DET("3"), N_(N("peoples"))),
                   VP_(VP(V(V("live"),
                            PP(PREP("in"), NP(PN("Brazil")))
                           )))));

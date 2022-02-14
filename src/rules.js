@@ -3,7 +3,7 @@ const {parse, first, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {
-  S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB, WH,
+  S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, N_, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB, WH,
   Discourse, Sentence, Statement, Question
 } = nodes;
 
@@ -35,11 +35,15 @@ function PRED(name, args, types, infix = false) {
     args: args,
     types: types,
     print(separator = ".") {
+      if (!this.name) {
+        throw new Error("Invalid predicate structure: " + JSON.stringify(this, undefined, 2));
+      }
       let params = this.args.map(arg => arg.name);
       if (infix) {
         return params.join(` ${this.name} `) + separator;
       }
       // console.log(separator);
+      // console.log(this);
       const name = this.name.split(" ").join("-");
       return `${name}(${params.join(", ")})${separator}`;
     }
@@ -439,6 +443,11 @@ class CRVPID extends Rule {
   }
   
   apply({det, noun}, node, refs) {
+    // console.log(noun);
+    //if (!(noun["@type"] == "N" || noun["@type"] == "N_")) {
+    //  return;
+    //}
+    // throw new Error("hi")
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
@@ -462,20 +471,85 @@ class CRNLIN extends Rule {
   }
   
   apply({noun}, node) {
-    if (!node.ref || node.children.length != 1) {
+    // console.log(node.prop);
+    if (!node.ref || node.children.length != 1 || !node.prop) {
       return;
     }
+    //console.log(node);
+    //throw new Error("hi");
 
     // console.log(noun);
+    // console.log(noun);
+    // noun.ref = node.ref;
     
-    // throw new Error("hi");
-    
+    //const n = child(noun, 0);
+    //console.log(n);
+    //throw new Error("hi");
     let pred = PRED(noun.prop, node.ref, node.types);
+    // console.log(pred);
+    // throw new Error("hello");
     
     return [[], [pred], node];
   }
 }
 
+class CRNLIN2 extends Rule {
+  constructor(ids) {
+    super(ids, N(N(capture("foo"))));
+  }
+  
+  apply({foo}, node) {
+    console.log(JSON.stringify(node, undefined, 2));
+    throw new Error("hello");
+    if (!node.ref || node.children.length != 1 || !node.prop) {
+      return;
+    }
+    //console.log(node);
+    //throw new Error("hi");
+
+    // console.log(noun);
+    // console.log(noun);
+    // noun.ref = node.ref;
+    
+    //const n = child(noun, 0);
+    //console.log(n);
+    //throw new Error("hi");
+    let pred = PRED(noun.prop, node.ref, node.types);
+    // console.log(pred);
+    // throw new Error("hello");
+    
+    return [[], [pred], node];
+  }
+}
+
+/**
+class CRNLIN2 extends Rule {
+  constructor(ids) {
+    super(ids, N(capture("noun")));
+  }
+  
+  apply({noun}, node) {
+    // console.log(node.ref);
+    if (!node.ref || node.children.length != 1) {
+      return;
+    }
+    //console.log(node);
+    //throw new Error("hi");
+
+    // console.log(noun);
+    // console.log(noun);
+    // noun.ref = node.ref;
+    
+    // throw new Error("hi");
+    // console.log(noun);
+    throw new Error("hello");
+    let pred = PRED(noun.prop, node.ref, node.types);
+    // console.log(pred);
+    
+    return [[], [pred], node];
+  }
+}
+*/
 class CRPPLIN extends Rule {
   constructor(ids) {
     super(ids, N(capture("noun"),
@@ -486,9 +560,14 @@ class CRPPLIN extends Rule {
       return;
     }
 
+    //console.log(node);
+    //throw new Error("hi");
+    //console.log(JSON.stringify(node, undefined, 2));
     //throw new Error("hi");
     
     const n = child(node, 0);
+
+    // console.log(n);
 
     let body = [];
     n.ref = node.ref;
@@ -496,22 +575,34 @@ class CRPPLIN extends Rule {
 
     let name = [];
     let i = child(noun, 0);
+    // console.log(i);
     while (i && i["@type"] == "N") {
-      if (i.prop) {
-        name.push(i.prop);
-      } else if (child(i, 0).prop) {
-        name.push(child(i, 0).prop);
-      }
-      i = child(i, 1);
+      //if (i.prop) {
+      //  name.push(i.prop);
+      //} else if (child(i, 0).prop) {
+      //  name.push(child(i, 0).prop);
+      //}
+      i = child(i, 0);
     }
 
+    
+    name.push(i.value);
     name.push(child(prep, 0).value);
 
+    // console.log(name);
     child(prep, 0).value = name.join("-");
+
+    // console.log(child(np, 1));
+    // console.log(child(np, 1));
+    // console.log(child(prep, 0));
+    // console.log(child(np, 1));
     
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
+    //console.log(JSON.stringify(cond, undefined, 2));
+    //throw new Error("hi");
+
     return [[], body, node];
   }
 }
@@ -571,7 +662,7 @@ class CRPPADJLIN extends Rule {
 
 class CRLIN extends CompositeRule {
   constructor(ids) {
-    super([new CRPPLIN(ids), new CRNLIN(ids), new CRPPADJLIN(ids), new CRADJLIN(ids)]);
+    super([new CRPPLIN(ids), new CRNLIN(ids), new CRNLIN2(ids), new CRPPADJLIN(ids), new CRADJLIN(ids)]);
   }
 }
 
@@ -1200,6 +1291,7 @@ class CRADJ extends Rule {
     }
     // console.log(name.join("-"));
     //console.log(node);
+    // throw new Error("hi");
     let pred = PRED(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], node];
@@ -1460,10 +1552,18 @@ class CRPUNCT2 extends Rule {
 
 class CRPUNCT extends CompositeRule {
   constructor(ids) {
-    super([
-      new CRPUNCT1(ids), 
-      new CRPUNCT2(ids),
-    ]);
+    super([new CRPUNCT1(ids), new CRPUNCT2(ids)]);
+  }
+}
+
+class CRN_ extends Rule {
+  constructor(ids) {
+    super(ids, N_(capture("noun")));
+  }
+  apply({noun}, node) {
+    // Re-write N_ nodes as N.
+    noun["@type"] = "N";
+    return [[], []];
   }
 }
 
@@ -1532,7 +1632,7 @@ class Rules {
       new CRQUESTION(ids),
       new CRPUNCT(ids),
     ];
-    return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
+    return [[new CRNAME(ids), new CRN_(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
   }
 }
 

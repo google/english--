@@ -96,6 +96,9 @@ class DRS {
     let body = nodes || this.body;
     
     for (let cond of body) {
+      if (!cond.print) {
+        throw new Error("Invalid node structure: " + JSON.stringify(cond, undefined, 2));
+      }
       result.push(cond.print(inner ? "" : nl));
     }
     

@@ -20,6 +20,7 @@ const {
   AUX,
   PRO,
   DET,
+  N_,
   N,
   RC,
   RPRO,
@@ -527,7 +528,7 @@ describe("Lexer", function() {
     assertThat(clear(results[0].children[0].children[0]))
       .equalsTo(S(NP(PN("Jones")),
                   VP_(VP(V("loves"),
-                         NP(DET("a"), N(ADJ("foo"), N("woman")))
+                         NP(DET("a"), N_(ADJ("foo"), N_(N("woman"))))
                         ))
                  ));
   });
@@ -777,13 +778,13 @@ describe("Lexer", function() {
                   VP_(VP(V("loves"), NP(PRO("herself"))))));
   });
   
-  it("Jones loves Mary", function() {        
+  it("Every man loves Mary", function() {        
     assertThat(parse("every man loves Mary.", "Statement"))
-      .equalsTo(S(NP(DET("every"), N("man")),
+      .equalsTo(S(NP(DET("every"), N_(N("man"))),
                   VP_(VP(V("loves"), NP(PN("Mary"))))));
     
     assertThat(parse("some man loves Mary.", "Statement"))
-      .equalsTo(S(NP(DET("some"), N("man")),
+      .equalsTo(S(NP(DET("some"), N_(N("man"))),
                   VP_(VP(V("loves"), NP(PN("Mary"))))));
     // return;
     assertThat(parse("he loves her.", "Statement"))

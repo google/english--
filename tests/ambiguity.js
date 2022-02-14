@@ -66,13 +66,13 @@ function clear(root) {
 
 describe("Ambiguity", () => {
 
-  it.only("father with a book by a woman", () => {
+  it("father with a book by a woman", () => {
     const {dict} = require("./dict.js");
     assertThat(
-      new Parser("N", dict).feed("father").length
+      new Parser("N_", dict).feed("father with a book").length
     ).equalsTo(1);
     assertThat(
-      new Parser("N_", dict).feed("father with a book").length
+      new Parser("N_", dict).feed("father").length
     ).equalsTo(1);
     assertThat(
       new Parser("N_", dict).feed("father with a book by a woman").length
@@ -105,7 +105,7 @@ describe("Ambiguity", () => {
     assertThat(
       clear(new Parser("NP", dict).feed("a reservation")[0])
     ).equalsTo(
-      NP(DET("a"), N("reservation"))
+      NP(DET("a"), N_(N("reservation")))
     );
 
     //assertThat(
@@ -114,7 +114,6 @@ describe("Ambiguity", () => {
     //  NP(DET("a"), N_(N("reservation")))
     //);
   });
-    
   
   it("Brian's reservation", () => {
     const {dict} = require("./dict.js");
@@ -125,7 +124,7 @@ describe("Ambiguity", () => {
     assertThat(
       clear(new Parser("NP", dict).feed("Brian's reservation")[0])
     ).equalsTo(
-      NP(DET(NP(PN("Brian")), "'s"), N("reservation"))
+      NP(DET(NP(PN("Brian")), "'s"), N_(N("reservation")))
     );
 
     //assertThat(
@@ -136,7 +135,44 @@ describe("Ambiguity", () => {
 
 
   });
-  
+
+  it("a reservation", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("a reservation").length
+    ).equalsTo(1);
+    
+    assertThat(
+      clear(new Parser("NP", dict).feed("a reservation")[0])
+    ).equalsTo(
+      NP(DET("a"), N_(N("reservation")))
+    );
+
+    //assertThat(
+    //  clear(new Parser("NP", dict).feed("Brian's reservation")[1])
+    //).equalsTo(
+    //  NP(DET(NP(PN("Brian")), "'s"), N_(N("reservation")))
+    //);
+
+
+  });
+
+  it("a reservation which loves", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("a reservation which loves").length
+    ).equalsTo(1);
+    
+    assertThat(
+      clear(new Parser("NP", dict).feed("a reservation which loves")[0])
+    ).equalsTo(
+      NP(DET("a"), N_(N_(N("reservation")),
+                      RC(RPRO("which"),
+                         S(NP(GAP()), VP_(VP(V("loves"))))
+                        )))
+    );
+  });
+
   it("father with a book by a woman", () => {
     const {dict} = require("./dict.js");
 
@@ -146,9 +182,9 @@ describe("Ambiguity", () => {
       N_(
         N_(
           N_(N("father")),
-          PP(PREP("with"), NP(DET("a"), N("book")))
+          PP(PREP("with"), NP(DET("a"), N_(N("book"))))
         ),
-        PP(PREP("by"), NP(DET("a"), N("woman")))
+        PP(PREP("by"), NP(DET("a"), N_(N("woman"))))
       )
     );
 
@@ -220,9 +256,9 @@ describe("Ambiguity", () => {
                     N_(
                       N_(
                         N_(N("reservation")),
-                        PP(PREP("for"), NP(DET("a"), N("woman")))
+                        PP(PREP("for"), NP(DET("a"), N_(N("woman"))))
                       ),
-                      PP(PREP("with"), NP(DET("a"), N("porsche")))
+                      PP(PREP("with"), NP(DET("a"), N_(N("porsche"))))
                     )
                    ))))), ".")));
   });
