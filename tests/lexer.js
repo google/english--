@@ -638,6 +638,20 @@ describe("Lexer", function() {
     assertThat(tokens.longest("loves ")).equalsTo("love");
   });
   
+  it("brother", function() {
+    const {dict} = require("../src/large.js"); 
+    const {Parser} = DRT;
+    let parser = new Parser("N", dict);
+    
+    let {lexer} = parser;
+    lexer.reset("brother ");
+    assertThat(lexer.next()).equalsTo(token("word", "brother", 0, [{
+      "@type": "N",
+      "prop": "brother",
+      "types": {"gen": "male", "num": "sing"}
+    }]));
+  });
+  
   it("Brian loves an awesome woman.", function() {
     const {dict} = require("../src/large.js"); 
     const {Parser} = DRT;

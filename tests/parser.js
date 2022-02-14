@@ -26,6 +26,7 @@ const {
   PRO,
   DET,
   N,
+  N_,
   RC,
   RPRO,
   GAP,
@@ -1260,7 +1261,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"),
                         NP(DET("a"), 
-                           N(N("book"), PP(PREP("about"), NP(PN("Brazil"))))
+                           N_(N_(N("book")), PP(PREP("about"), NP(PN("Brazil"))))
                           )))));
   });
 
@@ -1269,7 +1270,7 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"),
                         NP(DET("a"), 
-                           N(N("book"), PP(PREP("from"), NP(PN("Brazil"))))), 
+                           N_(N_(N("book")), PP(PREP("from"), NP(PN("Brazil"))))), 
                        ))));
   });
 
@@ -1278,8 +1279,8 @@ describe("Statements", function() {
      .equalsTo(S(NP(PN("Jones")),
                  VP_(VP(V("likes"),
                         NP(DET("a"), 
-                           N(N("girl"), 
-                             PP(PREP("with"), NP(DET("a"), N("telescope")))))
+                           N_(N_(N("girl")), 
+                              PP(PREP("with"), NP(DET("a"), N("telescope")))))
                        ))));
   });
 
@@ -1498,8 +1499,15 @@ describe("Statements", function() {
     // This is ambiguous because it has the following interpretations:
     // - [Either Jones's wife or Smith's brother] loves Mary. or
     // - [Either Jones's wife or Smith]'s brother loves Mary.
+    // The new grammar resolves this ambiguity in favor of the former
+    // rather than the latter.
     assertThat(parse("Either Jones's wife or Smith's brother loves Mary."))
-      .equalsTo(2);
+      .equalsTo(S(NP("Either",
+                     NP(DET(NP(PN("Jones")), "'s"), N("wife")),
+                     "or",
+                     NP(DET(NP(PN("Smith")), "'s"), N("brother"))
+                    ),
+                  VP_(VP(V("loves"), NP(PN("Mary"))))));
    });
 
   it("Every man is mortal.", function() {

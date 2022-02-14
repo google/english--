@@ -704,19 +704,19 @@ const DrtSyntax = `
       Q_ -> Q.
 
       Q -> AUX[num=1, fin=+, tp=2, tense=3] __ 
-           NP[num=1, gen=4, case=+nom, gap=-] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
            VP[num=1, fin=-, gap=-, tp=5, tense=3].
 
       Q -> BE[num=1, fin=+, tp=2, tense=3] __
-           NP[num=1, gen=4, case=+nom, gap=-] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
            ADJ.
 
       Q -> BE[num=1, fin=2, tp=-past, tense=4] __
-           NP[num=1, gen=3, case=+nom, gap=-] __
+           NP[num=1, gen=3, case=+nom, gap=-, prep=+] __
            PP.
 
       Q -> BE[num=1, fin=2, tp=-past, tense=4] __
-           NP[num=1, gen=3, case=+nom, gap=-] __
+           NP[num=1, gen=3, case=+nom, gap=-, prep=+] __
            DET[num=1] __ 
            N[num=1, gen=5].
 
@@ -725,7 +725,7 @@ const DrtSyntax = `
 
       Q -> WH __ 
            AUX[num=1, fin=+, tp=2, tense=3] __
-           NP[num=1, gen=4, case=+nom, gap=-] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
            V[num=1, fin=-, trans=+].
 
       Q -> WH __ 
@@ -756,15 +756,15 @@ const DrtSyntax = `
           S[num=5, gap=-, tp=2, tense=3].
 
       S[num=1, gap=-, tp=3, tense=4] -> 
-          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          NP[num=1, gen=2, case=+nom, gap=-, prep=5] __ 
           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
       S[num=1, gap=np, tp=3, tense=4] ->
-          NP[num=1, gen=2, case=+nom, gap=np] _ 
+          NP[num=1, gen=2, case=+nom, gap=np, prep=5] _ 
           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
       S[num=1, gap=np, tp=3, tense=4] ->
-          NP[num=1, gen=2, case=+nom, gap=-] __ 
+          NP[num=1, gen=2, case=+nom, gap=-, prep=5] __ 
           VP_[num=1, fin=+, gap=np, tp=3, tense=4].
 
       VP_[num=1, fin=+, gap=2, stat=3, tp=4, tense=fut] ->
@@ -781,11 +781,11 @@ const DrtSyntax = `
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] ->
           V[num=1, fin=2, trans=+, stat=3, tp=4, tense=5] __ 
-          NP[num=6, gen=7, case=-nom, gap=-].
+          NP[num=6, gen=7, case=-nom, gap=-, prep=8].
 
       VP[num=1, fin=2, gap=np, tp=6, tense=7] ->
           V[num=1, fin=2, trans=+, tp=6, tense=7] _ 
-          NP[num=4, gen=5, case=-nom, gap=np].
+          NP[num=4, gen=5, case=-nom, gap=np, prep=8].
 
       VP[num=1, fin=2, gap=-, stat=3, tp=4, tense=5] -> 
         V[num=1, fin=2, trans=-, stat=3, tp=4, tense=5].
@@ -803,32 +803,32 @@ const DrtSyntax = `
           BE[num=1, fin=+, tp=-past, tense=5] __
           VP[num=1, fin=part, gap=np, stat=6, tp=8, tense=5].
 
-      NP[num=1, gen=2, case=3, gap=np] -> GAP.
+      NP[num=1, gen=2, case=3, gap=np, prep=4] -> GAP.
 
       GAP -> null.
 
-      NP[num=1, gen=2, case=3, gap=-] -> DET[num=1] __ N[num=1, gen=2].
+      NP[num=1, gen=2, case=3, gap=-, prep=-] -> DET[num=1] __ N[num=1, gen=2].
 
-      NP[num=sing, gen=2, case=3, gap=-] -> PN[gen=2].
+      NP[num=1, gen=2, case=3, gap=-, prep=+] -> DET[num=1] __ N_[num=1, gen=2, prep=+].
 
-      NP[num=plur, gen=2, case=3, gap=-] -> N[num=plur, gen=2].
+      NP[num=sing, gen=2, case=3, gap=-, prep=4] -> PN[gen=2].
+
+      NP[num=plur, gen=2, case=3, gap=-, prep=4] -> N[num=plur, gen=2].
  
       PN -> %the __ PN.
 
-      NP[num=1, gen=2, case=3, gap=-] -> PRO[num=1, gen=2, case=3].
+      NP[num=1, gen=2, case=3, gap=-, prep=4] -> PRO[num=1, gen=2, case=3].
 
       NP[num=plur, gen=1, case=2, gap=-] -> 
         NP[num=3, gen=4, case=2, gap=-] __ 
         %and __ 
         NP[num=5, gen=6, case=2, gap=-].
 
-      NP[num=3, gen=1, case=2, gap=-] -> 
+      NP[num=3, gen=1, case=2, gap=-, prep=7] -> 
         %either __
-        NP[num=3, gen=4, case=2, gap=-] __ 
+        NP[num=3, gen=4, case=2, gap=-, prep=7] __ 
         %or __ 
-        NP[num=3, gen=6, case=2, gap=-].
-
-      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
+        NP[num=3, gen=6, case=2, gap=-, prep=7].
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
@@ -844,12 +844,12 @@ const DrtSyntax = `
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
           BE[num=1, fin=2, tp=-past, tense=7] __ 
-          NP[num=3, gen=4, case=5, gap=-].
+          NP[num=3, gen=4, case=5, gap=-, prep=8].
 
       VP[num=1, fin=2, gap=-, stat=+, tp=-past, tense=7] -> 
           BE[num=1, fin=2, tp=-past, tense=7] __ 
           %not __ 
-          NP[num=3, gen=4, case=5, gap=-].
+          NP[num=3, gen=4, case=5, gap=-, prep=8].
 
       DET[num=sing] -> %a.
       DET[num=sing] -> %an.
@@ -873,10 +873,8 @@ const DrtSyntax = `
       DET[num=plur, quant=+] -> %exactly __ %UNSIGNED_INT.
       DET[num=plur, quant=+] -> %UNSIGNED_INT.
       
-      DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-] _ %POSS.
+      DET[num=1] -> NP[num=2, gen=3, case=+nom, gap=-, prep=+] _ %POSS.
 
-      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
-      
       PRO[num=sing, gen=male, case=+nom] -> %he.
       PRO[num=sing, gen=male, case=-nom] -> %him.
       
@@ -896,9 +894,15 @@ const DrtSyntax = `
         V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] __ 
         PP.  
 
-      N[num=1, gen=2] -> N[num=1, gen=2] __ PP.
+      N[num=1, gen=2] -> ADJ __ N[num=1, gen=2].
+      
+      N[num=1, gen=2] -> N[num=1, gen=2] __ RC[num=1, gen=2].
 
-      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-].
+      N_[num=1, gen=2, prep=+] -> N_[num=1, gen=2, prep=3] __ PP.
+
+      N_[num=1, gen=2, prep=-] -> N[num=1, gen=2].
+
+      PP -> PREP __ NP[num=1, gen=2, case=3, gap=-, prep=-].
 
       ADJ -> ADJ __ PP.
       
@@ -1179,6 +1183,7 @@ module.exports = {
     "PRO": node("PRO"),
     "DET": node("DET"),
     "N": node("N"),
+    "N_": node("N_"),
     "RC": node("RC"),
     "RPRO": node("RPRO"),
     "GAP": node("GAP"),

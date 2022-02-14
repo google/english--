@@ -73,6 +73,8 @@ class Tokenizer {
   }
   next() {
 
+    // console.log("next");
+    
     {
       // numbers.
       let match = this.buffer.match(/^([0-9]+[KMBT]?)/);
@@ -90,6 +92,8 @@ class Tokenizer {
 
     let next = this.longest(this.buffer);
 
+    // console.log(next);
+    
     // proper names form.
     let match = this.buffer.match(/^([A-Z][A-Za-z\-]+)(\s[A-Z][A-Za-z\-]+)*/);
     //console.log(this.buffer);
@@ -117,8 +121,11 @@ class Tokenizer {
     let [name, first] = match || [];
     // console.log(first);
     // console.log(this.loc);
+    //console.log(name);
     if (next && !name) {
+      // console.log(next);
       this.eat(next);
+      // console.log(JSON.stringify(this.get(next), undefined, 2));
       return this.get(next);
     } else if (!next && name) {
       this.eat(name);
@@ -133,6 +140,7 @@ class Tokenizer {
       if (tok["@type"] != "%word" &&
          first.length <= next.length) {
         this.eat(next);
+        // console.log(this.get(next));
         return this.get(next);
       } else if (name.length > next.length) {
         // If the proper name is the longest string
