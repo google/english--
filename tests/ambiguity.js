@@ -320,25 +320,25 @@ describe("Ambiguity", () => {
   it("Jones is a happy man who loves Mary.", function() {
     assertThat(
       new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.").length)
-      .equalsTo(2);
+      .equalsTo(1);
 
     // Jones is [a happy [man who loves Mary]].
     // Jones is [a happy man [who loves Mary]].
-    assertThat(
-      clear(new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.")[0])
-    ).equalsTo(
-      Statement(
-        S_(S(NP(PN("Jones")),
-             VP_(VP(BE("is"),
-                    NP(DET("a"), N_(ADJ("happy"),
-                                    N_(N_(N("man")),
-                                       RC(RPRO("who"), S(NP(GAP()), VP_(VP(V("loves"), NP(PN("Mary"))))))
-                                      )))
-                   )))), ".")
-    );
+    //assertThat(
+    //  clear(new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.")[0])
+    //).equalsTo(
+    //  Statement(
+    //    S_(S(NP(PN("Jones")),
+    //         VP_(VP(BE("is"),
+    //                NP(DET("a"), N_(ADJ("happy"),
+    //                                N_(N_(N("man")),
+    //                                   RC(RPRO("who"), S(NP(GAP()), VP_(VP(V("loves"), NP(PN("Mary"))))))
+    //                                  )))
+    //               )))), ".")
+    //);
 
     assertThat(
-      clear(new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.")[1])
+      clear(new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.")[0])
     ).equalsTo(
       Statement(
         S_(S(NP(PN("Jones")),

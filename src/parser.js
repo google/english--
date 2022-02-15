@@ -892,7 +892,7 @@ const DrtSyntax = `
         V[num=1, fin=2, trans=3, stat=4, tp=5, tense=6] __ 
         PP.  
 
-      N_[num=1, gen=2, prep=3] -> ADJ __ N_[num=1, gen=2, prep=3].
+      N_[num=1, gen=2, prep=3] -> ADJ __ N_[num=1, gen=2, prep=-].
       
       N_[num=1, gen=2, prep=+] -> N_[num=1, gen=2, prep=3] __ RC[num=1, gen=2].
 

@@ -2394,7 +2394,7 @@ describe("Large Lexicon", () => {
        l = k.
        official-language(l).
        language(l).
-       language-of(l, a).
+       official-language-of(l, a).
        Pedro-Alvares-Cabral(m).
        Portuguese-Empire(n).
        s4 < __now__.
