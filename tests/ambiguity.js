@@ -326,7 +326,13 @@ describe("Ambiguity", () => {
       new Parser("N_", dict).feed("happy woman that likes Sam near Jones").length)
       .equalsTo(1);
 
+    // We favor the first interpretation:
     // [happy woman [that likes Sam] near Jones]
+
+    // But these are valid interpretations too:
+    // [happy woman [that likes [Sam near Jones]]]
+    // happy [woman [that likes Sam] near Jones]
+    // happy [woman [that likes Sam near Jones]]
     assertThat(
       clear(new Parser("N_", dict).feed("happy woman that likes Sam near Jones")[0]))
       .equalsTo(
