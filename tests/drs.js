@@ -8,7 +8,7 @@ const {Tokenizer} = require("../src/lexer.js");
 const {Console} = require("../src/console.js");
 const {KB} = require("logic/src/solver.js");
 
-describe.skip("DRS", function() {
+describe("DRS", function() {
 
   it("A man admires a woman.", function() {
     assertThat("A man admires a woman.")
@@ -2026,7 +2026,7 @@ describe.skip("DRS", function() {
   }
 });
 
-describe.skip("Large Lexicon", () => {
+describe("Large Lexicon", () => {
   it("Mel likes Yuji's girlfriend.", function() { 
     assertThat("Mel likes Yuji's girlfriend.")
       .equalsTo(`
@@ -2438,6 +2438,18 @@ describe.skip("Large Lexicon", () => {
   });
 
   it("Every country is a political territory which is controlled.", () => {
+    assertThat(`
+      Every country is a political territory which is controlled.
+    `).equalsTo(`
+       for (let every a: country(a)) {
+         political-territory(a).
+         territory(a).
+         control(s0, b, a).
+       }
+     `);
+  });
+  
+  it("Every country is a political territory which is controlled.", () => {
     // TODO: allow adjectives to apply to multiple nouns.
     // A country is a political state, nation or territory which is controlled
     // Things that I'd expect to be able to write:
@@ -2470,6 +2482,24 @@ describe.skip("Large Lexicon", () => {
   });
 
   it("Every nation is a stable community of some peoples with a common language.", () => {
+    assertThat(`
+      Every nation is a stable community of some peoples with a common language.
+    `).equalsTo(`
+       for (let every a: nation(a)) {
+         stable-community(a).
+         for (let some b: people(b)) {
+           stable-community-of(a, b).
+         }
+         community(a).
+         common-language(c).
+         language(c).
+         stable-community-with(a, c).
+       }
+     `);
+
+  });
+  
+  it("Every nation is a stable community of some peoples with a common language.", () => {
     // Things I'd expect I'd be able to write:
     //   - a stable community of peoples (probably need generics)
     //   - some peoples with a common language, territory, history, ethnicity or culture.
@@ -2494,7 +2524,7 @@ describe.skip("Large Lexicon", () => {
          community(a).
          common-language(c).
          language(c).
-         with(a, c).
+         stable-community-with(a, c).
        }
        for (let every d: nation(d)) {
          political(d).
@@ -2512,7 +2542,7 @@ describe.skip("Large Lexicon", () => {
          community(g).
          aware(g).
          autonomy(h).
-         of(g, h).
+         cultural-community-of(g, h).
        }
      `);
   });

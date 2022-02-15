@@ -419,7 +419,7 @@ class CRPRO extends CompositeRule {
 
 class CRSID extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_()));
+    super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_()));
   }
   
   apply({det, noun}, node, refs) {
@@ -439,7 +439,7 @@ class CRSID extends Rule {
 
 class CRVPID extends Rule {
   constructor(ids) {
-    super(ids, VP(V(), NP(DET(capture("det")), N(capture("noun")))));
+    super(ids, VP(V(), NP(DET(capture("det")), N_(capture("noun")))));
   }
   
   apply({det, noun}, node, refs) {
@@ -467,12 +467,11 @@ class CRID extends CompositeRule {
 
 class CRNLIN extends Rule {
   constructor(ids) {
-    super(ids, N(capture("noun")));
+    super(ids, N_(N(capture("noun"))));
   }
   
   apply({noun}, node) {
-    // console.log(node.prop);
-    if (!node.ref || node.children.length != 1 || !node.prop) {
+    if (!node.ref || node.children.length != 1 || !noun.prop) {
       return;
     }
     //console.log(node);
@@ -485,34 +484,7 @@ class CRNLIN extends Rule {
     //const n = child(noun, 0);
     //console.log(n);
     //throw new Error("hi");
-    let pred = PRED(noun.prop, node.ref, node.types);
-    // console.log(pred);
-    // throw new Error("hello");
-    
-    return [[], [pred], node];
-  }
-}
-
-class CRNLIN2 extends Rule {
-  constructor(ids) {
-    super(ids, N(N(capture("foo"))));
-  }
-  
-  apply({foo}, node) {
-    console.log(JSON.stringify(node, undefined, 2));
-    throw new Error("hello");
-    if (!node.ref || node.children.length != 1 || !node.prop) {
-      return;
-    }
-    //console.log(node);
-    //throw new Error("hi");
-
-    // console.log(noun);
-    // console.log(noun);
-    // noun.ref = node.ref;
-    
-    //const n = child(noun, 0);
-    //console.log(n);
+    //console.log(noun);
     //throw new Error("hi");
     let pred = PRED(noun.prop, node.ref, node.types);
     // console.log(pred);
@@ -522,48 +494,32 @@ class CRNLIN2 extends Rule {
   }
 }
 
-/**
-class CRNLIN2 extends Rule {
-  constructor(ids) {
-    super(ids, N(capture("noun")));
-  }
-  
-  apply({noun}, node) {
-    // console.log(node.ref);
-    if (!node.ref || node.children.length != 1) {
-      return;
-    }
-    //console.log(node);
-    //throw new Error("hi");
-
-    // console.log(noun);
-    // console.log(noun);
-    // noun.ref = node.ref;
-    
-    // throw new Error("hi");
-    // console.log(noun);
-    throw new Error("hello");
-    let pred = PRED(noun.prop, node.ref, node.types);
-    // console.log(pred);
-    
-    return [[], [pred], node];
-  }
-}
-*/
 class CRPPLIN extends Rule {
   constructor(ids) {
-    super(ids, N(capture("noun"),
-                 PP(PREP(capture("prep")), capture("np"))));
+    super(ids, N_(capture("noun"),
+                  PP(PREP(capture("prep")), capture("np"))));
   }
   apply({noun, prep, np}, node) {
     if (!node.ref) {
       return;
     }
 
+    let i = child(noun, 0);
+    //while (i) {
+      // console.log(i);
+    //  if (i["@type"] != "N_") {
+    //    return;
+    //  }
+    //  i = child(i, 0);      
+      // throw new Error("hi");
+    //}
+    
+    // console.log(noun);
+
     //console.log(node);
     //throw new Error("hi");
-    //console.log(JSON.stringify(node, undefined, 2));
-    //throw new Error("hi");
+    //console.log(JSON.stringify(noun, undefined, 2));
+    // throw new Error("hi");
     
     const n = child(node, 0);
 
@@ -574,20 +530,36 @@ class CRPPLIN extends Rule {
     body.push(n);
 
     let name = [];
-    let i = child(noun, 0);
     // console.log(i);
-    while (i && i["@type"] == "N") {
-      //if (i.prop) {
-      //  name.push(i.prop);
-      //} else if (child(i, 0).prop) {
+    // console.log(JSON.stringify(noun, undefined, 2));
+    while (i && i["@type"] == "N_") {
+    // while (i && i[""]) {
+      // console.log(i);
+      if (child(i, 0)["@type"] == "ADJ") {
+        name.push(child(i, 0).prop);
+        // throw new Error("hi");
+        i = child(i, 1);
+        continue;
+      }
+
+      if (i.prop) {
+        name.push(i.prop);
+      }
+      i = child(i, 0);
+      // throw new Error();
+      //else if (child(i, 0).prop) {
       //  name.push(child(i, 0).prop);
       //}
-      i = child(i, 0);
+      //console.log(i);
     }
 
-    
-    name.push(i.value);
+   
+    name.push(i.prop);
     name.push(child(prep, 0).value);
+
+    //console.log(name);
+    //console.log(i);
+    //throw new Error("hi");
 
     // console.log(name);
     child(prep, 0).value = name.join("-");
@@ -650,6 +622,9 @@ class CRPPADJLIN extends Rule {
       i = child(i, 1);
     }
 
+    //console.log(name);
+    //throw new Error("foo");
+    
     name.push(child(prep, 0).value);
     child(prep, 0).value = name.join("-");
     
@@ -662,7 +637,7 @@ class CRPPADJLIN extends Rule {
 
 class CRLIN extends CompositeRule {
   constructor(ids) {
-    super([new CRPPLIN(ids), new CRNLIN(ids), new CRNLIN2(ids), new CRPPADJLIN(ids), new CRADJLIN(ids)]);
+    super([new CRPPLIN(ids), new CRNLIN(ids), new CRPPADJLIN(ids), new CRADJLIN(ids)]);
   }
 }
 
@@ -712,12 +687,18 @@ class CRADV extends Rule {
 
 class CRNRC extends Rule {
   constructor(ids) {
-    super(ids, N(N(), RC(capture("rc"))));
+    super(ids, N_(N_(), RC(capture("rc"))));
   }
   
   apply(m, node) {
     let head = [];
     let body = [];    
+
+    // throw new Error(JSON.stringify(node, undefined, 2));
+    // if (!node.ref) {
+    //  return [head, body];
+    //}
+
     let rc = node.children.pop();
     let s = rc.children[1];
     
@@ -735,6 +716,7 @@ class CRNRC extends Rule {
     
     let subject = s.children[0];
     if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
+      // console.log(child(node, 0));
       s.children[0] = node.ref[0];
     }
     
@@ -825,9 +807,10 @@ class CRNEGBE extends Rule {
 
 class CRNBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N(capture("noun")))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
+    // throw new Error("hi");
     let np = clone(noun);
     np.ref = [ref];
     
@@ -842,11 +825,13 @@ class CRNBE extends Rule {
 
 class CRGENERICBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(N(capture("noun")))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(N_(capture("noun")))))));
   }
   apply({ref, noun}, node, refs) {
     let np = clone(noun);
     np.ref = [ref];
+    console.log();
+    // throw new Error("hi");
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -859,7 +844,7 @@ class CRGENERICBE extends Rule {
 
 class CRNEGNBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N(capture("noun")))))));
+    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
     let sub = drs(this.ids);
@@ -944,7 +929,7 @@ class CRCOND extends Rule {
 
 class CRGENERIC extends Rule {
   constructor(ids) {
-    super(ids, S(NP(N(capture("noun"))), VP_(capture("verb"))));
+    super(ids, S(NP(N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({noun, verb}, node, refs) {
     let ref = REF(this.id(), noun.types);
@@ -972,7 +957,7 @@ class CRGENERIC extends Rule {
 
 class CRVPGENERIC extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"), VP_(VP(V(), NP(N(capture("noun")))))));
+    super(ids, S(capture("subject"), VP_(VP(V(), NP(N_(capture("noun")))))));
   }
   apply({subject, noun}, node, refs) {
     let ref = REF(this.id(), noun.types);
@@ -1001,7 +986,7 @@ class CRVPGENERIC extends Rule {
 
 class CREVERY extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(capture("det")), N(capture("noun"))), VP_(capture("verb"))));
+    super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
     if (!det.types.quant) {
@@ -1057,7 +1042,7 @@ class CREVERY extends Rule {
 
 class CRVPEVERY extends Rule {
   constructor(ids) {
-    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N(capture("noun")))))));
+    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({det, subject, noun}, node, refs) {
     if (!det.types.quant) {
@@ -1214,7 +1199,7 @@ class CRAND extends CompositeRule {
 // Possessive Phrases
 class CRSPOSS extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(capture("name"), "'s"), N(capture("noun")))));
+    super(ids, S(NP(DET(capture("name"), "'s"), N_(capture("noun")))));
   }
   
   apply({name, noun, verb}, node, refs) {
@@ -1231,7 +1216,7 @@ class CRSPOSS extends Rule {
 
 class CRVPPOSS extends Rule {
   constructor(ids) {
-    super(ids, S(capture("sub"), VP_(VP(capture("verb"), NP(DET(capture("name"), "'s"), N(capture("noun")))))));
+    super(ids, S(capture("sub"), VP_(VP(capture("verb"), NP(DET(capture("name"), "'s"), N_(capture("noun")))))));
   }
   
   apply({name, noun, verb}, node, refs) {
@@ -1270,7 +1255,7 @@ class CRPOSS extends CompositeRule {
 
 class CRADJ extends Rule {
   constructor(ids) {
-    super(ids, N(ADJ(capture("adj")), N(capture("noun"))));
+    super(ids, N_(ADJ(capture("adj")), N_(capture("noun"))));
   }
   apply({adj, noun}, node, refs) {
     if (!node.ref) {
@@ -1281,17 +1266,45 @@ class CRADJ extends Rule {
     noun.ref = node.ref;
     let name = [];
     let i = node;
-    while (i && i["@type"] == "N") {
-      if (i.prop) {
-        name.push(i.prop);
-      } else {
+
+    //console.log(JSON.stringify(i, undefined, 2));
+    //throw new Error();
+    while (i && i["@type"] == "N_") {
+      // console.log(i);
+      if (child(i, 0)["@type"] == "ADJ") {
         name.push(child(i, 0).prop);
+        //console.log(name);
+        //throw new Error("hi");
+        i = child(i, 1);
+        //console.log(i);
+        //throw new Error("hi");
+        continue;
+      } else if (child(i, 0)["@type"] == "N") {
+        name.push(child(i, 0).prop);
+        //console.log(child(i, 0).prop);
+        //console.log();
+        //throw new Error();
+        i = child(i, 0);
+        //throw  new Error("hi");
+        continue;
+      } else if (i.prop) {
+        name.push(i.prop);
+        // i = child(i, 0);
+        
       }
-      i = child(i, 1);
+      i = child(i, 0);
+      //else {
+      //throw new Error("hi");
+      // name.push(child(i, 0).prop);
+      //}
+      //console.log(i);
+      //throw new Error("hi");
     }
-    // console.log(name.join("-"));
+    
+    //console.log(JSON.stringify(node, undefined, 2));
+    //console.log(name.join("-"));
     //console.log(node);
-    // throw new Error("hi");
+    //throw new Error("hi");
     let pred = PRED(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], node];
@@ -1433,7 +1446,7 @@ class CRQUESTIONBEDETN extends Rule {
       BE(capture("be")),
       ANY(capture("sub")),
       DET(capture("det")),
-      N(capture("noun")),
+      N_(capture("noun")),
     ))));
   }
   apply({be, sub, det, noun}, node) {
@@ -1450,6 +1463,7 @@ class CRQUESTIONYESNO extends Rule {
     super(ids, Question(Q_(Q(AUX(), ANY(capture("sub")), VP(capture("vp")), "?"))));
   }
   apply({sub, vp}, node) {
+    // throw new Error("hi");
     let q = drs(this.ids);
     
     q.push(S(sub, VP_(vp)));
@@ -1476,7 +1490,7 @@ class CRQUESTIONWHO extends Rule {
 
 class CRQUESTIONWHICH extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q(WH(), N(capture("noun")), VP_(capture("vp_")))), "?"));
+    super(ids, Question(Q_(Q(WH(), N_(capture("noun")), VP_(capture("vp_")))), "?"));
   }
   apply({noun, vp_}, node, refs = []) {
     let q = drs(this.ids);
@@ -1556,17 +1570,6 @@ class CRPUNCT extends CompositeRule {
   }
 }
 
-class CRN_ extends Rule {
-  constructor(ids) {
-    super(ids, N_(capture("noun")));
-  }
-  apply({noun}, node) {
-    // Re-write N_ nodes as N.
-    noun["@type"] = "N";
-    return [[], []];
-  }
-}
-
 class CRPRED extends Rule {
   constructor(ids) {
     super(ids, S(ANY(capture("sub")),
@@ -1632,7 +1635,7 @@ class Rules {
       new CRQUESTION(ids),
       new CRPUNCT(ids),
     ];
-    return [[new CRNAME(ids), new CRN_(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
+    return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
   }
 }
 

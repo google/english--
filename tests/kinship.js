@@ -80,8 +80,8 @@ describe("Kinship", function() {
           married(a).
           parent(b).
           sibling(c).
-          of(a, b).
-          to(a, c).
+          male-relative-of(a, b).
+          male-relative-to(a, c).
         }
     `);
   });

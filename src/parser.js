@@ -704,19 +704,19 @@ const DrtSyntax = `
       Q_ -> Q.
 
       Q -> AUX[num=1, fin=+, tp=2, tense=3] __ 
-           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=6] __
            VP[num=1, fin=-, gap=-, tp=5, tense=3].
 
       Q -> BE[num=1, fin=+, tp=2, tense=3] __
-           NP[num=1, gen=4, case=+nom, gap=-, prep=+] __
+           NP[num=1, gen=4, case=+nom, gap=-, prep=5] __
            ADJ.
 
       Q -> BE[num=1, fin=2, tp=-past, tense=4] __
-           NP[num=1, gen=3, case=+nom, gap=-, prep=+] __
+           NP[num=1, gen=3, case=+nom, gap=-, prep=5] __
            PP.
 
       Q -> BE[num=1, fin=2, tp=-past, tense=4] __
-           NP[num=1, gen=3, case=+nom, gap=-, prep=+] __
+           NP[num=1, gen=3, case=+nom, gap=-, prep=7] __
            DET[num=1] __ 
            N_[num=1, gen=5, prep=6].
 
