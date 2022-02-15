@@ -303,19 +303,6 @@ describe("DRS", function() {
     `);
   });
 
-  it("Jones is a happy man who loves Mary.", function() {
-    assertThat("Jones is a happy man who loves Mary.")
-      .equalsTo(2);
-     //.equalsTo(`
-     //  let a, b, s0
-     //  Jones(a)
-     //  Mary(b)
-     //  happy-man(a)
-     //  man(a)
-     //  love(s0, a, b)
-    //`);
-  });
-
   it("Jones is a man. He is happy. He loves Mary.", function() {
     assertThat("Jones is a man. He is happy. He loves Mary.")
      .equalsTo(`

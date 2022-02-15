@@ -807,9 +807,7 @@ const DrtSyntax = `
 
       GAP -> null.
 
-      NP[num=1, gen=2, case=3, gap=-, prep=-] -> DET[num=1] __ N_[num=1, gen=2, prep=-].
-
-      NP[num=1, gen=2, case=3, gap=-, prep=+] -> DET[num=1] __ N_[num=1, gen=2, prep=+].
+      NP[num=1, gen=2, case=3, gap=-, prep=4] -> DET[num=1] __ N_[num=1, gen=2, prep=4].
 
       NP[num=sing, gen=2, case=3, gap=-, prep=4] -> PN[gen=2].
 
