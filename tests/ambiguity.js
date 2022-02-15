@@ -317,6 +317,30 @@ describe("Ambiguity", () => {
     assertThat(new Parser("Discourse", dict).feed("Jones is Brian's brother. He likes Brazil.").length).equalsTo(1);
   });
 
+  it("happy woman that likes Sam near Jones.", function() {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("happy woman that likes Sam").length)
+      .equalsTo(1);
+    assertThat(
+      new Parser("N_", dict).feed("happy woman that likes Sam near Jones").length)
+      .equalsTo(1);
+
+    // [happy woman [that likes Sam] near Jones]
+    assertThat(
+      clear(new Parser("N_", dict).feed("happy woman that likes Sam near Jones")[0]))
+      .equalsTo(
+        N_(
+          N_(
+            N_(ADJ("happy"), N_(N("woman"))),
+            RC(RPRO("that"), S(NP(GAP()), VP_(VP(V("likes"), NP(PN("Sam"))))))
+          ),
+          PP(PREP("near"), NP(PN("Jones")))
+        )
+      );
+    
+  });
+
   it("Jones is a happy man who loves Mary.", function() {
     assertThat(
       new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.").length)
@@ -324,6 +348,9 @@ describe("Ambiguity", () => {
 
     // Jones is [a happy [man who loves Mary]].
     // Jones is [a happy man [who loves Mary]].
+
+    // We favor the second, making the adjective bind quickly to the noun.
+    
     //assertThat(
     //  clear(new Parser("Statement", dict).feed("Jones is a happy man who loves Mary.")[0])
     //).equalsTo(
