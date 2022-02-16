@@ -488,6 +488,14 @@ describe("Ambiguity", () => {
     ).equalsTo(0);
   });
 
+  it.skip("Sam, Dani and Leo", () => {
+    const {dict} = require("./dict.js");
+    console.log(JSON.stringify(new Parser("NP", dict).feed("Sam, Dani and Leo"), undefined, 2));
+    assertThat(
+      new Parser("NP", dict).feed("Sam, Dani and Leo").length
+    ).equalsTo(1);
+  });
+
   it("either Sam or Dani", () => {
     const {dict} = require("./dict.js");
     assertThat(
@@ -510,6 +518,21 @@ describe("Ambiguity", () => {
     // We should disable ANDs of being composites too.
     assertThat(
       new Parser("NP", dict).feed("Either Sam or Dani and Anna").length
+    ).equalsTo(0);
+  });
+
+  it("if Sam likes Anna then Anna likes Sam", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("S", dict).feed("if Sam likes Anna then Anna likes Sam").length
+    ).equalsTo(1);
+  });
+
+  it("if if John likes Dani then Sam likes Anna then Anna likes Sam", () => {
+    const {dict} = require("./dict.js");
+    // We disallow if-then sentences to contain if-then sentences.
+    assertThat(
+      new Parser("S", dict).feed("if if John likes Dani then Sam likes Anna then Anna likes Sam").length
     ).equalsTo(0);
   });
 

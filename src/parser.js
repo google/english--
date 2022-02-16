@@ -736,34 +736,34 @@ const DrtSyntax = `
       WH -> %what.
       WH -> %which.
 
-      S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3].
+      S_[num=1, gap=-, tp=2, tense=3] -> S[num=1, gap=-, tp=2, tense=3, s=+].
 
-      S[num=1, gap=-, tp=2, tense=3] -> 
+      S[num=1, gap=-, tp=2, tense=3, s=+] -> 
           %__if__ __ 
-          S[num=1, gap=-, tp=2, tense=3] __ 
+          S[num=1, gap=-, tp=2, tense=3, s=-] __ 
           %then __ 
-          S[num=1, gap=-, tp=2, tense=3].
+          S[num=1, gap=-, tp=2, tense=3, s=-].
 
-      S[num=1, gap=-, tp=2, tense=3] -> 
-          S[num=4, gap=-, tp=2, tense=3] __ 
+      S[num=1, gap=-, tp=2, tense=3, s=+] -> 
+          S[num=4, gap=-, tp=2, tense=3, s=-] __ 
           %and __ 
-          S[num=5, gap=-, tp=2, tense=3].
+          S[num=5, gap=-, tp=2, tense=3, s=-].
 
-      S[num=1, gap=-, tp=2, tense=3] -> 
+      S[num=1, gap=-, tp=2, tense=3,s=+] -> 
           %either __
-          S[num=4, gap=-, tp=2, tense=3] __ 
+          S[num=4, gap=-, tp=2, tense=3, s=-] __ 
           %or __ 
-          S[num=5, gap=-, tp=2, tense=3].
+          S[num=5, gap=-, tp=2, tense=3, s=-].
 
-      S[num=1, gap=-, tp=3, tense=4] -> 
+      S[num=1, gap=-, tp=3, tense=4, s=6] -> 
           NP[num=1, gen=2, case=+nom, gap=-, deep=5] __ 
           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
-      S[num=1, gap=np, tp=3, tense=4] ->
+      S[num=1, gap=np, tp=3, tense=4, s=6] ->
           NP[num=1, gen=2, case=+nom, gap=np, deep=5] _ 
           VP_[num=1, fin=+, gap=-, tp=3, tense=4].
 
-      S[num=1, gap=np, tp=3, tense=4] ->
+      S[num=1, gap=np, tp=3, tense=4, s=6] ->
           NP[num=1, gen=2, case=+nom, gap=-, deep=5] __ 
           VP_[num=1, fin=+, gap=np, tp=3, tense=4].
 
