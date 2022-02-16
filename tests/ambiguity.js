@@ -66,17 +66,29 @@ function clear(root) {
 
 describe("Ambiguity", () => {
 
-  it("father with a book by a woman", () => {
+  it("father", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("father").length
+    ).equalsTo(1);
+  });
+  
+  it("father with a book", () => {
     const {dict} = require("./dict.js");
     assertThat(
       new Parser("N_", dict).feed("father with a book").length
     ).equalsTo(1);
-    assertThat(
-      new Parser("N_", dict).feed("father").length
-    ).equalsTo(1);
+  });
+  
+  it("father with a book by a woman", () => {
+    const {dict} = require("./dict.js");
     assertThat(
       new Parser("N_", dict).feed("father with a book by a woman").length
     ).equalsTo(1);
+  });
+  
+  it("father with Cascal", () => {
+    const {dict} = require("./dict.js");
     assertThat(
       new Parser("N_", dict).feed("father with Cascal").length
     ).equalsTo(1);
@@ -410,6 +422,13 @@ describe("Ambiguity", () => {
     assertThat(
       new Parser("N_", dict).feed("beautiful book about Brazil").length
     ).equalsTo(1);
+  });
+
+  it("Sam and Dani and Leo", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("Sam and Dani and Leo").length
+    ).equalsTo(2);
   });
 
 
