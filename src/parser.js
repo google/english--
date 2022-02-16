@@ -822,6 +822,11 @@ const DrtSyntax = `
         %and __ 
         NP[num=5, gen=6, case=2, gap=-, deep=7, np=-].
 
+      NP[num=plur, gen=1, case=2, gap=-, deep=7, np=-] -> 
+        NP[num=3, gen=4, case=2, gap=-, deep=7, np=-] _ 
+        %COMMA _
+        NP[num=5, gen=6, case=2, gap=-, deep=7, np=-].
+
       NP[num=3, gen=1, case=2, gap=-, deep=7, np=+] -> 
         %either __
         NP[num=3, gen=4, case=2, gap=-, deep=7, np=-] __ 
@@ -1022,6 +1027,7 @@ class Parser {
       [" ", "WS"],
       ["\n", "WS"],
       [".", "PERIOD"],
+      [",", "COMMA"],
       ["?", "QUESTION"],
       ["'s", "POSS"],
     ]);

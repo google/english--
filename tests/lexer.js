@@ -1208,6 +1208,15 @@ module.exports = ${JSON.stringify(parts, undefined, 2)};
     assertThat(lexer.next()).equalsTo(undefined);
   });
 
+  it(",", () => {
+    let lexer = new Tokenizer();
+    lexer.push(",", "COMMA");
+    
+    lexer.reset(",");
+    assertThat(lexer.next()).equalsTo(token("COMMA", ","));
+    assertThat(lexer.next()).equalsTo(undefined);
+  });
+
 
 });
 

@@ -528,6 +528,7 @@ A "f" token based on:
     assertThat(feed(parser, "a man "))
       .equalsTo([
         "WS",
+        "COMMA",
         "and",
         "does",
         "did",

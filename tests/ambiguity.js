@@ -488,9 +488,8 @@ describe("Ambiguity", () => {
     ).equalsTo(0);
   });
 
-  it.skip("Sam, Dani and Leo", () => {
+  it("Sam, Dani and Leo", () => {
     const {dict} = require("./dict.js");
-    console.log(JSON.stringify(new Parser("NP", dict).feed("Sam, Dani and Leo"), undefined, 2));
     assertThat(
       new Parser("NP", dict).feed("Sam, Dani and Leo").length
     ).equalsTo(1);
