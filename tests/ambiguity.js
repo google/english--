@@ -426,9 +426,10 @@ describe("Ambiguity", () => {
 
   it("Sam and Dani and Leo", () => {
     const {dict} = require("./dict.js");
+    // You cannot have nesting from the AND connective
     assertThat(
       new Parser("NP", dict).feed("Sam and Dani and Leo").length
-    ).equalsTo(1);
+    ).equalsTo(0);
   });
 
   it("Sam and a book", () => {
@@ -470,16 +471,47 @@ describe("Ambiguity", () => {
     const {dict} = require("./dict.js");
     assertThat(
       new Parser("NP", dict).feed("him and her and Sam").length
-    ).equalsTo(1);
+    ).equalsTo(0);
   });
 
   it("him and her and Sam and a country", () => {
     const {dict} = require("./dict.js");
     assertThat(
       new Parser("NP", dict).feed("him and her and Sam and a country").length
+    ).equalsTo(0);
+  });
+
+  it("Sam and Dani and Leo", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("Sam and Dani and Leo").length
+    ).equalsTo(0);
+  });
+
+  it("either Sam or Dani", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("Either Sam or Dani").length
     ).equalsTo(1);
   });
 
+  it("either Sam and Anna or Dani", () => {
+    const {dict} = require("./dict.js");
+    // We disallow composite noun phrases inside the head of the either
+    assertThat(
+      new Parser("NP", dict).feed("Either Sam and Anna or Dani").length
+    ).equalsTo(0);
+  });
+
+  it("either Sam or Dani and Anna", () => {
+    const {dict} = require("./dict.js");
+    // We disallow composite noun phrases inside the foot of the either
+    // But this actually refers to an AND of NPs
+    // We should disable ANDs of being composites too.
+    assertThat(
+      new Parser("NP", dict).feed("Either Sam or Dani and Anna").length
+    ).equalsTo(0);
+  });
 
 });
 

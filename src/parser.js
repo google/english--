@@ -818,13 +818,13 @@ const DrtSyntax = `
       NP[num=1, gen=2, case=3, gap=-, deep=4, np=5] -> PRO[num=1, gen=2, case=3].
 
       NP[num=plur, gen=1, case=2, gap=-, deep=7, np=+] -> 
-        NP[num=3, gen=4, case=2, gap=-, deep=7, np=+] __ 
+        NP[num=3, gen=4, case=2, gap=-, deep=7, np=-] __ 
         %and __ 
         NP[num=5, gen=6, case=2, gap=-, deep=7, np=-].
 
       NP[num=3, gen=1, case=2, gap=-, deep=7, np=+] -> 
         %either __
-        NP[num=3, gen=4, case=2, gap=-, deep=7, np=+] __ 
+        NP[num=3, gen=4, case=2, gap=-, deep=7, np=-] __ 
         %or __ 
         NP[num=3, gen=6, case=2, gap=-, deep=7, np=-].
 
