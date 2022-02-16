@@ -2054,7 +2054,9 @@ describe("Backwards compatibility", function() {
     assertThat(parse("every man loves a book and a woman."))
       .equalsTo(S(NP(DET("every"), N_(N("man"))),
                  VP_(VP(V("loves"), 
-                        NP(NP(DET("a"), N_(N("book"))), "and", NP(DET("a"), N_(N("woman"))))
+                        NP(NP(DET("a"), N_(N("book"))),
+                           "and",
+                           NP(DET("a"), N_(N("woman"))))
                         ))));
   });
 
