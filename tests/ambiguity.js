@@ -384,6 +384,34 @@ describe("Ambiguity", () => {
 
   });
 
+  it("happy father", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("happy father").length
+    ).equalsTo(1);
+  });
+  
+  it("happy foolish father", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("happy foolish father").length
+    ).equalsTo(1);
+  });
+
+  it("happy foolish book by the unhappy woman from the beautiful person that loves", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("happy foolish book by the unhappy woman from the beautiful person that loves").length
+    ).equalsTo(1);
+  });
+
+  it("beautiful book about Brazil", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("N_", dict).feed("beautiful book about Brazil").length
+    ).equalsTo(1);
+  });
+
 
 });
 
