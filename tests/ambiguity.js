@@ -428,7 +428,56 @@ describe("Ambiguity", () => {
     const {dict} = require("./dict.js");
     assertThat(
       new Parser("NP", dict).feed("Sam and Dani and Leo").length
-    ).equalsTo(2);
+    ).equalsTo(1);
+  });
+
+  it("Sam and a book", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("Sam and a book").length
+    ).equalsTo(1);
+  });
+
+  it("a book", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("a book").length
+    ).equalsTo(1);
+  });
+
+  it("Sam", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("Sam").length
+    ).equalsTo(1);
+  });
+
+  it("a book and Sam", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("a book and Sam").length
+    ).equalsTo(1);
+  });
+
+  it("him and Sam", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("him and Sam").length
+    ).equalsTo(1);
+  });
+
+  it("him and her and Sam", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("him and her and Sam").length
+    ).equalsTo(1);
+  });
+
+  it("him and her and Sam and a country", () => {
+    const {dict} = require("./dict.js");
+    assertThat(
+      new Parser("NP", dict).feed("him and her and Sam and a country").length
+    ).equalsTo(1);
   });
 
 

@@ -803,30 +803,30 @@ const DrtSyntax = `
           BE[num=1, fin=+, tp=-past, tense=5] __
           VP[num=1, fin=part, gap=np, stat=6, tp=8, tense=5].
 
-      NP[num=1, gen=2, case=3, gap=np, deep=4] -> GAP.
+      NP[num=1, gen=2, case=3, gap=np, deep=4, np=5] -> GAP.
 
       GAP -> null.
 
-      NP[num=1, gen=2, case=3, gap=-, deep=4] -> DET[num=1] __ N_[num=1, gen=2, deep=4].
+      NP[num=1, gen=2, case=3, gap=-, deep=4, np=5] -> DET[num=1] __ N_[num=1, gen=2, deep=4].
 
-      NP[num=sing, gen=2, case=3, gap=-, deep=4] -> PN[gen=2].
+      NP[num=sing, gen=2, case=3, gap=-, deep=4, np=5] -> PN[gen=2].
 
-      NP[num=plur, gen=2, case=3, gap=-, deep=4] -> N_[num=plur, gen=2, deep=4].
+      NP[num=plur, gen=2, case=3, gap=-, deep=4, np=5] -> N_[num=plur, gen=2, deep=4].
  
       PN -> %the __ PN.
 
-      NP[num=1, gen=2, case=3, gap=-, deep=4] -> PRO[num=1, gen=2, case=3].
+      NP[num=1, gen=2, case=3, gap=-, deep=4, np=5] -> PRO[num=1, gen=2, case=3].
 
-      NP[num=plur, gen=1, case=2, gap=-] -> 
-        NP[num=3, gen=4, case=2, gap=-] __ 
+      NP[num=plur, gen=1, case=2, gap=-, deep=7, np=+] -> 
+        NP[num=3, gen=4, case=2, gap=-, deep=7, np=+] __ 
         %and __ 
-        NP[num=5, gen=6, case=2, gap=-].
+        NP[num=5, gen=6, case=2, gap=-, deep=7, np=-].
 
-      NP[num=3, gen=1, case=2, gap=-, deep=7] -> 
+      NP[num=3, gen=1, case=2, gap=-, deep=7, np=+] -> 
         %either __
-        NP[num=3, gen=4, case=2, gap=-, deep=7] __ 
+        NP[num=3, gen=4, case=2, gap=-, deep=7, np=+] __ 
         %or __ 
-        NP[num=3, gen=6, case=2, gap=-, deep=7].
+        NP[num=3, gen=6, case=2, gap=-, deep=7, np=-].
 
       RC[num=1, gen=2] -> RPRO[num=1, gen=2] __ S[num=1, gap=np].
 
