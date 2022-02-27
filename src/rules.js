@@ -15,7 +15,7 @@ function drs(ids) {
   return new DRS(Rules.from(ids));
 }
 
-function REF(name, types, value, loc) {
+function referent(name, types, value, loc) {
   return {
     "@type": "REF",
     types: types,
@@ -28,7 +28,7 @@ function REF(name, types, value, loc) {
   }
 }
 
-function PRED(name, args, types, infix = false) {
+function predicate(name, args, types, infix = false) {
   return {
     "@type": "PRED",
     name: name,
@@ -42,8 +42,6 @@ function PRED(name, args, types, infix = false) {
       if (infix) {
         return params.join(` ${this.name} `) + separator;
       }
-      // console.log(separator);
-      // console.log(this);
       const name = this.name.split(" ").join("-");
       return `${name}(${params.join(", ")})${separator}`;
     }
@@ -315,9 +313,9 @@ class CRPN1 extends Rule {
     let ref = find(name.types, refs, value, name.loc);
 
     if (!ref) {
-      ref = REF(this.id(), name.types, value, name.loc);
+      ref = referent(this.id(), name.types, value, name.loc);
       head.push(ref);
-      let pred = PRED(pn, [ref], name.types);
+      let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -339,9 +337,9 @@ class CRPN2 extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
 
     if (!ref) {
-      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
+      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
-      let pred = PRED(pn, [ref], name.types);
+      let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -363,9 +361,9 @@ class CRPN4 extends Rule {
     let ref = find(name.types, refs, name.children[0].value, name.loc);
 
     if (!ref) {
-      ref = REF(this.id(), name.types, name.children[0].value, name.loc);
+      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
       head.push(ref);
-      let pred = PRED(pn, [ref], name.types);
+      let pred = predicate(pn, [ref], name.types);
       body.push(pred);
     }
 
@@ -431,7 +429,7 @@ class CRSID extends Rule {
       return;
     }
 
-    let ref = REF(this.id(), noun.types);
+    let ref = referent(this.id(), noun.types);
     noun.ref = [ref];
     node.children[0] = ref;
     
@@ -455,7 +453,7 @@ class CRVPID extends Rule {
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
-    let ref = REF(this.id(), types);
+    let ref = referent(this.id(), types);
     noun.ref = [ref];
     node.children[1] = ref;
     
@@ -490,7 +488,7 @@ class CRNLIN extends Rule {
     //throw new Error("hi");
     //console.log(noun);
     //throw new Error("hi");
-    let pred = PRED(noun.prop, node.ref, node.types);
+    let pred = predicate(noun.prop, node.ref, node.types);
     // console.log(pred);
     // throw new Error("hello");
     
@@ -593,7 +591,7 @@ class CRADJLIN extends Rule {
       return [[], []];
     }
 
-    let pred = PRED(adj.prop, node.ref, node.types);
+    let pred = predicate(adj.prop, node.ref, node.types);
     
     return [[], [pred], node];
   }
@@ -759,7 +757,7 @@ class CRREFBE extends Rule {
                  VP_(VP(BE(), REFFY(capture("b"))))));
   }
   apply({a, b}, node, refs) {
-    let s = PRED("=", [a, b], node.types, true);
+    let s = predicate("=", [a, b], node.types, true);
     return [[], [s], node];
   }
 }
@@ -936,7 +934,7 @@ class CRGENERIC extends Rule {
     super(ids, S(NP(N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({noun, verb}, node, refs) {
-    let ref = REF(this.id(), noun.types);
+    let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -964,7 +962,7 @@ class CRVPGENERIC extends Rule {
     super(ids, S(capture("subject"), VP_(VP(V(), NP(N_(capture("noun")))))));
   }
   apply({subject, noun}, node, refs) {
-    let ref = REF(this.id(), noun.types);
+    let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -993,7 +991,7 @@ class CREVERYONE extends Rule {
     super(ids, S(NP("everyone"), VP_(capture("verb"))));
   }
   apply({}, node, refs) {
-    let ref = REF(this.id(), {});
+    let ref = referent(this.id(), {});
     let head = drs(this.ids);
     
     let v = drs(this.ids);
@@ -1014,8 +1012,8 @@ class CREVERYONE2 extends Rule {
     super(ids, S(NP(DET(NP("Everyone"), "'s"), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({verb, noun}, node, refs) {
-    let ref2 = REF(this.id(), {});
-    let ref = REF(this.id(), {});
+    let ref2 = referent(this.id(), {});
+    let ref = referent(this.id(), {});
     
     let head = clone(node.children[0]);
     head.children[0].children[0] = ref2;
@@ -1045,7 +1043,7 @@ class CREVERY extends Rule {
       return;
     }
     
-    let ref = REF(this.id(), noun.types);
+    let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -1102,7 +1100,7 @@ class CRVPEVERY extends Rule {
     }
     // console.log(det);
 
-    let ref = REF(this.id(), noun.types);
+    let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
@@ -1257,7 +1255,7 @@ class CRSPOSS extends Rule {
   }
   
   apply({name, noun, verb}, node, refs) {
-    let u = REF(this.id(), noun.types);
+    let u = referent(this.id(), noun.types);
     node.children[0] = u;
     node.ref = [u];
     
@@ -1283,7 +1281,7 @@ class CRVPPOSS extends Rule {
     // throw new Error("hio");
     // console.log(child(node, 1));
     // throw new Error("hi");
-    let u = REF(this.id(), noun.types);
+    let u = referent(this.id(), noun.types);
     child(node, 1, 0).children[1] = u;
     // console.log(noun);
     // console.log(child(name, 0));
@@ -1359,7 +1357,7 @@ class CRADJ extends Rule {
     //console.log(name.join("-"));
     //console.log(node);
     //throw new Error("hi");
-    let pred = PRED(name.join("-"), [node.ref[0]]);
+    let pred = predicate(name.join("-"), [node.ref[0]]);
     
     return [[], [noun, pred], node];
   }
@@ -1422,13 +1420,13 @@ class CRTENSE extends Rule {
       //}
       return;
     } else {
-      let s = REF(this.id("s"), {}, undefined, node.loc, true);
+      let s = referent(this.id("s"), {}, undefined, node.loc, true);
       node.time = s;
       //let op = tense == "pres" ? "=" : (tense == "past" ? "<" : ">");
       let body = [];
       if (tense == "past" || tense == "fut") {
         let op = (tense == "past" ? "<" : ">");
-        body.push(PRED(op, [s, REF("__now__")], {}, true));
+        body.push(predicate(op, [s, referent("__now__")], {}, true));
       }
       return [[s], body];
     }
@@ -1532,7 +1530,7 @@ class CRQUESTIONWHO extends Rule {
   apply({vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = REF(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1549,7 +1547,7 @@ class CRQUESTIONWHICH extends Rule {
   apply({noun, vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = REF(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1566,7 +1564,7 @@ class CRQUESTIONWHOM extends Rule {
   apply({sub, verb}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = REF(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", refs);
     
     q.head.push(u);
     
@@ -1670,7 +1668,7 @@ class CRPRED extends Rule {
     if (sub["@type"] == "REF") {
       args.push(sub);
     } else if (sub["@type"] == "GAP") {
-      let u = REF(this.id(), {}, "", refs);
+      let u = referent(this.id(), {}, "", refs);
       head.push(u);
       args.push(u);
     }
@@ -1680,7 +1678,7 @@ class CRPRED extends Rule {
     
     let name = verb.prop || verb.children[0].value;
 
-    body.push(PRED(name, args, node.types));
+    body.push(predicate(name, args, node.types));
 
     return [head, body, node];
   }
