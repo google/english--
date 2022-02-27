@@ -9,7 +9,7 @@ const {
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
 let ANY = (...children) => { return {"@type": "ANY", "children": children} };
-let REFFY = (...children) => { return {"@type": "REF", "children": children} };
+let REFFY = (...children) => { return {"@type": "Referent", "children": children} };
 
 function drs(ids) {
   return new DRS(Rules.from(ids));
@@ -17,7 +17,7 @@ function drs(ids) {
 
 function referent(name, types, value, loc) {
   return {
-    "@type": "REF",
+    "@type": "Referent",
     types: types,
     name: name,
     value: value,
@@ -423,7 +423,7 @@ class CRSID extends Rule {
   }
   
   apply({det, noun}, node, refs) {
-    if (child(det, 0)["@type"] == "REF") {
+    if (child(det, 0)["@type"] == "Referent") {
       // console.log(det);
       // throw new Error("hi");
       return;
@@ -1452,7 +1452,7 @@ class CRASPECT extends Rule {
 
 function unwrap({["@type"]: type, value, children = []}) {
   if (value) {
-    return type == "REF" ? value : value.toLowerCase();
+    return type == "Referent" ? value : value.toLowerCase();
   }
   const result = [];
   for (let child of children) {
@@ -1665,7 +1665,7 @@ class CRPRED extends Rule {
     if (node.time) {
       args.push(node.time);
     }
-    if (sub["@type"] == "REF") {
+    if (sub["@type"] == "Referent") {
       args.push(sub);
     } else if (sub["@type"] == "GAP") {
       let u = referent(this.id(), {}, "", refs);
