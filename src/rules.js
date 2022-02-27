@@ -1,15 +1,17 @@
 const {clone, print, child} = require("./base.js");
-const {parse, first, nodes} = require("./parser.js");
+const {parse, first, node, nodes} = require("./parser.js");
 const {DRS} = require("./drs.js");
 
 const {
   S, S_, Q, Q_, NP, NP_, PN, VP_, VP, V, BE, DET, N, N_, PRO, AUX, RC, RPRO, GAP, ADJ, PP, PREP, HAVE, VERB, WH,
-  Discourse, Sentence, Statement, Question
+  Discourse, Sentence, Statement, Question,
 } = nodes;
 
+
+const ANY = node("ANY");
+const REFFY = node("Referent");
+
 let capture = (name) => { return {"@type": "Match", "name": name} };
-let ANY = (...children) => { return {"@type": "ANY", "children": children} };
-let REFFY = (...children) => { return {"@type": "Referent", "children": children} };
 
 function drs(ids) {
   return new DRS(Rules.from(ids));

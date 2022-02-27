@@ -1179,6 +1179,7 @@ module.exports = {
   valid: valid,
   continuous: continuous,
   complete: complete,
+  node: node,
   nodes: {
     "Statement": node("Statement"),
     "Sentence": node("Sentence"),
