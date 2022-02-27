@@ -1779,6 +1779,15 @@ describe("DRS", function() {
      `);
   });
 
+  it.skip("Every uncle is either rich or happy.", function() { 
+    assertThat("Every uncle is either rich or happy.")
+     .equalsTo(`
+      for (let every a: uncle(a)) {
+        rich(a).
+      }
+     `);
+  });
+
   it("Mel is unhappy about Brazil", function() { 
     assertThat("Mel is unhappy about Brazil.")
      .equalsTo(`

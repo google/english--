@@ -449,6 +449,8 @@ A "f" token based on:
       // conditionals
       "__if__",
       "either",
+      // parenthesis
+      "LBRACKET",
       // quantifiers
       "a",
       "an",

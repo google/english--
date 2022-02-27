@@ -2895,7 +2895,7 @@ describe("large dictionary", () => {
     assertThat(parse("Every person who was born in Brazil is brazilian."))
       .equalsTo(2);
   });
-  
+    
   function parse(s, start = "Sentence") {
     const {dict} = require("../src/large.js");
     let parser = new Parser("Sentence", dict);

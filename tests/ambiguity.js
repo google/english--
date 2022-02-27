@@ -225,11 +225,40 @@ describe("Ambiguity", () => {
   });
 
   it("Sam loves Dani.", () => {
-    assertThat(new Parser("NP", dict).feed("Sam").length).equalsTo(1);
     assertThat(new Parser("NP", dict).feed("Dani").length).equalsTo(1);
     assertThat(new Parser("Statement", dict).feed("Sam loves.").length).equalsTo(1);
     assertThat(new Parser("Statement", dict).feed("Sam loves Dani.").length)
       .equalsTo(1);
+  });
+
+  it("[Sam]", () => {
+    assertThat(parse("[Sam]", "NP")).equalsTo(NP("[", NP(PN("Sam")), "]"));
+  });
+
+  it("[a man]", () => {
+    assertThat(parse("[a man]", "NP")).equalsTo(NP("[", NP(DET("a"), N_(N("man"))), "]"));
+  });
+
+  it("[a man from Brazil]", () => {
+    assertThat(parse("[a man from Brazil]", "NP")).equalsTo(NP("[", NP(DET("a"), N_(
+      N_(N("man")),
+      PP(PREP("from"), NP(PN("Brazil")))
+    )), "]"));
+  });
+
+  it("with [a man from Brazil]", () => {
+    assertThat(parse("with [a man from Brazil]", "PP"))
+      .equalsTo(
+        PP(
+          PREP("with"),
+          NP("[",
+             NP(DET("a"), N_(
+               N_(N("man")),
+               PP(PREP("from"), NP(PN("Brazil")))
+             )),
+             "]")          
+        )
+    );
   });
 
   it("Sam made a reservation for Cascal for Dani.", () => {
@@ -541,6 +570,58 @@ describe("Ambiguity", () => {
     ).equalsTo(0);
   });
 
+  function parse(s, type = "Statement") {
+    const result = new Parser(type, dict).feed(s);
+
+    if (result.length > 1) {
+      throw new Error("ambiguous");
+    }
+
+
+    // console.log(result);
+    
+    return clear(result[0]);
+  }
+  
+  it("Mary travelled with a man from Brazil.", function() {
+    // This phrase is ambiguous in that it can be either interpreted as:
+    // Mary travelled with [a man from Brazil]. or
+    // Mary travelled with [a man] from Brazil.
+    // By default, the ambiguity is resolved in binding to the verb
+    // rather than the noun.
+    assertThat(parse("Mary travelled with a man from Brazil."))
+      .equalsTo(Statement(S_(S(NP(PN("Mary")),
+                               VP_(VP(
+                                 V(
+                                   V(
+                                     V("travelled"),
+                                     PP(PREP("with"), NP(DET("a"), N_(N("man"))))
+                                   ),
+                                   PP(PREP("from"), NP(PN("Brazil")))
+                                 )
+                               )))), "."));
+  });
+
+  it("Mary travelled with [a man from Brazil].", function() {
+    assertThat(parse("Mary travelled with [a man from Brazil]."))
+      .equalsTo(Statement(S_(S(NP(PN("Mary")),
+                               VP_(VP(
+                                 V(
+                                   V("travelled"),
+                                   PP(PREP("with"),
+                                      NP("[",
+                                         NP(DET("a"),
+                                            N_(
+                                              N_(N("man")),
+                                              PP(PREP("from"), NP(PN("Brazil")))
+                                            )),
+                                         "]")
+                                     )
+                                 )
+                               ))
+                              ))
+                          , "."));
+  });
 });
 
 function assertThat(x) {

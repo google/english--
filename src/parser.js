@@ -803,6 +803,11 @@ const DrtSyntax = `
           BE[num=1, fin=+, tp=-past, tense=5] __
           VP[num=1, fin=part, gap=np, stat=6, tp=8, tense=5].
 
+      NP[num=1, gen=2, case=3, gap=-, deep=-, np=6] -> 
+        %LBRACKET _
+        NP[num=1, gen=2, case=3, gap=4, deep=5, np=6] _
+        %RBRACKET.
+
       NP[num=1, gen=2, case=3, gap=np, deep=4, np=5] -> GAP.
 
       GAP -> null.
@@ -1030,6 +1035,8 @@ class Parser {
       [",", "COMMA"],
       ["?", "QUESTION"],
       ["'s", "POSS"],
+      ["[", "LBRACKET"],
+      ["]", "RBRACKET"],
     ]);
     // world/content words
     this.load(dict);
