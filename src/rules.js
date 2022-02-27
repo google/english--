@@ -1011,22 +1011,28 @@ class CREVERYONE extends Rule {
 
 class CREVERYONE2 extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(NP("Everyone"))), VP_(capture("verb"))));
+    super(ids, S(NP(DET(NP("Everyone"), "'s"), N_(capture("noun"))), VP_(capture("verb"))));
   }
-  apply({verb}, node, refs) {
+  apply({verb, noun}, node, refs) {
+    let ref2 = REF(this.id(), {});
     let ref = REF(this.id(), {});
-    let head = drs(this.ids);
     
-    let v = drs(this.ids);
+    let head = clone(node.children[0]);
+    head.children[0].children[0] = ref2;
+    let u = drs(this.ids);
+    noun.ref = [ref, ref2];
+    u.push(noun);
 
     let s = clone(node);
-    
-    s.children[0].children[0].children[0] = ref;
+    s.children[0] = ref;
+    let v = drs(this.ids);
     v.push(s);
 
-    let result = quantifier("every", undefined, v, ref);
+    let inner = quantifier("every", u, v, ref);
 
-    return [[], [result], node];
+    let everyone = quantifier("every", undefined, inner, ref2);
+
+    return [[], [everyone], node];
   }
 }
 

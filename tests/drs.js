@@ -1802,8 +1802,21 @@ describe("DRS", function() {
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
        for (let every a) {
-         uncle(b, a).
-         happy(b).
+         for (let every b: uncle(b, a)) {
+           happy(b).
+         }
+       }
+     `);
+  });
+
+  it("Everyone's uncle is a male relative", function() { 
+    assertThat("Everyone's uncle is a male relative.")
+     .equalsTo(`
+       for (let every a) {
+         for (let every b: uncle(b, a)) {
+           male-relative(b).
+           relative(b).
+         }
        }
      `);
   });
