@@ -76,9 +76,11 @@ function quantifier(q, a, b, ref) {
     "ref": ref,
     print() {
       let result = [];
-      let letty = q == "if" ? "" : `let ${q} ${ref.name}: `;
+      let letty = q == "if" ? "" : `let ${q} ${ref.name}`;
       let head = q == "if" ? "if" : "for";
-      result.push(`${head} (${letty}${this.a.print(" ", true)}) {`);
+      const col = (q != "if" && a) ? ": " : "";
+      const cond = a ? `${this.a.print(" ", true)}` : ``;
+      result.push(`${head} (${letty}${col}${cond}) {`);
       result.push(this.b.print() + "}");
       return result.join("\n") + "\n";
     }
@@ -986,6 +988,48 @@ class CRVPGENERIC extends Rule {
   }
 }
 
+class CREVERYONE extends Rule {
+  constructor(ids) {
+    super(ids, S(NP("everyone"), VP_(capture("verb"))));
+  }
+  apply({}, node, refs) {
+    let ref = REF(this.id(), {});
+    let head = drs(this.ids);
+    
+    let v = drs(this.ids);
+
+    let s = clone(node);
+    
+    s.children[0] = ref;
+    v.push(s);
+
+    let result = quantifier("every", undefined, v, ref);
+
+    return [[], [result], node];
+  }
+}
+
+class CREVERYONE2 extends Rule {
+  constructor(ids) {
+    super(ids, S(NP(DET(NP("Everyone"))), VP_(capture("verb"))));
+  }
+  apply({verb}, node, refs) {
+    let ref = REF(this.id(), {});
+    let head = drs(this.ids);
+    
+    let v = drs(this.ids);
+
+    let s = clone(node);
+    
+    s.children[0].children[0].children[0] = ref;
+    v.push(s);
+
+    let result = quantifier("every", undefined, v, ref);
+
+    return [[], [result], node];
+  }
+}
+
 class CREVERY extends Rule {
   constructor(ids) {
     super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
@@ -1641,6 +1685,8 @@ class Rules {
     let rules = [
       new CREVERY(ids),
       new CRVPEVERY(ids),
+      new CREVERYONE(ids),
+      new CREVERYONE2(ids),
       new CRGENERIC(ids),
       new CRVPGENERIC(ids),
       new CRASPECT(ids),

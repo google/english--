@@ -1780,6 +1780,34 @@ describe("DRS", function() {
      `);
   });
 
+  it("Everyone is happy", function() { 
+    assertThat("Everyone is happy.")
+     .equalsTo(`
+     for (let every a) {
+       happy(a).
+     }
+     `);
+  });
+
+  it.skip("Everyone who likes Sam is happy", function() { 
+    assertThat("Everyone who likes Sam is happy.")
+     .equalsTo(`
+     for (let every a) {
+       happy(a).
+     }
+     `);
+  });
+
+  it("Everyone's uncle is happy", function() { 
+    assertThat("Everyone's uncle is happy.")
+     .equalsTo(`
+       for (let every a) {
+         uncle(b, a).
+         happy(b).
+       }
+     `);
+  });
+
   it.skip("Every uncle is either rich or happy.", function() { 
     assertThat("Every uncle is either rich or happy.")
      .equalsTo(`
