@@ -1135,9 +1135,10 @@ class CRNPOR extends Rule {
 class CRVPNPOR extends Rule {
   constructor(ids) {
     super(ids, S(capture("sub"), 
-                 VP_(VP(V(capture("verb")), NP("either", ANY(capture("first")), "or", ANY(capture("second")))))));
+                 VP_(VP(ANY(capture("verb")), NP("either", ANY(capture("first")), "or", ANY(capture("second")))))));
   }
   apply({sub, verb, first, second}, node, refs) {
+    // throw new Error("hi");
     let a = drs(this.ids);
     a.head.push(...clone(refs));
     a.head.forEach(ref => ref.closure = true);
@@ -1151,6 +1152,7 @@ class CRVPNPOR extends Rule {
     return [[], [disjunction(a, b)], node];
   }
 }
+
 
 class CRSAND extends Rule {
   constructor(ids) {

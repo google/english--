@@ -1767,6 +1767,18 @@ describe("DRS", function() {
      `);
   });
 
+  it("Every uncle is either a parent or a relative", function() { 
+    assertThat("Every uncle is either a parent or a relative.")
+     .equalsTo(`
+      for (let every a: uncle(a)) {
+        either (
+          parent(a).
+        ) or (
+          relative(a).
+        ).}
+     `);
+  });
+
   it("Mel is unhappy about Brazil", function() { 
     assertThat("Mel is unhappy about Brazil.")
      .equalsTo(`
