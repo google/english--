@@ -308,9 +308,7 @@ class CRPN1 extends Rule {
     let head = [];
     let body = [];
 
-    // console.log(name);
-    const value = name.children[0].value; //.split(" ").join("-");
-    // console.log(value);
+    const value = name.children[0].value;
     
     let ref = find(name.types, refs, value, name.loc);
 
@@ -425,9 +423,7 @@ class CRSID extends Rule {
   }
   
   apply({det, noun}, node, refs) {
-    if (child(det, 0)["@type"] == "Referent") {
-      // console.log(det);
-      // throw new Error("hi");
+    if (det.types.quant != "some") {
       return;
     }
 
@@ -442,16 +438,9 @@ class CRSID extends Rule {
 class CRVPID extends Rule {
   constructor(ids) {
     super(ids, VP(V(), NP(DET(capture("det")), N_(capture("noun")))));
-    // super(ids, VP(V(), NP()));
   }
   
   apply({det, noun}, node, refs) {
-    // console.log(noun);
-    //if (!(noun["@type"] == "N" || noun["@type"] == "N_")) {
-    //  return;
-    //}
-    //console.log(JSON.stringify(node, undefined, 2));
-    //throw new Error("hi")
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
@@ -1041,7 +1030,7 @@ class CREVERY extends Rule {
     super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
-    if (!det.types.quant) {
+    if (det.types.quant != "+") {
       return;
     }
     
@@ -1097,7 +1086,7 @@ class CRVPEVERY extends Rule {
     super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({det, subject, noun}, node, refs) {
-    if (!det.types.quant) {
+    if (det.types.quant != "+") {
       return;
     }
     // console.log(det);

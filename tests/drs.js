@@ -767,6 +767,16 @@ describe("DRS", function() {
     `);
   });
 
+  it("Anna is Jones's wife.", function() {
+    assertThat("Anna is Jones's wife.")
+     .equalsTo(`
+       Anna(a).
+       Jones(b).
+       a = c.
+       wife(c, b).
+    `);
+  });
+
   it("Jones's wife is happy. She likes Smith.", function() {
     assertThat("Jones's wife is happy. She likes Smith.")
      .equalsTo(`
