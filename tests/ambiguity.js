@@ -251,6 +251,12 @@ describe("Ambiguity", () => {
     assertThat(results.length).equalsTo(1);
   });
 
+  it("Sam travelled from a beautifil country to an evil country.", () => {
+    let parser = new Parser("Sentence", dict);
+    let results = parser.feed("Sam travelled from a beautiful country to an evil country.");
+    assertThat(results.length).equalsTo(1);
+  });
+
   it("Sam made a reservation for a woman with a porsche.", () => {
     let parser = new Parser("Sentence", dict);
     let results = parser.feed("Sam made a reservation for a woman with a porsche.");

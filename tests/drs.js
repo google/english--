@@ -2485,6 +2485,21 @@ describe("Large Lexicon", () => {
      `);
 
   });
+
+  it("Sam travelled from a beautiful country to an evil country.", () => {
+    assertThat(`Sam travelled from a beautiful country to an evil country.`)
+      .equalsTo(`
+        Sam(a).
+        s0 < __now__.
+        evil-country(b).
+        country(b).
+        beautiful-country(c).
+        country(c).
+        travel-to(s0, b).
+        travel-from(s0, c).
+        travel(s0, a).
+      `);
+  });
   
   it("Every nation is a stable community of some peoples with a common language.", () => {
     // Things I'd expect I'd be able to write:
