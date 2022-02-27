@@ -574,7 +574,8 @@ describe("Ambiguity", () => {
     const result = new Parser(type, dict).feed(s);
 
     if (result.length > 1) {
-      throw new Error("ambiguous");
+      return result.length;
+      // throw new Error("ambiguous");
     }
 
 
@@ -602,6 +603,13 @@ describe("Ambiguity", () => {
                                )))), "."));
   });
 
+  it("Sam loves a woman who is a sibling of Thais.", function() {
+    // Ambiguity!
+    assertThat(parse("Sam loves a woman who is a sibling of Thais."))
+      .equalsTo(2);
+  });
+  
+  
   it("Mary travelled with [a man from Brazil].", function() {
     assertThat(parse("Mary travelled with [a man from Brazil]."))
       .equalsTo(Statement(S_(S(NP(PN("Mary")),
