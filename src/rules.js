@@ -440,6 +440,7 @@ class CRSID extends Rule {
 class CRVPID extends Rule {
   constructor(ids) {
     super(ids, VP(V(), NP(DET(capture("det")), N_(capture("noun")))));
+    // super(ids, VP(V(), NP()));
   }
   
   apply({det, noun}, node, refs) {
@@ -447,7 +448,8 @@ class CRVPID extends Rule {
     //if (!(noun["@type"] == "N" || noun["@type"] == "N_")) {
     //  return;
     //}
-    // throw new Error("hi")
+    //console.log(JSON.stringify(node, undefined, 2));
+    //throw new Error("hi")
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
@@ -1566,6 +1568,30 @@ class CRPUNCT2 extends Rule {
   }
 }
 
+class CRPUNCT3 extends Rule {
+  constructor(ids) {
+    super(ids, NP("[", ANY(capture("q")), "]"));
+  }
+  apply({q}, node) {
+    const types = clone(node.types);
+    //console.log(types);
+    //console.log(q);
+    //console.log(node);
+    //Object.assign(node, q);
+    // overrides the current node with its inner part.
+    // TODO(goto): the node delegation code relies
+    // on deleting top-level nodes, rather than inner
+    // nodes, so we override it here. we should probably
+    // make that better.
+    //console.log(node);
+    Object.assign(node, q);
+    //console.log(node);
+    //throw new Error("hi");
+    // Object.assign(node.types, types);
+    return [[], []];
+  }
+}
+
 class CRPUNCT extends CompositeRule {
   constructor(ids) {
     super([new CRPUNCT1(ids), new CRPUNCT2(ids)]);
@@ -1637,7 +1663,7 @@ class Rules {
       new CRQUESTION(ids),
       new CRPUNCT(ids),
     ];
-    return [[new CRNAME(ids)], [new CRPN(ids)], rules, [new CRPRED(ids)]];
+    return [[new CRNAME(ids)], [new CRPN(ids), new CRPUNCT3(ids)], rules, [new CRPRED(ids)]];
   }
 }
 

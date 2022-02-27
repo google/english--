@@ -2000,6 +2000,37 @@ describe("DRS", function() {
     `);
   });
 
+  it("Sam loves [Dani].", function() { 
+    assertThat("Sam loves [Dani].")
+     .equalsTo(`
+       Sam(a).
+       Dani(b).
+       love(s0, a, b).
+     `);
+  });
+
+  it("Sam loves [a woman].", function() { 
+    assertThat("Sam loves [a woman].")
+     .equalsTo(`
+      Sam(a).
+      woman(b).
+      love(s0, a, b).
+     `);
+  });
+
+  it("Sam loves a woman who is a [sibling of Thais].", function() { 
+    assertThat("Sam loves a woman who is [a sibling of Thais].")
+     .equalsTo(`
+       Sam(a).
+       Thais(b).
+       woman(c).
+       sibling(c).
+       love(s0, a, c).
+       sibling-of(c, b).
+     `);
+  });
+
+
   function assertThat(x) { 
     return {
       trim (str) {

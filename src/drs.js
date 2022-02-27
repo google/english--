@@ -52,6 +52,7 @@ class DRS {
       // If this is a node that we want to replace, remove it.
       if (remove) {
         let i = this.body.indexOf(p);
+        // console.log(p);
         if (i == -1) {
           throw new Error("Ooops, deleting an invalid node.");
         }
