@@ -1775,7 +1775,8 @@ describe("DRS", function() {
           parent(a).
         ) or (
           relative(a).
-        ).}
+        ).
+      }
      `);
   });
 

@@ -60,7 +60,7 @@ function disjunction(a, b) {
       result.push("either (");
       result.push(this.a.print() + ") or (");
       // result.push();
-      result.push(this.b.print() + ").");
+      result.push(this.b.print() + ").\n");
       // result.push("}");
       return result.join("\n");
     }
