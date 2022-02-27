@@ -9,7 +9,7 @@ const {
 
 
 const ANY = node("ANY");
-const REFFY = node("Referent");
+const REF = node("Referent");
 
 let capture = (name) => { return {"@type": "Match", "name": name} };
 
@@ -755,8 +755,8 @@ class CRNEG extends Rule {
 
 class CRREFBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("a")),
-                 VP_(VP(BE(), REFFY(capture("b"))))));
+    super(ids, S(REF(capture("a")),
+                 VP_(VP(BE(), REF(capture("b"))))));
   }
   apply({a, b}, node, refs) {
     let s = predicate("=", [a, b], node.types, true);
@@ -766,7 +766,7 @@ class CRREFBE extends Rule {
 
 class CRPOSBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), ADJ(capture("adj"))))));
+    super(ids, S(REF(capture("ref")), VP_(VP(BE(), ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
     adj.ref = [ref];
@@ -780,7 +780,7 @@ class CRPOSBE extends Rule {
 
 class CRPREPBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")),
+    super(ids, S(REF(capture("ref")),
                  VP_(VP(BE("is"), PP(PREP(capture("prep")), ANY(capture("np")))))
                 ));
   }
@@ -796,7 +796,7 @@ class CRPREPBE extends Rule {
 
 class CRNEGBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
+    super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
     let sub = drs(this.ids);
@@ -811,7 +811,7 @@ class CRNEGBE extends Rule {
 
 class CRNBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N_(capture("noun")))))));
+    super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
     // throw new Error("hi");
@@ -829,7 +829,7 @@ class CRNBE extends Rule {
 
 class CRGENERICBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), NP(N_(capture("noun")))))));
+    super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(N_(capture("noun")))))));
   }
   apply({ref, noun}, node, refs) {
     let np = clone(noun);
@@ -848,7 +848,7 @@ class CRGENERICBE extends Rule {
 
 class CRNEGNBE extends Rule {
   constructor(ids) {
-    super(ids, S(REFFY(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
+    super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
     let sub = drs(this.ids);
