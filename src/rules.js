@@ -76,11 +76,23 @@ function quantifier(q, a, b, ref) {
     "ref": ref,
     print() {
       let result = [];
-      let letty = q == "if" ? "" : `let ${q} ${ref.name}`;
-      let head = q == "if" ? "if" : "for";
-      const col = (q != "if" && a) ? ": " : "";
-      const cond = a ? `${this.a.print(" ", true)}` : ``;
-      result.push(`${head} (${letty}${col}${cond}) {`);
+      const cond = a ? `: ${this.a.print(" ", true)}` : ``;
+      result.push(`for (let ${q} ${ref.name}${cond}) {`);
+      result.push(this.b.print() + "}");
+      return result.join("\n") + "\n";
+    }
+  };
+}
+
+function conditional(a, b, ref) {
+  return {
+    "@type": "Quantifier",
+    "a": a,
+    "b": b,
+    "ref": ref,
+    print() {
+      let result = [];
+      result.push(`if (${this.a.print(" ", true)}) {`);
       result.push(this.b.print() + "}");
       return result.join("\n") + "\n";
     }
@@ -927,7 +939,7 @@ class CRCOND extends Rule {
     consequent.head.forEach(ref => ref.closure = true);
     consequent.push(tail.children[3]);
     
-    return [[], [quantifier("if", antecedent, consequent)], node];
+    return [[], [conditional(antecedent, consequent)], node];
   }
 }
 

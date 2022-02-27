@@ -92,8 +92,6 @@ class DRS {
   print(nl = ".\n", inner = false, nodes) {
     let result = [];
 
-    // result.push(`let ${names.join()}${nl}`);
-    
     let body = nodes || this.body;
     
     for (let cond of body) {
