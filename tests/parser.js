@@ -2896,6 +2896,18 @@ describe("large dictionary", () => {
       .equalsTo(2);
   });
     
+  it("Everyone likes Sam.", function() {
+    assertThat(parse("Everyone likes Sam."))
+      .equalsTo(S(NP("Everyone"),
+                  VP_(VP(V("likes"), NP(PN("Sam"))))));
+  });
+    
+  it("Everyone's child likes Sam.", function() {
+    assertThat(parse("Everyone's child likes Sam."))
+      .equalsTo(S(NP(DET(NP("Everyone"), "'s"), N_(N("child"))),
+                  VP_(VP(V("likes"), NP(PN("Sam"))))));
+  });
+    
   function parse(s, start = "Sentence") {
     const {dict} = require("../src/large.js");
     let parser = new Parser("Sentence", dict);

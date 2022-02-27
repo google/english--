@@ -451,6 +451,8 @@ A "f" token based on:
       "either",
       // parenthesis
       "LBRACKET",
+      // noun phrases
+      "everyone",
       // quantifiers
       "a",
       "an",

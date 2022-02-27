@@ -859,6 +859,8 @@ const DrtSyntax = `
           %not __ 
           NP[num=3, gen=4, case=5, gap=-, deep=8].
 
+      NP[num=1, gen=2, case=3, gap=-, deep=+, np=+] -> %everyone.
+
       DET[num=sing] -> %a.
       DET[num=sing] -> %an.
       DET[num=sing] -> %the.
