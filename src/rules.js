@@ -30,7 +30,7 @@ function referent(name, types, value, loc) {
 
 function predicate(name, args, types, infix = false) {
   return {
-    "@type": "PRED",
+    "@type": "Predicate",
     name: name,
     args: args,
     types: types,
@@ -129,7 +129,7 @@ function conjunction(a, b) {
 
 function equals(a, b) {
   return {
-    "@type": "Equals",
+    "@type": "Equality",
     "a": a,
     "b": b,
     print() {
