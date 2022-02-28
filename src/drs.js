@@ -37,40 +37,7 @@ class DRS {
     return [result];
   }
 
-  process(nodes, rules = []) {
-
-    // console.log(nodes);
-    
-    let queue = [...nodes];
-    
-    while (queue.length > 0) {
-      let p = queue.shift();
-      // Breadth first search: apply all rules for this node
-      // until we get asked to remove it.
-      let [next, remove] = this.apply(p, rules);
-
-      // Queue up new roots that are introduced to the body.
-      queue.push(...next);
-
-      // If this is a node that we want to replace, remove it.
-      if (remove) {
-        let i = this.body.indexOf(p);
-        // console.log(p);
-        if (i == -1) {
-          throw new Error("Ooops, deleting an invalid node.");
-        }
-        this.body.splice(i, 1);
-        continue;
-      }
-
-      // If not, queue up all of its children to descend.
-      queue.push(...(p.children || []).flat(2));
-    }
-    
-    return this;
-  }
-
-  dive(node, rules) {
+  process(node, rules) {
     const {children = []} = node;
     const head = []
     const body = [];
@@ -78,7 +45,7 @@ class DRS {
     let added = false;
     
     for (const child of children) {
-      const [more, remove] = this.dive(child, rules);
+      const [more, remove] = this.process(child, rules);
       if (remove) {
         let i = node.children.indexOf(remove);
         if (i == -1) {
@@ -104,22 +71,18 @@ class DRS {
       done = true;
       
       for (const node of this.body) {
-        const [added, remove] = this.dive(node, rules);
+        const [added, remove] = this.process(node, rules);
         
         if (added) {
           done = false;
-          // throw new Error("hi");
         }
       
         if (remove) {
           let i = this.body.indexOf(remove);
-          // console.log(remove);
-          // throw new Error("hi");
           if (i == -1) {
             throw new Error("Ooops, deleting an invalid node.");
           }
           this.body.splice(i, 1);
-          //continue;
         }
       }
 
@@ -133,30 +96,14 @@ class DRS {
       ref.loc = 0;
     }
 
-    // Make simplications.
-    //this.process([node], this.setup);
-
-    // Resolve all proper names.
-    //this.process([node], this.before);
-
     this.body.push(node);
 
     this.go(this.setup);
     this.go(this.before);
     this.go(this.rules);
     this.go(this.after);
-    //console.log(this.print());
-
-    //throw new Error("hi");
-    
-    //throw new Error("hi");
-    // let result = this.process([node], this.rules);
-    
-    //this.process(this.body, this.after);
 
     return this;
-    
-    return result;
   }
   
   print(nl = ".\n", inner = false, nodes) {
