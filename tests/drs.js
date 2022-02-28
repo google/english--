@@ -1852,13 +1852,13 @@ describe("DRS", function() {
   it("Everyone's uncle is a male relative", function() { 
     assertThat("Everyone's uncle is a male relative.")
      .equalsTo(`
-       for (let every b) {
-         for (let every c: uncle(c, b)) {
-           c = a.
+       for (let every a) {
+         for (let every b: uncle(b, a)) {
+           b = c.
+           male-relative(c).
+           relative(c).
          }
        }
-       male-relative(a).
-       relative(a).
      `);
   });
 
