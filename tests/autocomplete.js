@@ -453,6 +453,7 @@ A "f" token based on:
       "LBRACKET",
       // noun phrases
       "everyone",
+      "one",
       // quantifiers
       "a",
       "an",

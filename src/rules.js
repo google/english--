@@ -956,7 +956,7 @@ class CREVERYONE2 extends Rule {
     super(ids, S(NP(DET(NP("Everyone"), "'s"), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({verb, noun}, node, refs) {
-    let ref2 = referent(this.id(), {});
+    let ref2 = referent(this.id(), {}, "one");
     let ref = referent(this.id(), {});
     
     let head = clone(node.children[0]);
@@ -968,13 +968,30 @@ class CREVERYONE2 extends Rule {
     let s = clone(node);
     s.children[0] = ref;
     let v = drs(this.ids);
+    v.head.push(ref2);
     v.push(s);
-
+    
     let inner = quantifier("every", u, v, ref);
 
     let everyone = quantifier("every", undefined, inner, ref2);
 
     return [[], [everyone], node];
+  }
+}
+
+class CRONE extends Rule {
+  constructor(ids) {
+    super(ids, ANY(NP("one")));
+  }
+  apply({}, node, refs) {
+    let one = find({}, refs, "one");
+    if (!one) {
+      throw new Error("Can't use 'one' outside of an 'everyone' clause");
+    }
+
+    node.children[0] = one;
+
+    return [[], []];
   }
 }
 
@@ -1029,7 +1046,7 @@ class CREVERY extends Rule {
       q = "every";
     }
     let result = quantifier(q, n, v, ref);
-    
+
     return [[], [result], node];
   }
 }
@@ -1590,6 +1607,7 @@ class Rules {
       new CRNEG(ids),
       new CRORS(ids),
       new CRBE(ids),
+      new CRONE(ids),
     ];
     return [
       [

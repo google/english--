@@ -816,6 +816,7 @@ const DrtSyntax = `
           NP[num=3, gen=4, case=5, gap=-, deep=8].
 
       NP[num=1, gen=2, case=3, gap=-, deep=+, np=+] -> %everyone.
+      NP[num=1, gen=2, case=3, gap=-, deep=+, np=+] -> %one.
 
       DET[num=sing, quant=some] -> %a.
       DET[num=sing, quant=some] -> %an.

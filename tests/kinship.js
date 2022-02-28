@@ -82,6 +82,30 @@ describe("Kinship", function() {
     `);
   });
 
+  it("Every uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].", function() {
+    assertThat("Every uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].")
+      .equalsTo(`
+        for (let every a: uncle(a)) {
+          a = b.
+          male-relative(b).
+          relative(b).
+          either (
+            b = c.
+            sibling(c).
+            parent(d).
+            sibling-of(c, d).
+          ) or (
+            b = e.
+            husband(e).
+            parent(g).
+            sibling(f).
+            husband-of(e, f).
+            sibling-of(f, g).
+          ).
+        }
+    `);
+  });
+
   it("Everyone's uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].", () => {
     assertThat("Everyone's uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].")
       .equalsTo(`
@@ -108,30 +132,32 @@ describe("Kinship", function() {
     `);
   });
   
-  it("Every uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].", function() {
-    assertThat("Every uncle is a male relative who is either [a sibling of a parent] or [a husband of [a sibling of a parent]].")
+  it("Everyone's uncle is one's male relative who is either [a sibling of one's parent] or [a husband of [a sibling of one's parent]].", () => {
+    assertThat("Everyone's uncle is one's male relative who is either [a sibling of one's parent] or [a husband of [a sibling of one's parent]].")
       .equalsTo(`
-        for (let every a: uncle(a)) {
-          a = b.
-          male-relative(b).
-          relative(b).
-          either (
-            b = c.
-            sibling(c).
-            parent(d).
-            sibling-of(c, d).
-          ) or (
-            b = e.
-            husband(e).
-            parent(g).
-            sibling(f).
-            husband-of(e, f).
-            sibling-of(f, g).
-          ).
-        }
+       for (let every a) {
+         for (let every b: uncle(b, a)) {
+           b = c.
+           male-relative(c).
+           relative(c, a).
+           either (
+             c = d.
+             sibling(d).
+             parent(e, a).
+             sibling-of(d, e).
+           ) or (
+             c = f.
+             husband(f).
+             parent(h, a).
+             sibling(g).
+             husband-of(f, g).
+             sibling-of(g, h).
+           ).
+         }
+       }
     `);
   });
-
+  
   it("Mel is married to Dani.", function() {
     assertThat(`
       Mel is married to Dani. 
