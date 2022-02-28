@@ -375,7 +375,7 @@ class CRPN4 extends Rule {
 
 class CRPN extends CompositeRule {
   constructor(ids) {
-    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids)]);
+    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids), new CRTHE(ids),]);
   }
 }
 
@@ -1612,7 +1612,7 @@ class CRQUESTION extends CompositeRule {
   }
 }
 
-class CRNAME extends Rule {
+class CRTHE extends Rule {
   constructor(ids) {
     super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
   }
@@ -1668,7 +1668,7 @@ class CRPUNCT3 extends Rule {
 
 class CRPUNCT extends CompositeRule {
   constructor(ids) {
-    super([new CRPUNCT1(ids), new CRPUNCT2(ids)]);
+    super([new CRPUNCT1(ids), new CRPUNCT2(ids), new CRPUNCT3(ids)]);
   }
 }
 
@@ -1758,18 +1758,26 @@ class Rules {
       new CRADJ(ids),
       new CRBE(ids),
       new CRNEG(ids),
-
       new CRORS(ids),
-
+      new CRBE(ids),
     ];
-    return [[new CRNAME(ids), new CRPUNCT(ids), new CRPUNCT3(ids), new CRPN(ids)],
-            [new CREVERY(ids), new CRVPEVERY(ids),
-             new CRCOND(ids),
-             new CRORS(ids),
-             new CRAND(ids),
-             new CRQUESTION(ids)],
-            rules,
-            [new CRPRED(ids), new CRBE(ids)]];
+    return [
+      [
+        new CRPN(ids),
+        new CRPUNCT(ids),
+      ],
+      [
+        new CREVERY(ids),
+        new CRVPEVERY(ids),
+        new CRCOND(ids),
+        new CRORS(ids),
+        new CRAND(ids),
+        new CRQUESTION(ids),
+      ],
+      rules,
+      [
+        new CRPRED(ids),
+      ]];
   }
 }
 
