@@ -1351,17 +1351,6 @@ class CRASPECT extends Rule {
   }
 }
 
-function unwrap({["@type"]: type, value, children = []}) {
-  if (value) {
-    return type == "Referent" ? value : value.toLowerCase();
-  }
-  const result = [];
-  for (let child of children) {
-    result.push(unwrap(child));
-  }
-  return result.join(" ");
-}
-
 class CRQUESTIONIS extends Rule {
   constructor(ids) {
     super(ids, Question(Q_(Q(
