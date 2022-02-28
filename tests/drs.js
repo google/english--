@@ -188,18 +188,16 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Jones does not own Ulysses. He likes it.", function() {
+  it("Jones does not own Ulysses. He likes it.", function() {
     // TODO(goto): we got the reference to "it" wrong here.
     assertThat("Jones does not own Ulysses. He likes it.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Ulysses(b)
-         ~drs() {
-           a own b
-         }
-         b likes a
-       }
+       Ulysses(a).
+       Jones(b).
+       not (
+         own(s0, b, a).
+       ).
+       like(s1, a, b).
      `);
   });
 
@@ -276,6 +274,18 @@ describe("DRS", function() {
          ).
          like(s0, a, b).
        ).
+     `);
+  });
+
+  it("Jones likes a porsche which he does not own.", function() {
+    assertThat("Jones likes a porsche which he does not own.")
+     .equalsTo(`
+       Jones(a).
+       not (
+         own(s0, a, b).
+       ).
+       porsche(b).
+       like(s1, a, b).
      `);
   });
 
@@ -378,10 +388,16 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("A man likes Smith. The man loves Mary.", function() {
+  it("A man likes Smith. The man loves Mary.", function() {
     // Anaphora resoution of "the" seems to not be working.
     assertThat("A man likes Smith. The man loves Mary.")
      .equalsTo(`
+       Smith(a).
+       man(b).
+       like(s0, b, a).
+       Mary(c).
+       man(d).
+       love(s1, d, c).
     `);
   });
   
@@ -771,12 +787,10 @@ describe("DRS", function() {
     // to be done.
     assertThat("Jones likes Smith. he admires him.")
      .equalsTo(`
-       drs(a, b) {
-         Jones(a)
-         Smith(b)
-         a likes b
-         b admires a
-       }
+       Smith(a).
+       Jones(b).
+       like(s0, b, a).
+       admire(s1, b, b).
     `);
   });
 
@@ -1021,18 +1035,9 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("A brazilian engineer who loves Mary's mother is happy.", function() {
+  it("A brazilian engineer who loves Mary's mother is happy.", function() {
     assertThat("A brazilian engineer who loves Mary's mother is happy.")
-     .equalsTo(`
-       drs(a, b, c) {
-         Anna(a)
-         happy(b)
-         b love c
-         brazilian(b)
-         engineer(b)
-         c mother a
-       }
-    `);
+     .equalsTo(2);
   });
 
   it("Jones is Mary's husband.", function() {
@@ -1167,7 +1172,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Smith was happy.", function() {
+  it("Smith was happy.", function() {
     assertThat("Smith was happy.")
      .equalsTo(`
        Smith(a).
@@ -1175,14 +1180,13 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Smith was not happy.", function() {
+  it("Smith was not happy.", function() {
     assertThat("Smith was not happy.")
      .equalsTo(`
-       let a
-       Smith(a)
-       not {
-         happy(a)
-       }
+       Smith(a).
+       not (
+         happy(a).
+       ).
     `);
   });
 
@@ -1299,15 +1303,11 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Smith was married to Mary.", function() {
+  it("Smith was married to Mary.", function() {
     // TODO: allow prepositional phrases to be attached
     // to adjectives.
     assertThat("Smith was married to Mary.")
-     .equalsTo(`
-       let a
-       Smith(a)
-       marry(a)
-    `);
+     .equalsTo(2);
   });
 
   it("Smith was not an engineer from Brazil.", function() {
@@ -1422,13 +1422,13 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Every engineer who was brazilian was happy.", function() {
+  it("Every engineer who was brazilian was happy.", function() {
     // Matches the DRS found in (3.57) on page 269.
     // who was brazilian 
     assertThat("Every engineer who was brazilian was happy.")
      .equalsTo(`
-       for (let every a: engineer(a)) {
-         < happy(a)
+       for (let every a: engineer(a) brazilian(a)) {
+         happy(a).
        }
     `);
   });
@@ -1511,7 +1511,7 @@ describe("DRS", function() {
      .equalsTo(`
        Argentina(a).
        Brazil(b).
-       let c: b = c country(c) border(s0, c, a)?
+       let s0, c: b = c country(c) border(s0, c, a)?
     `);
   });
 
@@ -1531,7 +1531,7 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Which countries border Brazil?", function() {
+  it("Which countries border Brazil?", function() {
     // NOTE: where is europe factored into the question?
     assertThat("Which country in Europe is happy about Brazil?")
      .equalsTo(`
@@ -1558,9 +1558,12 @@ describe("DRS", function() {
     `);
   });
 
-  it.skip("Does Jones like a woman from Brazil?", function() {
+  it("Does Jones like a woman from Brazil?", function() {
     assertThat("Does Jones like a woman from Brazil?")
      .equalsTo(`
+       Brazil(a).
+       Jones(b).
+       let c: woman(c) like(b, c) woman-from(c, a)?
     `);
   });
 

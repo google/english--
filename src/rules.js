@@ -700,11 +700,12 @@ class CRNRC extends Rule {
     let rc = node.children.pop();
     let s = rc.children[1];
     
-    const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
+    const g1 = S(REF(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
 
-    // console.log(s);
+    //console.log(s);
+    //throw new Error("hi");
     if (match(g1, s)) {
-      // throw new Error("hi");
+      //throw new Error("hi");
       child(s, 1, 2).children[1] = node.ref[0];
     }
     
@@ -1746,7 +1747,6 @@ class Rules {
       new CRPRO(ids),
       new CRPOSS(ids),
       new CRADJ(ids),
-      new CRQUESTION(ids),
       new CRBE(ids),
       new CRNEG(ids),
     ];
@@ -1754,7 +1754,8 @@ class Rules {
             [new CREVERY(ids), new CRVPEVERY(ids),
              new CRCOND(ids),
              new CROR(ids), new CRVPOR(ids), new CRNPOR(ids), new CRVPNPOR(ids),
-             new CRAND(ids)],
+             new CRAND(ids),
+             new CRQUESTION(ids)],
             rules,
             [new CRPRED(ids), new CRBE(ids)]];
   }

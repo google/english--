@@ -2,7 +2,7 @@ const Assert = require("assert");
 const {Console, transpile} = require("../src/console.js");
 const {dict} = require("./dict.js");
 
-describe.skip("Console", () => {
+describe("Console", () => {
 
   function unroll(gen) {
     const result = [];
@@ -32,7 +32,7 @@ describe.skip("Console", () => {
     `))).equalsTo(["I don't know."]);
   });
 
-  it("Is Sam happy about Brazil?", () => {
+  it.skip("Is Sam happy about Brazil?", () => {
     const code = `
       Every person who is brazilian is happy about Brazil.
       Sam is brazilian.
@@ -85,8 +85,7 @@ describe.skip("Console", () => {
       b = c.
       capital(c).
       capital-of(c, a).
-      let e: e = d?capital(d). 
-      capital-of(d, a).
+      let d, e: d = e capital(e) capital-of(e, a)?
     `, true);
     assertThat(unroll(new Console(dict).load(code))).equalsTo(["Brasilia."]);
   });
@@ -98,7 +97,7 @@ describe.skip("Console", () => {
     `))).equalsTo(["Mel."]);
   });
 
-  it("Is Brazil a country which borders Argentina?", () => {
+  it.skip("Is Brazil a country which borders Argentina?", () => {
     assertThat(unroll(new Console(dict).load(`
       Brazil is a country in South America.
       Brazil borders Argentina.
@@ -135,7 +134,7 @@ describe.skip("Console", () => {
     `, true);        
   });
   
-  it("Sam is a brazilian engineer.", () => {
+  it.skip("Sam is a brazilian engineer.", () => {
     const {dict} = require("../src/large.js");
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
