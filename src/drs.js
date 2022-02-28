@@ -38,6 +38,9 @@ class DRS {
   }
 
   process(nodes, rules = []) {
+
+    // console.log(nodes);
+    
     let queue = [...nodes];
     
     while (queue.length > 0) {
@@ -66,6 +69,62 @@ class DRS {
     
     return this;
   }
+
+  dive(node, rules) {
+    const {children = []} = node;
+    const head = []
+    const body = [];
+
+    let added = false;
+    
+    for (const child of children) {
+      const [more, remove] = this.dive(child, rules);
+      if (remove) {
+        let i = node.children.indexOf(remove);
+        if (i == -1) {
+          throw new Error("Ooops, deleting an invalid node.");
+        }
+        node.children.splice(i, 1);
+        added = true;
+      }
+      if (more) {
+        added = true;
+      }
+    }
+
+    const [next, remove] = this.apply(node, rules);
+
+    return [added || next.length > 0, remove];
+  }
+
+  go(rules) {
+    let done;
+
+    do {
+      done = true;
+      
+      for (const node of this.body) {
+        const [added, remove] = this.dive(node, rules);
+        
+        if (added) {
+          done = false;
+          // throw new Error("hi");
+        }
+      
+        if (remove) {
+          let i = this.body.indexOf(remove);
+          // console.log(remove);
+          // throw new Error("hi");
+          if (i == -1) {
+            throw new Error("Ooops, deleting an invalid node.");
+          }
+          this.body.splice(i, 1);
+          //continue;
+        }
+      }
+
+    } while (!done);
+  }
   
   push(node) {
     for (let ref of this.head) {
@@ -73,19 +132,30 @@ class DRS {
       // referents before new phrases are processed.
       ref.loc = 0;
     }
-    
+
     // Make simplications.
-    this.process([node], this.setup);
+    //this.process([node], this.setup);
 
     // Resolve all proper names.
-    this.process([node], this.before);
+    //this.process([node], this.before);
 
     this.body.push(node);
 
-    let result = this.process([node], this.rules);
+    this.go(this.setup);
+    this.go(this.before);
+    this.go(this.rules);
+    this.go(this.after);
+    //console.log(this.print());
 
-    this.process(this.body, this.after);
+    //throw new Error("hi");
+    
+    //throw new Error("hi");
+    // let result = this.process([node], this.rules);
+    
+    //this.process(this.body, this.after);
 
+    return this;
+    
     return result;
   }
   

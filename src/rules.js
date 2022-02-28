@@ -437,10 +437,14 @@ class CRSID extends Rule {
 
 class CRVPID extends Rule {
   constructor(ids) {
-    super(ids, VP(V(), NP(DET(capture("det")), N_(capture("noun")))));
+    super(ids, VP(ANY(), NP(DET(capture("det")), N_(capture("noun")))));
   }
   
   apply({det, noun}, node, refs) {
+    if (det.types.quant != "some") {
+      return;
+    }
+
     let types = clone(noun.types);
     Object.assign(types, child(noun, 0).types);
     
@@ -578,6 +582,8 @@ class CRADJLIN extends Rule {
   }
   
   apply({adj}, node) {
+    //console.log(node);
+    //throw new Error("hi");
     if (!adj.ref || adj.children.length != 1) {
       return [[], []];
     }
@@ -684,24 +690,27 @@ class CRNRC extends Rule {
   }
   
   apply(m, node) {
+    if (!node.ref) {
+      return;
+    }
+    
     let head = [];
     let body = [];    
-
-    // throw new Error(JSON.stringify(node, undefined, 2));
-    // if (!node.ref) {
-    //  return [head, body];
-    //}
 
     let rc = node.children.pop();
     let s = rc.children[1];
     
     const g1 = S(NP(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
-    
+
+    // console.log(s);
     if (match(g1, s)) {
+      // throw new Error("hi");
       child(s, 1, 2).children[1] = node.ref[0];
     }
     
     // Binds gap to the referent.
+    // console.log(rc);
+    // console.log(rc);
     let object = child(s, 1, 0, 1);
     if (object && object.children && object.children[0]["@type"] == "GAP") {
       child(s, 1, 0).children[1] = node.ref[0];
@@ -710,9 +719,14 @@ class CRNRC extends Rule {
     let subject = s.children[0];
     if (subject && subject.children && subject.children[0]["@type"] == "GAP") {
       // console.log(child(node, 0));
+      //console.log(s.children[0]);
+      //console.log(node);
       s.children[0] = node.ref[0];
     }
-    
+
+    // Fills the GAP.
+    s.types.gap = "-";
+
     let noun = node.children.pop();
     noun.ref = node.ref;
     body.push(noun);
@@ -723,31 +737,17 @@ class CRNRC extends Rule {
   }
 }
 
-class CRNEG extends Rule {
-  constructor(ids) {
-    super(ids, S(ANY(), VP_(AUX(), "not", VP())));
-  }
-  
-  apply({}, node, refs) {
-    let sub = drs(this.ids);
-    sub.head = clone(refs);
-    sub.head.forEach(ref => ref.closure = true);
-    
-    let s = clone(node);
-    child(s, 1).children.splice(0, 2);
-    
-    sub.push(s);
-    
-    return [[], [negation(sub)], node];
-  }
-}
-
 class CRREFBE extends Rule {
   constructor(ids) {
     super(ids, S(REF(capture("a")),
                  VP_(VP(BE(), REF(capture("b"))))));
   }
   apply({a, b}, node, refs) {
+    //if (node.types.gap != "-") {
+    //  return;
+    //}
+
+    // throw new Error("hi");
     let s = predicate("=", [a, b], node.types, true);
     return [[], [s], node];
   }
@@ -758,6 +758,11 @@ class CRPOSBE extends Rule {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
+    //if (node.types.gap != "-") {
+    //  return;
+    //}
+
+    // throw new Error("hi");
     adj.ref = [ref];
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -774,6 +779,10 @@ class CRPREPBE extends Rule {
                 ));
   }
   apply({ref, prep, np}, node, refs) {
+    //if (node.types.gap != "-") {
+    //  return;
+    //}
+
     let body = [];
 
     let s = S(ref, VP_(VP(V(child(prep, 0)), np)));
@@ -788,6 +797,10 @@ class CRNEGBE extends Rule {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", ADJ(capture("adj"))))));
   }
   apply({ref, adj}, node, refs) {
+    //if (node.types.gap != "-") {
+    //  return;
+    //}
+
     let sub = drs(this.ids);
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
@@ -803,7 +816,12 @@ class CRNBE extends Rule {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
-    // throw new Error("hi");
+    if ((node.types || {}).gap != "-") {
+      return;
+    }
+
+    //throw new Error("hi");
+    return;
     let np = clone(noun);
     np.ref = [ref];
     
@@ -821,6 +839,10 @@ class CRGENERICBE extends Rule {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(N_(capture("noun")))))));
   }
   apply({ref, noun}, node, refs) {
+    if (node.types.gap != "-") {
+      return;
+    }
+
     let np = clone(noun);
     np.ref = [ref];
     console.log();
@@ -840,6 +862,10 @@ class CRNEGNBE extends Rule {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
+    if (node.types.gap != "-") {
+      return;
+    }
+
     let sub = drs(this.ids);
     
     sub.head = clone(refs);
@@ -877,6 +903,10 @@ class CRPASSIVEBE extends Rule {
                            NP(GAP()))))));
   }
   apply({obj, be, verb}, node, refs) {
+    if (node.types.gap != "-") {
+      return;
+    }
+
     let s = S(GAP(), VP_(VP(verb, obj)));
     // Matches the DRS found in (3.57) on page 269.
     s.types = {
@@ -1030,6 +1060,7 @@ class CREVERY extends Rule {
     super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
+    // throw new Error("hi");
     if (det.types.quant != "+") {
       return;
     }
@@ -1637,6 +1668,29 @@ class CRPUNCT extends CompositeRule {
   }
 }
 
+class CRNEG extends Rule {
+  constructor(ids) {
+    super(ids, S(ANY(), VP_(AUX(), "not", VP())));
+  }
+  
+  apply({}, node, refs) {
+    if (node.types.gap != "-") {
+      return;
+    }
+    
+    let sub = drs(this.ids);
+    sub.head = clone(refs);
+    sub.head.forEach(ref => ref.closure = true);
+
+    let s = clone(node);
+    child(s, 1).children.splice(0, 2);
+    
+    sub.push(s);
+    
+    return [[], [negation(sub)], node];
+  }
+}
+
 class CRPRED extends Rule {
   constructor(ids) {
     super(ids, S(ANY(capture("sub")),
@@ -1645,6 +1699,7 @@ class CRPRED extends Rule {
   }
   
   apply({sub, verb}, node, refs = []) {
+    //throw new Error("hi");
     let obj = child(node, 1, 0, 1);
     //console.log(obj);
     //throw new Error();
@@ -1678,33 +1733,30 @@ class CRPRED extends Rule {
 class Rules {
   static from(ids = new Ids()) {
     let rules = [
-      new CREVERY(ids),
-      new CRVPEVERY(ids),
+      new CRID(ids),
+      new CRLIN(ids),
       new CREVERYONE(ids),
       new CREVERYONE2(ids),
       new CRGENERIC(ids),
       new CRVPGENERIC(ids),
       new CRASPECT(ids),
       new CRTENSE(ids),
-      new CRLIN(ids),
-      new CRID(ids),
       new CRADV(ids),
       new CRNRC(ids), 
       new CRPRO(ids),
-      new CRNEG(ids),
       new CRPOSS(ids),
-      new CRBE(ids),
-      new CRCOND(ids),
-      new CROR(ids),
-      new CRVPOR(ids),
-      new CRNPOR(ids),
-      new CRVPNPOR(ids),
-      new CRAND(ids),
       new CRADJ(ids),
       new CRQUESTION(ids),
-      new CRPUNCT(ids),
+      new CRBE(ids),
+      new CRNEG(ids),
     ];
-    return [[new CRNAME(ids)], [new CRPN(ids), new CRPUNCT3(ids)], rules, [new CRPRED(ids)]];
+    return [[new CRNAME(ids), new CRPUNCT(ids), new CRPUNCT3(ids), new CRPN(ids)],
+            [new CREVERY(ids), new CRVPEVERY(ids),
+             new CRCOND(ids),
+             new CROR(ids), new CRVPOR(ids), new CRNPOR(ids), new CRVPNPOR(ids),
+             new CRAND(ids)],
+            rules,
+            [new CRPRED(ids), new CRBE(ids)]];
   }
 }
 
