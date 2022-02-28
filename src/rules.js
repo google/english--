@@ -702,7 +702,7 @@ class CRNRC extends Rule {
     
     const g1 = S(REF(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
 
-    //console.log(s);
+    //console.log(rc);
     //throw new Error("hi");
     if (match(g1, s)) {
       //throw new Error("hi");
@@ -1211,6 +1211,9 @@ class CRVPNPOR extends Rule {
                  VP_(VP(ANY(capture("verb")), NP("either", ANY(capture("first")), "or", ANY(capture("second")))))));
   }
   apply({sub, verb, first, second}, node, refs) {
+    if ((node.types || {}).gap != "-") {
+      return;
+    }
     // throw new Error("hi");
     let a = drs(this.ids);
     a.head.push(...clone(refs));
@@ -1731,6 +1734,12 @@ class CRPRED extends Rule {
   }
 }
 
+class CRORS extends CompositeRule {
+  constructor(ids) {
+    super([new CROR(ids), new CRVPOR(ids), new CRNPOR(ids), new CRVPNPOR(ids)]);
+  }
+}
+
 class Rules {
   static from(ids = new Ids()) {
     let rules = [
@@ -1749,11 +1758,14 @@ class Rules {
       new CRADJ(ids),
       new CRBE(ids),
       new CRNEG(ids),
+
+      new CRORS(ids),
+
     ];
     return [[new CRNAME(ids), new CRPUNCT(ids), new CRPUNCT3(ids), new CRPN(ids)],
             [new CREVERY(ids), new CRVPEVERY(ids),
              new CRCOND(ids),
-             new CROR(ids), new CRVPOR(ids), new CRNPOR(ids), new CRVPNPOR(ids),
+             new CRORS(ids),
              new CRAND(ids),
              new CRQUESTION(ids)],
             rules,
