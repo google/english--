@@ -963,6 +963,7 @@ class CREVERYONE2 extends Rule {
     head.children[0].children[0] = ref2;
     let u = drs(this.ids);
     noun.ref = [ref, ref2];
+    u.head.push(ref2);
     u.push(noun);
 
     let s = clone(node);

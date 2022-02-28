@@ -158,6 +158,30 @@ describe("Kinship", function() {
     `);
   });
   
+  it("Everyone's husband of a sibling of one's parent is one's uncle.", () => {
+    assertThat("Everyone's husband of a sibling of one's parent is one's uncle.")
+      .equalsTo(`
+       for (let every a) {
+         for (let every b: parent(c, a) husband(b, a) sibling(d) husband-of(b, c) husband-of(b, d)) {
+           b = e.
+           uncle(e, a).
+         }
+       }
+    `);
+  });
+  
+  it("Everyone's sibling of one's parent is one's uncle.", () => {
+    assertThat("Everyone's sibling of one's parent is one's uncle.")
+      .equalsTo(`
+       for (let every a) {
+         for (let every b: parent(c, a) sibling(b, a) sibling-of(b, c)) {
+           b = d.
+           uncle(d, a).
+         }
+       }
+    `);
+  });
+  
   it("Mel is married to Dani.", function() {
     assertThat(`
       Mel is married to Dani. 

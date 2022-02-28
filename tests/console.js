@@ -105,6 +105,44 @@ describe("Console", () => {
     `))).equalsTo(["Yes."]);
   });
 
+  it("Kinship", () => {
+    assertThat(new Console(dict).transpile(`
+      Everyone's uncle is one's male relative who is either [a sibling of one's parent] or [a husband of [a sibling of one's parent]].
+      Maura is Sam's parent.
+      Tio Bo is Maura's sibling.
+      Who is Sam's uncle?
+    `)).equalsTo(`
+      for (let every a) {
+        for (let every b: uncle(b, a)) {
+          b = c.
+          male-relative(c).
+          relative(c, a).
+          either (
+            c = d.
+            sibling(d).
+            parent(e, a).
+            sibling-of(d, e).
+          ) or (
+            c = f.
+            husband(f).
+            parent(h, a).
+            sibling(g).
+            husband-of(f, g).
+            sibling-of(g, h).
+          ).
+        }
+      }
+      Sam(i).
+      Maura(j).
+      j = k.
+      parent(k, i).      
+      Tio-Bo(l).
+      l = m.
+      sibling(m, j).
+      let n, o: n = o uncle(o, i)?
+    `, true);
+  });
+  
   it.skip("", () => {
     const {dict} = require("../src/large.js");
     const console = new Console(dict);
