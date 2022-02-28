@@ -57,16 +57,27 @@ describe("Kinship", function() {
     `);
   });
 
-  it.skip("Every uncle is a male relative who is a sibling of a parent.", function() {
+  it("Every uncle is a male relative who is a sibling of a parent.", function() {
     assertThat("Every uncle is a male relative who is either a sibling of a parent or a person who is married to a sibling of a parent.")
       .equalsTo(`
         for (let every a: uncle(a)) {
-          let b
-          male-relative(a)
-          relative(a)
-          sibling(a)
-          parent(b)
-          of(a, b)
+          a = b.
+          male-relative(b).
+          relative(b).
+          either (
+            b = e.
+            sibling(e).
+            parent(f).
+            sibling-of(e, f).
+          ) or (
+            b = g.
+            person(g).
+            married(g).
+          ).
+          parent(c).
+          sibling(d).
+          male-relative-of(b, c).
+          male-relative-to(b, d).
        }
     `);
   });
