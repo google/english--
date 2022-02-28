@@ -6,8 +6,6 @@ const {Tokenizer} = require("./lexer.js");
 
 class Nearley {
   constructor(compiled, start) {
-    // const {ParserRules, ParserStart} = compiled;  
-    // const rule = start ? start : ParserStart;
     if (start) {
       compiled.ParserStart = start;  
     }
@@ -39,10 +37,7 @@ class Nearley {
     
     const module = { exports: {} };
     
-    // console.log(code);
     eval(code);
-    
-    // console.log(module.exports.Lexer);
     
     return module.exports;
   }
@@ -57,8 +52,6 @@ class Nearley {
   
   reportError(e) {
     let that = this;
-    //console.log(this.parser.current);
-    //console.log();
     const buffer = this.parser.lexer.tokenizer ?
           this.parser.lexer.tokenizer.buffer :
           this.parser.lexer.buffer;
@@ -67,15 +60,8 @@ class Nearley {
       token: e.token,
       loc: e.offset, 
       start: buffer[that.parser.current],
-      // get message() { return this.print(); },
       print() {
         const tracks = that.tracks(2);
-        //console.log(tracks);
-        //return;
-        //const completions = that.complete(tracks);
-        //console.log("hi");
-        //console.log(completions);
-        //return;
         const result = [];
         let unexpected = ""; 
         let head = "";
@@ -87,7 +73,6 @@ class Nearley {
         head += " ";
         head += `Instead, I was expecting to see one of the following:`;
         result.push(head);
-        // return result.join("\n");
         result.push(``);
         for (let track of tracks) {
           result.push(`A ${track.symbol} token based on:`);
@@ -331,26 +316,19 @@ function continuous(path) {
     }
   } while (true);
   
-  //console.log(j);
-  //console.log(path);
   let last = {
     "@type": path[j].rule.name,
     "types" : path[j].rule.postprocess.meta.types,
   };
   
   for (let i = (j + 1); i < path.length; i++) {
-    // let current = path[i];
     let next = path[i];
-    //console.log(j);
     let meta = next.rule.postprocess.meta;
     let right = walk(next);
     right.push(last);
     let result = match(next.rule.name, meta.types, meta.conditions,
                        right, undefined, false, true);
     if (!result) {
-      //console.log(meta.conditions);
-      //console.log(walk(next));
-      //console.log(`${next.rule.name} cant take ${last["@type"]}`);
       return false;
     }
     last = result;
@@ -400,11 +378,6 @@ function match(type, types = {}, conditions = [], data, location, reject,
   // Ignores the null type.
   let expects = conditions.filter((x) => x["@type"] != "null");
 
-  //let b = (types = {}) => Object.entries(types).map(([key, value]) => `${key}=${value}`).join(", ");
-  //let a = (node) => `${node["@type"]}[${b(node.types)}]`;
-  //console.log(`Trying to bind: ${type}[${b(types)}] -> ${expects.map(a).join(" ")}`);
-  //console.log(`To: ${data.map(a).join(" ")}`);
-  
   if (!partial && expects.length != data.length) {
     throw new Error("Unexpected data length");
   }
@@ -413,8 +386,6 @@ function match(type, types = {}, conditions = [], data, location, reject,
 
   let intersection = (a, b) => a.filter(value => b.includes(value));
 
-  // console.log(intersection([1, 5, 2, 3], [1, 4, 5, 3, 6]));
-  
   for (let i = 0; i < result.length; i++) {
     let expected = expects[i];
     let child = result[i];
@@ -427,29 +398,22 @@ function match(type, types = {}, conditions = [], data, location, reject,
           if (Array.isArray(variables[value])) {
             if (Array.isArray(child.types[key])) {
               if (intersection(child.types[key], variables[value]).length == 0) {
-                //console.log("hi");
-                //console.log(child.types[key]);
-                //console.log(variables[value]);
                 return reject;
               }
             } else if (!variables[value].includes(child.types[key])) {
               return reject;
             }
           } else if (typeof variables[value] == "number") {
-            // console.log("hi");
             variables[value] = child.types[key];
           } else if (Array.isArray(child.types[key])) {
             if (!child.types[key].includes(variables[value])) {
-              // console.log("hi");
               return reject;
             }
             continue;
           } else if (typeof child.types[key] == "number") {
-            // console.log("hi");
             variables[child.types[key]] = variables[value];
             continue;
           } else if (variables[value] != child.types[key]) {
-            // console.log(`Expected ${key}="${variables[value]}", got ${key}="${child.types[key]}"`);
             return reject;
           }
         }
@@ -459,7 +423,6 @@ function match(type, types = {}, conditions = [], data, location, reject,
         child.types[key] = value;
       } else if (Array.isArray(child.types[key])) {
         if (!child.types[key].includes(expected.types[key])) {
-          // console.log("hi");
           return reject;
         }
         child.types[key] = expected.types[key];
@@ -467,11 +430,8 @@ function match(type, types = {}, conditions = [], data, location, reject,
                  expected.types[key] != child.types[key]) {
         if (Array.isArray(expected.types[key]) &&
             expected.types[key].includes(child.types[key])) {
-          // variables[key] = child.types[key];
-          // console.log(key);
           continue;
         }
-        // console.log(`Expected ${key}="${expected.types[key]}", got ${key}="${child.types[key]}"`);
         return reject;
       } else if (!child.types[key]) {
         return reject;
@@ -491,8 +451,6 @@ function match(type, types = {}, conditions = [], data, location, reject,
     }
   }
 
-  // console.log("Done!");
-  
   return {
     "@type": type,
     "types": bindings,
@@ -628,10 +586,8 @@ class FeaturedNearley {
   }
 
   static generate(source, header = "", footer = "", raw) {
-    // console.log("hi");
     let parser = new FeaturedNearley();
     let grammar = parser.feed(source + footer);
-    // console.log("hello");
     
     let result = [];
 
@@ -1028,7 +984,6 @@ class Parser {
           .map(word => [word.match("^(__)?([a-z]+)(__)?")[2], word, []]);
     // keywords
     this.load(reserved);
-    // console.log(reserved);
     // punctuation
     this.load([
       [" ", "WS"],
@@ -1153,7 +1108,6 @@ function first(result) {
 
 function preprocess(node) {
  if (node["@type"] == "V") {
-  // console.log(node);                                                       
   let root = node.children[0].children[0];
   let suffix = node.children[1] || "";
   node.children = [root + suffix];
