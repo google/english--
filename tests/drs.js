@@ -263,16 +263,16 @@ describe("DRS", function() {
      `);
   });
 
-  it.skip("Jones does not like a porsche which he does not own.", function() {
+  it("Jones does not like a porsche which he does not own.", function() {
     assertThat("Jones does not like a porsche which he does not own.")
      .equalsTo(`
        Jones(a).
        not (
-         porsche(b).
-         not (
-           own(s1, a, b).
-         ).
-         like(s0, a, b).
+         like(s1, a, b).
+       ).
+       porsche(b).
+       not (
+         own(s0, a, b).
        ).
      `);
   });

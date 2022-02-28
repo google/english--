@@ -32,7 +32,7 @@ describe("Console", () => {
     `))).equalsTo(["I don't know."]);
   });
 
-  it.skip("Is Sam happy about Brazil?", () => {
+  it("Is Sam happy about Brazil?", () => {
     const code = `
       Every person who is brazilian is happy about Brazil.
       Sam is brazilian.
@@ -97,7 +97,7 @@ describe("Console", () => {
     `))).equalsTo(["Mel."]);
   });
 
-  it.skip("Is Brazil a country which borders Argentina?", () => {
+  it("Is Brazil a country which borders Argentina?", () => {
     assertThat(unroll(new Console(dict).load(`
       Brazil is a country in South America.
       Brazil borders Argentina.
@@ -134,7 +134,7 @@ describe("Console", () => {
     `, true);        
   });
   
-  it.skip("Sam is a brazilian engineer.", () => {
+  it("Sam is a brazilian engineer.", () => {
     const {dict} = require("../src/large.js");
     const console = new Console(dict);
     assertThat(unroll(console.load(`Sam is a brazilian engineer.`))).equalsTo([]);
