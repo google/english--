@@ -485,7 +485,6 @@ class CRNLIN extends Rule {
     }
     let pred = predicate(noun.prop, node.ref, node.types);
     
-    //throw new Error("hi");
     return [[], [pred], true];
   }
 }
@@ -531,7 +530,7 @@ class CRPPLIN extends Rule {
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
-    return [[], body, node];
+    return [[], body, true];
   }
 }
 
@@ -547,7 +546,7 @@ class CRADJLIN extends Rule {
 
     let pred = predicate(adj.prop, node.ref, node.types);
     
-    return [[], [pred], node];
+    return [[], [pred], true];
   }
 }
 
@@ -584,7 +583,7 @@ class CRPPADJLIN extends Rule {
     let cond = S(node.ref[0], VP_(VP(V(child(prep, 0)), child(np, 1))));
     body.push(cond);
     
-    return [[], body, node];
+    return [[], body, true];
   }
 }
 
@@ -634,7 +633,7 @@ class CRADV extends Rule {
 
     body.push(s);
     
-    return [[], body, node];
+    return [[], body, true];
   }
 }
 
@@ -680,7 +679,7 @@ class CRNRC extends Rule {
     
     body.push(s);
     
-    return [head, body, node];
+    return [head, body, true];
   }
 }
 
@@ -691,7 +690,7 @@ class CRREFBE extends Rule {
   }
   apply({a, b}, node, refs) {
     let s = predicate("=", [a, b], node.types, true);
-    return [[], [s], node];
+    return [[], [s], true];
   }
 }
 
@@ -705,7 +704,7 @@ class CRPOSBE extends Rule {
     if (node.types && node.types.tense) {
       adj.types.tense = node.types.tense;
     }
-    return [[], [adj], node];
+    return [[], [adj], true];
   }
 }
 
@@ -721,7 +720,7 @@ class CRPREPBE extends Rule {
     let s = S(ref, VP_(VP(V(child(prep, 0)), np)));
     body.push(s);
     
-    return [[], body, node];
+    return [[], body, true];
   }
 }
 
@@ -736,7 +735,7 @@ class CRNEGBE extends Rule {
     let s = S(ref, VP_(VP(BE(), adj)));
     s.types = node.types;   
     sub.push(s);
-    return [[], [negation(sub)], node];
+    return [[], [negation(sub)], true];
   }
 }
 
@@ -758,7 +757,7 @@ class CRNBE extends Rule {
       np.types.tense = node.types.tense;
     }
     
-    return [[], [np], node];
+    return [[], [np], true];
   }
 }
 
@@ -780,7 +779,7 @@ class CRGENERICBE extends Rule {
       np.types.tense = node.types.tense;
     }
     
-    return [[], [np], node];
+    return [[], [np], true];
   }
 }
 
@@ -817,7 +816,7 @@ class CRNEGNBE extends Rule {
     }
     sub.push(cond);
     
-    return [[], [negation(sub)], node];
+    return [[], [negation(sub)], true];
   }
 }
 
@@ -838,7 +837,7 @@ class CRPASSIVEBE extends Rule {
     s.types = {
       tense: be.types.tense
     };
-    return [[], [s], node];
+    return [[], [s], true];
   }
 }
 
@@ -872,7 +871,7 @@ class CRCOND extends Rule {
     consequent.head.forEach(ref => ref.closure = true);
     consequent.push(tail.children[3]);
     
-    return [[], [conditional(antecedent, consequent)], node];
+    return [[], [conditional(antecedent, consequent)], true];
   }
 }
 
@@ -900,7 +899,7 @@ class CRGENERIC extends Rule {
 
     let result = quantifier("every", n, v, ref);
     
-    return [[], [result], node];
+    return [[], [result], true];
   }
 }
 
@@ -929,7 +928,7 @@ class CRVPGENERIC extends Rule {
 
     let result = quantifier("every", n, v, ref);
     
-    return [[], [result], node];
+    return [[], [result], true];
   }
 }
 
@@ -948,7 +947,7 @@ class CREVERYONE extends Rule {
 
     let result = quantifier("every", undefined, v, ref);
 
-    return [[], [result], node];
+    return [[], [result], true];
   }
 }
 
@@ -977,7 +976,7 @@ class CREVERYONE2 extends Rule {
 
     let everyone = quantifier("every", undefined, inner, ref2);
 
-    return [[], [everyone], node];
+    return [[], [everyone], true];
   }
 }
 
@@ -1049,7 +1048,7 @@ class CREVERY extends Rule {
     }
     let result = quantifier(q, n, v, ref);
 
-    return [[], [result], node];
+    return [[], [result], true];
   }
 }
 
@@ -1079,7 +1078,7 @@ class CRVPEVERY extends Rule {
     verb.push(s);
   
     let q = det.children.map((d) => d.value).join("-").toLowerCase();
-    return [[], [quantifier(q, n, verb, ref)], node];
+    return [[], [quantifier(q, n, verb, ref)], true];
   }
 }
 
@@ -1097,7 +1096,7 @@ class CROR extends Rule {
     second.head.forEach(ref => ref.closure = true);
     second.push(b);
     
-    return [[], [disjunction(first, second)], node];
+    return [[], [disjunction(first, second)], true];
   }
 }
 
@@ -1116,7 +1115,7 @@ class CRVPOR extends Rule {
     second.head.forEach(ref => ref.closure = true);
     second.push(S(clone(n.children[0]), VP_(b)));
     
-    return [[], [disjunction(first, second)], node];
+    return [[], [disjunction(first, second)], true];
   }
 }
 
@@ -1137,7 +1136,7 @@ class CRNPOR extends Rule {
     b.head.forEach(ref => ref.closure = true);
     b.push(S(second, clone(vp)));
     
-    return [[], [disjunction(a, b)], node];
+    return [[], [disjunction(a, b)], true];
   }
 }
 
@@ -1160,7 +1159,7 @@ class CRVPNPOR extends Rule {
     b.head.forEach(ref => ref.closure = true);
     b.push(S(child(sub, 0), VP_(VP(verb, second))));
     
-    return [[], [disjunction(a, b)], node];
+    return [[], [disjunction(a, b)], true];
   }
 }
 
@@ -1180,7 +1179,7 @@ class CRSAND extends Rule {
     second.head.forEach(ref => ref.closure = true);
     second.push(b);
     
-    return [[], [conjunction(first, second)], node];
+    return [[], [conjunction(first, second)], true];
   }
 }
 
@@ -1199,7 +1198,7 @@ class CRVPAND extends Rule {
     second.head.forEach(ref => ref.closure = true);
     second.push(S(clone(subject.children[0]), VP_(VP(b, clone(object)))));
     
-    return [[], [conjunction(first, second)], node];
+    return [[], [conjunction(first, second)], true];
   }
 }
 
@@ -1288,7 +1287,7 @@ class CRADJ extends Rule {
     
     let pred = predicate(name.join("-"), [node.ref[0]]);
     
-    return [[], [noun, pred], node];
+    return [[], [noun, pred], true];
   }
 }
 
@@ -1396,7 +1395,7 @@ class CRQUESTIONBEPP extends Rule {
     
     q.push(S(sub, VP_(VP(be, pp))));
     
-    return [[], [query(q)], node];
+    return [[], [query(q)], true];
   }
 }
 
@@ -1414,7 +1413,7 @@ class CRQUESTIONBEDETN extends Rule {
 
     q.push(S(sub, VP_(VP(be, NP(det, noun)))));
     
-    return [[], [query(q)], node];
+    return [[], [query(q)], true];
   }
 }
 
@@ -1426,7 +1425,7 @@ class CRQUESTIONYESNO extends Rule {
     let q = drs(this.ids);
     
     q.push(S(sub, VP_(vp)));
-    return [[], [query(q)], node];
+    return [[], [query(q)], true];
   }
 }
 
@@ -1443,7 +1442,7 @@ class CRQUESTIONWHO extends Rule {
     
     q.push(S(u, vp_));
     
-    return [[u], [query(q, u)], node];
+    return [[u], [query(q, u)], true];
   }
 }
 
@@ -1460,7 +1459,7 @@ class CRQUESTIONWHICH extends Rule {
     
     q.push(S(u, vp_));
     
-    return [[u], [query(q, u)], node];
+    return [[u], [query(q, u)], true];
   }
 }
 
@@ -1477,7 +1476,7 @@ class CRQUESTIONWHOM extends Rule {
     
     q.push(S(sub, VP_(VP(verb, u))));
     
-    return [[u], [query(q, u)], node];
+    return [[u], [query(q, u)], true];
   }
 }
 
@@ -1498,7 +1497,7 @@ class CRPUNCT1 extends Rule {
     super(ids, Sentence(Statement(S_(S(capture("s"))))));
   }
   apply({s}, node) {
-    return [[], [s], node];
+    return [[], [s], true];
   }
 }
 
@@ -1507,7 +1506,7 @@ class CRPUNCT2 extends Rule {
     super(ids, Sentence(Question(capture("q"))));
   }
   apply({q}, node) {
-    return [[], [q], node];
+    return [[], [q], true];
   }
 }
 
@@ -1547,7 +1546,7 @@ class CRNEG extends Rule {
     
     sub.push(s);
     
-    return [[], [negation(sub)], node];
+    return [[], [negation(sub)], true];
   }
 }
 
@@ -1583,7 +1582,7 @@ class CRPRED extends Rule {
 
     body.push(predicate(name, args, node.types));
 
-    return [head, body, node];
+    return [head, body, true];
   }
 }
 

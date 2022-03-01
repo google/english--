@@ -24,14 +24,14 @@ class DRS {
     let result = [];
 
     for (let rule of rules) {
-      let [head, body, remove] = rule.match(p, this.head);
+      let [head, body, remove, replace] = rule.match(p, this.head);
       this.head.push(...head);
       this.body.push(...body);
       
       result.push(...body.filter(c => !(c instanceof DRS)));
 
       if (remove) {
-        return [result, remove];
+        return [result, remove, replace];
       }
     }
     return [result];
@@ -46,7 +46,7 @@ class DRS {
 
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      const [more, remove] = this.process(child, rules);
+      const [more, remove, replace] = this.process(child, rules);
       if (remove) {
         node.children.splice(i, 1);
         added = true;
@@ -56,7 +56,7 @@ class DRS {
       }
     }
 
-    const [next, remove] = this.apply(node, rules);
+    const [next, remove, replace] = this.apply(node, rules);
 
     return [added || next.length > 0, remove];
   }
