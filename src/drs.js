@@ -30,7 +30,7 @@ class DRS {
       
       result.push(...body.filter(c => !(c instanceof DRS)));
 
-      if (remove) {
+      if (remove || replace) {
         return [result, remove, replace];
       }
     }
@@ -50,6 +50,12 @@ class DRS {
       if (remove) {
         node.children.splice(i, 1);
         added = true;
+      } else if (replace) {
+        //console.log(node);
+        node.children.splice(i, 1, replace);
+        added = true;
+        // console.log(node);
+        //throw new Error("hi");
       }
       if (more) {
         added = true;
@@ -58,7 +64,19 @@ class DRS {
 
     const [next, remove, replace] = this.apply(node, rules);
 
-    return [added || next.length > 0, remove];
+    //if (node["@type"] == "Sentence") {
+      //console.log(JSON.stringify(node, undefined, 2));
+      //console.log(rules);
+      //console.log(replace);
+    //  throw new Error("hi");
+    //}
+    
+    //if (replace) {
+      // throw new Error("hi");
+    //}
+    // console.log(JSON.stringify(node, undefined, 2));
+
+    return [added || next.length > 0, remove, replace];
   }
 
   go(rules) {
@@ -69,13 +87,14 @@ class DRS {
 
       for (let i = 0; i < this.body.length; i++) {
         const node = this.body[i];
-        const [added, remove] = this.process(node, rules);
+        const [added, remove, replace] = this.process(node, rules);
         
         if (added) {
           done = false;
         }
       
         if (remove) {
+          // throw new Error("hi");
           this.body.splice(i, 1);
         }
       }
@@ -93,6 +112,11 @@ class DRS {
     this.body.push(node);
 
     this.go(this.setup);
+
+    // console.log(JSON.stringify(this.body, undefined, 2));
+    
+    // throw new Error("hi");
+    
     this.go(this.before);
     this.go(this.rules);
     this.go(this.after);

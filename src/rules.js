@@ -230,6 +230,7 @@ class Rule {
   }
   
   match(node, refs) {
+    //console.log(this);
     let m = match(this.trigger, node);
     
     if (!m) {
@@ -241,6 +242,9 @@ class Rule {
     if (!result) {
       return [[], []];
     }
+
+    //console.log(result);
+    //throw new Error();
     
     return result;
   }
@@ -258,11 +262,16 @@ class CompositeRule extends Rule {
   match(node, refs) {
     let result = [[], []];
     for (let rule of this.rules) {
-      let [head, body, remove] = rule.match(node, refs);
+      let [head, body, remove, replace] = rule.match(node, refs);
       result[0].push(...head);
       result[1].push(...body);
       if (remove) {
         result[2] = remove;
+      }
+      if (replace) {
+        // throw new Error("hi");
+        // console.log(replace);
+        result[3] = replace;
       }
     }
     return result;
@@ -301,7 +310,7 @@ function find({gen, num}, refs, name, loc, exclude = []) {
 
 class CRPN1 extends Rule {
   constructor(ids) {
-    super(ids, ANY(NP(PN(capture("name")))));
+    super(ids, NP(PN(capture("name"))));
   }
   apply({name}, node, refs) {
     const pn = child(name, 0).value;
@@ -319,9 +328,10 @@ class CRPN1 extends Rule {
       body.push(pred);
     }
 
-    node.children[0] = ref;
+    // throw new Error("hi");
+    //node.children[0] = ref;
 
-    return [head, body];
+    return [head, body, false, ref];
   }
 }
 
@@ -385,11 +395,11 @@ class CRTHE extends Rule {
   }
 }
 
-class CRPN extends CompositeRule {
-  constructor(ids) {
-    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids), new CRTHE(ids),]);
-  }
-}
+//class CRPN extends CompositeRule {
+//  constructor(ids) {
+//    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids), new CRTHE(ids),]);
+//  }
+//}
 
 class CRPRO1 extends Rule {
   constructor(ids) {
@@ -772,7 +782,7 @@ class CRGENERICBE extends Rule {
 
     let np = clone(noun);
     np.ref = [ref];
-    console.log();
+    //console.log();
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -1468,6 +1478,7 @@ class CRQUESTIONWHOM extends Rule {
     super(ids, Question(Q_(Q(WH(), AUX(), NP(capture("sub")), V(capture("verb")))), "?"));
   }
   apply({sub, verb}, node, refs = []) {
+    //throw new Error("hi");
     let q = drs(this.ids);
     
     let u = referent(this.id(), {}, "", refs);
@@ -1612,7 +1623,8 @@ class Rules {
     ];
     return [
       [
-        new CRPN(ids),
+        new CRPN1(ids),
+        new CRTHE(ids),
         new CRPUNCT(ids),
       ],
       [
@@ -1639,7 +1651,7 @@ module.exports = {
   capture: capture,
   Ids: Ids,
   Rules: Rules,
-  CRPN: CRPN,
+  //CRPN: CRPN,
   CRPRO: CRPRO,
   CRID: CRID,
   CRLIN: CRLIN,
