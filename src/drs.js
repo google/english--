@@ -43,14 +43,11 @@ class DRS {
     const body = [];
 
     let added = false;
-    
-    for (const child of children) {
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
       const [more, remove] = this.process(child, rules);
       if (remove) {
-        let i = node.children.indexOf(remove);
-        if (i == -1) {
-          throw new Error("Ooops, deleting an invalid node.");
-        }
         node.children.splice(i, 1);
         added = true;
       }
@@ -69,8 +66,9 @@ class DRS {
 
     do {
       done = true;
-      
-      for (const node of this.body) {
+
+      for (let i = 0; i < this.body.length; i++) {
+        const node = this.body[i];
         const [added, remove] = this.process(node, rules);
         
         if (added) {
@@ -78,10 +76,6 @@ class DRS {
         }
       
         if (remove) {
-          let i = this.body.indexOf(remove);
-          if (i == -1) {
-            throw new Error("Ooops, deleting an invalid node.");
-          }
           this.body.splice(i, 1);
         }
       }

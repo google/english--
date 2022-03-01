@@ -485,7 +485,8 @@ class CRNLIN extends Rule {
     }
     let pred = predicate(noun.prop, node.ref, node.types);
     
-    return [[], [pred], node];
+    //throw new Error("hi");
+    return [[], [pred], true];
   }
 }
 
