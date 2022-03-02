@@ -376,36 +376,6 @@ class CRSID extends Rule {
   }
 }
 
-class CRVPID extends Rule {
-  constructor(ids) {
-    super(ids, VP(ANY(), NP(DET(capture("det")), N_(capture("noun")))));
-  }
-  
-  apply({det, noun}, node, refs) {
-    if (det.types.quant != "some") {
-      return;
-    }
-
-    let types = clone(noun.types);
-    Object.assign(types, child(noun, 0).types);
-    
-    let ref = referent(this.id(), types);
-    noun.ref = [ref];
-    node.children[1] = ref;
-    
-    return [[ref], [noun]];
-  }
-}
-
-class CRID extends CompositeRule {
-  constructor(ids) {
-    super([
-      new CRSID(ids),
-      // new CRVPID(ids)
-    ]);
-  }
-}
-
 class CRNLIN extends Rule {
   constructor(ids) {
     super(ids, N_(N(capture("noun"))));
@@ -1561,7 +1531,7 @@ class CRORS extends CompositeRule {
 class Rules {
   static from(ids = new Ids()) {
     let rules = [
-      new CRID(ids),
+      new CRSID(ids),
       new CRLIN(ids),
       new CRASPECT(ids),
       new CRTENSE(ids),
@@ -1608,7 +1578,7 @@ module.exports = {
   Ids: Ids,
   Rules: Rules,
   CRPRO1: CRPRO1,
-  CRID: CRID,
+  CRSID: CRSID,
   CRLIN: CRLIN,
   CRNRC: CRNRC,
   CRNEG: CRNEG,
