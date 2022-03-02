@@ -886,44 +886,25 @@ class CRONE extends Rule {
   }
 }
 
-class CREVERY2 extends Rule {
+class CREVERY extends Rule {
   constructor(ids) {
     super(ids, NP(DET(capture("det")), N_(capture("noun"))));
   }
   apply({det, noun, verb}, node, refs, path) {
-    //console.log(det);
     if (det.types.quant != "+") {
       return;
     }
     
-    //console.log(path);
-    // throw new Error("hi");
     let ref = referent(this.id(), noun.types);
     let n = drs(this.ids);
     n.head.push(...clone(refs));
     n.head.forEach(ref => ref.closure = true);
 
-    //let prep = child(node, 0, 2);
     let cond = noun;
     noun.ref = [ref];
-    //if (prep) {
-    //throw new Error("hello");
-    //  cond = S(NP(DET(), noun, prep));
-    //} else {
-    //cond = noun;
-    //}
     cond.ref = [ref];
     n.push(cond);
     
-    //let v = drs(this.ids);
-    //v.head.push(...clone(n.head));
-    //v.head.forEach(ref => ref.closure = true);
-
-    //let s = clone(node);
-    
-    //s.children[0] = ref;
-    //v.push(s);
-
     let q = det.children
         .filter((d) => d["@type"] != "%UNSIGNED_INT")
         .map((d) => d.value)
@@ -936,21 +917,13 @@ class CREVERY2 extends Rule {
       }
       q += `(${det.children[det.children.length - 1].value})`;
     }
-    // console.log(q);
     if (q == "all") {
       q = "every";
     }
-    // let result = quantifier(q, n, v, ref);
-
-    // console.log(path);
-    //let s;
-    //throw new Error("hi");
     for (let i = 0; i < path.length; i++) {
       const parent = path[path.length - 1 - i];
-      //console.log(parent);
       if (parent["@type"] == "S" ||
           parent["@type"] == "Q") {
-        // throw new Error("hi");
         parent.q = parent.q || [];
         parent.q.push({ref: ref, head: n, type: q});
         break;
@@ -985,93 +958,6 @@ class CRQUANT extends Rule {
     }
 
     return [[], [result], true];
-  }
-}
-
-class CREVERY extends Rule {
-  constructor(ids) {
-    super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
-  }
-  apply({det, noun, verb}, node, refs) {
-    throw new Error("hi");
-    if (det.types.quant != "+") {
-      return;
-    }
-    
-    let ref = referent(this.id(), noun.types);
-    let n = drs(this.ids);
-    n.head.push(...clone(refs));
-    n.head.forEach(ref => ref.closure = true);
-
-    let prep = child(node, 0, 2);
-    let cond;
-    noun.ref = [ref];
-    if (prep) {
-      cond = S(NP(DET(), noun, prep));
-    } else {
-      cond = noun;
-    }
-    cond.ref = [ref];
-    n.push(cond);
-    
-    let v = drs(this.ids);
-    v.head.push(...clone(n.head));
-    v.head.forEach(ref => ref.closure = true);
-
-    let s = clone(node);
-    
-    s.children[0] = ref;
-    v.push(s);
-
-    let q = det.children
-        .filter((d) => d["@type"] != "%UNSIGNED_INT")
-        .map((d) => d.value)
-        .join("-")
-        .toLowerCase();
-    if (det.children[det.children.length - 1]["@type"]
-        == "%UNSIGNED_INT") {
-      if (det.children.length == 1) {
-        q = "exactly";
-      }
-      q += `(${det.children[det.children.length - 1].value})`;
-    }
-    // console.log(q);
-    if (q == "all") {
-      q = "every";
-    }
-    let result = quantifier(q, n, v, ref);
-
-    return [[], [result], true];
-  }
-}
-
-class CRVPEVERY extends Rule {
-  constructor(ids) {
-    super(ids, S(capture("subject"), VP_(VP(V(), NP(DET(capture("det")), N_(capture("noun")))))));
-  }
-  apply({det, subject, noun}, node, refs) {
-    if (det.types.quant != "+") {
-      return;
-    }
-
-    let ref = referent(this.id(), noun.types);
-    let n = drs(this.ids);
-    n.head.push(...clone(refs));
-    n.head.forEach(ref => ref.closure = true);
-    noun.ref = [ref];
-    n.push(noun);
-    
-    let verb = drs(this.ids);
-    verb.head.push(...clone(n.head));
-    verb.head.forEach(ref => ref.closure = true);
-
-    let s = clone(node);
-
-    child(s, 1, 0).children[1] = ref;
-    verb.push(s);
-  
-    let q = det.children.map((d) => d.value).join("-").toLowerCase();
-    return [[], [quantifier(q, n, verb, ref)], true];
   }
 }
 
@@ -1440,7 +1326,6 @@ class CRQUESTIONWHOM extends Rule {
     super(ids, Question(Q_(Q(WH(), AUX(), REF(capture("sub")), V(capture("verb")))), "?"));
   }
   apply({sub, verb}, node, refs = []) {
-    //throw new Error("hi");
     let q = drs(this.ids);
     
     let u = referent(this.id(), {}, "", refs);
@@ -1592,10 +1477,8 @@ class Rules {
         new CRPUNCT(ids),
       ],
       [
-        new CREVERY2(ids),
+        new CREVERY(ids),
         new CRQUANT(ids),
-        //new CREVERY(ids),
-        //new CRVPEVERY(ids),
         new CRCOND(ids),
         new CREVERYONE(ids),
         new CREVERYONE2(ids),
@@ -1625,8 +1508,6 @@ module.exports = {
   CRNEG: CRNEG,
   CRBE: CRBE,
   CRCOND: CRCOND,
-  CREVERY: CREVERY,
-  CRVPEVERY: CRVPEVERY,
   CROR: CROR,
   CRVPOR: CRVPOR,
   CRNPOR: CRNPOR,
