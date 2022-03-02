@@ -8,7 +8,7 @@ const {Tokenizer} = require("../src/lexer.js");
 const {Console} = require("../src/console.js");
 const {KB} = require("logic/src/solver.js");
 
-describe.only("DRS", function() {
+describe("DRS", function() {
 
   it("Jones loves Mary.", function() {
     assertThat("Jones loves Mary.", true)
@@ -1487,14 +1487,16 @@ describe.only("DRS", function() {
   it("Who does Jones love?", function() { 
     assertThat("Who does Jones love?")
      .equalsTo(`
-       let a, b: Jones(b) love(b, a)?
+       Jones(a).
+       let b: love(a, b)?
     `);
   });
 
-  it.only("What does Jones love?", function() { 
+  it("What does Jones love?", function() { 
     assertThat("What does Jones love?")
      .equalsTo(`
-       let a, b: Jones(b) love(b, a)?
+       Jones(a).
+       let b: love(a, b)?
     `);
   });
 
@@ -2165,21 +2167,21 @@ describe("Large Lexicon", () => {
   it("Mel likes Yuji's girlfriend.", function() { 
     assertThat("Mel likes Yuji's girlfriend.")
       .equalsTo(`
-      Yuji(a).
-      Mel(b).
-      girlfriend(c, a).
-      like(s0, b, c).
+      Mel(a).
+      Yuji(b).
+      girlfriend(c, b).
+      like(s0, a, c).
     `);
   });
 
   it("Mel likes Yuji's awesome girlfriend.", function() {
     assertThat("Mel likes Yuji's awesome girlfriend.")
       .equalsTo(`
-      Yuji(a).
-      Mel(b).
+      Mel(a).
+      Yuji(b).
       awesome-girlfriend(c).
-      girlfriend(c, a).
-      like(s0, b, c).
+      girlfriend(c, b).
+      like(s0, a, c).
     `);
   });
 
@@ -2219,11 +2221,11 @@ describe("Large Lexicon", () => {
   it("Mel does not live in Brazil.", function() { 
     assertThat("Mel does not live in Brazil.")
       .equalsTo(`
-       Brazil(a).
-       Mel(b).
+       Mel(a).
+       Brazil(b).
        not (
-         live-in(s0, a).
-         live(s0, b).
+         live-in(s0, b).
+         live(s0, a).
        ).
     `);
   });
@@ -2242,31 +2244,31 @@ describe("Large Lexicon", () => {
   it("Mel lives in Brazil.", function() { 
     assertThat("Mel lives in Brazil.")
       .equalsTo(`
-       Brazil(a).
-       Mel(b).
-       live-in(s0, a).
-       live(s0, b).
+       Mel(a).
+       Brazil(b).
+       live-in(s0, b).
+       live(s0, a).
     `);
   });
 
   it("Mel lived in Brazil.", function() { 
     assertThat("Mel lived in Brazil.")
       .equalsTo(`
-       Brazil(a).
-       Mel(b).
+       Mel(a).
+       Brazil(b).
        s0 < __now__.
-       live-in(s0, a).
-       live(s0, b).
+       live-in(s0, b).
+       live(s0, a).
     `);
   });
 
   it("Mel has lived in Brazil.", function() { 
     assertThat("Mel has lived in Brazil.")
       .equalsTo(`
-       Brazil(a).
-       Mel(b).
-       live-in(s0, a).
-       live(s0, b).
+       Mel(a).
+       Brazil(b).
+       live-in(s0, b).
+       live(s0, a).
     `);
   });
 
@@ -2293,21 +2295,21 @@ describe("Large Lexicon", () => {
   it("Brazil is a country in South America.", () => {
     assertThat("Brazil is a country in South America.")
       .equalsTo(`
-        South-America(a).
-        Brazil(b).
-        b = c.
+        Brazil(a).
+        South-America(b).
+        a = c.
         country(c).
-        country-in(c, a).
+        country-in(c, b).
       `);
   });
 
   it("Brazil borders most countries in South America.", () => {
     assertThat("Brazil borders all countries in South America.")
       .equalsTo(`
-        South-America(a).
-        Brazil(b).
-        for (let all c: country(c) country-in(c, a)) {
-          border(s0, b, c).
+        Brazil(a).
+        South-America(b).
+        for (let all c: country(c) country-in(c, b)) {
+          border(s0, a, c).
         }
       `);
   });
@@ -2337,11 +2339,11 @@ describe("Large Lexicon", () => {
   it("Brasilia is the capital of Brazil.", () => {
     assertThat("Brasilia is a capital of Brazil.")
       .equalsTo(`
-        Brazil(a).
-        Brasilia(b).
-        b = c.
+        Brasilia(a).
+        Brazil(b).
+        a = c.
         capital(c).
-        capital-of(c, a).
+        capital-of(c, b).
       `);
   });
 
@@ -2369,11 +2371,11 @@ describe("Large Lexicon", () => {
   it("Brazil is bounded by the Atlantic Ocean on the East.", () => {
     assertThat("Brazil is bounded by the Atlantic Ocean on the East.")
       .equalsTo(`
-        Atlantic-Ocean(a).
-        East(b).
-        Brazil(c).
-        bound-on(s0, b).
-        bound(s0, a, c).
+        Brazil(a).
+        Atlantic-Ocean(b).
+        East(c).
+        bound-on(s0, c).
+        bound(s0, b, a).
       `);
   });
 
@@ -2425,14 +2427,14 @@ describe("Large Lexicon", () => {
     // single proper name.
     assertThat("Pedro Alvares Cabral claimed for the Portuguese Empire the area of Brazil.")
       .equalsTo(`
-        Portuguese-Empire(a).
-        Brazil(b).
-        Pedro-Alvares-Cabral(c).
+        Pedro-Alvares-Cabral(a).
+        Portuguese-Empire(b).
+        Brazil(c).
         s0 < __now__.
         area(d).
-        claim-for(s0, a).
-        area-of(d, b).
-        claim(s0, c, d).
+        claim-for(s0, b).
+        area-of(d, c).
+        claim(s0, a, d).
       `);
   });
 
@@ -2458,12 +2460,12 @@ describe("Large Lexicon", () => {
     // which conflicts here.
     assertThat("Brazil is classified by the World Bank as an industrial country.")
       .equalsTo(`
-        World-Bank(a).
-        Brazil(b).
+        Brazil(a).
+        World-Bank(b).
         industrial-country(c).
         country(c).
         classify-as(s0, c).
-        classify(s0, a, b).
+        classify(s0, b, a).
       `);
   });
 
@@ -2471,11 +2473,11 @@ describe("Large Lexicon", () => {
     //   - Brazil is a founding member of the United Nations and the Mercosul.
     assertThat("Brazil is a member of the United Nations.")
       .equalsTo(`
-        United-Nations(a).
-        Brazil(b).
-        b = c.
+        Brazil(a).
+        United-Nations(b).
+        a = c.
         member(c).
-        member-of(c, a).
+        member-of(c, b).
       `);
   });
   
@@ -2520,46 +2522,46 @@ describe("Large Lexicon", () => {
       Brazil is a member of the United Nations.
       Brazil is considered as an upcoming economy.
     `).equalsTo(`
-       South-America(a).
-       Brazil(b).
-       b = c.
+       Brazil(a).
+       South-America(b).
+       a = c.
        country(c).
-       country-in(c, a).
-       for (let most d: country(d) country-in(d, a)) {
-         border(s0, b, d).
+       country-in(c, b).
+       for (let most d: country(d) country-in(d, b)) {
+         border(s0, a, d).
        }
        for (let exactly(211M) e: people(e)) {
-         live-in(s1, b).
+         live-in(s1, a).
          live(s1, e).
        }
        Brasilia(f).
        g = f.
        capital(g).
-       capital-of(g, b).
+       capital-of(g, a).
        for (let exactly(26) h: state(h)) {
-         federation(i, b).
+         federation(i, a).
          compose(s2, h, i).
        }
        Atlantic-Ocean(j).
        East(k).
        bound-on(s3, k).
-       bound(s3, j, b).
+       bound(s3, j, a).
        Portuguese(l).
        m = l.
        official-language(m).
        language(m).
-       official-language-of(m, b).
-       Portuguese-Empire(n).
-       Pedro-Alvares-Cabral(o).
+       official-language-of(m, a).
+       Pedro-Alvares-Cabral(n).
+       Portuguese-Empire(o).
        s4 < __now__.
        area(p).
-       claim-for(s4, n).
-       area-of(p, b).
-       claim(s4, o, p).
+       claim-for(s4, o).
+       area-of(p, a).
+       claim(s4, n, p).
        Lisbon(q).
        Rio-De-Janeiro(r).
        s5 < __now__.
-       capital(s, n).
+       capital(s, o).
        transfer-to(s5, r).
        transfer(s5, t, s).
        transfer-from(s5, q).
@@ -2567,15 +2569,15 @@ describe("Large Lexicon", () => {
        industrial-country(v).
        country(v).
        classify-as(s6, v).
-       classify(s6, u, b).
+       classify(s6, u, a).
        United-Nations(w).
-       b = x.
+       a = x.
        member(x).
        member-of(x, w).
        upcoming-economy(y).
        economy(y).
        consider-as(s7, y).
-       consider(s7, z, b).
+       consider(s7, z, a).
     `);    
   });
 

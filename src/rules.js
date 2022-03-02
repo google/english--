@@ -1475,7 +1475,7 @@ class CRQUESTIONWHICH extends Rule {
 
 class CRQUESTIONWHOM extends Rule {
   constructor(ids) {
-    super(ids, Question(Q_(Q(WH(), AUX(), NP(capture("sub")), V(capture("verb")))), "?"));
+    super(ids, Question(Q_(Q(WH(), AUX(), REF(capture("sub")), V(capture("verb")))), "?"));
   }
   apply({sub, verb}, node, refs = []) {
     //throw new Error("hi");

@@ -60,10 +60,10 @@ describe("Console", () => {
       Sam loves Dani.
       Who loves Dani?
     `)).equalsTo(`
-      Dani(a).
-      Sam(b).
-      love(s0, b, a).
-      let c: love(c, a)?
+      Sam(a).
+      Dani(b).
+      love(s0, a, b).
+      let c: love(c, b)?
     `, true);
   });
 
@@ -80,12 +80,12 @@ describe("Console", () => {
       // - Which countries border Brazil?
     `;
     assertThat(new Console(dict).transpile(code)).equalsTo(`
-      Brazil(a).
-      Brasilia(b).
-      b = c.
+      Brasilia(a).
+      Brazil(b).
+      a = c.
       capital(c).
-      capital-of(c, a).
-      let d, e: d = e capital(e) capital-of(e, a)?
+      capital-of(c, b).
+      let d, e: d = e capital(e) capital-of(e, b)?
     `, true);
     assertThat(unroll(new Console(dict).load(code))).equalsTo(["Brasilia."]);
   });
@@ -132,14 +132,14 @@ describe("Console", () => {
           ).
         }
       }
-      Sam(i).
-      Maura(j).
-      j = k.
-      parent(k, i).      
+      Maura(i).
+      Sam(j).
+      i = k.
+      parent(k, j).      
       Tio-Bo(l).
       l = m.
-      sibling(m, j).
-      let n, o: n = o uncle(o, i)?
+      sibling(m, i).
+      let n, o: n = o uncle(o, j)?
     `, true);
   });
   
