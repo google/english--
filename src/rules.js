@@ -302,7 +302,7 @@ function find({gen, num}, refs, name, loc, exclude = []) {
   return undefined;
 }
 
-class CRPN1 extends Rule {
+class CRPN extends Rule {
   constructor(ids) {
     super(ids, NP(PN(capture("name"))));
   }
@@ -356,7 +356,7 @@ class CRPRO1 extends Rule {
   }
 }
 
-class CRSID extends Rule {
+class CRID extends Rule {
   constructor(ids) {
     super(ids, NP(DET(capture("det")), N_(capture("noun"))));
   }
@@ -555,6 +555,7 @@ class CRNRC extends Rule {
     const g1 = S(REF(), VP_(AUX(), "not", VP(V(), NP(GAP(capture("gap"))))));
 
     if (match(g1, s)) {
+      // throw new Error("hi");
       child(s, 1, 2).children[1] = node.ref[0];
     }
     
@@ -632,12 +633,8 @@ class CRPREPBE extends Rule {
                 ));
   }
   apply({ref, prep, np}, node, refs) {
-    let body = [];
-
-    let s = S(ref, VP_(VP(V(child(prep, 0)), np)));
-    body.push(s);
-    
-    return [[], body, true];
+    const s = S(ref, VP_(VP(V(child(prep, 0)), np)));
+    return [[], [s], true];
   }
 }
 
@@ -656,33 +653,12 @@ class CRNEGBE extends Rule {
   }
 }
 
-class CRNBE extends Rule {
-  constructor(ids) {
-    super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(DET(capture("det")), N_(capture("noun")))))));
-  }
-  apply({ref, det, noun}, node, refs) {
-    if ((node.types || {}).gap != "-") {
-      return;
-    }
-
-    return;
-    let np = clone(noun);
-    np.ref = [ref];
-    
-    // Matches the DRS found in (3.57) on page 269.
-    if (node.types && node.types.tense) {
-      np.types.tense = node.types.tense;
-    }
-    
-    return [[], [np], true];
-  }
-}
-
 class CRGENERICBE extends Rule {
   constructor(ids) {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), NP(N_(capture("noun")))))));
   }
   apply({ref, noun}, node, refs) {
+    // throw new Error("hi");
     if (node.types.gap != "-") {
       return;
     }
@@ -765,7 +741,6 @@ class CRBE extends CompositeRule {
       new CRREFNEGBE(ids),
       new CRPOSBE(ids),
       new CRNEGBE(ids),
-      new CRNBE(ids),
       new CRGENERICBE(ids),
       new CRNEGNBE(ids),
       new CRPREPBE(ids)
@@ -1369,13 +1344,15 @@ class CRQUESTIONWHOM extends Rule {
 
 class CRQUESTION extends CompositeRule {
   constructor(ids) {
-    super([new CRQUESTIONYESNO(ids),
-           new CRQUESTIONIS(ids),
-           new CRQUESTIONBEPP(ids),
-           new CRQUESTIONBEDETN(ids),
-           new CRQUESTIONWHICH(ids), 
-           new CRQUESTIONWHO(ids), 
-           new CRQUESTIONWHOM(ids)]);
+    super([
+      new CRQUESTIONYESNO(ids),
+      new CRQUESTIONIS(ids),
+      new CRQUESTIONBEPP(ids),
+      new CRQUESTIONBEDETN(ids),
+      new CRQUESTIONWHICH(ids), 
+      new CRQUESTIONWHO(ids), 
+      new CRQUESTIONWHOM(ids)
+    ]);
   }
 }
 
@@ -1482,7 +1459,7 @@ class CRORS extends CompositeRule {
 class Rules {
   static from(ids = new Ids()) {
     let rules = [
-      new CRSID(ids),
+      new CRID(ids),
       new CRLIN(ids),
       new CRASPECT(ids),
       new CRTENSE(ids),
@@ -1499,7 +1476,7 @@ class Rules {
     ];
     return [
       [
-        new CRPN1(ids),
+        new CRPN(ids),
         new CRTHE(ids),
         new CRPUNCT(ids),
       ],
@@ -1529,7 +1506,7 @@ module.exports = {
   Ids: Ids,
   Rules: Rules,
   CRPRO1: CRPRO1,
-  CRSID: CRSID,
+  CRID: CRID,
   CRLIN: CRLIN,
   CRNRC: CRNRC,
   CRNEG: CRNEG,
