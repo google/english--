@@ -55,6 +55,7 @@ class DRS {
         node.children.splice(i, 1, replace);
         added = true;
         // console.log(node);
+        // console.log(replace);
         //throw new Error("hi");
       }
       if (more) {

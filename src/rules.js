@@ -340,10 +340,12 @@ class CRTHE extends Rule {
     super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
   }
   apply({name}, node, refs) {
-    node.children = [{
+    const result = PN({
       "type": "name",
       "value": child(name, 0).value
-    }];
+    });
+    result.types = node.types;
+    return [[], [], false, result];
   }
 }
 
