@@ -335,54 +335,6 @@ class CRPN1 extends Rule {
   }
 }
 
-class CRPN2 extends Rule {
-  constructor(ids) {
-    super(ids, ANY(ANY(), NP(PN(capture("name")))));
-  }
-  apply({name}, node, refs) {
-    const pn = child(name, 0).value;
-    let head = [];
-    let body = [];
-
-    let ref = find(name.types, refs, name.children[0].value, name.loc);
-
-    if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
-      head.push(ref);
-      let pred = predicate(pn, [ref], name.types);
-      body.push(pred);
-    }
-
-    node.children[1] = ref;
-
-    return [head, body];
-  }
-}
-
-class CRPN4 extends Rule {
-  constructor(ids) {
-    super(ids, ANY(ANY(), ANY(), ANY(), NP(PN(capture("name")))));
-  }
-  apply({name}, node, refs) {
-    const pn = child(name, 0).value;
-    let head = [];
-    let body = [];
-
-    let ref = find(name.types, refs, name.children[0].value, name.loc);
-
-    if (!ref) {
-      ref = referent(this.id(), name.types, name.children[0].value, name.loc);
-      head.push(ref);
-      let pred = predicate(pn, [ref], name.types);
-      body.push(pred);
-    }
-
-    node.children[3] = ref;
-
-    return [head, body];
-  }
-}
-
 class CRTHE extends Rule {
   constructor(ids) {
     super(ids, PN({"@type": "%the", "children": []}, PN(capture("name"))));
@@ -394,12 +346,6 @@ class CRTHE extends Rule {
     }];
   }
 }
-
-//class CRPN extends CompositeRule {
-//  constructor(ids) {
-//    super([new CRPN1(ids), new CRPN2(ids), new CRPN4(ids), new CRTHE(ids),]);
-//  }
-//}
 
 class CRPRO1 extends Rule {
   constructor(ids) {
