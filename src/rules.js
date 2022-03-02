@@ -230,7 +230,6 @@ class Rule {
   }
   
   match(node, refs) {
-    //console.log(this);
     let m = match(this.trigger, node);
     
     if (!m) {
@@ -243,9 +242,6 @@ class Rule {
       return [[], []];
     }
 
-    //console.log(result);
-    //throw new Error();
-    
     return result;
   }
   
@@ -269,8 +265,6 @@ class CompositeRule extends Rule {
         result[2] = remove;
       }
       if (replace) {
-        // throw new Error("hi");
-        // console.log(replace);
         result[3] = replace;
       }
     }
@@ -328,9 +322,6 @@ class CRPN1 extends Rule {
       body.push(pred);
     }
 
-    // throw new Error("hi");
-    //node.children[0] = ref;
-
     return [head, body, false, ref];
   }
 }
@@ -367,19 +358,21 @@ class CRPRO1 extends Rule {
 
 class CRSID extends Rule {
   constructor(ids) {
-    super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_()));
+    //super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_()));
+    super(ids, NP(DET(capture("det")), N_(capture("noun"))));
   }
   
   apply({det, noun}, node, refs) {
+    // throw new Error("hi");
     if (det.types.quant != "some") {
       return;
     }
 
     let ref = referent(this.id(), noun.types);
     noun.ref = [ref];
-    node.children[0] = ref;
+    // node.children[0] = ref;
     
-    return [[ref], [noun]];
+    return [[ref], [noun], false, ref];
   }
 }
 
@@ -406,7 +399,10 @@ class CRVPID extends Rule {
 
 class CRID extends CompositeRule {
   constructor(ids) {
-    super([new CRSID(ids), new CRVPID(ids)]);
+    super([
+      new CRSID(ids),
+      // new CRVPID(ids)
+    ]);
   }
 }
 
@@ -630,6 +626,34 @@ class CRREFBE extends Rule {
   }
 }
 
+class CRREFNEGBE extends Rule {
+  constructor(ids) {
+    super(ids, S(ANY(capture("a")),
+                 VP_(VP(BE(), "not", ANY(capture("b"))))));
+  }
+  apply({a, b}, node, refs) {
+    // let s = predicate("=", [a, b], node.types, true);
+    const result = clone(node);
+    // console.log();
+    // remove the "not".
+    // const u = drs();
+    child(result, 1, 0).children.splice(1, 1);
+
+
+    let sub = drs(this.ids);
+    sub.head = clone(refs);
+    sub.head.forEach(ref => ref.closure = true);
+    // let s = S(ref, VP_(VP(BE(), adj)));
+    //s.types = node.types;   
+    sub.push(result);
+    return [[], [negation(sub)], true];
+
+    // console.log(child(result, 1, 0));
+    // throw new Error("hi");
+    // return [[], [negation(result)], true];
+  }
+}
+
 class CRPOSBE extends Rule {
   constructor(ids) {
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), ADJ(capture("adj"))))));
@@ -721,6 +745,7 @@ class CRGENERICBE extends Rule {
 
 class CRNEGNBE extends Rule {
   constructor(ids) {
+    // super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
@@ -782,6 +807,7 @@ class CRBE extends CompositeRule {
     super([
       new CRPASSIVEBE(ids),
       new CRREFBE(ids),
+      new CRREFNEGBE(ids),
       new CRPOSBE(ids),
       new CRNEGBE(ids),
       new CRNBE(ids),
@@ -1082,9 +1108,12 @@ class CRVPNPOR extends Rule {
                  VP_(VP(ANY(capture("verb")), NP("either", ANY(capture("first")), "or", ANY(capture("second")))))));
   }
   apply({sub, verb, first, second}, node, refs) {
+    //console.log(node.types);
+    //throw new Error("hi");
     if ((node.types || {}).gap != "-") {
       return;
     }
+    //throw new Error("hi");
     let a = drs(this.ids);
     a.head.push(...clone(refs));
     a.head.forEach(ref => ref.closure = true);
@@ -1564,6 +1593,7 @@ class Rules {
         new CRORS(ids),
         new CRAND(ids),
         new CRQUESTION(ids),
+        new CRREFNEGBE(ids),
       ],
       rules,
       [
@@ -1577,7 +1607,6 @@ module.exports = {
   capture: capture,
   Ids: Ids,
   Rules: Rules,
-  //CRPN: CRPN,
   CRPRO1: CRPRO1,
   CRID: CRID,
   CRLIN: CRLIN,

@@ -105,7 +105,7 @@ describe("Console", () => {
     `))).equalsTo(["Yes."]);
   });
 
-  it("Kinship", () => {
+  it.skip("Kinship", () => {
     assertThat(new Console(dict).transpile(`
       Everyone's uncle is one's male relative who is either [a sibling of one's parent] or [a husband of [a sibling of one's parent]].
       Maura is Sam's parent.

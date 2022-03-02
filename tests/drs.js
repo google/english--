@@ -22,9 +22,9 @@ describe("DRS", function() {
   it("A man admires a woman.", function() {
     assertThat("A man admires a woman.")
      .equalsTo(`
-       woman(a).
-       man(b).
-       admire(s0, b, a).
+       man(a).
+       woman(b).
+       admire(s0, a, b).
      `);
   });
 
@@ -49,10 +49,10 @@ describe("DRS", function() {
   it("A man admires a woman. She likes him.", function() {
     assertThat("A man admires a woman. She likes him.")
      .equalsTo(`
-       woman(a).
-       man(b).
-       admire(s0, b, a).
-       like(s1, a, b).
+       man(a).
+       woman(b).
+       admire(s0, a, b).
+       like(s1, b, a).
     `);
   });
 
@@ -115,11 +115,11 @@ describe("DRS", function() {
      .equalsTo(`
        Mary(a).
        Smith(b).
-       book(c).
-       man(d).
-       love(s2, d, c).
-       fascinate(s0, d, a).
-       fascinate(s1, c, b).
+       man(c).
+       book(d).
+       love(s2, c, d).
+       fascinate(s1, d, b).
+       fascinate(s0, c, a).
      `);
   });
 
@@ -921,10 +921,10 @@ describe("DRS", function() {
     assertThat("Jones loves a woman with a donkey.")
      .equalsTo(`
        Jones(a).
-       donkey(c).
-       woman(b).
-       love(s0, a, b).
-       woman-with(b, c).
+       donkey(b).
+       woman(c).
+       love(s0, a, c).
+       woman-with(c, b).
     `);
   });
 
@@ -932,10 +932,10 @@ describe("DRS", function() {
     assertThat("a woman with a donkey loves Jones.")
      .equalsTo(`
        Jones(a).
-       donkey(c).
-       woman(b).
-       love(s0, b, a).
-       woman-with(b, c).
+       donkey(b).
+       woman(c).
+       love(s0, c, a).
+       woman-with(c, b).
     `);
   });
 
@@ -961,7 +961,7 @@ describe("DRS", function() {
     assertThat("Every woman with a donkey loves Jones.")
      .equalsTo(`
        Jones(a).
-       for (let every b: donkey(c) woman(b) woman-with(b, c)) {
+       for (let every b: woman(b) donkey(c) woman-with(b, c)) {
          love(s0, b, a).
        }
     `);
@@ -1298,7 +1298,8 @@ describe("DRS", function() {
      .equalsTo(`
        Smith(a).
        not (
-         engineer(a).
+         a = b.
+         engineer(b).
        ).
     `);
   });
@@ -1316,8 +1317,9 @@ describe("DRS", function() {
       Smith(a).
       Brazil(b).
       not (
-        engineer(a).
-        engineer-from(a, b).
+        a = c.
+        engineer(c).
+        engineer-from(c, b).
       ).
     `);
   });
@@ -1918,12 +1920,12 @@ describe("DRS", function() {
      .equalsTo(`
        Sam(a).
        s0 < __now__.
-       reservation(b).
+       woman(b).
+       reservation(d).
        porsche(c).
-       woman(d).
-       make(s0, a, b).
-       reservation-with(b, c).
-       reservation-for(b, d).
+       make(s0, a, d).
+       reservation-with(d, c).
+       reservation-for(d, b).
      `);
   });
 
@@ -2651,13 +2653,13 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         Sam(a).
         s0 < __now__.
-        beautiful-country(c).
-        evil-country(b).
+        evil-country(c).
+        beautiful-country(b).
         country(c).
         country(b).
-        travel-to(s0, b).
+        travel-to(s0, c).
+        travel-from(s0, b).
         travel(s0, a).
-        travel-from(s0, c).
       `);
   });
   
@@ -2679,13 +2681,13 @@ describe("Large Lexicon", () => {
       Every nation is a cultural community which is aware of the autonomy.
     `).equalsTo(`
        for (let every a: nation(a)) {
-         a = b.
-         stable-community(b).
-         community(b).
-         common-language(c).
-         language(c).
-         stable-community-with(b, c).
-         stable-community-of(b, ).
+         a = c.
+         stable-community(c).
+         community(c).
+         common-language(b).
+         language(b).
+         stable-community-with(c, b).
+         stable-community-of(c, ).
        }
        for (let every d: nation(d)) {
          political(d).
@@ -2699,12 +2701,12 @@ describe("Large Lexicon", () => {
          ).
        }
        for (let every g: nation(g)) {
-         g = h.
-         cultural-community(h).
-         community(h).
-         autonomy(i).
-         aware(h).
-         cultural-community-of(h, i).
+         g = i.
+         cultural-community(i).
+         community(i).
+         autonomy(h).
+         aware(i).
+         cultural-community-of(i, h).
        }
      `);
   });
