@@ -558,7 +558,9 @@ class CRNRC extends Rule {
       // throw new Error("hi");
       child(s, 1, 2).children[1] = node.ref[0];
     }
-    
+
+    //console.log(rc);
+    //throw new Error("hi");
     // Binds gap to the referent.
     let object = child(s, 1, 0, 1);
     if (object && object.children && object.children[0]["@type"] == "GAP") {
@@ -576,8 +578,10 @@ class CRNRC extends Rule {
     let noun = node.children.pop();
     noun.ref = node.ref;
     body.push(noun);
-    
+    //console.log(s);
+    //console.log("pushing");
     body.push(s);
+    // console.log(body);
     
     return [head, body, true];
   }
@@ -940,6 +944,10 @@ class CRQUANT extends Rule {
   }
   apply({s}, node, refs, path) {
     if (!s.q) {
+      return;
+    }
+
+    if (s.types && s.types.gap != "-") {
       return;
     }
 
@@ -1469,6 +1477,7 @@ class Rules {
       new CRORS(ids),
       new CRBE(ids),
       new CRONE(ids),
+      new CRQUANT(ids),
     ];
     return [
       [
