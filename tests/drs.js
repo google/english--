@@ -129,11 +129,11 @@ describe("DRS", function() {
        Jones(a).
        Ulysses(b).
        own(s0, a, b).
-       fascinate(s1, a, b).
+       fascinate(s1, b, a).
      `);
   });
 
-  it("Jones owns a book.", function() {
+  it("Jones owns a book. It fascinates him.", function() {
     assertThat("Jones owns a book. it fascinates him.")
      .equalsTo(`
        Jones(a).
@@ -197,7 +197,7 @@ describe("DRS", function() {
        not (
          own(s0, a, b).
        ).
-       like(s1, a, b).
+       like(s1, b, a).
      `);
   });
 
@@ -490,7 +490,7 @@ describe("DRS", function() {
       drs.feed(new Parser("Discourse", dict).feed("He likes it."));
       throw new Error("expected reference 'he' to fail");
     } catch (e) {
-      Assert.deepEqual(e.message, "Invalid reference: it");
+      Assert.deepEqual(e.message, "Invalid reference: He");
     }
   });
 
@@ -709,7 +709,7 @@ describe("DRS", function() {
        (
          love(s0, a, b).
        ) and (
-         love(s1, a, b).
+         love(s1, b, a).
        ).
     `);
   });
@@ -740,7 +740,7 @@ describe("DRS", function() {
       // She can't bind to "Mary" because Mary is introduced
       // lexically after She, regardless of "Mary" being a
       // proper noun and being visible globally.
-      Assert.deepEqual(e.message, "Invalid reference: She");
+      Assert.deepEqual(e.message, "Invalid reference: it");
     }
   });
 

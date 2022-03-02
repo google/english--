@@ -351,39 +351,17 @@ class CRTHE extends Rule {
 
 class CRPRO1 extends Rule {
   constructor(ids) {
-    super(ids, ANY(NP(PRO(capture("pro")))));
+    super(ids, NP(PRO(capture("pro"))));
   }
   
   apply({pro}, node, refs) {
     let u = find(pro.types, refs, undefined, child(pro, 0).loc);
-    
+
     if (!u) {
       throw new Error("Invalid reference: " + pro.children[0].value);
     }
     
-    node.children[0] = u;
-  }
-}
-
-class CRPRO2 extends Rule {
-  constructor(ids) {
-    super(ids, ANY(ANY(), NP(PRO(capture("pro")))));
-  }
-  
-  apply({pro}, node, refs) {
-    let u = find(pro.types, refs, undefined, child(pro, 0).loc);
-    
-    if (!u) {
-      throw new Error("Invalid reference: " + pro.children[0].value);
-    }
-    
-    node.children[1] = u;
-  }
-}
-
-class CRPRO extends CompositeRule {
-  constructor(ids) {
-    super([new CRPRO1(ids), new CRPRO2(ids)]);
+    return [[], [], false, u];
   }
 }
 
@@ -1560,7 +1538,7 @@ class Rules {
       new CRTENSE(ids),
       new CRADV(ids),
       new CRNRC(ids), 
-      new CRPRO(ids),
+      new CRPRO1(ids),
       new CRPOSS(ids),
       new CRADJ(ids),
       new CRBE(ids),
@@ -1600,7 +1578,7 @@ module.exports = {
   Ids: Ids,
   Rules: Rules,
   //CRPN: CRPN,
-  CRPRO: CRPRO,
+  CRPRO1: CRPRO1,
   CRID: CRID,
   CRLIN: CRLIN,
   CRNRC: CRNRC,
