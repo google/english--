@@ -20,11 +20,11 @@ class DRS {
     return this.body.slice(start, end);
   }
 
-  apply(p, rules) {
+  apply(p, rules, path) {
     let result = [];
 
     for (let rule of rules) {
-      let [head, body, remove, replace] = rule.match(p, this.head);
+      let [head, body, remove, replace] = rule.match(p, this.head, path);
       this.head.push(...head);
       this.body.push(...body);
       
@@ -37,46 +37,33 @@ class DRS {
     return [result];
   }
 
-  process(node, rules) {
+  process(node, rules, path = []) {
     const {children = []} = node;
     const head = []
     const body = [];
 
     let added = false;
 
+    path.push(node);
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      const [more, remove, replace] = this.process(child, rules);
+      const [more, remove, replace] = this.process(child, rules, path);
       if (remove) {
         node.children.splice(i, 1);
         added = true;
       } else if (replace) {
-        //console.log(node);
         node.children.splice(i, 1, replace);
         added = true;
-        // console.log(node);
-        // console.log(replace);
-        //throw new Error("hi");
       }
       if (more) {
         added = true;
       }
     }
 
-    const [next, remove, replace] = this.apply(node, rules);
+    const [next, remove, replace] = this.apply(node, rules, path);
 
-    //if (node["@type"] == "Sentence") {
-      //console.log(JSON.stringify(node, undefined, 2));
-      //console.log(rules);
-      //console.log(replace);
-    //  throw new Error("hi");
-    //}
+    path.pop();
     
-    //if (replace) {
-      // throw new Error("hi");
-    //}
-    // console.log(JSON.stringify(node, undefined, 2));
-
     return [added || next.length > 0, remove, replace];
   }
 
@@ -95,7 +82,6 @@ class DRS {
         }
       
         if (remove) {
-          // throw new Error("hi");
           this.body.splice(i, 1);
         }
       }
@@ -113,11 +99,6 @@ class DRS {
     this.body.push(node);
 
     this.go(this.setup);
-
-    // console.log(JSON.stringify(this.body, undefined, 2));
-    
-    // throw new Error("hi");
-    
     this.go(this.before);
     this.go(this.rules);
     this.go(this.after);

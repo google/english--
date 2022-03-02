@@ -229,14 +229,14 @@ class Rule {
     this.trigger = trigger;
   }
   
-  match(node, refs) {
+  match(node, refs, path) {
     let m = match(this.trigger, node);
     
     if (!m) {
       return [[], []];
     }
     
-    let result = this.apply(m, node, refs);
+    let result = this.apply(m, node, refs, path);
 
     if (!result) {
       return [[], []];
@@ -255,10 +255,10 @@ class CompositeRule extends Rule {
     super();
     this.rules = rules;
   }
-  match(node, refs) {
+  match(node, refs, path) {
     let result = [[], []];
     for (let rule of this.rules) {
-      let [head, body, remove, replace] = rule.match(node, refs);
+      let [head, body, remove, replace] = rule.match(node, refs, path);
       result[0].push(...head);
       result[1].push(...body);
       if (remove) {
@@ -886,11 +886,114 @@ class CRONE extends Rule {
   }
 }
 
+class CREVERY2 extends Rule {
+  constructor(ids) {
+    super(ids, NP(DET(capture("det")), N_(capture("noun"))));
+  }
+  apply({det, noun, verb}, node, refs, path) {
+    //console.log(det);
+    if (det.types.quant != "+") {
+      return;
+    }
+    
+    //console.log(path);
+    // throw new Error("hi");
+    let ref = referent(this.id(), noun.types);
+    let n = drs(this.ids);
+    n.head.push(...clone(refs));
+    n.head.forEach(ref => ref.closure = true);
+
+    //let prep = child(node, 0, 2);
+    let cond = noun;
+    noun.ref = [ref];
+    //if (prep) {
+    //throw new Error("hello");
+    //  cond = S(NP(DET(), noun, prep));
+    //} else {
+    //cond = noun;
+    //}
+    cond.ref = [ref];
+    n.push(cond);
+    
+    //let v = drs(this.ids);
+    //v.head.push(...clone(n.head));
+    //v.head.forEach(ref => ref.closure = true);
+
+    //let s = clone(node);
+    
+    //s.children[0] = ref;
+    //v.push(s);
+
+    let q = det.children
+        .filter((d) => d["@type"] != "%UNSIGNED_INT")
+        .map((d) => d.value)
+        .join("-")
+        .toLowerCase();
+    if (det.children[det.children.length - 1]["@type"]
+        == "%UNSIGNED_INT") {
+      if (det.children.length == 1) {
+        q = "exactly";
+      }
+      q += `(${det.children[det.children.length - 1].value})`;
+    }
+    // console.log(q);
+    if (q == "all") {
+      q = "every";
+    }
+    // let result = quantifier(q, n, v, ref);
+
+    // console.log(path);
+    //let s;
+    //throw new Error("hi");
+    for (let i = 0; i < path.length; i++) {
+      const parent = path[path.length - 1 - i];
+      //console.log(parent);
+      if (parent["@type"] == "S" ||
+          parent["@type"] == "Q") {
+        // throw new Error("hi");
+        parent.q = parent.q || [];
+        parent.q.push({ref: ref, head: n, type: q});
+        break;
+      }
+    }
+
+    return [[], [], false, ref];
+  }
+}
+
+class CRQUANT extends Rule {
+  constructor(ids) {
+    super(ids, S(capture("s")));
+  }
+  apply({s}, node, refs, path) {
+    if (!s.q) {
+      return;
+    }
+
+    const {ref, type, head} = s.q[s.q.length - 1];;
+    let v = drs(this.ids);
+    let body = clone(s);
+    delete body.q;
+    v.push(body);
+    
+    let result = quantifier(type, head, v, ref);
+    for (let i = s.q.length - 2; i >= 0; i--) {
+      const {ref, type, head} = s.q[i];
+      let v = drs(this.ids);
+      v.push(result);
+      result = quantifier(type, head, v, ref);
+    }
+
+    return [[], [result], true];
+  }
+}
+
 class CREVERY extends Rule {
   constructor(ids) {
     super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({det, noun, verb}, node, refs) {
+    throw new Error("hi");
     if (det.types.quant != "+") {
       return;
     }
@@ -1239,7 +1342,12 @@ class CRQUESTIONIS extends Rule {
   }
   apply({be, sub, adj}, node) {
     let q = drs(this.ids);
-    q.push(S(sub, VP_(VP(be, adj))));
+    const s = S(sub, VP_(VP(be, adj)));
+
+    // Propagate the quantifiers too.
+    s.q = child(node, 0, 0).q; 
+    q.push(s);
+
     return [[], [query(q, undefined)], node];
   }
 }
@@ -1284,8 +1392,11 @@ class CRQUESTIONYESNO extends Rule {
   }
   apply({sub, vp}, node) {
     let q = drs(this.ids);
+
+    const s = S(sub, VP_(vp));
+    s.q = child(node, 0, 0).q; 
     
-    q.push(S(sub, VP_(vp)));
+    q.push(s);
     return [[], [query(q)], true];
   }
 }
@@ -1481,8 +1592,10 @@ class Rules {
         new CRPUNCT(ids),
       ],
       [
-        new CREVERY(ids),
-        new CRVPEVERY(ids),
+        new CREVERY2(ids),
+        new CRQUANT(ids),
+        //new CREVERY(ids),
+        //new CRVPEVERY(ids),
         new CRCOND(ids),
         new CREVERYONE(ids),
         new CREVERYONE2(ids),

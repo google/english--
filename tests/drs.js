@@ -483,6 +483,12 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Jones likes a woman that likes every man.", function() {
+    assertThat("Jones likes a woman that likes every man.")
+     .equalsTo(`
+    `);
+  });
+
   it("Every man is happy. He likes it.", function() {
     try {
       let drs = new DRS(Rules.from());
@@ -1929,8 +1935,8 @@ describe("DRS", function() {
      `);
   });
 
-  it("Either every man or every woman is mortal.", function() {
-    assertThat("either every man or every woman is mortal.")
+  it.skip("Either every man is mortal or every woman is mortal.", function() {
+    assertThat("Either every man is mortal or every woman is mortal.")
      .equalsTo(`
        either (
          for (let every a: man(a)) {
@@ -1944,22 +1950,37 @@ describe("DRS", function() {
     `);
   });
 
-  it("Either every man or every woman is not mortal.", function() {
-    assertThat("either every man or every woman is not mortal.")
+  it("Either every man or every woman is mortal.", function() {
+    assertThat("either every man or every woman is mortal.")
      .equalsTo(`
-       either (
-         for (let every a: man(a)) {
-           not (
-             mortal(a).
-           ).
-         }
-       ) or (
+       for (let every a: man(a)) {
          for (let every b: woman(b)) {
-           not (
+           either (
+             mortal(a).
+           ) or (
              mortal(b).
            ).
          }
-       ).
+       }
+    `);
+  });
+
+  it("Either every man or every woman is not mortal.", function() {
+    assertThat("either every man or every woman is not mortal.")
+     .equalsTo(`
+         for (let every a: man(a)) {
+           for (let every b: woman(b)) {
+             either (
+               not (
+                 mortal(a).
+               ).
+             ) or (
+               not (
+                 mortal(b).
+               ).
+             ).
+           }
+         }
     `);
   });
 
@@ -1967,15 +1988,15 @@ describe("DRS", function() {
     assertThat("either every man or every woman is from Brazil.")
      .equalsTo(`
        Brazil(a).
-       either (
-         for (let every b: man(b)) {
-           from(b, a).
-         }
-       ) or (
+       for (let every b: man(b)) {
          for (let every c: woman(c)) {
-           from(c, a).
+           either (
+             from(b, a).
+           ) or (
+             from(c, a).
+           ).
          }
-       ).
+       }
     `);
   });
 
@@ -2310,7 +2331,7 @@ describe("Large Lexicon", () => {
       .equalsTo(`
         Brazil(a).
         South-America(b).
-        for (let all c: country(c) country-in(c, b)) {
+        for (let every c: country(c) country-in(c, b)) {
           border(s0, a, c).
         }
       `);
@@ -2620,11 +2641,11 @@ describe("Large Lexicon", () => {
          state(e).
        }
        United-Nations(f).
-       for (let all g: country(g)) {
+       for (let every g: country(g)) {
          classify(s1, f, g).
        }
        World-Bank(h).
-       for (let all i: country(i)) {
+       for (let every i: country(i)) {
          classify(s2, h, i).
        }
      `);
