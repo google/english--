@@ -1065,10 +1065,10 @@ describe("DRS", function() {
     assertThat("Mary's father is a brazilian engineer.")
      .equalsTo(`
        Mary(a).
-       c = b.
-       father(c, a).
-       brazilian-engineer(b).
-       engineer(b).
+       b = c.
+       brazilian-engineer(c).
+       engineer(c).
+       father(b, a).
     `);
   });
 
@@ -2663,7 +2663,7 @@ describe("Large Lexicon", () => {
       `);
   });
   
-  it("Every nation is a stable community of some peoples with a common language.", () => {
+  it.skip("Every nation is a stable community of some peoples with a common language.", () => {
     // Things I'd expect I'd be able to write:
     //   - a stable community of peoples (probably need generics)
     //   - some peoples with a common language, territory, history, ethnicity or culture.
@@ -2681,11 +2681,11 @@ describe("Large Lexicon", () => {
       Every nation is a cultural community which is aware of the autonomy.
     `).equalsTo(`
        for (let every a: nation(a)) {
-         a = c.
-         stable-community(c).
-         community(c).
-         common-language(b).
+         a = d.
+         common-language(c).
          language(b).
+         community(c).
+         stable-community(c).
          stable-community-with(c, b).
          stable-community-of(c, ).
        }
