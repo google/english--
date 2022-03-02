@@ -340,7 +340,7 @@ class CRTHE extends Rule {
   }
 }
 
-class CRPRO1 extends Rule {
+class CRPRO extends Rule {
   constructor(ids) {
     super(ids, NP(PRO(capture("pro"))));
   }
@@ -1465,7 +1465,7 @@ class Rules {
       new CRTENSE(ids),
       new CRADV(ids),
       new CRNRC(ids), 
-      new CRPRO1(ids),
+      new CRPRO(ids),
       new CRPOSS(ids),
       new CRADJ(ids),
       new CRBE(ids),
@@ -1505,7 +1505,7 @@ module.exports = {
   capture: capture,
   Ids: Ids,
   Rules: Rules,
-  CRPRO1: CRPRO1,
+  CRPRO1: CRPRO,
   CRID: CRID,
   CRLIN: CRLIN,
   CRNRC: CRNRC,
