@@ -1127,55 +1127,18 @@ class CRAND extends CompositeRule {
 }
 
 // Possessive Phrases
-class CRSPOSS extends Rule {
+class CRPOSS extends Rule {
   constructor(ids) {
-//    super(ids, S(NP(DET(capture("name"), "'s"), N_(capture("noun")))));
     super(ids, NP(DET(capture("name"), "'s"), N_(capture("noun"))));
   }
   
   apply({name, noun, verb}, node, refs) {
-    //throw new Error("hi");
     let u = referent(this.id(), noun.types);
-    //node.children[0] = u;
-    //node.ref = [u];
     
     let s = clone(noun);
     s.ref = [u, child(name, 0)];
 
     return [[u], [s], false, u];
-  }
-}
-
-class CRVPPOSS extends Rule {
-  constructor(ids) {
-    super(ids, S(capture("sub"), VP_(VP(capture("verb"), NP(DET(capture("name"), "'s"), N_(capture("noun")))))));
-  }
-  
-  apply({name, noun, verb}, node, refs) {
-    let poss = child(node, 1, 0, 1, 0, 1);
-    if (!poss) {
-      // TODO(goto): figure out why the "'s" isn't preventing this from
-      // matching
-      return;
-    }
-    // throw new Error("hio");
-    // console.log(child(node, 1));
-    // throw new Error("hi");
-    let u = referent(this.id(), noun.types);
-    child(node, 1, 0).children[1] = u;
-    let s = clone(noun);
-    s.ref = [u, child(name, 0)];
-
-    return [[u], [s]];
-  }
-}
-
-class CRPOSS extends CompositeRule {
-  constructor(ids) {
-    super([
-      new CRSPOSS(ids),
-      //new CRVPPOSS(ids)
-    ]);
   }
 }
 
