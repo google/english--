@@ -495,6 +495,18 @@ describe("DRS", function() {
     `);
   });
 
+  it.skip("Jones likes every woman that loves every man.", function() {
+    assertThat("Jones likes every woman that loves every man.")
+     .equalsTo(`
+       Jones(a).
+       for (let every b: man(b)) {
+         love(s0, c, b).
+       }
+       woman(c).
+       like(s1, a, c).
+    `);
+  });
+
   it("Every man is happy. He likes it.", function() {
     try {
       let drs = new DRS(Rules.from());
