@@ -358,19 +358,16 @@ class CRPRO1 extends Rule {
 
 class CRSID extends Rule {
   constructor(ids) {
-    //super(ids, S(NP(DET(capture("det")), N_(capture("noun"))), VP_()));
     super(ids, NP(DET(capture("det")), N_(capture("noun"))));
   }
   
   apply({det, noun}, node, refs) {
-    // throw new Error("hi");
     if (det.types.quant != "some") {
       return;
     }
 
     let ref = referent(this.id(), noun.types);
     noun.ref = [ref];
-    // node.children[0] = ref;
     
     return [[ref], [noun], false, ref];
   }
@@ -602,25 +599,15 @@ class CRREFNEGBE extends Rule {
                  VP_(VP(BE(), "not", ANY(capture("b"))))));
   }
   apply({a, b}, node, refs) {
-    // let s = predicate("=", [a, b], node.types, true);
     const result = clone(node);
-    // console.log();
-    // remove the "not".
-    // const u = drs();
     child(result, 1, 0).children.splice(1, 1);
 
 
     let sub = drs(this.ids);
     sub.head = clone(refs);
     sub.head.forEach(ref => ref.closure = true);
-    // let s = S(ref, VP_(VP(BE(), adj)));
-    //s.types = node.types;   
     sub.push(result);
     return [[], [negation(sub)], true];
-
-    // console.log(child(result, 1, 0));
-    // throw new Error("hi");
-    // return [[], [negation(result)], true];
   }
 }
 
@@ -702,7 +689,6 @@ class CRGENERICBE extends Rule {
 
     let np = clone(noun);
     np.ref = [ref];
-    //console.log();
     
     // Matches the DRS found in (3.57) on page 269.
     if (node.types && node.types.tense) {
@@ -715,7 +701,6 @@ class CRGENERICBE extends Rule {
 
 class CRNEGNBE extends Rule {
   constructor(ids) {
-    // super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
     super(ids, S(REF(capture("ref")), VP_(VP(BE(), "not", NP(DET(capture("det")), N_(capture("noun")))))));
   }
   apply({ref, det, noun}, node, refs) {
@@ -914,7 +899,7 @@ class CREVERYONE2 extends Rule {
 
 class CRONE extends Rule {
   constructor(ids) {
-    super(ids, ANY(NP("one")));
+    super(ids, NP("one"));
   }
   apply({}, node, refs) {
     let one = find({}, refs, "one");
@@ -922,9 +907,7 @@ class CRONE extends Rule {
       throw new Error("Can't use 'one' outside of an 'everyone' clause");
     }
 
-    node.children[0] = one;
-
-    return [[], []];
+    return [[], [], false, one];
   }
 }
 
