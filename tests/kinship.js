@@ -158,11 +158,11 @@ describe("Kinship", function() {
     `);
   });
   
-  it("Everyone's husband of a sibling of one's parent is one's uncle.", () => {
-    assertThat("Everyone's husband of a sibling of one's parent is one's uncle.")
+  it("Every husband of a sibling of one's parent is one's uncle.", () => {
+    assertThat("Every husband of [a sibling of one's parent] is one's uncle.")
       .equalsTo(`
        for (let every a) {
-         for (let every b: parent(d, a) sibling(c) husband(b, a) husband-of(b, d) husband-of(b, c)) {
+         for (let every b: sibling(d) parent(c, a) husband(b) husband-of(b, d) sibling-of(d, c)) {
            b = e.
            uncle(e, a).
          }
@@ -170,11 +170,11 @@ describe("Kinship", function() {
     `);
   });
   
-  it("Everyone's sibling of one's parent is one's uncle.", () => {
-    assertThat("Everyone's sibling of one's parent is one's uncle.")
+  it("Every sibling of one's parent is one's uncle.", () => {
+    assertThat("Every sibling of one's parent is one's uncle.")
       .equalsTo(`
        for (let every a) {
-         for (let every b: sibling(b, a) parent(c, a) sibling-of(b, c)) {
+         for (let every b: sibling(b) parent(c, a) sibling-of(b, c)) {
            b = d.
            uncle(d, a).
          }

@@ -1869,35 +1869,59 @@ describe("DRS", function() {
   it("Everyone's uncle is happy", function() { 
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
+       for (let every a: uncle(b, a)) {
+         happy(b).
+       }
+     `);
+  });
+
+  it("Every brother of one's parent uncle is happy", function() { 
+    assertThat("Every brother of one's parent is one's uncle.")
+     .equalsTo(`
        for (let every a) {
-         for (let every b: uncle(b, a)) {
-           happy(b).
+         for (let every b: brother(b) parent(c, a) brother-of(b, c)) {
+           b = d.
+           uncle(d, a).
          }
        }
      `);
   });
 
-  it("Everyone's uncle is one's relative", function() { 
+  it("Everyone's uncle one is one's relative", function() { 
     assertThat("Everyone's uncle is one's relative.")
      .equalsTo(`
-       for (let every a) {
-         for (let every b: uncle(b, a)) {
-           b = c.
-           relative(c, a).
-         }
-       }
+      for (let every a: uncle(b, a)) {
+        b = c.
+        relative(c, a).
+      }
+     `);
+  });
+
+  it("Every uncle is happy", function() { 
+    assertThat("Every uncle is happy.")
+     .equalsTo(`
+      for (let every a: uncle(a)) {
+        happy(a).
+      }
+     `);
+  });
+
+  it("Everyone's uncle is happy", function() { 
+    assertThat("Everyone's uncle is happy.")
+     .equalsTo(`
+      for (let every a: uncle(b, a)) {
+        happy(b).
+      }
      `);
   });
 
   it("Everyone's uncle is a male relative", function() { 
     assertThat("Everyone's uncle is a male relative.")
      .equalsTo(`
-       for (let every a) {
-         for (let every b: uncle(b, a)) {
-           b = c.
-           male-relative(c).
-           relative(c).
-         }
+       for (let every a: uncle(b, a)) {
+         b = c.
+         male-relative(c).
+         relative(c).
        }
      `);
   });

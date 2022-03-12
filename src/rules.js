@@ -833,7 +833,7 @@ class CREVERYONE extends Rule {
     super(ids, S(NP("everyone"), VP_(capture("verb"))));
   }
   apply({}, node, refs) {
-    let ref = referent(this.id(), {});
+    let ref = referent(this.id(), {}, "one");
     let head = drs(this.ids);
     let v = drs(this.ids);
     let s = clone(node);
@@ -847,12 +847,40 @@ class CREVERYONE extends Rule {
   }
 }
 
+class CREVERYONE3 extends Rule {
+  constructor(ids) {
+    super(ids, NP("Everyone"));
+  }
+  apply({verb, noun}, node, refs) {
+    return;
+    let one = find({}, refs, "one");
+    // throw new Error("hi");
+    if (one) {
+      return [[], [], false, one];
+    }
+  }
+}
+
 class CREVERYONE2 extends Rule {
   constructor(ids) {
     super(ids, S(NP(DET(NP("Everyone"), "'s"), N_(capture("noun"))), VP_(capture("verb"))));
   }
   apply({verb, noun}, node, refs) {
-    let ref2 = referent(this.id(), {}, "one");
+    //console.log(one);
+    //console.log(node);
+    
+    //throw new Error("hi");
+    // throw new Error("hi");
+    //console.log(refs);
+    let one = find({}, refs, "one");
+
+    if (one) {
+      node.q.pop();
+      //console.log(node);
+    }
+    // console.log(one);
+    
+    let ref2 = one || referent(this.id(), {}, "one");
     let ref = referent(this.id(), {});
     
     let head = clone(node.children[0]);
@@ -867,12 +895,14 @@ class CREVERYONE2 extends Rule {
     let v = drs(this.ids);
     v.head.push(ref2);
     v.push(s);
+
+    // console.log(node);
     
-    let inner = quantifier("every", u, v, ref);
+    //let inner = quantifier("every", u, v, ref);
 
-    let everyone = quantifier("every", undefined, inner, ref2);
+    let everyone = quantifier("every", u, v, ref2);
 
-    return [[], [everyone], true];
+    return [[ref2], [everyone], true];
   }
 }
 
@@ -880,13 +910,41 @@ class CRONE extends Rule {
   constructor(ids) {
     super(ids, NP("one"));
   }
-  apply({}, node, refs) {
+  apply({}, node, refs, path) {
+    // console.log(refs);
+
     let one = find({}, refs, "one");
-    if (!one) {
-      throw new Error("Can't use 'one' outside of an 'everyone' clause");
+    //console.log(one);
+    //console.log(one);
+    //throw new Error("hi");
+    // console.log("hello");
+
+    //console.log("crone");
+    // console.log(one);
+
+    if (one) {
+      return [[], [], false, one];
     }
 
-    return [[], [], false, one];
+    //if (!one) {
+    let ref = referent(this.id(), {}, "one");
+    // one = ref;
+    //}
+
+    for (let i = 0; i < path.length; i++) {
+      const parent = path[path.length - 1 - i];
+      if (parent["@type"] == "S" ||
+          parent["@type"] == "Q") {
+        //console.log(parent);
+        //throw new Error("hi");
+        parent.q = parent.q || [];
+        parent.q.push({ref: ref, head: undefined, type: "every"});
+        // console.log(parent);
+        break;
+      }
+    }
+    
+    return [[ref], [], false, ref];
   }
 }
 
@@ -924,6 +982,7 @@ class CREVERY extends Rule {
     if (q == "all") {
       q = "every";
     }
+
     for (let i = 0; i < path.length; i++) {
       const parent = path[path.length - 1 - i];
       if (parent["@type"] == "S" ||
@@ -943,7 +1002,7 @@ class CRQUANT extends Rule {
     super(ids, S(capture("s")));
   }
   apply({s}, node, refs, path) {
-    if (!s.q) {
+    if (!s.q || s.q.length == 0) {
       return;
     }
 
@@ -951,13 +1010,18 @@ class CRQUANT extends Rule {
       return;
     }
 
+    //throw new Error("hi");
+    //console.log(node);
+    
     const {ref, type, head} = s.q[s.q.length - 1];;
     let v = drs(this.ids);
+    v.head.push(...clone(refs));
     let body = clone(s);
     delete body.q;
     v.push(body);
-    
+
     let result = quantifier(type, head, v, ref);
+    // console.log(result.print());
     for (let i = s.q.length - 2; i >= 0; i--) {
       const {ref, type, head} = s.q[i];
       let v = drs(this.ids);
@@ -1476,7 +1540,6 @@ class Rules {
       new CRNEG(ids),
       new CRORS(ids),
       new CRBE(ids),
-      new CRONE(ids),
       new CRQUANT(ids),
     ];
     return [
@@ -1484,13 +1547,15 @@ class Rules {
         new CRPN(ids),
         new CRTHE(ids),
         new CRPUNCT(ids),
+        new CRONE(ids),
       ],
       [
         new CREVERY(ids),
-        new CRQUANT(ids),
         new CRCOND(ids),
         new CREVERYONE(ids),
         new CREVERYONE2(ids),
+        new CREVERYONE3(ids),
+        new CRQUANT(ids),
         new CRGENERIC(ids),
         new CRVPGENERIC(ids),
         new CRORS(ids),
