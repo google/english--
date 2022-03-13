@@ -1187,6 +1187,16 @@ class CRPOSS extends Rule {
   
   apply({name, noun, verb}, node, refs) {
     let u = referent(this.id(), noun.types);
+
+    // console.log(noun);
+    let n = child(noun, noun.children.length - 1);
+    while (n["@type"] != "N") {
+      //console.log(n);
+      n = child(n, 0);
+    }
+    n.prop += "-of";
+    //console.log(n);
+    //throw new Error("hi");
     
     let s = clone(noun);
     s.ref = [u, child(name, 0)];
