@@ -938,7 +938,7 @@ class CREVERYONE2 extends Rule {
     
     let everyone = quantifier("every", u, v, ref2);
 
-    return [[ref2], [everyone], true];
+    return [[], [everyone], true];
   }
 }
 
