@@ -822,8 +822,9 @@ describe("DRS", function() {
     assertThat("Jones's wife is happy.")
      .equalsTo(`
        Jones(a).
-       happy(b).
+       wife(b).
        wife-of(b, a).
+       happy(b).
     `);
   });
 
@@ -833,6 +834,7 @@ describe("DRS", function() {
        Anna(a).
        Jones(b).
        a = c.
+       wife(c).
        wife-of(c, b).
     `);
   });
@@ -841,8 +843,9 @@ describe("DRS", function() {
     assertThat("Jones's wife is happy. She likes Smith.")
      .equalsTo(`
        Jones(a).
-       happy(b).
+       wife(b).
        wife-of(b, a).
+       happy(b).
        Smith(c).
        like(s0, b, c).
     `);
@@ -854,6 +857,7 @@ describe("DRS", function() {
        Smith(a).
        Jones(b).
        wife-of(c, b).
+       wife(c).
        like(s0, a, c).
     `);
   });
@@ -1070,6 +1074,7 @@ describe("DRS", function() {
        Jones(a).
        Mary(b).
        a = c.
+       husband(c).
        husband-of(c, b).
     `);
   });
@@ -1080,8 +1085,10 @@ describe("DRS", function() {
        Jones(a).
        Mary(b).
        c = d.
-       husband-of(d, b).
+       father(c).
+       husband(d).
        father-of(c, a).
+       husband-of(d, b).
     `);
   });
 
@@ -1090,9 +1097,10 @@ describe("DRS", function() {
      .equalsTo(`
        Mary(a).
        b = c.
+       father(b).
+       father-of(b, a).
        brazilian-engineer(c).
        engineer(c).
-       father-of(b, a).
     `);
   });
 
@@ -1140,8 +1148,10 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        Mary(b).
-       sister-of(d, b).
+       wife(c).
+       sister(d).
        wife-of(c, a).
+       sister-of(d, b).
        behind(c, d).
     `);
   });
@@ -1152,6 +1162,7 @@ describe("DRS", function() {
        Jones(a).
        Mary(b).
        c = b.
+       wife(c).
        wife-of(c, a).
     `);
   });
@@ -1162,6 +1173,7 @@ describe("DRS", function() {
        Mary(a).
        Jones(b).
        a = c.
+       wife(c).
        wife-of(c, b).
     `);
   });
@@ -1172,6 +1184,7 @@ describe("DRS", function() {
        Jones(a).
        Smith(b).
        a = c.
+       brother(c).
        brother-of(c, b).
        Brazil(d).
        like(s0, c, d).
@@ -1888,8 +1901,9 @@ describe("DRS", function() {
     assertThat("Every brother of one's parent is one's uncle.")
      .equalsTo(`
        for (let every a) {
-         for (let every b, c: brother(b) parent-of(c, a) brother-of(b, c)) {
+         for (let every b, c: parent(c) parent-of(c, a) brother(b) brother-of(b, c)) {
            b = d.
+           uncle(d).
            uncle-of(d, a).
          }
        }
@@ -1902,6 +1916,7 @@ describe("DRS", function() {
        Maura(a).
        Mel(b).
        a = c.
+       parent(c).
        parent-of(c, b).
      `);
   });
@@ -1911,6 +1926,7 @@ describe("DRS", function() {
      .equalsTo(`
       for (let every a, b: uncle(b, a)) {
         b = c.
+        relative(c).
         relative-of(c, a).
       }
      `);
@@ -2254,6 +2270,7 @@ describe("Large Lexicon", () => {
       Mel(a).
       Yuji(b).
       girlfriend-of(c, b).
+      girlfriend(c).
       like(s0, a, c).
     `);
   });
@@ -2265,6 +2282,8 @@ describe("Large Lexicon", () => {
       Yuji(b).
       awesome-girlfriend-of(c).
       girlfriend-of(c, b).
+      awesome-girlfriend(c).
+      girlfriend(c).
       like(s0, a, c).
     `);
   });
@@ -2447,6 +2466,7 @@ describe("Large Lexicon", () => {
         Brazil(a).
         for (let exactly(26) b: state(b)) {
           federation-of(c, a).
+          federation(c).
           compose(s0, b, c).
         }
       `);
@@ -2469,6 +2489,8 @@ describe("Large Lexicon", () => {
         Brazil(a).
         Portuguese(b).
         c = b.
+        official-language(c).
+        language(c).
         official-language-of(c).
         language-of(c, a).
       `);
@@ -2528,8 +2550,9 @@ describe("Large Lexicon", () => {
         Portuguese-Empire(a).
         Lisbon(b).
         Rio-De-Janeiro(c).
-        s0 < __now__.
+        capital(d).
         capital-of(d, a).
+        s0 < __now__.
         transfer-to(s0, c).
         transfer(s0, e, d).
         transfer-from(s0, b).
@@ -2624,6 +2647,7 @@ describe("Large Lexicon", () => {
        capital-of(g, a).
        for (let exactly(26) h: state(h)) {
          federation-of(i, a).
+         federation(i).
          compose(s2, h, i).
        }
        Atlantic-Ocean(j).
@@ -2644,8 +2668,9 @@ describe("Large Lexicon", () => {
        claim(s4, n, p).
        Lisbon(q).
        Rio-De-Janeiro(r).
-       s5 < __now__.
+       capital(s).
        capital-of(s, o).
+       s5 < __now__.
        transfer-to(s5, r).
        transfer(s5, t, s).
        transfer-from(s5, q).

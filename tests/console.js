@@ -105,20 +105,13 @@ describe("Console", () => {
     `))).equalsTo(["Yes."]);
   });
 
-  it.skip("Who is Mel's uncle?", () => {
+  it("Who is Mel's uncle?", () => {
     assertThat(unroll(new Console(dict).load(`
       Every sibling of one's parent is one's uncle.
       Maura is Mel's parent.
       Tio Bo is Maura's sibling.
       Who is Mel's uncle?
-    `))).equalsTo(["I don't know."]);
-
-    assertThat(new Console(dict).transpile(`
-      Every sibling of one's parent is one's uncle.
-      Maura is Mel's parent.
-      Tio Bo is Maura's sibling.
-      Who is Mel's uncle?
-    `)).equalsTo("");
+    `))).equalsTo(["Tio Bo."]);
   });
   
   it.skip("", () => {

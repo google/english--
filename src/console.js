@@ -26,15 +26,28 @@ class Console {
         this.kb.read(statement).next();
       } else if (type == "Question") {
         const q = this.drs.print(undefined, undefined, nodes);
-        const result = this.kb.read(q);
+        const result = this.kb.read(q, true);
+
+        const {value: arg} = result.next();
+        // console.log(arg);
+        
         const first = result.next();
+        // console.log(first);
         if (first.done) {
           yield "I don't know.";
         } else if (Object.keys(first.value).length == 0) {
           yield "Yes.";
         } else {
-          const [key] = Object.values(first.value)[0];
-          const ref = this.drs.head.find((el) => el.name == key);
+          // const [key] = Object.values(first.value)[0];
+          const [key] = arg;
+
+          const [name] = first.value[key];
+          //console.log(first.value[key]);
+          //throw new Error("hi");
+          
+          const ref = this.drs.head.find((el) => el.name == name);
+          //console.log(ref.sameAs);
+          //console.log(this.drs.head);
           const value = ref.value || "Yes";
           yield `${value}.`;
           for (let answer of result) {

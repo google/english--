@@ -604,6 +604,16 @@ class CRREFBE extends Rule {
                  VP_(VP(BE(), REF(capture("b"))))));
   }
   apply({a, b}, node, refs) {
+    //if (a.value && !b.value) {
+    //  b.value = a.value;
+    //} else if (b.value && !a.value) {
+    //  a.value = b.value;
+    //}
+    //a.sameAs = b;
+    //b.sameAs = a;
+    //console.log(a);
+    //console.log(b);
+    //throw new Error("hi");
     let s = predicate("=", [a, b], node.types, true);
     return [[], [s], true];
   }
@@ -1188,12 +1198,16 @@ class CRPOSS extends Rule {
   apply({name, noun, verb}, node, refs) {
     let u = referent(this.id(), noun.types);
 
+    const s2 = clone(noun);
+    s2.ref = [u];
+    
     // console.log(noun);
     let n = child(noun, noun.children.length - 1);
     while (n["@type"] != "N") {
       //console.log(n);
       n = child(n, 0);
     }
+    // console.log(noun);
     n.prop += "-of";
     //console.log(n);
     //throw new Error("hi");
@@ -1201,7 +1215,7 @@ class CRPOSS extends Rule {
     let s = clone(noun);
     s.ref = [u, child(name, 0)];
 
-    return [[u], [s], false, u];
+    return [[u], [s, s2], false, u];
   }
 }
 
