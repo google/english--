@@ -698,7 +698,7 @@ describe("DRS", function() {
      .equalsTo(`
        Jones(a).
        Smith(b).
-       for (let every c: woman(c) love(s0, b, c)) {
+       for (let every c, s0: woman(c) love(s0, b, c)) {
          like(s1, a, c).
        }
      `);
@@ -985,7 +985,7 @@ describe("DRS", function() {
     assertThat("Every woman with a donkey loves Jones.")
      .equalsTo(`
        Jones(a).
-       for (let every b: woman(b) donkey(c) woman-with(b, c)) {
+       for (let every b, c: woman(b) donkey(c) woman-with(b, c)) {
          love(s0, b, a).
        }
     `);
@@ -1869,17 +1869,26 @@ describe("DRS", function() {
   it("Everyone's uncle is happy", function() { 
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
-       for (let every a: uncle(b, a)) {
+       for (let every a, b: uncle(b, a)) {
          happy(b).
        }
      `);
   });
 
-  it("Every brother of one's parent uncle is happy", function() { 
+  it.skip("Some uncle is happy", function() { 
+    assertThat("Some uncle is happy.")
+     .equalsTo(`
+       for (let every a: uncle(a)) {
+         happy(a).
+       }
+     `);
+  });
+
+  it("Every brother of one's parent uncle is one's uncle", function() { 
     assertThat("Every brother of one's parent is one's uncle.")
      .equalsTo(`
        for (let every a) {
-         for (let every b: brother(b) parent(c, a) brother-of(b, c)) {
+         for (let every b, c: brother(b) parent(c, a) brother-of(b, c)) {
            b = d.
            uncle(d, a).
          }
@@ -1890,13 +1899,13 @@ describe("DRS", function() {
   it("Everyone's uncle one is one's relative", function() { 
     assertThat("Everyone's uncle is one's relative.")
      .equalsTo(`
-      for (let every a: uncle(b, a)) {
+      for (let every a, b: uncle(b, a)) {
         b = c.
         relative(c, a).
       }
      `);
   });
-
+ 
   it("Every uncle is happy", function() { 
     assertThat("Every uncle is happy.")
      .equalsTo(`
@@ -1909,7 +1918,7 @@ describe("DRS", function() {
   it("Everyone's uncle is happy", function() { 
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
-      for (let every a: uncle(b, a)) {
+      for (let every a, b: uncle(b, a)) {
         happy(b).
       }
      `);
@@ -1918,7 +1927,7 @@ describe("DRS", function() {
   it("Everyone's uncle is a male relative", function() { 
     assertThat("Everyone's uncle is a male relative.")
      .equalsTo(`
-       for (let every a: uncle(b, a)) {
+       for (let every a, b: uncle(b, a)) {
          b = c.
          male-relative(c).
          relative(c).
@@ -2055,7 +2064,7 @@ describe("DRS", function() {
     assertThat("Brazilians who like Sam are happy.")
      .equalsTo(`
        Sam(a).
-       for (let every b: brazilian(b) like(s0, b, a)) {
+       for (let every b, s0: brazilian(b) like(s0, b, a)) {
          happy(b).
        }
     `);
@@ -2083,7 +2092,7 @@ describe("DRS", function() {
     assertThat("Birds that like Sam are happy.")
      .equalsTo(`
        Sam(a).
-       for (let every b: bird(b) like(s0, b, a)) {
+       for (let every b, s0: bird(b) like(s0, b, a)) {
          happy(b).
        }
     `);
@@ -2092,7 +2101,7 @@ describe("DRS", function() {
   it("Birds that fly are happy.", function() { 
     assertThat("Birds that fly are happy.")
      .equalsTo(`
-       for (let every a: bird(a) fly(s0, a)) {
+       for (let every a, s0: bird(a) fly(s0, a)) {
          happy(a).
        }
     `);
@@ -2134,7 +2143,7 @@ describe("DRS", function() {
     assertThat("People love birds that fly.")
      .equalsTo(`
        for (let every a: person(a)) {
-         for (let every b: bird(b) fly(s0, b)) {
+         for (let every b, s0: bird(b) fly(s0, b)) {
            love(s1, a, b).
          }
        }

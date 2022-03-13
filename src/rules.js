@@ -74,9 +74,20 @@ function quantifier(q, a, b, ref) {
     "b": b,
     "ref": ref,
     print() {
+      //console.log("hi");
+      //console.log();
+      //if (a) {
+      //  console.log(a.head);
+      //}
+      let vars = a ? a.head
+          .filter((x) => x != ref)
+          .filter(({closure}) => !closure)
+          .map(({name}) => name)
+          .join(", ") : undefined;
+      vars = vars ? ", " + vars : "";
       let result = [];
       const cond = a ? `: ${this.a.print(" ", true)}` : ``;
-      result.push(`for (let ${q} ${ref.name}${cond}) {`);
+      result.push(`for (let ${q} ${ref.name}${vars}${cond}) {`);
       result.push(`${this.b.print()}}`);
       result.push("");
       return result.join("\n");
@@ -368,7 +379,7 @@ class CRID extends Rule {
 
     let ref = referent(this.id(), noun.types);
     noun.ref = [ref];
-    
+
     return [[ref], [noun], false, ref];
   }
 }
@@ -882,11 +893,15 @@ class CREVERYONE2 extends Rule {
     
     let ref2 = one || referent(this.id(), {}, "one");
     let ref = referent(this.id(), {});
+
+    //console.log(ref);
+    //throw new Error("hi");
     
     let head = clone(node.children[0]);
     head.children[0].children[0] = ref2;
     let u = drs(this.ids);
     noun.ref = [ref, ref2];
+    u.head.push(ref);
     u.head.push(ref2);
     u.push(noun);
 
@@ -900,6 +915,8 @@ class CREVERYONE2 extends Rule {
     
     //let inner = quantifier("every", u, v, ref);
 
+    // console.log(u.head);
+    
     let everyone = quantifier("every", u, v, ref2);
 
     return [[ref2], [everyone], true];
