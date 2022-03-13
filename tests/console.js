@@ -107,11 +107,30 @@ describe("Console", () => {
 
   it("Who is Mel's uncle?", () => {
     assertThat(unroll(new Console(dict).load(`
-      Every sibling of one's parent is one's uncle.
+      Every brother of one's parent is one's uncle.
       Maura is Mel's parent.
-      Tio Bo is Maura's sibling.
+      Tio Bo is Maura's brother.
       Who is Mel's uncle?
     `))).equalsTo(["Tio Bo."]);
+  });
+  
+  it("Who is Mel's aunt?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Every sister of one's parent is one's aunt.
+      Maura is Mel's parent.
+      Tio Gordinha is Maura's sister.
+      Who is Mel's aunt?
+    `))).equalsTo(["Tio Gordinha."]);
+  });
+  
+  it.skip("Who is Mel's uncle?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Every husband of a sibling of one's parent is one's uncle.
+      Maura is Mel's parent.
+      Tio Gordao is Tia Gordinha's husband.
+      Tia Gordinha is Maura's sibling.
+      Who is Mel's uncle?
+    `))).equalsTo(["Tio Gordao."]);
   });
   
   it.skip("", () => {
