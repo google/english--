@@ -906,14 +906,23 @@ class CREVERYONE2 extends Rule {
 
     //console.log(ref);
     //throw new Error("hi");
-    
+
+    //console.log(n);
+        
     let head = clone(node.children[0]);
     head.children[0].children[0] = ref2;
     let u = drs(this.ids);
-    noun.ref = [ref, ref2];
     u.head.push(ref);
     u.head.push(ref2);
-    u.push(noun);
+
+    const n = clone(noun);
+    n.ref = [ref];
+    u.push(n);
+
+    const poss = clone(noun);
+    child(poss, 0).prop += "-of";
+    poss.ref = [ref, ref2];
+    u.push(poss);
 
     let s = clone(node);
     s.children[0] = ref;

@@ -43,11 +43,16 @@ const dict = [
   N("husband", "sing", "male"),
   N("sister", "sing", "fem"),
   N("mother", "sing", "fem"),
+  N("son", "sing", "male"),
+  N("daughter", "sing", "fem"),
   N("wife", "sing", "fem"),
   N("uncle", "sing", "male"),
+  N("nephew", "sing", "male"),
+  N("niece", "sing", "fem"),
   N("aunt", "sing", "fem"),
   N("sibling", "sing", ["male", "fem"]),
   N("parent", "sing", ["male", "fem"]),
+  N("child", "sing", ["male", "fem"]),
 
   // Adjectives
   ADJ("brazilian"),

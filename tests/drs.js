@@ -1882,7 +1882,7 @@ describe("DRS", function() {
   it("Everyone's uncle is happy", function() { 
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
-       for (let every a, b: uncle(b, a)) {
+       for (let every a, b: uncle(b) uncle-of(b, a)) {
          happy(b).
        }
      `);
@@ -1924,7 +1924,7 @@ describe("DRS", function() {
   it("Everyone's uncle one is one's relative", function() { 
     assertThat("Everyone's uncle is one's relative.")
      .equalsTo(`
-      for (let every a, b: uncle(b, a)) {
+      for (let every a, b: uncle(b) uncle-of(b, a)) {
         b = c.
         relative(c).
         relative-of(c, a).
@@ -1944,7 +1944,7 @@ describe("DRS", function() {
   it("Everyone's uncle is happy", function() { 
     assertThat("Everyone's uncle is happy.")
      .equalsTo(`
-      for (let every a, b: uncle(b, a)) {
+      for (let every a, b: uncle(b) uncle-of(b, a)) {
         happy(b).
       }
      `);
@@ -1953,7 +1953,7 @@ describe("DRS", function() {
   it("Everyone's uncle is a male relative", function() { 
     assertThat("Everyone's uncle is a male relative.")
      .equalsTo(`
-       for (let every a, b: uncle(b, a)) {
+       for (let every a, b: uncle(b) uncle-of(b, a)) {
          b = c.
          male-relative(c).
          relative(c).

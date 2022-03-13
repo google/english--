@@ -2,16 +2,15 @@ const Assert = require("assert");
 const {Console, transpile} = require("../src/console.js");
 const {dict} = require("./dict.js");
 
-describe("Console", () => {
-
-  function unroll(gen) {
-    const result = [];
-    for (const item of gen) {
-      result.push(item);
-    }
-    return result;
+function unroll(gen) {
+  const result = [];
+  for (const item of gen) {
+    result.push(item);
   }
-  
+  return result;
+}
+
+describe("Console", () => {
   it("Sam is happy. Is Sam happy?", () => {
     const code = `
       Sam is happy. Is Sam happy?
@@ -133,6 +132,35 @@ describe("Console", () => {
     `))).equalsTo(["Tio Gordao."]);
   });
   
+  it("Who is Tio Bo's nephew?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Every son of one's sibling is one's nephew.
+      Mel is Maura's son.
+      Maura is Tio Bo's sibling.
+      Who is Tio Bo's nephew?
+    `))).equalsTo(["Mel."]);
+  });
+  
+  it("Who is Tio Bo's niece?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Every daughter of one's sibling is one's niece.
+      Denise is Maura's daughter.
+      Maura is Tio Bo's sibling.
+      Who is Tio Bo's niece?
+    `))).equalsTo(["Denise."]);
+  });
+  
+  it.skip("Who is Tio Bo's niece?", () => {
+    assertThat(unroll(new Console(dict).load(`
+      Every daughter of one's sibling is one's niece.
+      Denise is Maura's daughter.
+      Lais is Tia Gordinha's daughter.
+      Maura is Tio Bo's sibling.
+      Tia Gordinha is Tio Bo's sibling.
+      Who is Tio Bo's niece?
+    `))).equalsTo(["Denise."]);
+  });
+  
   it.skip("", () => {
     const {dict} = require("../src/large.js");
     const console = new Console(dict);
@@ -226,6 +254,31 @@ describe("Console", () => {
         } else {
           Assert.deepEqual(x, y);
         }
+      }
+    }
+  }
+});
+
+describe("Queries", () => {
+  it.skip("Who is Maura's sibling?", () => {
+    assertThat(`
+      Everyone's sibling is a child of one's parent.
+      Every child of one's parent is one's sibling.
+      Maura is Tio Bo's sibling.
+      Who is Maura's sibling?
+    `)
+      .equalsTo(["Maura."]);
+  });  
+
+  function assertThat(x, debug) {
+    return {
+      equalsTo(expected) {
+        if (debug) {
+          console.log(new Console(dict).transpile(x));
+          throw new Error();
+        }
+        const actual = unroll(new Console(dict).load(x));
+        Assert.deepEqual(actual, expected);
       }
     }
   }
