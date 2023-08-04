@@ -5,7 +5,12 @@ The compiler takes a controlled subset of the english language and compiles to a
 For example:
 
 ```
-Every person who is brazilian is happy about Brazil. Sam is brazilian. Sam is a person. Sam is an engineer. He works at Google on the Web Platform. He is interested in Compilers. He likes every area of Computer Science. Is Sam happy about Brazil?
+Every person who is brazilian is happy about Brazil.
+Sam is brazilian. Sam is a person. Sam is an engineer.
+He works at Google on the Web Platform.
+He is interested in Compilers.
+He likes every area of Computer Science.
+Is Sam happy about Brazil?
 ```
 
 Compiles to:
