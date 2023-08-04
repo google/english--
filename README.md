@@ -15,7 +15,7 @@ Is Sam happy about Brazil?
 
 Compiles to:
 
-```javascript
+```
 // Every person who is brazilian is happy about Brazil.
 Brazil(a).
 for (let every b: person(b) brazilian(b)) {
