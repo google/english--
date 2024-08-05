@@ -64,7 +64,47 @@ describe("Earley", function() {
   class Parser {
     constructor(rules = []) {
       this.rules = rules;
+      this.S = [];
     }
+
+    start() {
+      // Expand the first node.
+      const S0 = this.predict([[0, 0, 0]], 0);
+      this.S.push(S0);
+      S0.print = this.print.bind(this, S0);
+      return S0;
+    }
+
+    eat(token) {
+      const set = this.scan(token);
+
+      set.push(...this.predict(set, this.S.length));
+
+      const expand = this.complete(this.S, set);
+
+      set.push(...expand);
+      
+      this.S.push(set);
+
+      set.print = this.print.bind(this, set);
+
+      return set;
+    }
+
+    print(set) {
+      const rules = this.rules;
+      return set.map(([index, dot, state]) => {
+	const name = rules[index][0];
+	const body = rules[index][1]
+	      .map(([type, name], i) => `${i == dot ? "• " : ""}${name}`)
+	      .join(" ");
+	
+	const completed = dot == rules[index][1].length ? " •" : "";
+      
+	return name + " -> " + body + completed + " (" + state + ")"
+      });
+    }
+    
     predict(set, step) {
       const result = [];
 
@@ -99,7 +139,8 @@ describe("Earley", function() {
       return result;
     }
 
-    scan(set, token) {
+    scan(token) {
+      const set = this.S[this.S.length - 1];
       const result = [];
       for (const [index, dot, step] of set) {
 	const rule = this.rules[index];
@@ -151,8 +192,6 @@ describe("Earley", function() {
       
       return result;
     }
-
-    
   }
 
   it("book that flight", () => {
@@ -216,25 +255,9 @@ describe("Earley", function() {
     // Book that flight
     const tokens = [["Verb", "book"], ["Det", "that"], ["Noun", "flight"]];
 
-    const S = [];
-
     const parser = new Parser(rules);
-    
-    const S0 = parser.predict([[0, 0, 0]], 0);
-    S.push(S0);
 
-    function print([index, dot, state]) {
-      const name = rules[index][0];
-      const body = rules[index][1]
-	    .map(([type, name], i) => `${i == dot ? "• " : ""}${name}`)
-	    .join(" ");
-
-      const completed = dot == rules[index][1].length ? " •" : "";
-      
-      return name + " -> " + body + completed + " (" + state + ")"
-    }
-    
-    assertThat(S0.map(print)).equalsTo([
+    assertThat(parser.start().print()).equalsTo([
       "S -> • NP VP (0)",
       "S -> • NP VP (0)",
       "S -> • VP (0)",
@@ -244,47 +267,20 @@ describe("Earley", function() {
       "VP -> • Verb NP (0)",
     ]);
 
-    const S1 = parser.scan(S[0], "Verb");
-    S.push(S1);
-
-    assertThat(S1.map(print)).equalsTo([
-      "VP -> Verb • (0)",
-      "VP -> Verb • NP (0)",
-    ]);
-
-    assertThat(parser.predict(S1, 1).map(print)).equalsTo([
-      "NP -> • Det Nominal (1)",
-    ]);
-    
-    S1.push(...parser.predict(S1, 1));
-    assertThat(S1.map(print)).equalsTo([
+    assertThat(parser.eat("Verb").print()).equalsTo([
       "VP -> Verb • (0)",
       "VP -> Verb • NP (0)",
       "NP -> • Det Nominal (1)",
+      "S -> VP • (0)",
     ]);
 
-    const S2 = parser.scan(S[1], "Det");
-    S.push(S2);
-    
-    assertThat(S2.map(print)).equalsTo([
-      "NP -> Det • Nominal (1)"
-    ]);
-
-    S2.push(...parser.predict(S2, 2));
-
-    assertThat(S2.map(print)).equalsTo([
+    assertThat(parser.eat("Det").print()).equalsTo([
       "NP -> Det • Nominal (1)",
       "Nominal -> • Noun (2)"
     ]);
 
-    const S3 = parser.scan(S[2], "Noun");
-    S.push(S3);
-    
-    assertThat(S3.map(print)).equalsTo([
+    assertThat(parser.eat("Noun").print()).equalsTo([
       "Nominal -> Noun • (2)",
-    ]);
-    
-    assertThat(parser.complete(S, S3).map(print)).equalsTo([
       "NP -> Det Nominal • (1)",
       "VP -> Verb NP • (0)",
       "S -> VP • (0)",
