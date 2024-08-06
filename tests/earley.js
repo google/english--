@@ -17,7 +17,13 @@
 const Assert = require("assert");
 
 describe("Earley", function() {
+  const token = (t) => ["token", t];
+  const term = (t) => ["term", t];
+    
   it("Terms", function() {
+    // Example from:
+    // https://www.youtube.com/watch?v=WNKw1tiskSM
+
     // term -> number "+" term
     // term -> number
     // number -> [0-9]
@@ -59,6 +65,43 @@ describe("Earley", function() {
     // term -> number "+" term * (2)
     // term -> number "+" term * (0)
 
+    // term -> number "+" term
+    // term -> number
+    // number -> [0-9]
+
+    const rules = [
+      ["@", [term("term")]],
+      ["term", [term("number"), token("+"), term("term")]],
+      ["term", [term("number")]],
+      ["number", [token("[0-9]")]],
+    ];
+    // 1+2+3
+    const parser = new Parser(rules);
+    assertThat(parser.start().print()).equalsTo([
+      "term -> • number + term (0)",
+      "term -> • number (0)",
+      "number -> • [0-9] (0)",
+    ]);
+
+    assertThat(parser.eat("[0-9]").print()).equalsTo([
+      "number -> [0-9] • (0)",
+      "term -> number • + term (0)",
+      "term -> number • (0)",
+    ]);
+
+    assertThat(parser.eat("+").print()).equalsTo([
+      "term -> number + • term (0)",
+      "term -> • number + term (2)",
+      "term -> • number (2)",
+      "number -> • [0-9] (2)",
+    ]);
+
+    assertThat(parser.eat("[0-9]").print()).equalsTo([
+      "number -> [0-9] • (2)",
+      "term -> number • + term (2)",
+      "term -> number • (2)",
+      "term -> number + term • (0)",
+    ]);
   });
 
   class Parser {
@@ -93,7 +136,7 @@ describe("Earley", function() {
 
     print(set) {
       const rules = this.rules;
-      return set.map(([index, dot, state]) => {
+      return [...set].map(([index, dot, state]) => {
 	const name = rules[index][0];
 	const body = rules[index][1]
 	      .map(([type, name], i) => `${i == dot ? "• " : ""}${name}`)
@@ -128,6 +171,13 @@ describe("Earley", function() {
 	  if (name != term) {
 	    continue;
 	  }
+	  // The same rule doesn't need to be added twice
+	  // NOTE(goto): maybe the same rule can be
+	  // added twice with two different dots.
+	  if (result.find(([j]) => i == j)) {
+	    continue;
+	  }
+	  
 	  result.push([i, 0, step]);
 	  const [type, next] = body[0];
 	  if (type == "term") {
@@ -195,6 +245,9 @@ describe("Earley", function() {
   }
 
   it("book that flight", () => {
+    // Example from:
+    // https://www.youtube.com/watch?v=1j6hB3O4hAM
+    
     // Det -> that | this | a | the
     // Noun -> book | flight | meal | money
     // Verb -> book | include | prefer
@@ -231,9 +284,6 @@ describe("Earley", function() {
     // VP -> Verb NP * (0)
     // S -> VP * (0)
 
-    const token = (t) => ["token", t];
-    const term = (t) => ["term", t];
-    
     // tokens and terms
     // Rules composed of tokens and terms
     //
@@ -262,7 +312,6 @@ describe("Earley", function() {
       "S -> • NP VP (0)",
       "S -> • VP (0)",
       "NP -> • Det Nominal (0)",
-      "NP -> • Det Nominal (0)",
       "VP -> • Verb (0)",
       "VP -> • Verb NP (0)",
     ]);
@@ -287,18 +336,10 @@ describe("Earley", function() {
     ]);
   });
 
-  
-  
-  it("", () => {
-    // Sum     -> Sum [+-] Product
-    // Sum     -> Product
-    // Product -> Product [*/] Factor
-    // Product -> Factor
-    // Factor  -> '(' Sum ')'
-    // Factor  -> Number
-    // Number  -> [0-9] Number
-    // Number  -> [0-9]
-
+  it("Products and factors", () => {
+    // Example from:
+    // https://loup-vaillant.fr/tutorials/earley-parsing/recogniser
+    
     // 1 + ( 2 * 3 - 4 )
 
     // S0
@@ -333,7 +374,66 @@ describe("Earley", function() {
     // Sum -> * Sum [+-] Product (3)
     // Sum -> * Product (3)
     // ...
+
+    const rules = [
+      ["@", [term("Sum")]],
+      ["Sum", [term("Sum"), token("+-"), term("Product")]],
+      ["Sum", [term("Product")]],
+      ["Product", [term("Product"), token("*/"), term("Factor")]],
+      ["Product" , [term("Factor")]],
+      ["Factor",  [token("("), term("Sum"), token(")")]],
+      ["Factor", [term("Number")]],
+      ["Number", [token("[0-9]"), term("Number")]],
+      ["Number", [token("[0-9]")]],
+    ];
     
+    const parser = new Parser(rules);
+
+    assertThat(parser.start().print()).equalsTo([
+      "Sum -> • Sum +- Product (0)",
+      "Sum -> • Product (0)",
+      "Product -> • Product */ Factor (0)",
+      "Product -> • Factor (0)",
+      "Factor -> • ( Sum ) (0)",
+      "Factor -> • Number (0)",
+      "Number -> • [0-9] Number (0)",
+      "Number -> • [0-9] (0)",
+    ]);
+
+    assertThat(parser.eat("[0-9]").print()).equalsTo([
+      "Number -> [0-9] • Number (0)",
+      "Number -> [0-9] • (0)",
+      "Number -> • [0-9] Number (1)",
+      "Number -> • [0-9] (1)",
+      "Factor -> Number • (0)",
+      "Product -> Factor • (0)",
+      "Sum -> Product • (0)",
+      "Product -> Product • */ Factor (0)",
+      "Sum -> Sum • +- Product (0)",
+    ]);
+    
+    assertThat(parser.eat("+-").print()).equalsTo([
+      "Sum -> Sum +- • Product (0)",
+      "Product -> • Product */ Factor (2)",
+      "Product -> • Factor (2)",
+      "Factor -> • ( Sum ) (2)",
+      "Factor -> • Number (2)",
+      "Number -> • [0-9] Number (2)",
+      "Number -> • [0-9] (2)",
+    ]);
+
+    assertThat(parser.eat("[0-9]").print()).equalsTo([
+      "Number -> [0-9] • Number (2)",
+      "Number -> [0-9] • (2)",
+      "Number -> • [0-9] Number (3)",
+      "Number -> • [0-9] (3)",
+      "Factor -> Number • (2)",
+      "Product -> Factor • (2)",
+      "Sum -> Sum +- Product • (0)",
+      "Product -> Product • */ Factor (2)",
+      "Sum -> Sum • +- Product (0)",
+    ]);
+
   });
   
 });
