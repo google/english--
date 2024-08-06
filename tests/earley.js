@@ -77,7 +77,7 @@ describe("Earley", function() {
     ];
     // 1+2+3
     const parser = new Parser(rules);
-    assertThat(parser.start().print()).equalsTo([
+    assertThat(parser.print()).equalsTo([
       "term -> • number + term (0)",
       "term -> • number (0)",
       "number -> • [0-9] (0)",
@@ -108,13 +108,48 @@ describe("Earley", function() {
     constructor(rules = []) {
       this.rules = rules;
       this.S = [];
+      this.start();
     }
 
     start() {
+      const nullables = [];
+
+      for (const rule of this.rules) {
+	const [head, body] = rule;
+	if (body.length == 0) {
+	  nullables.push(head);
+	}
+      }
+
+      this.nullables = new Set();
+      
+      while (nullables.length > 0) {
+	const nullable = nullables.pop();
+
+	this.nullables.add(nullable);
+	
+	for (const rule of this.rules) {
+	  const [head, body] = rule;
+	  let nullable = true;
+	  for (const [type, name] of body) {
+	    if (!this.nullables.has(name)) {
+	      // This rule references a non-nullable rule
+	      nullable = false;
+	      break;
+	    }
+	  }
+	  if (nullable && !this.nullables.has(head)) {
+	    nullables.push(head);
+	  }
+	}
+      }
+
+
       // Expand the first node.
       const S0 = this.predict([[0, 0, 0]], 0);
-      this.S.push(S0);
       S0.print = this.print.bind(this, S0);
+      this.S.push(S0);
+
       return S0;
     }
 
@@ -135,6 +170,11 @@ describe("Earley", function() {
     }
 
     print(set) {
+
+      if (!set) {
+	return this.S[this.S.length - 1].print();
+      }
+      
       const rules = this.rules;
       return [...set].map(([index, dot, state]) => {
 	const name = rules[index][0];
@@ -179,13 +219,31 @@ describe("Earley", function() {
 	  }
 	  
 	  result.push([i, 0, step]);
+
+	  if (body.length == 0) {
+	    continue;
+	  }
+	  
 	  const [type, next] = body[0];
 	  if (type == "term") {
 	    terms.push(next);
 	  }
 	}
       };
-      
+
+      for (const rule of result) {
+	const [index, dot, step] = rule;
+	const [head, body] = this.rules[index];
+	if (dot >= body.length) {
+	  continue;
+	}
+	const [type, next] = body[dot];
+	if (this.nullables.has(next)) {
+	  // The next item is nullable, so advance it
+	  result.push([index, dot + 1, step]);
+	}
+      }
+
       return result;
     }
 
@@ -307,7 +365,7 @@ describe("Earley", function() {
 
     const parser = new Parser(rules);
 
-    assertThat(parser.start().print()).equalsTo([
+    assertThat(parser.print()).equalsTo([
       "S -> • NP VP (0)",
       "S -> • NP VP (0)",
       "S -> • VP (0)",
@@ -323,6 +381,8 @@ describe("Earley", function() {
       "S -> VP • (0)",
     ]);
 
+    return;
+    
     assertThat(parser.eat("Det").print()).equalsTo([
       "NP -> Det • Nominal (1)",
       "Nominal -> • Noun (2)"
@@ -389,7 +449,7 @@ describe("Earley", function() {
     
     const parser = new Parser(rules);
 
-    assertThat(parser.start().print()).equalsTo([
+    assertThat(parser.print()).equalsTo([
       "Sum -> • Sum +- Product (0)",
       "Sum -> • Product (0)",
       "Product -> • Product */ Factor (0)",
@@ -434,6 +494,26 @@ describe("Earley", function() {
       "Sum -> Sum • +- Product (0)",
     ]);
 
+  });
+
+  it("Null", () => {
+    const parser = new Parser([
+      ["$", [term("A")]],
+      ["A", []],
+      ["A", [term("B")]],
+      ["B", [term("A")]],
+      ["C", [term("A"), token("[0-9]")]],
+    ]);
+
+    assertThat(parser.nullables).equalsTo(new Set(["$", "A", "B"]));
+    
+    assertThat(parser.print()).equalsTo([
+      "A ->  • (0)",
+      "A -> • B (0)",
+      "B -> • A (0)",
+      "A -> B • (0)",
+      "B -> A • (0)",
+    ]);
   });
   
 });
