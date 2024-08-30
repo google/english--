@@ -181,7 +181,6 @@ describe("Earley", function() {
     }
 
     print(set) {
-
       if (!set) {
 	return this.S[this.S.length - 1].print();
       }
@@ -583,77 +582,40 @@ Number -> [0-9] • (3)
 	};
 
 	// console.log(next);
+
+	const s = offset + (next - dot);
 	
 	const edges = [];
-	for (let j = 0; j < steps[step].length; j++) {
-	  const [rule, , end] = steps[step][j];
+	for (let j = 0; j < steps[s].length; j++) {
+	  const [rule, , end] = steps[s][j];
 	  const [head, body] = parser.rules[rule];
 	  if (head == name) {
-	    const edge = [step, j];
-	    edge.print = () => `${step}: ` + print(steps[step][j], parser.rules);
+	    const edge = [s, j];
+	    edge.print = () => `${s}: ` + print(steps[s][j], parser.rules);
 	    edges.push(edge);
+	    // console.log(`${offset} ${next} ${dot} ${s}`);
+	    // console.log(edge.print());
 	  }
 	}
 
 	return edges;
       }
 
-
-      
-      {
-	const node = [0, 4, 0];
-	assertThat(toString(node)).equalsTo("0: Number -> • [0-9] (1)");
-	assertThat(parse(node)).equalsTo([[0, 4]]);
-      }
-
-      {
-	const node = [0, 3, 0];
-	assertThat(toString(node)).equalsTo("0: Factor -> • Number (1)");
-	assertThat(parse(node)).equalsTo([[0, 3], [[0, 4]]]);
-      }
-
-      {
-	const node = [0, 2, 0];
-	assertThat(toString(node)).equalsTo("0: Product -> • Factor (1)");
-	assertThat(parse(node)).equalsTo([[0, 2], [[0, 3], [[0, 4]]]]);
-      }
-
-      {
-	const node = [2, 2, 0];
-	assertThat(toString(node)).equalsTo("2: Number -> • [0-9] (3)");
-	assertThat(parse(node)).equalsTo([[2, 2]]);
-      }
-
-      {
-	const node = [2, 1, 0];
-	assertThat(toString(node)).equalsTo("2: Factor -> • Number (3)");
-	assertThat(edges(node).map(({print}) => print()))
-	  .equalsTo(["2: Number -> [0-9] • (3)"]);
-	assertThat(parse(node)).equalsTo([[2, 1], [[2, 2]]]);
-      }
-
-      {
-	const node = [2, 0, 0];
-	assertThat(toString(node)).equalsTo("2: Product -> • Factor (3)");
-	assertThat(edges(node).map(({print}) => print()))
-	  .equalsTo(["2: Factor -> Number • (3)"]);
-	assertThat(parse(node)).equalsTo([[2, 0], [[2, 1], [[2, 2]]]]);
-      }
-
       // return;
 
       function toString(node) {
-	const [step, i, dot] = node;
+	const [step, i, dot, offset] = node;
+
 	const [rule, , end] = steps[step][i];
-	return step + ": " + print([rule, dot, end], parser.rules)
+	return offset + ": " + print([rule, dot, end], parser.rules);
       }
 
       function failed(node) {
-	const [step, i, dot] = node;
+	const [step, i, dot, offset] = node;
 	const [rule, , end] = steps[step][i];
 	const [head, body] = parser.rules[rule];
 
-	if (body.length > dot && step >= end) {
+	if (body.length > dot && offset >= end) {
 	  // if we aren't yet at the end of the rule
 	  // but have no characters left, this node
 	  // has failed.
@@ -680,8 +642,10 @@ Number -> [0-9] • (3)
 	};
 
 	// console.log(p);
+	// console.log(end);
 	return [
-	  step, i,
+	  step,
+	  i,
 	  p + 1 /** moves forward, skipping tokens */,
 	  end /** eats the last term */
 	];
@@ -703,7 +667,7 @@ Number -> [0-9] • (3)
 
       {
 	// Each node is the step and where we are at
-	const node = [0, 4, 0];
+	const node = [0, 4, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Number -> • [0-9] (1)");
 	assertThat(leaf(node)).equalsTo(true);
@@ -715,7 +679,7 @@ Number -> [0-9] • (3)
       }
 
       {
-	const node = [0, 3, 0];
+	const node = [0, 3, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Factor -> • Number (1)");
 	assertThat(leaf(node)).equalsTo(false);
@@ -725,7 +689,7 @@ Number -> [0-9] • (3)
       }
 
       {
-	const node = [0, 2, 0];
+	const node = [0, 2, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Product -> • Factor (1)");
 	assertThat(leaf(node)).equalsTo(false);
@@ -735,7 +699,7 @@ Number -> [0-9] • (3)
       }
 
       {
-	const node = [0, 1, 0];
+	const node = [0, 1, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Sum -> • Product (1)");
 	assertThat(leaf(node)).equalsTo(false);
@@ -744,40 +708,8 @@ Number -> [0-9] • (3)
 	assertThat(failed(node)).equalsTo(false);
       }
 
-
-      function parse(node) {
-	if (done(node)) {
-	  return [];
-	}
-
-	//if (leaf(node)) {
-	//  return [];
-	//}
-	
-	if (failed(node)) {
-	  return false;
-	}
-	
-	const edge = ([step, i]) => [step, i];
-
-	for (const e of edges(node)) {
-	  const next = move(node, e);
-	  const tail = parse(next);
-	  if (!tail) {
-	    continue;
-	  }
-	  const [step, i] = e;
-	  const child = [step, i, 0, step];
-	  return [edge(node), parse(child), ...tail];
-	}
-
-	return [edge(node)];
-	
-	// throw new Error("oops");
-      }
-      
       {
-	const node = [0, 0, 0];
+	const node = [0, 0, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Sum -> • Sum +- Product (3)");
 	assertThat(leaf(node)).equalsTo(false);
@@ -789,180 +721,154 @@ Number -> [0-9] • (3)
 	assertThat(failed(node)).equalsTo(false);
 
 	{
+	  const next = move(node, edges(node)[0]);
+	  assertThat(toString(next))
+	    .equalsTo("3: Sum -> Sum • +- Product (3)");
+	  assertThat(failed(next)).equalsTo(true);
+	}
+	
+	{
 	  // Skips the token
-	  //const next = move(node, edges(node)[1]);
-	  //assertThat(toString(next))
-	  //  .equalsTo("1: Sum -> Sum • +- Product (3)");
-	  //assertThat(failed(next)).equalsTo(false);
+	  const next = move(node, edges(node)[1]);
+	  assertThat(toString(next))
+	    .equalsTo("1: Sum -> Sum • +- Product (3)");
+	  assertThat(failed(next)).equalsTo(false);
 	  
-	  //assertThat(edges(next).map(({print}) => print()))
-	  //.equalsTo(["2: Product -> Factor • (3)"]);
+	  assertThat(edges(next).map(({print}) => print()))
+	  .equalsTo(["2: Product -> Factor • (3)"]);
 	  
-	  //assertThat(toString(move(next, edges(next)[0])))
-	  //  .equalsTo("3: Sum -> Sum +- Product • (3)");
+	  assertThat(toString(move(next, edges(next)[0])))
+	    .equalsTo("3: Sum -> Sum +- Product • (3)");
 	}
-
-	
-	{
-	  //const next = move(node, edges(node)[0]);
-	  //assertThat(toString(next))
-	  //  .equalsTo("0: Sum -> Sum • +- Product (3)");
-	  //assertThat(failed(next)).equalsTo(true);
-	}
-
-
 
       }
 
+      function parse(node) {
+	const edge = ([step, i]) => [step, i];
 
-      return;
+	if (done(node)) {
+	  return [];
+	}
+
+	if (leaf(node)) {
+	  return [edge(node)];
+	}
+	
+	if (failed(node)) {
+	  return false;
+	}
+	
+	for (const e of edges(node)) {
+	  const next = move(node, e);
+	  const tail = parse(next);
+	  if (!tail) {
+	    continue;
+	  }
+	  const [step, i] = e;
+	  const child = [step, i, 0, step];
+	  const [, , dot] = node;
+	  const result = [parse(child), ...tail];
+	  if (dot == 0) {
+	    // If this is the beginning of the matching
+	    result.unshift(edge(node));
+	  }
+	  return result;
+	}
+	
+	throw new Error("oops");
+      }
+
       {
-	const node = [0, 0, 0];
-	
-	// console.log(JSON.stringify(parse(node), undefined, 2));
+	const node = [0, 4, 0, 0];
+	assertThat(toString(node)).equalsTo("0: Number -> • [0-9] (1)");
+	assertThat(parse(node)).equalsTo([[0, 4]]);
+      }
+      
+      {
+	const node = [0, 3, 0, 0];
+	assertThat(toString(node)).equalsTo("0: Factor -> • Number (1)");
+	assertThat(parse(node)).equalsTo([[0, 3], [[0, 4]]]);
+      }
 
-	{
-	  function walk(node, f) {
-	    // const [edge, child] 
+      {
+	const node = [0, 2, 0, 0];
+	assertThat(toString(node)).equalsTo("0: Product -> • Factor (1)");
+	assertThat(parse(node)).equalsTo([[0, 2], [[0, 3], [[0, 4]]]]);
+      }
+
+      {
+	const node = [0, 1, 0, 0];
+	assertThat(toString(node)).equalsTo("0: Sum -> • Product (1)");
+	assertThat(parse(node)).equalsTo([[0, 1], [[0, 2], [[0, 3], [[0, 4]]]]]);
+      }
+
+      {
+	const node = [2, 2, 0, 2];
+	assertThat(toString(node)).equalsTo("2: Number -> • [0-9] (3)");
+	assertThat(parse(node)).equalsTo([[2, 2]]);
+      }
+
+      {
+	const node = [2, 1, 0, 2];
+	assertThat(toString(node)).equalsTo("2: Factor -> • Number (3)");
+	assertThat(edges(node).map(({print}) => print()))
+	  .equalsTo(["2: Number -> [0-9] • (3)"]);
+	assertThat(parse(node)).equalsTo([[2, 1], [[2, 2]]]);
+      }
+
+      {
+	const node = [2, 0, 0, 2];
+	assertThat(toString(node)).equalsTo("2: Product -> • Factor (3)");
+	assertThat(edges(node).map(({print}) => print()))
+	  .equalsTo(["2: Factor -> Number • (3)"]);
+	assertThat(parse(node)).equalsTo([[2, 0], [[2, 1], [[2, 2]]]]);
+      }
+
+      {
+	const node = [0, 0, 0, 0];
+	assertThat(toString(node)).equalsTo("0: Sum -> • Sum +- Product (3)");
+	assertThat(parse(node)).equalsTo([
+	  [0, 0],
+	  [[0, 1], [[0, 2], [[0, 3], [[0, 4]]]]],
+	  [[2, 0], [[2, 1], [[2, 2]]]]
+	]);
+
+	function dump(parent) {
+	  const [edge] = parent;
+	  const [step, i] = edge;
+	  
+	  const result = print(steps[step][i], parser.rules);
+
+	  if (parent.length == 1) {
+	    return [result];
 	  }
-	}
-	
-	//assertThat(parse(node).map(([edge, tree]) => edge.print()))
-	//  .equalsTo([
-	//    "0: Sum -> Product • (1)",
-	//    "2: Product -> Factor • (3)"
-	//  ]);
-	//assertThat(parse(node).map(([edge, tree]) => tree.map(([edge, tree]) => tree)))
-	//  .equalsTo([
-	//    //"0: Sum -> Product • (1)",
-	//    //"2: Product -> Factor • (3)"
-	//  ]);
-      }
-    }
 
-    return;
-    
-    assertThat(print(root, parser.rules))
-      .equalsTo("Sum -> Sum +- Product • (3)");
+	  const [, ...children] = parent;
 
-    function parse(rule, dot) {
-      const [index, , step] = rule;
-      const [head, body] = parser.rules[index];
-      // console.log(body);
-      console.log(body[0]);
-
-      
-      
-      console.log(print([index, dot, step], parser.rules));
-    }
-    
-    assertThat(parse(steps[0][4], 0)).equalsTo();
-    
-    return;
-    
-    function search(parent, offset, begin) {
-      const [index, dot, end] = parent;
-      console.log(`Searching for the ${offset}th child of step #${begin} ${print(parent, parser.rules)} starting from ${begin}`);
-      const [head, body] = parser.rules[index];
-
-      if (begin < end && offset < body.length) {
-	const [type, name] = body[offset];
-	if (type == "token") {
-	  if ((begin + 1) >= end) {
-	    return [["token", name]];
-	  }
-	  const next = search(parent, offset + 1, begin + 1);
-	  //  if (next) {
-	  return [["token", name], next];
-	  //}
-	  //return ["token", name];
-	  // return name;
+	  return [result, ...children.map((child) => dump(child))];
 	}
 
-	// console.log("hi");
-      }
-      
-      // for (const child of body) {
-      // console.log(body[offset]);
-      if (begin >= end) {
-	// throw new Error(`Can't find a child: reached the end of the symbols: ${begin} >= ${end}`);
-	// throw new Error("hi");
-	// console.log(`${begin} ${end}`);
-	return false;
-      }
-            
-      const [type, name] = body[offset];
-      // Completions starting at this index:
-      const completions = steps[begin]
-	    .filter(([index]) => parser.rules[index][0] == name);
-      for (const completion of completions) {
-	// console.log(print(completion, parser.rules));
-	const [, , e] = completion;
-	// console.log(e);
-	console.log(`Step #${begin}: ` + print(completion, parser.rules));
-	// This is the last symbol to search
-	//if ((offset + 1) == body.length &&
-	//   ) {
-	//}
-	// console.log(`${(offset + 1) == body.length} `);
-	// console.log(`${e} ${end} `);
-	// We are at the end, and the endings match
-	// console.log(`${offset} ${body.length} ${e} ${end}`);
-	// console.log(head);
-	// console.log();
-	// console.log("hi");
-	if ((offset + 1) == body.length && end == e) {
-	  console.log("hello: " + head);
-	  // console.log(completion);
-	  // console.log(begin);
-	  // throw new Error("hi");
-	  // const children = ;
-	  // console.log(children);
-	  //
-	  return ["term", head, search(completion, 0, begin)];
-	}
-
-	console.log("hello");
-	const next = search(parent, offset + 1, e);
-	if (next) {
-	  return [["term", head, search(completion, 0, begin)], ...next];
-	}
-      }
-    }
-
-    console.log(search([4, 3, 1], 0, 2));
-
-    return;
-    
-    const result = search(root, 0, 0);
-    // console.log(JSON.stringify(result, undefined, 2));
-    return;
-    assertThat(result).equalsTo([
-      ["term", "Sum", [
-	"term", "Sum", [
-	  "term", "Product", [
-	    "term", "Factor", [
-	      "token", "[0-9]"
+	// https://loup-vaillant.fr/tutorials/earley-parsing/parser
+	assertThat(dump(parse(node))).equalsTo([
+	  "Sum -> Sum +- Product • (3)", [
+	    "Sum -> Product • (1)", [
+	      "Product -> Factor • (1)", [
+		"Factor -> Number • (1)", [
+		  "Number -> [0-9] • (1)"
+		]
+	      ]
+	    ]
+	  ],  [
+	    "Product -> Factor • (3)", [
+	      "Factor -> Number • (3)", [
+		"Number -> [0-9] • (3)"
+	      ]
 	    ]
 	  ]
-	]
-      ]],
-      ["token", "+-"],
-      ["term", "Sum", [
-	"term", "Product", [
-	  "term", "Factor", [
-	    "token", "[0-9]"
-	  ]
-	]
-      ]]
-    ]);
-    //assertThat(print(result[0][1], parser.rules))
-    // .equalsTo("Sum -> Product • (1)");
-    // return;
-    // assertThat(print(result[2], parser.rules))
-    //  .equalsTo("Product -> Factor • (3)");
-
-    // const level2 = search(result[0], 0, 0);
+	]);
+      }
+    }
+    
   });
 
   it("Null", () => {
