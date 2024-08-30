@@ -384,8 +384,6 @@ describe("Earley", function() {
       "S -> VP • (0)",
     ]);
 
-    return;
-    
     assertThat(parser.eat("Det").print()).equalsTo([
       "NP -> Det • Nominal (1)",
       "Nominal -> • Noun (2)"
@@ -397,8 +395,261 @@ describe("Earley", function() {
       "VP -> Verb NP • (0)",
       "S -> VP • (0)",
     ]);
+    const {parse, dump, root, table} = recognizer(parser);
+
+    assertThat(table().trim()).equalsTo(`
+=== 0 ===
+S -> VP • (3)
+VP -> Verb NP • (3)
+S -> VP • (1)
+VP -> Verb • (1)
+
+=== 1 ===
+NP -> Det Nominal • (3)
+
+=== 2 ===
+Nominal -> Noun • (3)
+`.trim());
+
+    assertThat(dump(parse(root()))).equalsTo([
+      "S -> VP • (3)",  [
+	"VP -> Verb NP • (3)", [
+	  "NP -> Det Nominal • (3)", [
+	    "Nominal -> Noun • (3)"
+	  ]
+	]
+      ]
+    ]);
   });
 
+  function recognizer(parser) {
+    const rules = parser.rules;
+
+    const steps = [];
+    for (let i = 0; i < parser.S.length; i++) {
+      const state = parser.S[i];
+      for (const [index, dot, step] of state) {
+	const [head, body] = parser.rules[index];
+	if (dot == body.length) {
+	  steps[step] = steps[step] || [];
+	  steps[step].unshift([index, dot, i]);
+	}
+      }
+    }
+
+    function table() {
+      const tree = [];
+      for (let i = 0; i < steps.length; i++) {
+	tree.push(`=== ${i} ===`);
+	for (let j = 0; j < (steps[i] || []).length; j++) {
+	  tree.push(print(steps[i][j], parser.rules));
+	}
+	tree.push("");
+      }
+
+      return tree.join("\n");
+
+      assertThat(tree.join("\n").trim())
+	.equalsTo(`
+
+=== 0 ===
+Sum -> Sum +- Product • (3)
+Sum -> Product • (1)
+Product -> Factor • (1)
+Factor -> Number • (1)
+Number -> [0-9] • (1)
+
+=== 1 ===
+
+=== 2 ===
+Product -> Factor • (3)
+Factor -> Number • (3)
+Number -> [0-9] • (3)
+
+`.trim());
+
+    }
+    
+    function root() {
+      for (let i = 0; steps[0].length; i++) {
+	const [index, dot, step] = steps[0][i];
+	if (step == (parser.S.length - 1)) {
+	  return [0, i, 0, 0];
+	}
+      }
+      throw new Error("Oops, couldn't find the root :(");
+    }
+    
+    function leaf(node) {
+      const [step, i, dot] = node;
+      const [rule, , end] = steps[step][i];
+      const [head, body] = rules[rule];
+      
+      if (body.length > 1) {
+	return false;
+      }
+      const [type] = body[0];
+      return type == "token";
+    }
+      
+    function edges(node) {
+      if (leaf(node)) {
+	return [];
+      }
+      
+      const [step, i, dot, offset] = node;
+      const [rule, , end] = steps[step][i];
+      const [head, body] = rules[rule];
+      
+      let name;
+      let next = dot;
+      while (next < body.length) {
+	const [type,  head] = body[next];
+	if (type == "term") {
+	  name = head;
+	  break;
+	}
+	next++;
+      };
+      
+      const s = offset + (next - dot);
+      
+      const edges = [];
+      for (let j = 0; j < steps[s].length; j++) {
+	const [rule, , end] = steps[s][j];
+	const [head, body] = rules[rule];
+	if (head == name) {
+	  const edge = [s, j];
+	  edge.print = () => `${s}: ` + print(steps[s][j], rules);
+	  edges.push(edge);
+	}
+      }
+      
+      return edges;
+    }
+      
+    function toString(node) {
+      const [step, i, dot, offset] = node;
+      
+      const [rule, , end] = steps[step][i];
+      return offset + ": " + print([rule, dot, end], rules);
+    }
+    
+    function failed(node) {
+      const [step, i, dot, offset] = node;
+      const [rule, , end] = steps[step][i];
+      const [head, body] = rules[rule];
+	
+      if (body.length > dot && offset >= end) {
+	// if we aren't yet at the end of the rule
+	// but have no characters left, this node
+	// has failed.
+	return true;
+      }
+	
+      return false;
+    }
+    
+    function move(node, edge) {
+      const [step, i, dot, begin] = node;
+      const [rule, , ] = steps[step][i];
+      const [head, body] = rules[rule];
+      const [next, j] = edge;
+      const [, , end] = steps[next][j]; 
+      
+      let p = dot;
+      while (p < body.length) {
+	const [type] = body[p];
+	if (type == "term") {
+	  break;
+	}
+	p++;
+      };
+      
+      return [
+	step,
+	i,
+	p + 1 /** moves forward, skipping tokens */,
+	end /** eats the last term */
+      ];
+    }
+    
+    function done(node) {
+      const [step, i, dot] = node;
+      const [rule, , end] = steps[step][i];
+      const [head, body] = rules[rule];
+
+      if (body.length == dot) {
+	return true;
+      }
+      
+      return false;
+    }
+    
+    function parse(node) {
+      const edge = ([step, i]) => [step, i];
+      
+      if (done(node)) {
+	return [];
+      }
+      
+      if (leaf(node)) {
+	return [edge(node)];
+      }
+      
+      if (failed(node)) {
+	return false;
+      }
+      
+      for (const e of edges(node)) {
+	const next = move(node, e);
+	const tail = parse(next);
+	if (!tail) {
+	  continue;
+	}
+	const [step, i] = e;
+	const child = [step, i, 0, step];
+	const [, , dot] = node;
+	const result = [parse(child), ...tail];
+	if (dot == 0) {
+	  // If this is the beginning of the matching
+	  result.unshift(edge(node));
+	}
+	return result;
+      }
+      
+      throw new Error("oops");
+    }
+
+    function dump(parent) {
+      const [edge] = parent;
+      const [step, i] = edge;
+      
+      const result = print(steps[step][i], parser.rules);
+
+      if (parent.length == 1) {
+	return [result];
+      }
+
+      const [, ...children] = parent;
+
+      return [result, ...children.map((child) => dump(child))];
+    }
+
+    return {
+      toString: toString,
+      root: root,
+      leaf: leaf,
+      edges: edges,
+      move: move,
+      parse: parse,
+      done: done,
+      failed: failed,
+      dump: dump,
+      table: table,
+    }
+  }
+  
   it("Products and factors", () => {
     // Example from:
     // https://loup-vaillant.fr/tutorials/earley-parsing/recogniser
@@ -497,182 +748,23 @@ describe("Earley", function() {
       "Sum -> Sum • +- Product (0)",
     ]);
 
-    // console.log(parser.S);
 
-    const steps = [];
-    for (let i = 0; i < parser.S.length; i++) {
-      //console.log(`=== ${i} ===`);
-      const state = parser.S[i];
-      for (const [index, dot, step] of state) {
-	const [head, body] = parser.rules[index];
-	if (dot == body.length) {
-	  //console.log(print([index, dot, step], parser.rules));
-	  steps[step] = steps[step] || [];
-	  steps[step].unshift([index, dot, i]);
-	}
-      }
-      //console.log("");
-    }
-
-    const tree = [];
-    for (let i = 0; i < steps.length; i++) {
-      tree.push(`=== ${i} ===`);
-      for (let j = 0; j < (steps[i] || []).length; j++) {
-	tree.push(print(steps[i][j], parser.rules));
-      }
-      tree.push("");
-    }
-
-    assertThat(tree.join("\n").trim())
-      .equalsTo(`
-
-=== 0 ===
-Sum -> Sum +- Product • (3)
-Sum -> Product • (1)
-Product -> Factor • (1)
-Factor -> Number • (1)
-Number -> [0-9] • (1)
-
-=== 1 ===
-
-=== 2 ===
-Product -> Factor • (3)
-Factor -> Number • (3)
-Number -> [0-9] • (3)
-
-`.trim());
-
-    // return;
+    const {
+      toString,
+      leaf,
+      edges,
+      failed,
+      move,
+      parse,
+      dump} = recognizer(parser);
     
-    // TODO(goto): handle multiple roots.
-    const root = steps[0].find(([index, dot, step]) => step == 3);
-
     {
-      function leaf(node) {
-	const [step, i, dot] = node;
-	const [rule, , end] = steps[step][i];
-	const [head, body] = parser.rules[rule];
-
-	if (body.length > 1) {
-	  return false;
-	}
-	const [type] = body[0];
-	return type == "token";
-      };
-
-      function edges(node) {
-	if (leaf(node)) {
-	  return [];
-	}
-	
-	const [step, i, dot, offset] = node;
-	const [rule, , end] = steps[step][i];
-	const [head, body] = parser.rules[rule];
-
-	let name;
-	let next = dot;
-	while (next < body.length) {
-	  const [type,  head] = body[next];
-	  if (type == "term") {
-	    name = head;
-	    break;
-	  }
-	  // throw new Error("hi");
-	  next++;
-	};
-
-	// console.log(next);
-
-	const s = offset + (next - dot);
-	
-	const edges = [];
-	for (let j = 0; j < steps[s].length; j++) {
-	  const [rule, , end] = steps[s][j];
-	  const [head, body] = parser.rules[rule];
-	  if (head == name) {
-	    const edge = [s, j];
-	    edge.print = () => `${s}: ` + print(steps[s][j], parser.rules);
-	    edges.push(edge);
-	    // console.log(`${offset} ${next} ${dot} ${s}`);
-	    // console.log(edge.print());
-	  }
-	}
-
-	return edges;
-      }
-
-      // return;
-
-      function toString(node) {
-	const [step, i, dot, offset] = node;
-
-	const [rule, , end] = steps[step][i];
-	return offset + ": " + print([rule, dot, end], parser.rules);
-      }
-
-      function failed(node) {
-	const [step, i, dot, offset] = node;
-	const [rule, , end] = steps[step][i];
-	const [head, body] = parser.rules[rule];
-
-	if (body.length > dot && offset >= end) {
-	  // if we aren't yet at the end of the rule
-	  // but have no characters left, this node
-	  // has failed.
-	  return true;
-	}
-
-	return false;
-      }
-
-      function move(node, edge) {
-	const [step, i, dot, begin] = node;
-	const [rule, , ] = steps[step][i];
-	const [head, body] = parser.rules[rule];
-	const [next, j] = edge;
-	const [, , end] = steps[next][j]; 
-
-	let p = dot;
-	while (p < body.length) {
-	  const [type] = body[p];
-	  if (type == "term") {
-	    break;
-	  }
-	  p++;
-	};
-
-	// console.log(p);
-	// console.log(end);
-	return [
-	  step,
-	  i,
-	  p + 1 /** moves forward, skipping tokens */,
-	  end /** eats the last term */
-	];
-      }
-      
-      function done(node) {
-	const [step, i, dot] = node;
-	const [rule, , end] = steps[step][i];
-	const [head, body] = parser.rules[rule];
-
-	// console.log(toString(node));
-	//console.log(`body=${body.length} dot=${dot}: ${toString(node)}`);
-	if (body.length == dot) {
-	  return true;
-	}
-	
-	return false;
-      }
-
       {
 	// Each node is the step and where we are at
 	const node = [0, 4, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Number -> • [0-9] (1)");
 	assertThat(leaf(node)).equalsTo(true);
-	// assertThat(parse(node))
-	//  .equalsTo([node, []]);
 	assertThat(edges(node))
 	  .equalsTo([]);
 	assertThat(failed(node)).equalsTo(false);
@@ -743,40 +835,6 @@ Number -> [0-9] • (3)
 
       }
 
-      function parse(node) {
-	const edge = ([step, i]) => [step, i];
-
-	if (done(node)) {
-	  return [];
-	}
-
-	if (leaf(node)) {
-	  return [edge(node)];
-	}
-	
-	if (failed(node)) {
-	  return false;
-	}
-	
-	for (const e of edges(node)) {
-	  const next = move(node, e);
-	  const tail = parse(next);
-	  if (!tail) {
-	    continue;
-	  }
-	  const [step, i] = e;
-	  const child = [step, i, 0, step];
-	  const [, , dot] = node;
-	  const result = [parse(child), ...tail];
-	  if (dot == 0) {
-	    // If this is the beginning of the matching
-	    result.unshift(edge(node));
-	  }
-	  return result;
-	}
-	
-	throw new Error("oops");
-      }
 
       {
 	const node = [0, 4, 0, 0];
@@ -833,20 +891,6 @@ Number -> [0-9] • (3)
 	  [[2, 0], [[2, 1], [[2, 2]]]]
 	]);
 
-	function dump(parent) {
-	  const [edge] = parent;
-	  const [step, i] = edge;
-	  
-	  const result = print(steps[step][i], parser.rules);
-
-	  if (parent.length == 1) {
-	    return [result];
-	  }
-
-	  const [, ...children] = parent;
-
-	  return [result, ...children.map((child) => dump(child))];
-	}
 
 	// https://loup-vaillant.fr/tutorials/earley-parsing/parser
 	assertThat(dump(parse(node))).equalsTo([
