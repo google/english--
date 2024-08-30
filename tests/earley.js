@@ -400,7 +400,7 @@ describe("Earley", function() {
     ]);
   });
 
-  it.only("Products and factors", () => {
+  it("Products and factors", () => {
     // Example from:
     // https://loup-vaillant.fr/tutorials/earley-parsing/recogniser
     
