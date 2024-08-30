@@ -102,6 +102,15 @@ describe("Earley", function() {
       "term -> number • (2)",
       "term -> number + term • (0)",
     ]);
+
+    const recognizer = new Recognizer(parser);
+    assertThat(recognizer.parse()).equalsTo([
+      "term",
+      ["number"],
+      ["term",
+       ["number"]
+      ]
+    ]);
   });
 
   function print([index, dot, state], rules) {
@@ -113,6 +122,19 @@ describe("Earley", function() {
     const completed = dot == rules[index][1].length ? " •" : "";
     
     return name + " -> " + body + completed + " (" + state + ")"
+  }
+
+  class Recognizer {
+    constructor(parser) {
+      this.parser = parser;
+      this.recognizer = recognizer(parser);
+    }
+    parse() {
+      const {parse, dump, root, table} = this.recognizer;
+      const result = parse(root());
+      // result.print = () => dump(result);
+      return dump(result);
+    }
   }
   
   class Parser {
@@ -412,10 +434,10 @@ Nominal -> Noun • (3)
 `.trim());
 
     assertThat(dump(parse(root()))).equalsTo([
-      "S -> VP • (3)",  [
-	"VP -> Verb NP • (3)", [
-	  "NP -> Det Nominal • (3)", [
-	    "Nominal -> Noun • (3)"
+      "S",  [
+	"VP", [
+	  "NP", [
+	    "Nominal"
 	  ]
 	]
       ]
@@ -624,16 +646,18 @@ Number -> [0-9] • (3)
     function dump(parent) {
       const [edge] = parent;
       const [step, i] = edge;
-      
-      const result = print(steps[step][i], parser.rules);
+
+      const [rule] = steps[step][i];
+      const [head] = parser.rules[rule];
+      // const result = print(steps[step][i], parser.rules);
 
       if (parent.length == 1) {
-	return [result];
+	return [head];
       }
 
       const [, ...children] = parent;
 
-      return [result, ...children.map((child) => dump(child))];
+      return [head, ...children.map((child) => dump(child))];
     }
 
     return {
@@ -894,18 +918,18 @@ Number -> [0-9] • (3)
 
 	// https://loup-vaillant.fr/tutorials/earley-parsing/parser
 	assertThat(dump(parse(node))).equalsTo([
-	  "Sum -> Sum +- Product • (3)", [
-	    "Sum -> Product • (1)", [
-	      "Product -> Factor • (1)", [
-		"Factor -> Number • (1)", [
-		  "Number -> [0-9] • (1)"
+	  "Sum", [
+	    "Sum", [
+	      "Product", [
+		"Factor", [
+		  "Number"
 		]
 	      ]
 	    ]
 	  ],  [
-	    "Product -> Factor • (3)", [
-	      "Factor -> Number • (3)", [
-		"Number -> [0-9] • (3)"
+	    "Product", [
+	      "Factor", [
+		"Number"
 	      ]
 	    ]
 	  ]
