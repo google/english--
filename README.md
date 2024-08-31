@@ -17,11 +17,8 @@ By far, the most notable investigation dates all the way back to Aristotelian [S
 For example:
 
 ```
-Every person who is brazilian is happy about Brazil.
-Sam is brazilian. Sam is a person. Sam is an engineer.
-He works at Google on the Web Platform.
-He is interested in Compilers.
-He likes every area of Computer Science.
+Every person who is brazilian is happy about Brazil. Sam is brazilian. Sam is a person. Sam is an engineer. He works at Google on the Web Platform. He is interested in Compilers. He likes every area of Computer Science.
+
 Is Sam happy about Brazil?
 ```
 
