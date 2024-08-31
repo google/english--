@@ -464,11 +464,6 @@ Nominal -> Noun • (3)
 	}
       }
     }
-
-    //return result;
-    //}
-
-    // const steps = generate();
     
     function table() {
       const tree = [];
@@ -485,8 +480,6 @@ Nominal -> Noun • (3)
     }
     
     function root() {
-      // console.log(steps);
-      // const steps = generate();
       for (let i = 0; steps[0].length; i++) {
 	const [index, dot, step] = steps[0][i];
 	if (step == (parser.S.length - 1)) {
@@ -509,37 +502,17 @@ Nominal -> Noun • (3)
     }
       
     function edges(node) {
-      //if (leaf(node)) {
-      //return [];
-      //}
-      
       const [step, i, dot, offset] = node;
       const [rule, , end] = steps[step][i];
       const [head, body] = rules[rule];
 
-      //console.log(toString(node));
-      //console.log(body);
-      //console.log(`${offset}`);
       const [type,  name] = body[dot];
 
-      //throw new Error("hi");
-      //console.log(type);
       if (type == "token") {
 	const edge = [type, offset];
 	edge.print = () => `token: ${name}`;
 	return [edge];
       }
-      //let name;
-      //let next = dot;
-      //while (next < body.length) {
-      //if (type == "term") {
-      //name = head;
-      //break;
-      //}
-      //	next++;
-      //};
-      
-      // const s = offset + (next - dot);
       
       const edges = [];
       for (let j = 0; j < steps[offset].length; j++) {
@@ -585,20 +558,9 @@ Nominal -> Noun • (3)
 
       if (type == "token") {
 	return [step, i, dot + 1, begin + 1];
-	// throw new Error("hi");
       }
-      // console.log(edge);
       
       const [, , end] = steps[next][j]; 
-
-      //let p = dot;
-      //while (p < body.length) {
-      //const [type] = body[p];
-      //if (type == "term") {
-      ///  break;
-      //}
-      //p++;
-      //};
       
       return [
 	step,
@@ -626,10 +588,6 @@ Nominal -> Noun • (3)
       if (done(node)) {
 	return [];
       }
-      
-      //if (leaf(node)) {
-      //return [edge(node)];
-      //}
       
       if (failed(node)) {
 	return false;
@@ -1045,7 +1003,7 @@ Nominal -> Noun • (3)
 
   });
   
-  it.skip("Expressions", () => {
+  it.skip("1+2*4", () => {
     const rules = [
       ["@", [term("Sum")]],
       ["Sum", [term("Sum"), token("+-"), term("Product")]],
@@ -1063,16 +1021,168 @@ Nominal -> Noun • (3)
     parser.eat("[0-9]", "1");
     parser.eat("+-", "+");
     parser.eat("[0-9]", "2");
-    //parser.eat("+-", "+");
-    //parser.eat("[0-9]", "3");
     parser.eat("*/", "*");
     parser.eat("[0-9]", "4");
     
-    const recognizer = new Recognizer(parser);
-    assertThat(recognizer.parse()).equalsTo();
+    const {root, table, parse, toString} = recognizer(parser);
+    console.log(table());
+    // 0: Number -> [0-9]
+    assertThat(parse([0, 5, 0, 0]))
+      .equalsTo([["term", 0, 5], [["token", 0]]]);
+    // 0: Factor -> Number
+    assertThat(parse([0, 4, 0, 0]))
+      .equalsTo([["term", 0, 4], [["term", 0, 5], [["token", 0]]]]);
+    // 0: Product -> Factor
+    assertThat(parse([0, 3, 0, 0]))
+      .equalsTo([["term", 0, 3], [["term", 0, 4], [["term", 0, 5], [["token", 0]]]]]);
+    // 0: Sum -> Product
+    assertThat(parse([0, 2, 0, 0]))
+      .equalsTo([["term", 0, 2], [["term", 0, 3], [["term", 0, 4], [["term", 0, 5], [["token", 0]]]]]]);
+
+    // 2: Number -> [0-9]
+    assertThat(parse([2, 3, 0, 2]))
+      .equalsTo([["term", 2, 3], [["token", 2]]]);
+    // 2: Factor -> Number
+    assertThat(parse([2, 2, 0, 2]))
+      .equalsTo([["term", 2, 2], [["term", 2, 3], [["token", 2]]]]);
+    // 2: Product -> Factor
+    assertThat(parse([2, 1, 0, 2]))
+      .equalsTo([["term", 2, 1], [["term", 2, 2], [["term", 2, 3], [["token", 2]]]]]);
+
+    // 4: Number -> [0-9]
+    assertThat(parse([4, 1, 0, 4]))
+      .equalsTo([["term", 4, 1], [["token", 4]]]);
+    // 4: Factor -> Number
+    assertThat(parse([4, 0, 0, 4]))
+      .equalsTo([["term", 4, 0], [["term", 4, 1], [["token", 4]]]]);
+
+    // 2: Product -> Product */ Factor • (5)
+    assertThat(parse([2, 0, 0, 2]))
+      .equalsTo([["term", 2, 0],
+		 [["term", 2, 1], [["term", 2, 2], [["term", 2, 3], [["token", 2]]]]],
+		 [["token", 3]], /** This is the * token */
+		 [["term", 4, 0], [["term", 4, 1], [["token", 4]]]]
+		]);
+
+    // 0: Sum -> Sum +- Product
+    assertThat(parse([0, 1, 0, 0]))
+      .equalsTo([["term", 0, 1],
+		 [["term", 0, 2], [["term", 0, 3], [["term", 0, 4], [["term", 0, 5], [["token", 0]]]]]],
+		 [["token", 1]],
+		 [["term", 2, 0],
+		  [["term", 2, 1], [["term", 2, 2], [["term", 2, 3], [["token", 2]]]]],
+		  [["token", 3]],
+		  [["term", 4, 0], [["term", 4, 1], [["token", 4]]]]
+		 ]
+		]);
+
+    // return;
+    
+    // assertThat(root()).equalsTo([0, 0, 0, 0]);
+    //assertThat(parse(root()));
+    //assertThat(recognizer.parse()).equalsTo();
     
   });
-  
+
+  it("1+(2*3-4)", () => {
+    const rules = [
+      ["@", [term("Sum")]],
+      ["Sum", [term("Sum"), token("+-"), term("Product")]],
+      ["Sum", [term("Product")]],
+      ["Product", [term("Product"), token("*/"), term("Factor")]],
+      ["Product" , [term("Factor")]],
+      ["Factor",  [token("("), term("Sum"), token(")")]],
+      ["Factor", [term("Number")]],
+      ["Number", [token("[0-9]"), term("Number")]],
+      ["Number", [token("[0-9]")]],
+    ];
+
+    const parser = new Parser(rules);
+
+    parser.eat("[0-9]", "1");
+    parser.eat("+-", "+");
+    parser.eat("(", "(");
+    parser.eat("[0-9]", "2");
+    parser.eat("*/", "*");
+    parser.eat("[0-9]", "3");
+    parser.eat("+-", "-");
+    parser.eat("[0-9]", "4");
+    parser.eat(")", ")");
+
+    const {root, table, parse, dump, toString} = recognizer(parser);
+    assertThat(dump(parse(root()))).equalsTo([
+      "Sum", [
+	"Sum", [
+	  "Product", [
+            "Factor", [
+              "Number", [
+		"[0-9]",
+		"1"
+              ]
+            ]
+	  ]
+	]
+      ],
+      [
+	"+-",
+	"+"
+      ],
+      [
+	"Product", [
+	  "Factor", [
+            "(",
+            "("
+	  ], [
+            "Sum", [
+              "Sum", [
+		"Product", [
+		  "Product", [
+                    "Factor", [
+                      "Number", [
+			"[0-9]",
+			"2"
+                      ]
+                    ]
+		  ]
+		],
+		[
+		  "*/",
+		  "*"
+		],
+		[
+		  "Factor", [
+                    "Number", [
+                      "[0-9]",
+                      "3"
+                    ]
+		  ]
+		]
+              ]
+            ],
+            [
+              "+-",
+              "-"
+            ],
+            [
+              "Product", [
+		"Factor", [
+		  "Number", [
+                    "[0-9]",
+                    "4"
+		  ]
+		]
+              ]
+            ]
+	  ],
+	  [
+            ")",
+            ")"
+	  ]
+	]
+      ]
+    ]);    
+  });
+
 });
 
 function assertThat(x) {
