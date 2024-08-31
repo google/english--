@@ -10,7 +10,7 @@ You can see a live demo running in the browser [here](https://code.sgo.to/2021/0
 
 There are still many open areas of investigations, most notably [generalized quantifiers](https://code.sgo.to/2020/09/09/the-relational-theory-of-determiners.html) and propositional attitudes (e.g. beliefs).
 
-If you are looking for what an [LLM](https://en.wikipedia.org/wiki/Large_language_model) can do, you'll likely be extremely disappointed. If you are looking for an exploration on what LLM can't quite well do yet, then it is likely you'll find something here. 
+`english--` is a **programming language**, which makes it strict but formally precise, rather than flexible and ambiguous. If you are looking for latter, you'll likely be extremely disappointed, and are better off using an [LLM](https://en.wikipedia.org/wiki/Large_language_model) instead. 
 
 By far, the most notable investigation dates all the way back to Aristotelian [Sillogisms](https://en.wikipedia.org/wiki/Syllogism), which was followed by Boole's [Laws of Thought](https://en.wikipedia.org/wiki/The_Laws_of_Thought) as well as the more recent branch of Analytical Philosophy explored by Frege, Russel and Whitehead. In Computer Science, Fuchs's [Attempto](https://en.wikipedia.org/wiki/Attempto_Controlled_English) and Knuth's [Literate Programming](https://www-cs-faculty.stanford.edu/~knuth/lp.html) can be thought of working on a related space. Other notable attempts are Peter Norvig's [A Grammar of English](https://github.com/norvig/paip-lisp/blob/main/docs/chapter21.md) and the [ERG](https://github.com/delph-in/erg), although it wasn't clear if their intent was to create a programming language (rather than a user-facing dialog system).
 
