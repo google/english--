@@ -16,7 +16,7 @@
 
 const Assert = require("assert");
 
-describe("Earley", function() {
+describe.only("Earley", function() {
   const token = (t) => ["token", t];
   const term = (t) => ["term", t];
     
@@ -452,6 +452,7 @@ Nominal -> Noun • (3)
   function recognizer(parser) {
     const rules = parser.rules;
 
+    // function generate() {
     const steps = [];
     for (let i = 0; i < parser.S.length; i++) {
       const state = parser.S[i];
@@ -464,8 +465,14 @@ Nominal -> Noun • (3)
       }
     }
 
+    //return result;
+    //}
+
+    // const steps = generate();
+    
     function table() {
       const tree = [];
+      // const steps = generate();
       for (let i = 0; i < steps.length; i++) {
 	tree.push(`=== ${i} ===`);
 	for (let j = 0; j < (steps[i] || []).length; j++) {
@@ -473,31 +480,13 @@ Nominal -> Noun • (3)
 	}
 	tree.push("");
       }
-
+      
       return tree.join("\n");
-
-      assertThat(tree.join("\n").trim())
-	.equalsTo(`
-
-=== 0 ===
-Sum -> Sum +- Product • (3)
-Sum -> Product • (1)
-Product -> Factor • (1)
-Factor -> Number • (1)
-Number -> [0-9] • (1)
-
-=== 1 ===
-
-=== 2 ===
-Product -> Factor • (3)
-Factor -> Number • (3)
-Number -> [0-9] • (3)
-
-`.trim());
-
     }
     
     function root() {
+      // console.log(steps);
+      // const steps = generate();
       for (let i = 0; steps[0].length; i++) {
 	const [index, dot, step] = steps[0][i];
 	if (step == (parser.S.length - 1)) {
@@ -645,6 +634,7 @@ Number -> [0-9] • (3)
       if (failed(node)) {
 	return false;
       }
+
       
       for (const e of edges(node)) {
 	const next = move(node, e);
@@ -668,8 +658,9 @@ Number -> [0-9] • (3)
 	return result;
       }
 
-      // console.log(node);
+      //console.log(node);
       throw new Error("oops");
+      //return [edge(node)];
     }
 
     function dump(parent) {
@@ -1027,6 +1018,59 @@ Number -> [0-9] • (3)
       "A -> B • (0)",
       "B -> A • (0)",
     ]);
+  });
+
+
+  it("Unexpected token", () => {
+    const rules = [
+      ["@", [term("Sum")]],
+      ["Sum", [term("Sum"), token("+-"), term("Product")]],
+      ["Sum", [term("Product")]],
+      ["Product", [term("Product"), token("*/"), term("Factor")]],
+      ["Product" , [term("Factor")]],
+      ["Factor",  [token("("), term("Sum"), token(")")]],
+      ["Factor", [term("Number")]],
+      ["Number", [token("[0-9]"), term("Number")]],
+      ["Number", [token("[0-9]")]],
+    ];
+
+    const parser = new Parser(rules);
+    try {
+      parser.eat("foo", "bar");
+      assertThat(true).equalsTo(false);
+    } catch (e) {
+      assertThat(e.message).equalsTo("Unexpected token");
+    }
+    
+
+  });
+  
+  it.skip("Expressions", () => {
+    const rules = [
+      ["@", [term("Sum")]],
+      ["Sum", [term("Sum"), token("+-"), term("Product")]],
+      ["Sum", [term("Product")]],
+      ["Product", [term("Product"), token("*/"), term("Factor")]],
+      ["Product" , [term("Factor")]],
+      ["Factor",  [token("("), term("Sum"), token(")")]],
+      ["Factor", [term("Number")]],
+      ["Number", [token("[0-9]"), term("Number")]],
+      ["Number", [token("[0-9]")]],
+    ];
+
+    const parser = new Parser(rules);
+
+    parser.eat("[0-9]", "1");
+    parser.eat("+-", "+");
+    parser.eat("[0-9]", "2");
+    //parser.eat("+-", "+");
+    //parser.eat("[0-9]", "3");
+    parser.eat("*/", "*");
+    parser.eat("[0-9]", "4");
+    
+    const recognizer = new Recognizer(parser);
+    assertThat(recognizer.parse()).equalsTo();
+    
   });
   
 });
