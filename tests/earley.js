@@ -16,7 +16,7 @@
 
 const Assert = require("assert");
 
-describe.only("Earley", function() {
+describe("Earley", function() {
   const token = (t) => ["token", t];
   const term = (t) => ["term", t];
     
@@ -539,15 +539,16 @@ Nominal -> Noun • (3)
       const [step, i, dot, offset] = node;
       const [rule, , end] = steps[step][i];
       const [head, body] = rules[rule];
-	
-      if (body.length > dot && offset >= end) {
+
+      // console.log(`${dot} < ${body.length} && ${offset} <= ${end}`);
+      if (dot <= body.length && offset <= end) {
 	// if we aren't yet at the end of the rule
 	// but have no characters left, this node
 	// has failed.
-	return true;
+	return false;
       }
 	
-      return false;
+      return true;
     }
     
     function move(node, edge) {
@@ -584,7 +585,6 @@ Nominal -> Noun • (3)
     }
     
     function parse(node) {
-      
       if (done(node)) {
 	return [];
       }
@@ -592,7 +592,6 @@ Nominal -> Noun • (3)
       if (failed(node)) {
 	return false;
       }
-
       
       for (const e of edges(node)) {
 	const next = move(node, e);
@@ -615,6 +614,8 @@ Nominal -> Noun • (3)
 	}
 	return result;
       }
+
+      return false;
 
       //console.log(node);
       throw new Error("oops");
@@ -837,7 +838,7 @@ Nominal -> Noun • (3)
 	  const next = move(node, edges(node)[0]);
 	  assertThat(toString(next))
 	    .equalsTo("3: Sum -> Sum • +- Product (3)");
-	  assertThat(failed(next)).equalsTo(true);
+	  assertThat(failed(next)).equalsTo(false);
 	}
 	
 	{
@@ -1003,7 +1004,7 @@ Nominal -> Noun • (3)
 
   });
   
-  it.skip("1+2*4", () => {
+  it("1+2*4", () => {
     const rules = [
       ["@", [term("Sum")]],
       ["Sum", [term("Sum"), token("+-"), term("Product")]],
@@ -1024,8 +1025,65 @@ Nominal -> Noun • (3)
     parser.eat("*/", "*");
     parser.eat("[0-9]", "4");
     
-    const {root, table, parse, toString} = recognizer(parser);
-    console.log(table());
+    const {
+      root,
+      table,
+      parse,
+      edges,
+      move,
+      failed,
+      done,
+      dump, 
+      toString} = recognizer(parser);
+
+    {
+      const node = [0, 1, 0, 0];
+      const e = edges(node);
+      assertThat(e.map(({print}) => print())).equalsTo([
+	"0: Sum -> Sum +- Product • (5)",
+	"0: Sum -> Sum +- Product • (3)",
+	"0: Sum -> Product • (1)"
+      ]);
+    
+      assertThat(toString(move(node, e[0])))
+	.equalsTo("5: Sum -> Sum • +- Product (3)");
+      assertThat(failed(move(node, e[0])))
+	.equalsTo(true);
+      assertThat(toString(move(node, e[1])))
+	.equalsTo("3: Sum -> Sum • +- Product (3)");
+      assertThat(failed(move(node, e[1])))
+	.equalsTo(false);
+      assertThat(toString(move(node, e[2])))
+	.equalsTo("1: Sum -> Sum • +- Product (3)");
+      assertThat(failed(move(node, e[2])))
+	.equalsTo(false);
+      assertThat(done(move(node, e[2])))
+	.equalsTo(false);
+    }
+    {
+      const node = [0, 1, 2, 2];
+      assertThat(toString(node))
+	.equalsTo("2: Sum -> Sum +- • Product (3)");
+      const e = edges(node);
+      assertThat(e.map(({print}) => print()))
+	.equalsTo([
+	  "2: Product -> Product */ Factor • (5)",
+	  "2: Product -> Factor • (3)"
+	]);
+      assertThat(toString(move(node, e[0])))
+	.equalsTo("5: Sum -> Sum +- Product • (3)");
+      assertThat(failed(move(node, e[0])))
+	.equalsTo(true);
+      assertThat(toString(move(node, e[1])))
+	.equalsTo("3: Sum -> Sum +- Product • (3)");
+      assertThat(failed(move(node, e[1])))
+	.equalsTo(false);
+      assertThat(done(move(node, e[1])))
+	.equalsTo(true);
+    }
+    
+    // console.log(table());
+    
     // 0: Number -> [0-9]
     assertThat(parse([0, 5, 0, 0]))
       .equalsTo([["term", 0, 5], [["token", 0]]]);
@@ -1079,9 +1137,50 @@ Nominal -> Noun • (3)
     // return;
     
     // assertThat(root()).equalsTo([0, 0, 0, 0]);
-    //assertThat(parse(root()));
-    //assertThat(recognizer.parse()).equalsTo();
-    
+    // console.log(JSON.stringify(dump(parse(root())), undefined, 2));
+    assertThat(dump(parse(root())))
+      .equalsTo([
+	"Sum", [
+	  "Sum", [
+	    "Product", [
+              "Factor", [
+		"Number", [
+		  "[0-9]",
+		  "1"
+		]
+              ]
+	    ]
+	  ]
+	],
+	[
+	  "+-",
+	  "+"
+	],
+	[
+	  "Product", [
+	    "Product", [
+              "Factor", [
+		"Number", [
+		  "[0-9]",
+		  "2"
+		]
+              ]
+	    ]
+	  ],
+	  [
+	    "*/",
+	    "*"
+	  ],
+	  [
+	    "Factor", [
+              "Number", [
+		"[0-9]",
+		"4"
+              ]
+	    ]
+	  ]
+	]
+      ]);
   });
 
   it("1+(2*3-4)", () => {
@@ -1183,6 +1282,58 @@ Nominal -> Noun • (3)
     ]);    
   });
 
+  it("1*2", () => {
+    const rules = [
+      ["@", [term("Sum")]],
+      ["Sum", [term("Sum"), token("+-"), term("Product")]],
+      ["Sum", [term("Product")]],
+      ["Product", [term("Product"), token("*/"), term("Factor")]],
+      ["Product" , [term("Factor")]],
+      ["Factor",  [token("("), term("Sum"), token(")")]],
+      ["Factor", [term("Number")]],
+      ["Number", [token("[0-9]"), term("Number")]],
+      ["Number", [token("[0-9]")]],
+    ];
+
+    const parser = new Parser(rules);
+
+    parser.eat("[0-9]", "1");
+    parser.eat("*/", "*");
+    parser.eat("[0-9]", "2");
+
+    const {root, table, parse, dump, toString} = recognizer(parser);
+    // console.log(table());
+    
+    // console.log(root());
+    // console.log(JSON.stringify(dump(parse(root())), undefined, 2));
+    assertThat(dump(parse(root())))
+      .equalsTo([
+	"Sum", [
+	  "Product", [
+	    "Product", [
+              "Factor", [
+		"Number", [
+		  "[0-9]",
+		  "1"
+		]
+              ]
+	    ]
+	  ],
+	  [
+	    "*/",
+	    "*"
+	  ],
+	  [
+	    "Factor", [
+              "Number", [
+		"[0-9]",
+		"2"
+              ]
+	    ]
+	  ]
+	]
+      ]);
+  });
 });
 
 function assertThat(x) {
