@@ -83,20 +83,20 @@ describe("Earley", function() {
       "number -> • [0-9] (0)",
     ]);
 
-    assertThat(parser.eat("[0-9]").print()).equalsTo([
+    assertThat(parser.eat("[0-9]", "1").print()).equalsTo([
       "number -> [0-9] • (0)",
       "term -> number • + term (0)",
       "term -> number • (0)",
     ]);
 
-    assertThat(parser.eat("+").print()).equalsTo([
+    assertThat(parser.eat("+", "+").print()).equalsTo([
       "term -> number + • term (0)",
       "term -> • number + term (2)",
       "term -> • number (2)",
       "number -> • [0-9] (2)",
     ]);
 
-    assertThat(parser.eat("[0-9]").print()).equalsTo([
+    assertThat(parser.eat("[0-9]", "2").print()).equalsTo([
       "number -> [0-9] • (2)",
       "term -> number • + term (2)",
       "term -> number • (2)",
@@ -106,9 +106,10 @@ describe("Earley", function() {
     const recognizer = new Recognizer(parser);
     assertThat(recognizer.parse()).equalsTo([
       "term",
-      ["number"],
+      ["number", ["[0-9]", "1"]],
+      ["+", "+"],
       ["term",
-       ["number"]
+       ["number", ["[0-9]", "2"]]
       ]
     ]);
   });
@@ -141,6 +142,7 @@ describe("Earley", function() {
     constructor(rules = []) {
       this.rules = rules;
       this.S = [];
+      this.tokens = [];
       this.start();
     }
 
@@ -177,7 +179,6 @@ describe("Earley", function() {
 	}
       }
 
-
       // Expand the first node.
       const S0 = this.predict([[0, 0, 0]], 0);
       S0.print = this.print.bind(this, S0);
@@ -186,15 +187,20 @@ describe("Earley", function() {
       return S0;
     }
 
-    eat(token) {
+    eat(token, value) {
       const set = this.scan(token);
+
+      if (set.length == 0) {
+	throw new Error("Unexpected token");
+      }
 
       set.push(...this.predict(set, this.S.length));
 
       const expand = this.complete(this.S, set);
 
       set.push(...expand);
-      
+
+      this.tokens.push([token, value]);
       this.S.push(set);
 
       set.print = this.print.bind(this, set);
@@ -282,8 +288,7 @@ describe("Earley", function() {
 	  continue;
 	}
 	const [type, name] = body[dot];
-	if (type == "token" &&
-	    name == token) {
+	if (type == "token" && name == token) {
 	  result.push([index, dot + 1, step]);
 	}
       }
@@ -399,19 +404,19 @@ describe("Earley", function() {
       "VP -> • Verb NP (0)",
     ]);
 
-    assertThat(parser.eat("Verb").print()).equalsTo([
+    assertThat(parser.eat("Verb", "book").print()).equalsTo([
       "VP -> Verb • (0)",
       "VP -> Verb • NP (0)",
       "NP -> • Det Nominal (1)",
       "S -> VP • (0)",
     ]);
 
-    assertThat(parser.eat("Det").print()).equalsTo([
+    assertThat(parser.eat("Det", "that").print()).equalsTo([
       "NP -> Det • Nominal (1)",
       "Nominal -> • Noun (2)"
     ]);
 
-    assertThat(parser.eat("Noun").print()).equalsTo([
+    assertThat(parser.eat("Noun", "flight").print()).equalsTo([
       "Nominal -> Noun • (2)",
       "NP -> Det Nominal • (1)",
       "VP -> Verb NP • (0)",
@@ -435,9 +440,9 @@ Nominal -> Noun • (3)
 
     assertThat(dump(parse(root()))).equalsTo([
       "S",  [
-	"VP", [
-	  "NP", [
-	    "Nominal"
+	"VP", ["Verb", "book"], [
+	  "NP", ["Det", "that"], [
+	    "Nominal", ["Noun", "flight"]
 	  ]
 	]
       ]
@@ -515,34 +520,45 @@ Number -> [0-9] • (3)
     }
       
     function edges(node) {
-      if (leaf(node)) {
-	return [];
-      }
+      //if (leaf(node)) {
+      //return [];
+      //}
       
       const [step, i, dot, offset] = node;
       const [rule, , end] = steps[step][i];
       const [head, body] = rules[rule];
+
+      //console.log(toString(node));
+      //console.log(body);
+      //console.log(`${offset}`);
+      const [type,  name] = body[dot];
+
+      //throw new Error("hi");
+      //console.log(type);
+      if (type == "token") {
+	const edge = [type, offset];
+	edge.print = () => `token: ${name}`;
+	return [edge];
+      }
+      //let name;
+      //let next = dot;
+      //while (next < body.length) {
+      //if (type == "term") {
+      //name = head;
+      //break;
+      //}
+      //	next++;
+      //};
       
-      let name;
-      let next = dot;
-      while (next < body.length) {
-	const [type,  head] = body[next];
-	if (type == "term") {
-	  name = head;
-	  break;
-	}
-	next++;
-      };
-      
-      const s = offset + (next - dot);
+      // const s = offset + (next - dot);
       
       const edges = [];
-      for (let j = 0; j < steps[s].length; j++) {
-	const [rule, , end] = steps[s][j];
+      for (let j = 0; j < steps[offset].length; j++) {
+	const [rule, , end] = steps[offset][j];
 	const [head, body] = rules[rule];
 	if (head == name) {
-	  const edge = [s, j];
-	  edge.print = () => `${s}: ` + print(steps[s][j], rules);
+	  const edge = [type, offset, j];
+	  edge.print = () => `${offset}: ` + print(steps[offset][j], rules);
 	  edges.push(edge);
 	}
       }
@@ -576,27 +592,35 @@ Number -> [0-9] • (3)
       const [step, i, dot, begin] = node;
       const [rule, , ] = steps[step][i];
       const [head, body] = rules[rule];
-      const [next, j] = edge;
-      const [, , end] = steps[next][j]; 
+      const [type, next, j] = edge;
+
+      if (type == "token") {
+	return [step, i, dot + 1, begin + 1];
+	// throw new Error("hi");
+      }
+      // console.log(edge);
       
-      let p = dot;
-      while (p < body.length) {
-	const [type] = body[p];
-	if (type == "term") {
-	  break;
-	}
-	p++;
-      };
+      const [, , end] = steps[next][j]; 
+
+      //let p = dot;
+      //while (p < body.length) {
+      //const [type] = body[p];
+      //if (type == "term") {
+      ///  break;
+      //}
+      //p++;
+      //};
       
       return [
 	step,
 	i,
-	p + 1 /** moves forward, skipping tokens */,
+	dot + 1 /** moves forward, skipping tokens */,
 	end /** eats the last term */
       ];
     }
     
     function done(node) {
+      // console.log(node);
       const [step, i, dot] = node;
       const [rule, , end] = steps[step][i];
       const [head, body] = rules[rule];
@@ -609,15 +633,14 @@ Number -> [0-9] • (3)
     }
     
     function parse(node) {
-      const edge = ([step, i]) => [step, i];
       
       if (done(node)) {
 	return [];
       }
       
-      if (leaf(node)) {
-	return [edge(node)];
-      }
+      //if (leaf(node)) {
+      //return [edge(node)];
+      //}
       
       if (failed(node)) {
 	return false;
@@ -629,24 +652,38 @@ Number -> [0-9] • (3)
 	if (!tail) {
 	  continue;
 	}
-	const [step, i] = e;
-	const child = [step, i, 0, step];
+	const [type, step, i] = e;
+	let body = [[type, step]]; 
+	if (type == "term") {
+	  const child = [step, i, 0, step];
+	  body = parse(child);
+	}
+	const result = [body, ...tail];
 	const [, , dot] = node;
-	const result = [parse(child), ...tail];
 	if (dot == 0) {
 	  // If this is the beginning of the matching
+	  const edge = ([step, i]) => ["term", step, i];
 	  result.unshift(edge(node));
 	}
 	return result;
       }
-      
+
+      // console.log(node);
       throw new Error("oops");
     }
 
     function dump(parent) {
       const [edge] = parent;
-      const [step, i] = edge;
+      const [type, step, i] = edge;
 
+      if (type == "token") {
+	// console.log(parser.tokens);
+	const [name, value] = parser.tokens[step];
+	return [name, value];
+      }
+
+      // console.log(edge);
+      // throw new Error("hi");;
       const [rule] = steps[step][i];
       const [head] = parser.rules[rule];
       // const result = print(steps[step][i], parser.rules);
@@ -656,6 +693,7 @@ Number -> [0-9] • (3)
       }
 
       const [, ...children] = parent;
+      // console.log(children);
 
       return [head, ...children.map((child) => dump(child))];
     }
@@ -738,7 +776,7 @@ Number -> [0-9] • (3)
       "Number -> • [0-9] (0)",
     ]);
 
-    assertThat(parser.eat("[0-9]").print()).equalsTo([
+    assertThat(parser.eat("[0-9]", "1").print()).equalsTo([
       "Number -> [0-9] • Number (0)",
       "Number -> [0-9] • (0)",
       "Number -> • [0-9] Number (1)",
@@ -750,7 +788,7 @@ Number -> [0-9] • (3)
       "Sum -> Sum • +- Product (0)",
     ]);
     
-    assertThat(parser.eat("+-").print()).equalsTo([
+    assertThat(parser.eat("+-", "+").print()).equalsTo([
       "Sum -> Sum +- • Product (0)",
       "Product -> • Product */ Factor (2)",
       "Product -> • Factor (2)",
@@ -760,7 +798,7 @@ Number -> [0-9] • (3)
       "Number -> • [0-9] (2)",
     ]);
 
-    assertThat(parser.eat("[0-9]").print()).equalsTo([
+    assertThat(parser.eat("[0-9]", "2").print()).equalsTo([
       "Number -> [0-9] • Number (2)",
       "Number -> [0-9] • (2)",
       "Number -> • [0-9] Number (3)",
@@ -772,7 +810,6 @@ Number -> [0-9] • (3)
       "Sum -> Sum • +- Product (0)",
     ]);
 
-
     const {
       toString,
       leaf,
@@ -783,14 +820,25 @@ Number -> [0-9] • (3)
       dump} = recognizer(parser);
     
     {
+
+      
+      {
+	const node = [0, 0, 1, 1];
+	assertThat(toString(node))
+	  .equalsTo("1: Sum -> Sum • +- Product (3)");
+	assertThat(edges(node).map(({print}) => print()))
+	  .equalsTo(["token: +-"]);
+      }
+      
       {
 	// Each node is the step and where we are at
 	const node = [0, 4, 0, 0];
 	assertThat(toString(node))
 	  .equalsTo("0: Number -> • [0-9] (1)");
 	assertThat(leaf(node)).equalsTo(true);
-	assertThat(edges(node))
-	  .equalsTo([]);
+	assertThat(edges(node).length).equalsTo(1);
+	assertThat(edges(node)[0].print())
+	  .equalsTo("token: [0-9]");
 	assertThat(failed(node)).equalsTo(false);
       }
 
@@ -844,50 +892,62 @@ Number -> [0-9] • (3)
 	}
 	
 	{
-	  // Skips the token
+	  // Do not skip the token
 	  const next = move(node, edges(node)[1]);
 	  assertThat(toString(next))
 	    .equalsTo("1: Sum -> Sum • +- Product (3)");
 	  assertThat(failed(next)).equalsTo(false);
 	  
 	  assertThat(edges(next).map(({print}) => print()))
-	  .equalsTo(["2: Product -> Factor • (3)"]);
+	    .equalsTo(["token: +-"]);
+	  // "2: Product -> Factor • (3)"
+	  // return;
 	  
 	  assertThat(toString(move(next, edges(next)[0])))
-	    .equalsTo("3: Sum -> Sum +- Product • (3)");
+	    .equalsTo("2: Sum -> Sum +- • Product (3)");
 	}
-
+	
       }
 
 
       {
 	const node = [0, 4, 0, 0];
 	assertThat(toString(node)).equalsTo("0: Number -> • [0-9] (1)");
-	assertThat(parse(node)).equalsTo([[0, 4]]);
+	assertThat(edges(node).map(({print}) => print())).equalsTo(["token: [0-9]"]);
+	assertThat(parse(node)).equalsTo([["term", 0, 4], [["token", 0]]]);
+	// return;
+	// console.log("hi");
+	// throw new Error("hi");
+	// return;
       }
       
       {
 	const node = [0, 3, 0, 0];
 	assertThat(toString(node)).equalsTo("0: Factor -> • Number (1)");
-	assertThat(parse(node)).equalsTo([[0, 3], [[0, 4]]]);
+	assertThat(parse(node)).equalsTo([["term", 0, 3], [["term", 0, 4], [["token", 0]]]]);
+	// return;
       }
 
       {
 	const node = [0, 2, 0, 0];
 	assertThat(toString(node)).equalsTo("0: Product -> • Factor (1)");
-	assertThat(parse(node)).equalsTo([[0, 2], [[0, 3], [[0, 4]]]]);
+	assertThat(parse(node)).equalsTo([["term", 0, 2], [["term", 0, 3], [["term", 0, 4], [["token", 0]]]]]);
+	// return;
       }
 
       {
 	const node = [0, 1, 0, 0];
 	assertThat(toString(node)).equalsTo("0: Sum -> • Product (1)");
-	assertThat(parse(node)).equalsTo([[0, 1], [[0, 2], [[0, 3], [[0, 4]]]]]);
+	assertThat(parse(node)).equalsTo([["term", 0, 1], [["term", 0, 2], [["term", 0, 3], [["term", 0, 4], [["token", 0]]]]]]);
+	// return;
       }
 
       {
 	const node = [2, 2, 0, 2];
 	assertThat(toString(node)).equalsTo("2: Number -> • [0-9] (3)");
-	assertThat(parse(node)).equalsTo([[2, 2]]);
+	assertThat(edges(node).map(({print}) => print())).equalsTo(["token: [0-9]"]);
+	assertThat(parse(node)).equalsTo([["term", 2, 2], [["token", 2]]]);
+	// return;
       }
 
       {
@@ -895,7 +955,7 @@ Number -> [0-9] • (3)
 	assertThat(toString(node)).equalsTo("2: Factor -> • Number (3)");
 	assertThat(edges(node).map(({print}) => print()))
 	  .equalsTo(["2: Number -> [0-9] • (3)"]);
-	assertThat(parse(node)).equalsTo([[2, 1], [[2, 2]]]);
+	assertThat(parse(node)).equalsTo([["term", 2, 1], [["term", 2, 2], [["token", 2]]]]);
       }
 
       {
@@ -903,18 +963,18 @@ Number -> [0-9] • (3)
 	assertThat(toString(node)).equalsTo("2: Product -> • Factor (3)");
 	assertThat(edges(node).map(({print}) => print()))
 	  .equalsTo(["2: Factor -> Number • (3)"]);
-	assertThat(parse(node)).equalsTo([[2, 0], [[2, 1], [[2, 2]]]]);
+	assertThat(parse(node)).equalsTo([["term", 2, 0], [["term", 2, 1], [["term", 2, 2], [["token", 2]]]]]);
       }
 
       {
 	const node = [0, 0, 0, 0];
 	assertThat(toString(node)).equalsTo("0: Sum -> • Sum +- Product (3)");
 	assertThat(parse(node)).equalsTo([
-	  [0, 0],
-	  [[0, 1], [[0, 2], [[0, 3], [[0, 4]]]]],
-	  [[2, 0], [[2, 1], [[2, 2]]]]
+	  ["term", 0, 0],
+	  [["term", 0, 1], [["term", 0, 2], [["term", 0, 3], [["term", 0, 4], [["token", 0]]]]]],
+	  [["token", 1]],
+	  [["term", 2, 0], [["term", 2, 1], [["term", 2, 2], [["token", 2]]]]]
 	]);
-
 
 	// https://loup-vaillant.fr/tutorials/earley-parsing/parser
 	assertThat(dump(parse(node))).equalsTo([
@@ -922,18 +982,25 @@ Number -> [0-9] • (3)
 	    "Sum", [
 	      "Product", [
 		"Factor", [
-		  "Number"
+		  "Number", [
+		    "[0-9]", "1"
+		  ]
 		]
 	      ]
 	    ]
-	  ],  [
+	  ],
+	  ["+-", "+"],
+	  [
 	    "Product", [
 	      "Factor", [
-		"Number"
+		"Number", [
+		  "[0-9]", "2"
+		]
 	      ]
 	    ]
 	  ]
 	]);
+
       }
     }
     
