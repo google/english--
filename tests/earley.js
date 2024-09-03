@@ -137,95 +137,96 @@ describe("Earley", function() {
       return dump(result);
     }
   }
-  
-  class Parser {
-    constructor(rules = []) {
-      this.rules = rules;
-      this.S = [];
-      this.tokens = [];
-      this.start();
-    }
 
-    start() {
-      const nullables = [];
+  function parse(rules) {
+    const S = [];
+    const tokens = [];
 
-      for (const rule of this.rules) {
+    const nullables = new Set();
+
+    function start() {
+      const nulls = [];
+
+      for (const rule of rules) {
 	const [head, body] = rule;
 	if (body.length == 0) {
-	  nullables.push(head);
+	  nulls.push(head);
 	}
       }
 
-      this.nullables = new Set();
+      // this.nullables = new Set();
       
-      while (nullables.length > 0) {
-	const nullable = nullables.pop();
+      while (nulls.length > 0) {
+	const nullable = nulls.pop();
 
-	this.nullables.add(nullable);
+	nullables.add(nullable);
 	
-	for (const rule of this.rules) {
+	for (const rule of rules) {
 	  const [head, body] = rule;
 	  let nullable = true;
 	  for (const [type, name] of body) {
-	    if (!this.nullables.has(name)) {
+	    if (!nullables.has(name)) {
 	      // This rule references a non-nullable rule
 	      nullable = false;
 	      break;
 	    }
 	  }
-	  if (nullable && !this.nullables.has(head)) {
-	    nullables.push(head);
+	  if (nullable && !nullables.has(head)) {
+	    nulls.push(head);
 	  }
 	}
       }
 
       // Expand the first node.
-      const S0 = this.predict([[0, 0, 0]], 0);
-      S0.print = this.print.bind(this, S0);
-      this.S.push(S0);
+      const S0 = predict([[0, 0, 0]], 0);
+      S0.print = () => print2(S0);
+      S.push(S0);
 
       return S0;
     }
 
-    eat(token, value) {
-      const set = this.scan(token);
+    function eat(token, value) {
+      const set = scan(token);
 
       if (set.length == 0) {
 	throw new Error("Unexpected token");
       }
 
-      set.push(...this.predict(set, this.S.length));
+      set.push(...predict(set, S.length));
 
-      const expand = this.complete(this.S, set);
+      const expand = complete(S, set);
 
       set.push(...expand);
 
-      this.tokens.push([token, value]);
-      this.S.push(set);
+      tokens.push([token, value]);
+      S.push(set);
 
-      set.print = this.print.bind(this, set);
+      set.print = () => print2(set);
 
       return set;
     }
 
-    print(set) {
+    function print2(set) {
       if (!set) {
-	return this.S[this.S.length - 1].print();
+	return S[S.length - 1].print();
       }
+
+      //console.log("hello");
+      //console.log(set);
       
-      const rules = this.rules;
+      // const rules = this.rules;
       return [...set].map(([index, dot, state]) => {
 	return print([index, dot, state], rules);
       });
     }
-    
-    predict(set, step) {
+
+    function predict(set, step) {
       const result = [];
 
       const terms = [];
       
       for (const [index, dot] of set) {
-	const [head, body] = this.rules[index];
+	const [head, body] = rules[index];
 	if (dot >= body.length) {
 	  continue;
 	}
@@ -237,8 +238,8 @@ describe("Earley", function() {
       
       while (terms.length > 0) {
 	const term = terms.shift();
-	for (let i = 0; i < this.rules.length; i++) {
-	  const [name, body] = this.rules[i];
+	for (let i = 0; i < rules.length; i++) {
+	  const [name, body] = rules[i];
 	  if (name != term) {
 	    continue;
 	  }
@@ -264,12 +265,12 @@ describe("Earley", function() {
 
       for (const rule of result) {
 	const [index, dot, step] = rule;
-	const [head, body] = this.rules[index];
+	const [head, body] = rules[index];
 	if (dot >= body.length) {
 	  continue;
 	}
 	const [type, next] = body[dot];
-	if (this.nullables.has(next)) {
+	if (nullables.has(next)) {
 	  // The next item is nullable, so advance it
 	  result.push([index, dot + 1, step]);
 	}
@@ -278,11 +279,11 @@ describe("Earley", function() {
       return result;
     }
 
-    scan(token) {
-      const set = this.S[this.S.length - 1];
+    function scan(token) {
+      const set = S[S.length - 1];
       const result = [];
       for (const [index, dot, step] of set) {
-	const rule = this.rules[index];
+	const rule = rules[index];
 	const [head, body] = rule;
 	if (dot >= body.length) {
 	  continue;
@@ -295,13 +296,13 @@ describe("Earley", function() {
       return result;
     }
 
-    complete(S, set) {
+    function complete(S, set) {
       const result = [];
 
       const completed = [];
       
       for (const [index, dot, step] of set) {
-	const [head, body] = this.rules[index];
+	const [head, body] = rules[index];
 	if (dot == body.length) {
 	  completed.push([index, dot, step]);
 	}
@@ -309,9 +310,9 @@ describe("Earley", function() {
 
       while (completed.length > 0) {
 	const [index, dot, step] = completed.shift();
-	const [head, body] = this.rules[index];
+	const [head, body] = rules[index];
 	for (const [i, d, s] of S[step]) {
-	  const [, body] = this.rules[i];
+	  const [, body] = rules[i];
 	  if (d >= body.length) {
 	    // already completed
 	    continue;
@@ -321,7 +322,7 @@ describe("Earley", function() {
 	  if (name == head) {
 	    const r = [i, d + 1, s];
 	    result.push(r);
-	    if (this.rules[i][1].length == (d + 1)) {
+	    if (rules[i][1].length == (d + 1)) {
 	      completed.push(r);
 	    }
 	  }
@@ -330,8 +331,63 @@ describe("Earley", function() {
       
       return result;
     }
+  
+    return {
+      start: start,
+      eat: eat,
+      print2: print2,
+      predict: predict,
+      complete: complete,
+      scan: scan,
+      S: S,
+      tokens: tokens,
+      nullables: nullables,
+    };
+  }
+    
+  class Parser {
+    constructor(rules = []) {
+      // this.rules = rules;
+      // this.S = [];
+      // this.tokens = [];
+      const {
+	start,
+	eat,
+	print2,
+	predict,
+	complete,
+	scan,
+	S,
+	tokens,
+	nullables} = parse(rules);
+      start();
+      this.eat = eat.bind(this);
+      this.print = () => print2();
+      this.__S__ = S;
+      this.__tokens__ = tokens;
+      this.__nullables__ = nullables;
+      this.rules = rules;
+    }
+
+    get S() {
+      return this.__S__;
+    }
+
+    get tokens() {
+      return this.__tokens__;
+    }
+    
+    get nullables() {
+      return this.__nullables__;
+    }
+    
   }
 
+  it("$", () => {
+
+  });
+
+  
   it("book that flight", () => {
     // Example from:
     // https://www.youtube.com/watch?v=1j6hB3O4hAM
@@ -404,6 +460,8 @@ describe("Earley", function() {
       "VP -> • Verb NP (0)",
     ]);
 
+    // return;
+    
     assertThat(parser.eat("Verb", "book").print()).equalsTo([
       "VP -> Verb • (0)",
       "VP -> Verb • NP (0)",
@@ -1368,7 +1426,7 @@ Nominal -> Noun • (3)
     const rules = [
       ["@", [term("S")]],
       ["S", [term("NP"), term("VP")]],
-      ["S", [term("NP"), term("VP")]],
+      // ["S", [term("NP"), term("VP")]],
       ["S", [term("VP")]],
       ["NP", [token("Det"), term("Nominal")]],
       ["Nominal", [token("Noun")]],
@@ -1421,6 +1479,24 @@ Nominal -> Noun • (3)
 	  NP(
 	    Det("that"),
 	    Nominal(Noun("flight"))
+	  )
+	)));
+    });
+
+    it.skip("the flight is a mess", () => {
+      const parser = new Parser(rules);
+      parser.eat("Det", "the");
+      parser.eat("Noun", "flight");
+      parser.eat("Verb", "is");
+      parser.eat("Det", "a");
+      parser.eat("Noun", "mess");
+      const {dump, parse, root} = recognizer(parser);
+      assertThat(dump(parse(root())))
+	.equalsTo(S(VP(
+	  Verb("is"),
+	  NP(
+	    Det("a"),
+	    Nominal(Noun("mess"))
 	  )
 	)));
     });
