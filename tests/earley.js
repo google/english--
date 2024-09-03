@@ -480,13 +480,18 @@ Nominal -> Noun • (3)
     }
     
     function root() {
-      for (let i = 0; steps[0].length; i++) {
+      if (steps.length == 0) {
+	return undefined;
+      }
+      for (let i = 0; i < steps[0].length; i++) {
+	// console.log(steps[0][i]);
 	const [index, dot, step] = steps[0][i];
 	if (step == (parser.S.length - 1)) {
 	  return [0, i, 0, 0];
 	}
       }
-      throw new Error("Oops, couldn't find the root :(");
+      // The parse is incomplete.
+      return undefined;
     }
     
     function leaf(node) {
@@ -686,7 +691,6 @@ Nominal -> Noun • (3)
     ]);
   });
   
-
   describe("Sum", () => {
     const rules = [
       ["@", [term("Sum")]],
@@ -1320,6 +1324,105 @@ Nominal -> Noun • (3)
 		t(")")
 	      ))
 	  ));
+    });
+
+    it("(1+2)", () => {
+      const parser = new Parser(rules);
+      parser.eat("(", "(");
+      parser.eat("[0-9]", "1");
+      parser.eat("+-", "+");
+      parser.eat("[0-9]", "2");
+      parser.eat(")", ")");
+      const {parse, dump, root} = recognizer(parser);
+      assertThat(dump(parse(root())))
+	.equalsTo(
+	  Sum(
+	    Product(
+	      Factor(
+		t("("),
+		Sum(
+		  Sum(
+		    Product(Factor(Number(t("[0-9]", "1"))))
+		  ),
+		  t("+-", "+"),
+		  Product(Factor(Number(t("[0-9]", "2"))))
+		),
+		t(")")
+	      ))
+	  ));
+    });
+
+    it("*", () => {
+      const parser = new Parser(rules);
+      try {
+	parser.eat("*/", "*");
+	assertThat(true).equalsTo(false);
+      } catch ({message}) {
+	assertThat(message).equalsTo("Unexpected token");
+      }
+    });
+  });
+
+  describe("english", () => {
+
+    const rules = [
+      ["@", [term("S")]],
+      ["S", [term("NP"), term("VP")]],
+      ["S", [term("NP"), term("VP")]],
+      ["S", [term("VP")]],
+      ["NP", [token("Det"), term("Nominal")]],
+      ["Nominal", [token("Noun")]],
+      ["VP", [token("Verb")]],
+      ["VP", [token("Verb"), term("NP")]],
+    ];
+    
+    const S = (...children) => ["S", ...children];
+    const VP = (...children) => ["VP", ...children];
+    const NP = (...children) => ["NP", ...children];
+    const Nominal = (...children) => ["Nominal", ...children];
+
+    const Verb = (value) => ["Verb", value];
+    const Det = (value) => ["Det", value];
+    const Noun = (value) => ["Noun", value];
+    
+    it("empty", () => {
+      const parser = new Parser(rules);
+      const {root} = recognizer(parser);
+      assertThat(root()).equalsTo(undefined);
+    });
+
+    it("book", () => {
+      const parser = new Parser(rules);
+      parser.eat("Verb", "book");
+      const {dump, parse, root} = recognizer(parser);
+      assertThat(dump(parse(root())))
+	.equalsTo(S(VP(
+	  Verb("book"),
+	)));
+    });
+
+    it("book that", () => {
+      const parser = new Parser(rules);
+      parser.eat("Verb", "book");
+      parser.eat("Det", "that");
+      const {root} = recognizer(parser);
+      assertThat(root()).equalsTo(undefined);
+    });
+
+    it("book that flight", () => {
+      const parser = new Parser(rules);
+      parser.eat("Verb", "book");
+      parser.eat("Det", "that");
+      parser.eat("Noun", "flight");
+      const {dump, parse, root} = recognizer(parser);
+      assertThat(dump(parse(root())))
+	.equalsTo(S(VP(
+	  Verb("book"),
+	  NP(
+	    Det("that"),
+	    Nominal(Noun("flight"))
+	  )
+	)));
     });
   });
   
