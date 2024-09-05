@@ -352,8 +352,16 @@ describe("Earley", function() {
       const [head] = rules[rule];
 
       const set = S[step];
+
+      //console.log("hello");
+      //console.log(node);
+      //console.log("world");
+      
       for (const option of set) {
 	const [rule, dot] = option;
+
+	// console.log(option);
+	
 	const [, body] = rules[rule];
 	const [type, name] = body[dot];
 	if (type == "token") {
@@ -369,12 +377,22 @@ describe("Earley", function() {
     function trace(node) {
       const result = [];
       let next = node;
+      const [, [[, root]]] = rules[0];
+      // console.log(root);
       do {
 	const [rule, dot, step] = next;
+	// console.log("hi");
+	const [head] = rules[rule];
+	// console.log(head);
+	// console.log(root);
 	result.push(next);
-	if (step == 0) {
+	if (head == root) {
 	  return result;
 	}
+	// console.log(next);
+	//if (step == 0) {
+	//  return result;
+	//}
 	next = from(next);
       } while (true);
     }
@@ -417,9 +435,11 @@ describe("Earley", function() {
 	scan,
 	S,
 	tokens,
-	nullables} = parse(rules);
+	nullables,
+	stack} = parse(rules);
       start();
       this.eat = eat.bind(this);
+      this.stack = () => stack();
       this.print = () => print2();
       this.__S__ = S;
       this.__tokens__ = tokens;
@@ -441,7 +461,7 @@ describe("Earley", function() {
     
   }
 
-  describe("next", () => {
+  describe("stack", () => {
     it("A -> • %token (0)", () => {
       const {start, next} = parse([
 	["@", [term("A")]],
@@ -456,7 +476,7 @@ describe("Earley", function() {
     });
 
     it("A -> • %token (0), A -> • %other (0)", () => {
-      const {start, next} = parse([
+      const {start, next, stack} = parse([
 	["@", [term("A")]],
 	["A", [token("%token")]],
 	["A", [token("%other")]],
@@ -471,6 +491,16 @@ describe("Earley", function() {
 	  ["%token", 1, 0, 0],
 	  ["%other", 2, 0, 0]
 	]);
+
+      assertThat(stack()).equalsTo([[
+	"%token", [
+	  "A -> • %token (0)"
+	]
+      ], [
+	"%other", [
+	  "A -> • %other (0)"
+	]
+      ]]);
     });
 
     it("A -> %token • %other(0)", () => {
@@ -566,6 +596,75 @@ describe("Earley", function() {
 
       assertThat(stack())
 	.equalsTo([]);
+    });
+
+    it.skip("Sentences", () => {
+      const {start, next, eat, S, rules, trace, from, stack} = parse([
+	["@", [term("S")]],
+	["S", [term("NP"), term("VP")]],
+	["S", [term("VP")]],
+	["NP", [token("Det"), term("Nominal")]],
+	["Nominal", [token("Noun")]],
+	["VP", [token("Verb")]],
+	["VP", [token("Verb"), term("NP")]],
+      ]);
+
+      start();
+
+      assertThat(next())
+	.equalsTo([
+	  ["Det", 3, 0, 0],
+	  ["Verb", 5, 0, 0],
+	  ["Verb", 6, 0, 0],
+	]);
+
+      assertThat(trace([3, 0, 0]))
+	.equalsTo([[3, 0, 0], [1, 0, 0]]);
+
+      assertThat(stack())
+	.equalsTo([
+	  ["Det", [
+	    "NP -> • Det Nominal (0)",
+	    "S -> • NP VP (0)"
+	  ]],
+	  ["Verb", [
+	    "VP -> • Verb (0)",
+	    "S -> • VP (0)"
+	  ]],
+	  ["Verb", [
+	    "VP -> • Verb NP (0)",
+	    "S -> • VP (0)"
+	  ]]
+	]);
+
+      eat("Det", "the");
+
+      assertThat(stack())
+	.equalsTo([
+	  ["Noun", [
+	    "Nominal -> • Noun (1)",
+	    "NP -> Det • Nominal (0)",
+	    "S -> • NP VP (0)"
+	  ]],
+	]);
+
+      eat("Noun", "flight");
+
+      return;
+      
+      assertThat(next())
+	.equalsTo([
+	]);
+      
+      assertThat(stack())
+	.equalsTo([
+	  ["Noun", [
+	    "Nominal -> • Noun (1)",
+	    "NP -> Det • Nominal (0)",
+	    "S -> • NP VP (0)"
+	  ]],
+	]);
+
     });
     
   });
@@ -1670,8 +1769,11 @@ Nominal -> Noun • (3)
 
     it.skip("the flight is a mess", () => {
       const parser = new Parser(rules);
+      assertThat(parser.stack()).equalsTo([]);
       parser.eat("Det", "the");
       parser.eat("Noun", "flight");
+      return;
+      
       parser.eat("Verb", "is");
       parser.eat("Det", "a");
       parser.eat("Noun", "mess");
