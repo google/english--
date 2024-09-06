@@ -338,6 +338,16 @@ describe("Earley", function() {
 	if (type != "token") {
 	  continue;
 	}
+
+	//console.log(name);
+	//console.log(result);
+	//if (result.some(([existing]) => existing == name)) {
+	//  console.log("hello");
+	//  console.log(name);
+	  // avoid duplicates
+	//  continue;
+	//}
+	
 	result.push([name, index, dot, step]);
       }
 
@@ -453,12 +463,12 @@ describe("Earley", function() {
     }
     
     function stack() {
-      return next()
+      return Object.fromEntries(next()
 	.map(([token, rule, dot, step]) => [
 	  token,
 	  trace([rule, dot, step])
 	    .map((node) => print(node, rules))
-	]);
+	]));
     }
 
     return {
@@ -550,15 +560,38 @@ describe("Earley", function() {
 	  ["%other", 2, 0, 0]
 	]);
 
-      assertThat(stack()).equalsTo([[
-	"%token", [
+      assertThat(stack()).equalsTo({
+	"%token": [
 	  "A -> • %token (0)"
-	]
-      ], [
-	"%other", [
+	],
+	"%other": [
 	  "A -> • %other (0)"
 	]
-      ]]);
+      });
+    });
+
+    it("A -> • %token (0), A -> • %token (0)", () => {
+      const {start, next, stack} = parse([
+	["@", [term("A")]],
+	["A", [token("%token")]],
+	["A", [token("%token")]],
+      ]);
+      assertThat(start().print())
+	.equalsTo([
+	  'A -> • %token (0)',
+	  'A -> • %token (0)'
+	]);
+      assertThat(next())
+	.equalsTo([
+	  ["%token", 1, 0, 0],
+	  ["%token", 2, 0, 0]
+	]);
+
+      assertThat(stack()).equalsTo({
+	"%token": [
+	  "A -> • %token (0)"
+	]
+      });
     });
 
     it("A -> %token • %other(0)", () => {
@@ -590,26 +623,26 @@ describe("Earley", function() {
       start();
 
       assertThat(stack())
-	.equalsTo([
-	  ["%token", [
+	.equalsTo({
+	  "%token": [
 	    "A -> • %token B (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("%token", "");
 
       assertThat(stack())
-	.equalsTo([
-	  ["%other", [
+	.equalsTo({
+	  "%other": [
 	    "B -> • %other (1)",
 	    "A -> %token • B (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("%other", "");
       
       assertThat(stack())
-	.equalsTo([]);
+	.equalsTo({});
     });
     
     it("C -> %third • C (0)", () => {
@@ -623,37 +656,37 @@ describe("Earley", function() {
       start();
 
       assertThat(stack())
-	.equalsTo([
-	  ["%first", [
+	.equalsTo({
+	  "%first": [
 	    "A -> • %first B (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("%first", "");
 
       assertThat(stack())
-	.equalsTo([
-	  ["%second", [
+	.equalsTo({
+	  "%second": [
 	    "B -> • %second C (1)",
 	    "A -> %first • B (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("%second", "");
 
       assertThat(stack())
-	.equalsTo([
-	  ["%third", [
+	.equalsTo({
+	  "%third": [
 	    "C -> • %third (2)",
 	    "B -> %second • C (1)",
 	    "A -> %first • B (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("%third", "");
 
       assertThat(stack())
-	.equalsTo([]);
+	.equalsTo({});
     });
 
     it("Sentences", () => {
@@ -680,31 +713,27 @@ describe("Earley", function() {
 	.equalsTo([[3, 0, 0], [1, 0, 0]]);
 
       assertThat(stack())
-	.equalsTo([
-	  ["Det", [
+	.equalsTo({
+	  "Det": [
 	    "NP -> • Det Nominal (0)",
 	    "S -> • NP VP (0)"
-	  ]],
-	  ["Verb", [
-	    "VP -> • Verb (0)",
-	    "S -> • VP (0)"
-	  ]],
-	  ["Verb", [
+	  ],
+	  "Verb": [
 	    "VP -> • Verb NP (0)",
 	    "S -> • VP (0)"
-	  ]]
-	]);
+	  ]
+	});
 
       eat("Det", "the");
 
       assertThat(stack())
-	.equalsTo([
-	  ["Noun", [
+	.equalsTo({
+	  "Noun": [
 	    "Nominal -> • Noun (1)",
 	    "NP -> Det • Nominal (0)",
 	    "S -> • NP VP (0)"
-	  ]],
-	]);
+	  ],
+	});
 
       eat("Noun", "flight");
 
@@ -723,16 +752,12 @@ describe("Earley", function() {
       ]);
 
       assertThat(stack())
-	.equalsTo([
-	  ["Verb", [
-	    "VP -> • Verb (2)",
-	    "S -> NP • VP (0)"
-	  ]],
-	  ["Verb", [
+	.equalsTo({
+	  "Verb": [
             "VP -> • Verb NP (2)",
             "S -> NP • VP (0)"
-          ]]
-	]);
+          ]
+	});
 
     });
     
@@ -1836,25 +1861,27 @@ Nominal -> Noun • (3)
 	)));
     });
 
-    it.skip("the flight is a mess", () => {
+    it("the flight is a mess", () => {
       const parser = new Parser(rules);
-      assertThat(parser.stack()).equalsTo([]);
       parser.eat("Det", "the");
       parser.eat("Noun", "flight");
-      return;
-      
       parser.eat("Verb", "is");
       parser.eat("Det", "a");
       parser.eat("Noun", "mess");
       const {dump, parse, root} = recognizer(parser);
       assertThat(dump(parse(root())))
-	.equalsTo(S(VP(
-	  Verb("is"),
+	.equalsTo(S(
 	  NP(
-	    Det("a"),
-	    Nominal(Noun("mess"))
-	  )
-	)));
+	    Det("the"),
+	    Nominal(Noun("flight"))
+	  ),
+	  VP(
+	    Verb("is"),
+	    NP(
+	      Det("a"),
+	      Nominal(Noun("mess"))
+	    )
+	  )));
     });
   });
   
