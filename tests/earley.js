@@ -125,6 +125,31 @@ describe("Earley", function() {
     return name + " -> " + body + completed + " (" + state + ")"
   }
 
+  it("Completion", () => {
+    const {start, next, eat, S, rules, trace, from, stack, table, predict, complete, scan} = parse([
+      ["@", [term("A")]],
+      ["A", [term("B"), term("C")]],
+      ["B", [token("foo")]],
+      ["C", [token("bar")]],
+    ]);
+
+    start();
+    assertThat(S[0].print()).equalsTo([
+      "A -> • B C (0)",
+      "B -> • foo (0)"
+    ]);
+    eat("foo");
+    assertThat(S[1].print()).equalsTo([
+      "B -> foo • (0)",
+      "A -> B • C (0)",
+      "C -> • bar (1)"
+    ]);
+    assertThat(next()).equalsTo([
+      ["bar", 3, 0, 1]
+    ]);
+    eat("bar");
+  });
+
   class Recognizer {
     constructor(parser) {
       this.parser = parser;
@@ -192,11 +217,28 @@ describe("Earley", function() {
 	throw new Error("Unexpected token");
       }
 
-      set.push(...predict(set, S.length));
+      // set.push(...predict(set, S.length));	
 
-      const expand = complete(S, set);
+      const diff = (a, b) => {
+	return a.filter((p) => !b.some((q) =>
+	  p[0] == q[0] &&
+	  p[1] == q[1] &&
+	  p[2] == q[2]
+	));
+      }
 
-      set.push(...expand);
+      const expand = [];
+      
+      do {
+	set.push(...predict(set, S.length));
+	const more = diff(complete(S, set), expand);
+	if (more.length == 0) {
+	  break;
+	}
+	expand.push(...more);
+	set.push(...more);
+      } while (true);
+      
 
       tokens.push([token, value]);
       S.push(set);
@@ -246,9 +288,13 @@ describe("Earley", function() {
 	  // The same rule doesn't need to be added twice
 	  // NOTE(goto): maybe the same rule can be
 	  // added twice with two different dots.
-	  if (result.find(([j]) => i == j)) {
+	  if ([...set, ...result].some(
+	    (p) => p[0] == i && p[1] == 0 && p[2] == step)) {
 	    continue;
 	  }
+	  //if (result.find(([j]) => i == j)) {
+	  //  continue;
+	  //}
 	  
 	  result.push([i, 0, step]);
 
@@ -358,11 +404,20 @@ describe("Earley", function() {
       //console.log("world");
       
       for (const option of set) {
+	// console.log(option);
 	const [rule, dot] = option;
 
+	//console.log(rules[rule]);
+	//console.log();
 	// console.log(option);
 	
 	const [, body] = rules[rule];
+
+	if (dot >= body.length) {
+	  // throw new Error("dot is beyond body");
+	  continue;
+	}
+	
 	const [type, name] = body[dot];
 	if (type == "token") {
 	  continue;
@@ -421,6 +476,9 @@ describe("Earley", function() {
       from: from,
       trace: trace,
       stack: stack,
+      predict: predict,
+      scan: scan,
+      complete: complete,
     };
   }
     
@@ -598,7 +656,7 @@ describe("Earley", function() {
 	.equalsTo([]);
     });
 
-    it.skip("Sentences", () => {
+    it("Sentences", () => {
       const {start, next, eat, S, rules, trace, from, stack} = parse([
 	["@", [term("S")]],
 	["S", [term("NP"), term("VP")]],
@@ -650,19 +708,30 @@ describe("Earley", function() {
 
       eat("Noun", "flight");
 
-      return;
-      
       assertThat(next())
 	.equalsTo([
+	  ["Verb", 5, 0, 2],
+	  ["Verb", 6, 0, 2],	  
 	]);
-      
+
+      assertThat(S[2].print()).equalsTo([
+	'Nominal -> Noun • (1)',
+	'NP -> Det Nominal • (0)',
+	'S -> NP • VP (0)',
+	'VP -> • Verb (2)',
+	'VP -> • Verb NP (2)'
+      ]);
+
       assertThat(stack())
 	.equalsTo([
-	  ["Noun", [
-	    "Nominal -> • Noun (1)",
-	    "NP -> Det • Nominal (0)",
-	    "S -> • NP VP (0)"
+	  ["Verb", [
+	    "VP -> • Verb (2)",
+	    "S -> NP • VP (0)"
 	  ]],
+	  ["Verb", [
+            "VP -> • Verb NP (2)",
+            "S -> NP • VP (0)"
+          ]]
 	]);
 
     });
