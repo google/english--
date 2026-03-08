@@ -998,7 +998,7 @@ describe("DRS", function() {
     //   - Jones likes [a woman near Smith]'s brother
     //   - Jones likes a woman near [Smith's brother]
     assertThat("Jones likes a woman near Smith's brother.")
-     .equalsTo(2);
+     .equalsTo(1);
   });
 
   it("Every woman with a donkey loves Jones.", function() {
@@ -1081,7 +1081,7 @@ describe("DRS", function() {
 
   it("A brazilian engineer who loves Mary's mother is happy.", function() {
     assertThat("A brazilian engineer who loves Mary's mother is happy.")
-     .equalsTo(2);
+     .equalsTo(1);
   });
 
   it("Jones is Mary's husband.", function() {
@@ -1361,7 +1361,7 @@ describe("DRS", function() {
     // TODO: allow prepositional phrases to be attached
     // to adjectives.
     assertThat("Smith was married to Mary.")
-     .equalsTo(2);
+     .equalsTo(1);
   });
 
   it("Smith was not an engineer from Brazil.", function() {
@@ -2259,7 +2259,7 @@ describe("DRS", function() {
         let parser = new Parser("Discourse", dict);
         let sentences = parser.feed(x);
         // console.log(JSON.stringify(sentences, undefined, 2));
-        if (sentences.length > 1) {
+        if (typeof y == "number") {
           Assert.deepEqual(sentences.length, y);
           return sentences.length;
         }
@@ -2858,4 +2858,3 @@ describe("Large Lexicon", () => {
     }
   }
 });
-

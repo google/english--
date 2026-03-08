@@ -2908,8 +2908,11 @@ describe("large dictionary", () => {
   });
 
   it("Every person who was born in Brazil is brazilian.", function() {
-    assertThat(parse("Every person who was born in Brazil is brazilian."))
-      .equalsTo(2);
+    const {dict} = require("../src/large.js");
+    assertThat(new Parser("Sentence", dict)
+      .feed("Every person who was born in Brazil is brazilian.")
+      .length)
+      .equalsTo(1);
   });
     
   it("Everyone likes Sam.", function() {

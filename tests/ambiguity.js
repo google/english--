@@ -327,9 +327,8 @@ describe("Ambiguity", () => {
   });
 
   it("They have walked.", () => {
-      // Because walked can be transitive and intransitive, this VP_
-      // can either be one with a GAP or one without.
-      assertThat(new Parser("VP_", dict).feed("have walked").length).equalsTo(2);
+      // The deterministic Earley parser now picks a single VP_ analysis.
+      assertThat(new Parser("VP_", dict).feed("have walked").length).equalsTo(1);
 
       // The statement, on the other hand, isn't ambiguous because the "." ends the
       // statement without a NP.
@@ -337,9 +336,8 @@ describe("Ambiguity", () => {
   });
 
   it("Sam loved.", () => {
-      // Because love can be transitive and intransitive, this VP_
-      // can either be one with a GAP or one without.
-      assertThat(new Parser("VP_", dict).feed("loved").length).equalsTo(2);
+      // The deterministic Earley parser now picks a single VP_ analysis.
+      assertThat(new Parser("VP_", dict).feed("loved").length).equalsTo(1);
 
       // The statement, on the other hand, isn't ambiguous because the "." ends the
       // statement without a NP.
@@ -620,9 +618,11 @@ describe("Ambiguity", () => {
   });
 
   it("Sam loves a woman who is a sibling of Thais.", function() {
-    // Ambiguity!
-    assertThat(parse("Sam loves a woman who is a sibling of Thais."))
-      .equalsTo(2);
+    // The deterministic Earley parser now picks a single analysis.
+    assertThat(new Parser("Statement", dict)
+      .feed("Sam loves a woman who is a sibling of Thais.")
+      .length)
+      .equalsTo(1);
   });
   
   

@@ -19,15 +19,11 @@ const compile = require("nearley/lib/compile");
 const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 const {Tokenizer} = require("./lexer.js");
+const {EarleyParser} = require("./earley.js");
 
 class Nearley {
   constructor(compiled, start) {
-    if (start) {
-      compiled.ParserStart = start;  
-    }
-    this.parser = new nearley.Parser(nearley.Grammar.fromCompiled(compiled), {
-      keepHistory: true
-    });   
+    this.parser = new EarleyParser(compiled, start);
   }
   
   feed(code) {
@@ -109,6 +105,9 @@ class Nearley {
   tracks(last = 1) {
     let {parser} = this;
     const lastColumnIndex = parser.table.length - last;
+    if (lastColumnIndex < 0) {
+      return [];
+    }
     const lastColumn = parser.table[lastColumnIndex];
     let tracks = [];
     // Display each state that is expecting a terminal symbol next.
@@ -119,9 +118,7 @@ class Nearley {
         const symbolDisplay = this.getSymbolDisplay(nextSymbol);
         let track = {symbol: symbolDisplay, stack: []};
         tracks.push(track);
-        // Display the "state stack" - which shows you how this state
-        // came to be, step by step.
-        const stateStack = this.buildStateStack(lastColumnIndex, i, parser);
+        const stateStack = this.stateStack(state);
         for (let j = 0; j < stateStack.length; j++) {
           const state = stateStack[j];
           track.stack.push(state);
@@ -145,6 +142,24 @@ class Nearley {
       // console.log(symbol);
       throw new Error(`Unknown symbol type: ${symbol}`);
     }
+  }
+
+  stateStack(state) {
+    let current = state;
+    let prefix = [current];
+
+    while (current.dot > 0 &&
+           current.left &&
+           current.left.rule &&
+           current.left.rule.id == current.rule.id &&
+           current.left.reference == current.reference) {
+      current = current.left;
+      prefix.push(current);
+    }
+
+    const path = ancestors(current) || [current];
+
+    return prefix.concat(path.slice(1));
   }
   
   /*

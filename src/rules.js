@@ -1432,7 +1432,7 @@ class CRQUESTIONWHO extends Rule {
   apply({vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", node.loc);
     
     q.head.push(u);
     
@@ -1449,7 +1449,7 @@ class CRQUESTIONWHICH extends Rule {
   apply({noun, vp_}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", node.loc);
     
     q.head.push(u);
     
@@ -1466,7 +1466,7 @@ class CRQUESTIONWHOM extends Rule {
   apply({sub, verb}, node, refs = []) {
     let q = drs(this.ids);
     
-    let u = referent(this.id(), {}, "", refs);
+    let u = referent(this.id(), {}, "", node.loc);
     
     q.head.push(u);
     
@@ -1568,7 +1568,7 @@ class CRPRED extends Rule {
     if (sub["@type"] == "Referent") {
       args.push(sub);
     } else if (sub["@type"] == "GAP") {
-      let u = referent(this.id(), {}, "", refs);
+      let u = referent(this.id(), {}, "", node.loc);
       head.push(u);
       args.push(u);
     }
