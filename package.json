@@ -17,8 +17,7 @@
   "dependencies": {
     "en-inflectors": "^1.0.12",
     "logic": "github:samuelgoto/logic",
-    "nearley": "^2.18.0",
-    "pegjs": "^0.10.0"
+    "nearley": "^2.18.0"
   },
   "devDependencies": {
     "minifyify": "^7.3.5",

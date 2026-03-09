@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-const {clone, print} = require("./base.js");
-const {parse} = require("./parser.js");
+const {clone} = require("./base.js");
 
 class DRS {
   constructor([setup, before, rules, after = []]) {

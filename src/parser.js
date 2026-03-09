@@ -75,7 +75,6 @@ class Nearley {
       print() {
         const tracks = that.tracks(2);
         const result = [];
-        let unexpected = ""; 
         let head = "";
         if (this.token.type) {
           head = `Unexpected %${this.token.type} token: "${this.token.value}".`;
@@ -524,7 +523,7 @@ class FeaturedNearley {
     return Nearley.compile(grammar, raw);    
   }
 
-  static generate(source, header = "", footer = "", raw) {
+  static generate(source, header = "", footer = "") {
     let parser = new FeaturedNearley();
     let grammar = parser.feed(source + footer);
     
