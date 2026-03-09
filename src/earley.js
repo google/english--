@@ -15,6 +15,7 @@
  */
 
 const REJECT = Symbol("reject");
+const {evaluateAction} = require("./unify.js");
 
 class StringLexer {
   constructor() {
@@ -96,6 +97,10 @@ function emptyFamily() {
 }
 
 function postprocess(rule, values, reference) {
+  if (rule.action) {
+    return evaluateAction(rule.action, values, reference, REJECT);
+  }
+
   if (!rule.postprocess) {
     return values;
   }
@@ -108,6 +113,7 @@ function normalizeRule(rule, id) {
     "id": id,
     "name": rule.name,
     "symbols": rule.symbols || [],
+    "action": rule.action,
     "postprocess": rule.postprocess,
     toString() {
       return `${this.id}:${this.name}`;

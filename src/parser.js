@@ -20,6 +20,8 @@ const generate = require("nearley/lib/generate");
 const grammar = require("nearley/lib/nearley-language-bootstrapped");
 const {Tokenizer} = require("./lexer.js");
 const {EarleyParser} = require("./earley.js");
+const {bind, match, ruleMeta} = require("./unify.js");
+const {compileFeatureGrammar, parseFeatureSource} = require("./feature-compiler.js");
 
 class Nearley {
   constructor(compiled, start) {
@@ -59,7 +61,19 @@ class Nearley {
   }
 
   complete() {
-    return complete(this.tracks());
+    const tokens = complete(this.tracks());
+    const last = this.parser.tokens[this.parser.tokens.length - 1];
+
+    if (!last || last.type != "WS" || !tokens.WS) {
+      return tokens;
+    }
+
+    return {
+      "WS": tokens.WS,
+      ...Object.fromEntries(
+        Object.entries(tokens).filter(([symbol]) => symbol != "WS")
+      ),
+    };
   }
   
   reportError(e) {
@@ -223,11 +237,10 @@ function walk({isComplete, data, left, right}) {
 
 function valid(path) {
   for (let line of path) {
-    if (!line.rule.postprocess ||
-        !line.rule.postprocess.meta) {
+    const meta = ruleMeta(line.rule);
+    if (!meta) {
       return true;
     }
-    const meta = line.rule.postprocess.meta; 
     let right = walk(line);
     let result = match(meta.type, meta.types, meta.conditions,
                        right, undefined, false, true);
@@ -242,7 +255,7 @@ function continuous(path) {
   let j = 0;
   do  {
     let rule = path[j].rule;
-    if (rule.postprocess && rule.postprocess.meta) {
+    if (ruleMeta(rule)) {
       break;
     }
     j++;
@@ -256,12 +269,12 @@ function continuous(path) {
   
   let last = {
     "@type": path[j].rule.name,
-    "types" : path[j].rule.postprocess.meta.types,
+    "types" : ruleMeta(path[j].rule).types,
   };
   
   for (let i = (j + 1); i < path.length; i++) {
     let next = path[i];
-    let meta = next.rule.postprocess.meta;
+    let meta = ruleMeta(next.rule);
     let right = walk(next);
     right.push(last);
     let result = match(next.rule.name, meta.types, meta.conditions,
@@ -288,245 +301,85 @@ function complete(tracks) {
   return tokens;
 }
 
-function namespace(type, bindings, conditions) {  
-  let signature = `${type}${JSON.stringify(bindings)} -> `;
-  for (let child of conditions) {
-    signature += `${child["@type"] || JSON.stringify(child)}${JSON.stringify(child.types || {})} `;
+function legacyFeatureTerm(term) {
+  if (term.kind == "name") {
+    return {
+      "name": term.name,
+      "types": term.types,
+    };
   }
-  
-  let hash = (str) => {
-    return str.split("")
-      .reduce((prevHash, currVal) =>
-              (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+
+  if (term.kind == "token") {
+    return `%${term.name}`;
   }
-  
-  return hash(signature); 
+
+  if (term.kind == "literal") {
+    return JSON.stringify(term.value);
+  }
+
+  throw new Error(`Unknown feature term: ${term.kind}`);
 }
 
-function match(type, types = {}, conditions = [], data, location, reject,
-               partial = false) {
-  // Creates a copy of the types because it is reused
-  // across multiple calls and we assign values to it.
-  let bindings = JSON.parse(JSON.stringify(types));
-
-  // Creates a copy of the input data, because it is
-  // reused across multiple calls.
-  let result = JSON.parse(JSON.stringify(data || []))
-  
-  // Ignores the null type.
-  let expects = conditions.filter((x) => x["@type"] != "null");
-
-  if (!partial && expects.length != data.length) {
-    throw new Error("Unexpected data length");
+function featureTermName(term) {
+  if (term.kind == "name") {
+    return term.name;
   }
-  
-  let variables = {};
 
-  let intersection = (a, b) => a.filter(value => b.includes(value));
-
-  for (let i = 0; i < result.length; i++) {
-    let expected = expects[i];
-    let child = result[i];
-    if (expected["@type"] != child["@type"]) {
-      return reject;
-    }
-    for (let [key, value] of Object.entries(expected.types || {})) {
-      if (typeof value == "number") {
-        if (variables[value]) {
-          if (Array.isArray(variables[value])) {
-            if (Array.isArray(child.types[key])) {
-              if (intersection(child.types[key], variables[value]).length == 0) {
-                return reject;
-              }
-            } else if (!variables[value].includes(child.types[key])) {
-              return reject;
-            }
-          } else if (typeof variables[value] == "number") {
-            variables[value] = child.types[key];
-          } else if (Array.isArray(child.types[key])) {
-            if (!child.types[key].includes(variables[value])) {
-              return reject;
-            }
-            continue;
-          } else if (typeof child.types[key] == "number") {
-            variables[child.types[key]] = variables[value];
-            continue;
-          } else if (variables[value] != child.types[key]) {
-            return reject;
-          }
-        }
-        // collects variables
-        variables[value] = child.types[key];
-      } else if (typeof child.types[key] == "number") {
-        child.types[key] = value;
-      } else if (Array.isArray(child.types[key])) {
-        if (!child.types[key].includes(expected.types[key])) {
-          return reject;
-        }
-        child.types[key] = expected.types[key];
-      } else if (typeof child.types[key] == "string" &&
-                 expected.types[key] != child.types[key]) {
-        if (Array.isArray(expected.types[key]) &&
-            expected.types[key].includes(child.types[key])) {
-          continue;
-        }
-        return reject;
-      } else if (!child.types[key]) {
-        return reject;
-      }
-    }
+  if (term.kind == "token") {
+    return `%${term.name}`;
   }
-    
-  // Sets variables
-  const scope = namespace(type, bindings, conditions);
-  for (let [key, value] of Object.entries(bindings)) {
-    if (typeof value == "number") {
-      if (!variables[value]) {
-        bindings[key] = scope + value;
-      } else {
-        bindings[key] = variables[value];
-      }
-    }
+
+  if (term.kind == "literal") {
+    return JSON.stringify(term.value);
+  }
+
+  throw new Error(`Unknown feature term: ${term.kind}`);
+}
+
+function featureCondition(term) {
+  if (term.kind == "name") {
+    return {
+      "@type": term.name,
+      "types": term.types,
+    };
   }
 
   return {
-    "@type": type,
-    "types": bindings,
-    "children": result.filter(
-      (child) => (child["@type"] != "_" && child["@type"] != "__")),
+    "@type": featureTermName(term),
+    "types": {},
   };
 }
 
-function bind(type, types = {}, conditions = []) {   
-  let matcher = (data, location, reject) => {
-    return match(type, types, conditions, data, location, reject);
-  };
-
-  matcher.meta = {
-    type: type,
-    types: types,
-    conditions: conditions
-  };
-  
-  return matcher;
+function renderFeatureCondition(term) {
+  const condition = featureCondition(term);
+  return `{"@type": ${JSON.stringify(condition["@type"])}, ` +
+    `"types": ${JSON.stringify(condition.types)}}`;
 }
-
-const RuntimeSyntax = `
-      @builtin "whitespace.ne"
-      @builtin "number.ne"
-      @builtin "string.ne"
-
-      rules -> (_ rule _ "."):+ _ {% ([rules]) => {
-        return rules.map(([ws, rule]) => rule);
-      } %}
-
-      rule -> head __ "->" __ tail {%
-        ([head, ws0, arrow, ws1, tail]) => {
-         return {
-          "head": head,
-          "tail": tail
-         }
-        }
-      %}
-
-      head -> name {% id %}
-      tail -> (term __ {% id %}):* term {%
-        ([beginning, end]) => {
-         return [...beginning, end];
-        }
-      %}
-
-      term -> name {% id %}
-      term -> string {% id %}
-      term -> "%" word {% ([tok, word]) =>  tok + word %}
-
-      name -> word features:? {% 
-        ([word, features]) => {
-         return {
-          name: word,
-          types: Object.fromEntries(features || []),
-         }
-        }
-      %}
-      string -> dqstring {% ([str]) => '"' + str + '"' %}
-
-      features -> "[" props "]" {% ([p0, props, p1]) => {
-        // console.log(props);
-        return props;
-      }%}
-
-      props -> (keyvalue _ "," _ {% id %}):* keyvalue:? {%
-        ([beginning, end]) => {
-         if (!end) {
-          return beginning;
-         }
-         return [...beginning, end];
-        }
-      %}
-
-      keyvalue -> word _ "=" _ word {% 
-        ([key, ws0, eq, ws1, value]) => {
-         return [key, value];
-        }
-      %}
-
-      keyvalue -> word _ "=" _ int {% 
-        ([key, ws0, eq, ws1, value]) => {
-         return [key, value];
-        }
-      %}
-
-      keyvalue -> word _ "=" _ array {% 
-        ([key, ws0, eq, ws1, value]) => {
-         return [key, value];
-        }
-      %}
-
-      array -> "[" values "]" {% ([p0, values, p1]) => values %}
-
-      values -> (word _ "," _ {% id %}):* word:? {%
-        ([beginning, end]) => {
-         if (!end) {
-          return beginning;
-         }
-         return [...beginning, end];
-        }
-      %}
-
-      word -> [a-zA-Z_\+\-]:+ {% ([char]) => {
-        return char.join("");
-      }%}
-`;
-
-let RuntimeGrammar;
-
-function runtimeGrammar() {
-  if (!RuntimeGrammar) {
-    RuntimeGrammar = Nearley.compile(RuntimeSyntax);
-  }
-
-  return RuntimeGrammar;
-}
-
 
 class FeaturedNearley {
-  constructor() {
-    this.parser = new Nearley(runtimeGrammar());
-  }
-
   feed(code) {
-    return this.parser.feed(code);
+    return [parseFeatureSource(code).map(({head, tail}) => {
+      return {
+        "head": legacyFeatureTerm(head),
+        "tail": tail.map(legacyFeatureTerm),
+      };
+    })];
   }
 
   static compile(source, header = "", footer = "", raw) {
+    if (!header && !footer && !raw) {
+      const rules = parseFeatureSource(source);
+      return compileFeatureGrammar(source, {
+        "ParserStart": rules[0].head.name,
+      });
+    }
+
     let grammar = FeaturedNearley.generate(source, header, footer);
-    return Nearley.compile(grammar, raw);    
+    return Nearley.compile(grammar, raw);
   }
 
   static generate(source, header = "", footer = "") {
-    let parser = new FeaturedNearley();
-    let grammar = parser.feed(source + footer);
-    
+    const grammar = parseFeatureSource(source + footer);
     let result = [];
 
     function feed(code) {
@@ -537,16 +390,11 @@ class FeaturedNearley {
       feed(header);
     }
 
-    for (let {head, tail} of grammar[0]) {
-      function name(x) {
-        if (typeof x == "string") {
-          return x;
-        } else {
-          return x.name;
-        }
-      }
-      feed(`${head.name} -> ${tail.map(name).join(" ")} {%`);
-      if (tail.length == 1 && tail[0] == "%word") {
+    for (let {head, tail} of grammar) {
+      feed(`${head.name} -> ${tail.map(featureTermName).join(" ")} {%`);
+      if (tail.length == 1 &&
+          tail[0].kind == "token" &&
+          tail[0].name == "word") {
         // For A[] -> %word rules, we special case and enforce that
         // the types of %A at runtime need to match the types of A[].
         feed(`
@@ -559,10 +407,8 @@ class FeaturedNearley {
                                     "types": ${JSON.stringify(head.types)}
                                   }])([match], location, reject);
                 if (result != reject) {
-                  // console.log(result.children[0]);
                   let node = JSON.parse(JSON.stringify(result.children[0]));
                   node.children = [{value: token.value}];
-                  //console.log(node);
                   return node;
                 }
               }
@@ -578,7 +424,7 @@ class FeaturedNearley {
       } else {
         feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
         for (let term of tail) {
-          feed(`    {"@type": "${name(term)}", "types": ${JSON.stringify(term.types)}}, `);
+          feed(`    ${renderFeatureCondition(term)}, `);
         }
         feed(`  ])`);
       }
@@ -869,42 +715,104 @@ const DrtSyntax = `
 
 let DRTGrammar;
 
-function drtGrammar() {
-  const header = `
-      @{%
-        const lexer = {
-          use(tokenizer) {
-            this.tokenizer = tokenizer;
-          },
-          next() {
-            return this.tokenizer.next();
-          },
-          save() {
-            return this.tokenizer.save();
-          },
-          reset(chunk, info) {
-            return this.tokenizer.reset(chunk, info);
-          },
-          formatError(token) {
-            return this.tokenizer.formatError(token);
-          },
-          has(name) {
-            this.keywords = this.keywords || [];
-            this.keywords.push(name);
-            return true;
-          }
-        };
-      %}
-      @lexer lexer
-      _ -> %WS:* {% function(d) {return {"@type": "_", types: {}};} %}
-      __ -> %WS:+ {% function(d) {return {"@type": "__", types: {}};} %}
-      Discourse -> _ (Sentence _):+ {% ([ws1, sentences]) => {
-         return sentences.map(([s, ws2]) => s); 
-      }%}
-    `;
+function drtLexer() {
+  return {
+    use(tokenizer) {
+      this.tokenizer = tokenizer;
+    },
+    next() {
+      return this.tokenizer.next();
+    },
+    save() {
+      return this.tokenizer.save();
+    },
+    reset(chunk, info) {
+      return this.tokenizer.reset(chunk, info);
+    },
+    formatError(token) {
+      return this.tokenizer.formatError(token);
+    },
+    has(name) {
+      this.keywords = this.keywords || [];
+      this.keywords.push(name);
+      return true;
+    }
+  };
+}
 
+function drtBaseRules() {
+  return [
+    {
+      "name": "_",
+      "symbols": [],
+      "action": {
+        "kind": "node",
+        "type": "_",
+        "types": {},
+      },
+    },
+    {
+      "name": "_",
+      "symbols": ["__"],
+      "action": {
+        "kind": "node",
+        "type": "_",
+        "types": {},
+      },
+    },
+    {
+      "name": "__",
+      "symbols": [{"type": "WS"}],
+      "action": {
+        "kind": "node",
+        "type": "__",
+        "types": {},
+      },
+    },
+    {
+      "name": "__",
+      "symbols": [{"type": "WS"}, "__"],
+      "action": {
+        "kind": "node",
+        "type": "__",
+        "types": {},
+      },
+    },
+    {
+      "name": "Discourse",
+      "symbols": ["_", "SentenceList"],
+      "action": {
+        "kind": "take",
+        "index": 1,
+      },
+    },
+    {
+      "name": "SentenceList",
+      "symbols": ["Sentence", "_"],
+      "action": {
+        "kind": "list_one",
+        "index": 0,
+      },
+    },
+    {
+      "name": "SentenceList",
+      "symbols": ["Sentence", "_", "SentenceList"],
+      "action": {
+        "kind": "list_cons",
+        "head": 0,
+        "tail": 2,
+      },
+    },
+  ];
+}
+
+function drtGrammar() {
   if (!DRTGrammar) {
-    DRTGrammar = FeaturedNearley.compile(DrtSyntax, header);
+    DRTGrammar = compileFeatureGrammar(DrtSyntax, {
+      "Lexer": drtLexer(),
+      "ParserStart": "Discourse",
+      "extraRules": drtBaseRules(),
+    });
   }
     
   return DRTGrammar;  
@@ -967,10 +875,7 @@ class Parser {
 
 function print(state) {
   let {rule} = state;
-  let meta = {};
-  if (rule.postprocess && rule.postprocess.meta) {
-    meta = rule.postprocess.meta;
-  }
+  let meta = ruleMeta(rule) || {};
   let features = (types) => Object
       .entries(types)
       .map(([key, value]) => `${key}=${value}`)
