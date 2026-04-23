@@ -679,20 +679,112 @@ describe("FeaturedNearley", function() {
   });
 
   it("Generate", function() {
-    let grammar = FeaturedNearley.generate(`
+    let code = FeaturedNearley.generate(`
       S[a=1] -> NP[b=2] _ VP[c=3].
     `);
+
+    assertThat(code.includes("{%")).equalsTo(false);
+    assertThat(code.includes("bind(")).equalsTo(false);
+
+    const generated = {"exports": {}};
+    new Function("module", code)(generated);
+    assertThat(generated.exports).equalsTo({
+      "ParserStart": "S",
+      "ParserRules": [{
+        "name": "S",
+        "symbols": ["NP", "_", "VP"],
+        "meta": {
+          "type": "S",
+          "types": {"a": 1},
+          "conditions": [{
+            "@type": "NP",
+            "types": {"b": 2},
+          }, {
+            "@type": "_",
+            "types": {},
+          }, {
+            "@type": "VP",
+            "types": {"c": 3},
+          }],
+          "symbolConditions": [{
+            "@type": "NP",
+            "types": {"b": 2},
+          }, {
+            "@type": "_",
+            "types": {},
+          }, {
+            "@type": "VP",
+            "types": {"c": 3},
+          }],
+        },
+      }],
+    });
+
+    assertThat(FeaturedNearley.compile(`
+      S[a=1] -> NP[b=2] _ VP[c=3].
+    `, "", true)).equalsTo(code);
     
-    assertThat(grammar).equalsTo(`
-S -> NP _ VP {%
-  bind("S", {"a":1}, [
-    {"@type": "NP", "types": {"b":2}}, 
-    {"@type": "_", "types": {}}, 
-    {"@type": "VP", "types": {"c":3}}, 
-  ])
-%}
-`.trim());
-    
+  });
+
+  it("Compiles declarative feature rules", function() {
+    let grammar = FeaturedNearley.compile(`
+       main -> N[num=sing].
+       N[num=1] -> %word.
+    `);
+
+    assertThat(grammar.ParserRules.map((rule) => rule.action))
+      .equalsTo([undefined, undefined]);
+    assertThat(grammar.ParserRules[0].meta).equalsTo({
+      "type": "main",
+      "types": {},
+      "conditions": [{
+        "@type": "N",
+        "types": {"num": "sing"},
+      }],
+      "symbolConditions": [{
+        "@type": "N",
+        "types": {"num": "sing"},
+      }],
+    });
+
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+      reset(chunk, state) {
+        this.done = false;
+      },
+      save() {
+      },
+      next() {
+        if (this.done) {
+          return undefined;
+        }
+        this.done = true;
+        return {
+          "type": "word",
+          "value": "dog",
+          "tokens": [{
+            "@type": "N",
+            "types": {"num": "plur"},
+          }, {
+            "@type": "N",
+            "types": {"num": "sing"},
+          }],
+        };
+      },
+    };
+
+    let parser = new Nearley(grammar, "main");
+    assertThat(parser.feed("dog")).equalsTo([{
+      "@type": "main",
+      "children": [{
+        "@type": "N",
+        "types": {"num": "sing"},
+        "children": [{"value": "dog"}],
+      }],
+      "types": {},
+    }]);
   });
 
   it("whitespace", function() {
@@ -799,42 +891,36 @@ S -> NP _ VP {%
   });
 
   it("Tokens", function() {
-    const header = `
-       @{%
-         const lexer = {
-           has(name) {
-             return true;
-           },
-           reset(chunk, state) {
-           },
-           save() {
-           },
-           formatError(e) {
-           },
-           next() {
-             if (this.parsed) {
-               return;
-             }
-             this.parsed = true;
-             return {
-               "@type": "%foo",
-               "value": "foo", 
-               "type": "foo",
-               "tokens": [{
-                 "@type": "foo", 
-                 "types": {}
-               }]
-             };
-           },
-         };
-       %}
-
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
-    `;
     let grammar = FeaturedNearley.compile(`
        main -> %foo.
-    `, header);
+    `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+      reset(chunk, state) {
+        this.parsed = false;
+      },
+      save() {
+      },
+      formatError(e) {
+      },
+      next() {
+        if (this.parsed) {
+          return;
+        }
+        this.parsed = true;
+        return {
+          "@type": "%foo",
+          "value": "foo",
+          "type": "foo",
+          "tokens": [{
+            "@type": "foo",
+            "types": {},
+          }],
+        };
+      },
+    };
 
     let parser = new Nearley(grammar, "main");
 
@@ -856,46 +942,38 @@ S -> NP _ VP {%
   });
   
   it("Typed Tokens", function() {
-    const header = `
-       @{%
-         const lexer = {
-           has(name) {
-             return true;
-           },
-           reset(chunk, state) {
-             this.i = 0;
-           },
-           save() {
-           },
-           next() {
-             // console.log("next");
-             this.i++;
-             if (this.i == 3) {
-               return undefined;
-             }
-             return {
-               "value": "foo", 
-               "type": "word",
-               "tokens": [{
-                 "@type": "N", 
-                 "types": {}
-               }, {
-                 "@type": "ADJ", 
-                 "types": {}
-               }]
-             };
-           },
-         };
-       %}
-
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
-    `;
     let grammar = FeaturedNearley.compile(`
        main -> ADJ N.
        ADJ[] -> %word.
        N[] -> %word.
-    `, header);
+    `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+      reset(chunk, state) {
+        this.i = 0;
+      },
+      save() {
+      },
+      next() {
+        this.i++;
+        if (this.i == 3) {
+          return undefined;
+        }
+        return {
+          "value": "foo",
+          "type": "word",
+          "tokens": [{
+            "@type": "N",
+            "types": {},
+          }, {
+            "@type": "ADJ",
+            "types": {},
+          }],
+        };
+      },
+    };
 
     let parser = new Nearley(grammar, "main");
 

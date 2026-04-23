@@ -320,40 +320,16 @@ function legacyFeatureTerm(term) {
   throw new Error(`Unknown feature term: ${term.kind}`);
 }
 
-function featureTermName(term) {
-  if (term.kind == "name") {
-    return term.name;
-  }
-
-  if (term.kind == "token") {
-    return `%${term.name}`;
-  }
-
-  if (term.kind == "literal") {
-    return JSON.stringify(term.value);
-  }
-
-  throw new Error(`Unknown feature term: ${term.kind}`);
+function declarativeFeatureGrammar(source, footer = "") {
+  const body = source + (footer || "");
+  const rules = parseFeatureSource(body);
+  return compileFeatureGrammar(body, {
+    "ParserStart": rules[0] ? rules[0].head.name : undefined,
+  });
 }
 
-function featureCondition(term) {
-  if (term.kind == "name") {
-    return {
-      "@type": term.name,
-      "types": term.types,
-    };
-  }
-
-  return {
-    "@type": featureTermName(term),
-    "types": {},
-  };
-}
-
-function renderFeatureCondition(term) {
-  const condition = featureCondition(term);
-  return `{"@type": ${JSON.stringify(condition["@type"])}, ` +
-    `"types": ${JSON.stringify(condition.types)}}`;
+function moduleSource(grammar) {
+  return `module.exports = ${JSON.stringify(grammar, undefined, 2)};\n`;
 }
 
 class FeaturedNearley {
@@ -367,70 +343,27 @@ class FeaturedNearley {
   }
 
   static compile(source, header = "", footer = "", raw) {
-    if (!header && !footer && !raw) {
-      const rules = parseFeatureSource(source);
-      return compileFeatureGrammar(source, {
-        "ParserStart": rules[0].head.name,
-      });
+    if (typeof footer == "boolean" && raw === undefined) {
+      raw = footer;
+      footer = "";
+    }
+    if (header && header.trim()) {
+      throw new Error("FeaturedNearley.compile no longer supports Nearley headers");
     }
 
-    let grammar = FeaturedNearley.generate(source, header, footer);
-    return Nearley.compile(grammar, raw);
+    const grammar = declarativeFeatureGrammar(source, footer);
+    if (raw) {
+      return moduleSource(grammar);
+    }
+
+    return grammar;
   }
 
   static generate(source, header = "", footer = "") {
-    const grammar = parseFeatureSource(source + footer);
-    let result = [];
-
-    function feed(code) {
-      result.push(code);
+    if (header && header.trim()) {
+      throw new Error("FeaturedNearley.generate no longer supports Nearley headers");
     }
-
-    if (header) {
-      feed(header);
-    }
-
-    for (let {head, tail} of grammar) {
-      feed(`${head.name} -> ${tail.map(featureTermName).join(" ")} {%`);
-      if (tail.length == 1 &&
-          tail[0].kind == "token" &&
-          tail[0].name == "word") {
-        // For A[] -> %word rules, we special case and enforce that
-        // the types of %A at runtime need to match the types of A[].
-        feed(`
-          (() => {
-            let lexicon = ([token], location, reject) => {
-              for (let match of token.tokens) {
-                let result = bind("${head.name}", 
-                                  ${JSON.stringify(head.types)}, [{
-                                    "@type": "${head.name}", 
-                                    "types": ${JSON.stringify(head.types)}
-                                  }])([match], location, reject);
-                if (result != reject) {
-                  let node = JSON.parse(JSON.stringify(result.children[0]));
-                  node.children = [{value: token.value}];
-                  return node;
-                }
-              }
-              return reject;
-            }
-            lexicon.meta = {
-              type: ${JSON.stringify(head.name)},
-              types: ${JSON.stringify(head.types)},
-            };
-            return lexicon;
-          })()
-        `);
-      } else {
-        feed(`  bind("${head.name}", ${JSON.stringify(head.types)}, [`);
-        for (let term of tail) {
-          feed(`    ${renderFeatureCondition(term)}, `);
-        }
-        feed(`  ])`);
-      }
-      feed(`%}`);
-    }
-    return result.join("\n");
+    return moduleSource(declarativeFeatureGrammar(source, footer));
   }
 }
 
@@ -971,6 +904,8 @@ module.exports = {
   Nearley: Nearley,
   bind: bind,
   match: match,
+  parseFeatureSource: parseFeatureSource,
+  compileFeatureGrammar: compileFeatureGrammar,
   FeaturedNearley: FeaturedNearley,
   Parser: Parser,
   ancestors: ancestors,

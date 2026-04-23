@@ -15,7 +15,7 @@
  */
 
 const REJECT = Symbol("reject");
-const {evaluateAction} = require("./unify.js");
+const {evaluateAction, match} = require("./unify.js");
 
 class StringLexer {
   constructor() {
@@ -96,16 +96,108 @@ function emptyFamily() {
   };
 }
 
-function postprocess(rule, values, reference) {
+function postprocessResults(rule, values, reference) {
   if (rule.action) {
-    return evaluateAction(rule.action, values, reference, REJECT);
+    const result = evaluateAction(rule.action, values, reference, REJECT);
+    return result === REJECT ? [] : [result];
+  }
+
+  if (rule.meta) {
+    return postprocessFeatureRule(rule, values, reference);
   }
 
   if (!rule.postprocess) {
-    return values;
+    return [values];
   }
 
-  return rule.postprocess(values, reference, REJECT);
+  const result = rule.postprocess(values, reference, REJECT);
+  return result === REJECT ? [] : [result];
+}
+
+function clone(node) {
+  return JSON.parse(JSON.stringify(node));
+}
+
+function isLexiconRule(rule) {
+  return rule.symbols.length == 1 &&
+    rule.symbols[0] &&
+    rule.symbols[0].type == "word";
+}
+
+function postprocessFeatureRule(rule, values, reference) {
+  const {type, types, conditions} = rule.meta;
+
+  if (!isLexiconRule(rule)) {
+    const result = match(type, types, conditions, values, reference, REJECT);
+    return result === REJECT ? [] : [result];
+  }
+
+  const results = lexiconNodes(rule, values, reference);
+  return results.length == 0 ? [] : [results[0].node];
+}
+
+function lexiconNodes(rule, values, reference) {
+  const {type, types} = rule.meta;
+  const results = [];
+
+  for (let token of values) {
+    for (let i = 0; i < (token.tokens || []).length; i++) {
+      const candidate = token.tokens[i];
+      let result = match(type,
+                         types,
+                         [{"@type": type, "types": types}],
+                         [candidate],
+                         reference,
+                         REJECT);
+      if (result == REJECT) {
+        continue;
+      }
+
+      let node = clone(result.children[0]);
+      node.children = [{"value": token.value}];
+      results.push({
+        "node": node,
+        "signature": `l:${i}`,
+      });
+    }
+  }
+
+  return results;
+}
+
+function matchesCondition(condition, value) {
+  if (!condition) {
+    return true;
+  }
+
+  return match(condition["@type"],
+               condition.types || {},
+               [condition],
+               [value],
+               undefined,
+               REJECT) !== REJECT;
+}
+
+function expectedCondition(state) {
+  const meta = state.rule.meta;
+  if (!meta) {
+    return undefined;
+  }
+
+  if (meta.symbolConditions) {
+    return meta.symbolConditions[state.dot];
+  }
+
+  return meta.conditions ? meta.conditions[state.dot] : undefined;
+}
+
+function hasConcreteTypes(condition) {
+  if (!condition || !condition.types) {
+    return false;
+  }
+
+  return Object.values(condition.types)
+    .some((value) => typeof value != "number");
 }
 
 function normalizeRule(rule, id) {
@@ -114,6 +206,7 @@ function normalizeRule(rule, id) {
     "name": rule.name,
     "symbols": rule.symbols || [],
     "action": rule.action,
+    "meta": rule.meta,
     "postprocess": rule.postprocess,
     toString() {
       return `${this.id}:${this.name}`;
@@ -164,7 +257,34 @@ function tokenLeaf(data) {
   };
 }
 
-function childAlternatives(state) {
+function childAlternatives(state, condition) {
+  if (state.rule.meta && isLexiconRule(state.rule)) {
+    if (!hasConcreteTypes(condition)) {
+      return state.families.map((family) => {
+        return {
+          "value": family.data,
+          "trace": family.trace,
+          "signature": family.signature,
+        };
+      });
+    }
+
+    const results = [];
+    for (let family of state.families) {
+      for (let item of lexiconNodes(state.rule, family.values, state.reference)) {
+        if (!matchesCondition(condition, item.node)) {
+          continue;
+        }
+        results.push({
+          "value": item.node,
+          "trace": family.trace,
+          "signature": joinSignature(family.signature, item.signature),
+        });
+      }
+    }
+    return results;
+  }
+
   return state.families.map((family) => {
     return {
       "value": family.data,
@@ -337,17 +457,15 @@ class EarleyParser {
     if (complete) {
       pendingFamilies = [];
       for (let family of families) {
-        const result = postprocess(rule, family.values, reference);
-        if (result === REJECT) {
-          continue;
+        const results = postprocessResults(rule, family.values, reference);
+        for (let i = 0; i < results.length; i++) {
+          pendingFamilies.push({
+            "values": family.values,
+            "data": results[i],
+            "trace": [rule.id].concat(family.trace),
+            "signature": `r:${rule.id}:${i}(${family.signature})`,
+          });
         }
-
-        pendingFamilies.push({
-          "values": family.values,
-          "data": result,
-          "trace": [rule.id].concat(family.trace),
-          "signature": `r:${rule.id}(${family.signature})`,
-        });
       }
 
       if (pendingFamilies.length == 0) {
@@ -392,7 +510,10 @@ class EarleyParser {
         continue;
       }
 
-      const families = advanceFamilies(parent.families, childAlternatives(child));
+      const families = advanceFamilies(
+        parent.families,
+        childAlternatives(child, expectedCondition(parent))
+      );
       if (families.length == 0) {
         continue;
       }
@@ -450,7 +571,10 @@ class EarleyParser {
         continue;
       }
 
-      const families = advanceFamilies(parent.families, childAlternatives(completed));
+      const families = advanceFamilies(
+        parent.families,
+        childAlternatives(completed, expectedCondition(parent))
+      );
       if (families.length == 0) {
         continue;
       }

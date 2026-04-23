@@ -297,38 +297,28 @@ function symbol(term) {
 }
 
 function compileRule({head, tail}) {
-  const conditions = tail.map(condition);
-  const symbols = tail.map(symbol).filter(Boolean);
+  const terms = tail.map((term) => {
+    return {
+      "symbol": symbol(term),
+      "condition": condition(term),
+    };
+  });
+  const conditions = terms.map(({condition}) => condition);
+  const symbols = terms.map(({symbol}) => symbol).filter(Boolean);
+  const symbolConditions = terms
+        .filter(({symbol}) => symbol !== undefined)
+        .map(({condition}) => condition);
   const meta = {
     "type": head.name,
     "types": head.types,
     "conditions": conditions,
+    "symbolConditions": symbolConditions,
   };
-
-  let action;
-  if (tail.length == 1 &&
-      tail[0].kind == "token" &&
-      tail[0].name == "word") {
-    action = {
-      "kind": "lexicon",
-      "type": head.name,
-      "types": head.types,
-      "meta": meta,
-    };
-  } else {
-    action = {
-      "kind": "bind",
-      "type": head.name,
-      "types": head.types,
-      "conditions": conditions,
-      "meta": meta,
-    };
-  }
 
   return {
     "name": head.name,
     "symbols": symbols,
-    "action": action,
+    "meta": meta,
   };
 }
 

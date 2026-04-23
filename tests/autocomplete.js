@@ -288,30 +288,23 @@ A bar token based on:
   });
 
   it("Features", () => {
-    const header = `
-       @{%
-         const lexer = {
-           has(name) {
-             return true;
-           },
-           reset(chunk, state) {
-           },
-           save() {
-           },
-           formatError(e) {
-           },
-           next() {
-           },
-         };
-       %}
-
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
-    `;
     let grammar = FeaturedNearley.compile(`
        main -> FOO[a=1].
        FOO[a=1] -> %word.
-    `, header);
+    `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+      reset(chunk, state) {
+      },
+      save() {
+      },
+      formatError(e) {
+      },
+      next() {
+      },
+    };
 
     let parser = new Nearley(grammar, "main");
 
@@ -325,41 +318,35 @@ A word token based on:
   });
   
   it("Features with feed", () => {
-    const header = `
-       @{%
-         const lexer = {
-           has(name) {
-             return true;
-           },
-           reset(chunk, state) {
-             this.buffer = chunk;
-           },
-           save() {
-           },
-           formatError(e) {
-           },
-           next() {
-             if (this.done) {
-               return undefined;
-             }
-             this.done = true;
-             return {
-               type: "word", 
-               value: "foo", 
-               tokens: [{"@type": "FOO", "types": {"a": 1}}]
-             };
-           },
-         };
-       %}
-
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
-    `;
     let grammar = FeaturedNearley.compile(`
        main -> FOO[a=1] BAR[b=2].
        FOO[a=1] -> %word.
        BAR[b=2] -> %word.
-    `, header);
+    `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+      reset(chunk, state) {
+        this.buffer = chunk;
+        this.done = false;
+      },
+      save() {
+      },
+      formatError(e) {
+      },
+      next() {
+        if (this.done) {
+          return undefined;
+        }
+        this.done = true;
+        return {
+          "type": "word",
+          "value": "foo",
+          "tokens": [{"@type": "FOO", "types": {"a": 1}}],
+        };
+      },
+    };
 
     let parser = new Nearley(grammar, "main");
 
@@ -375,22 +362,16 @@ A word token based on:
   });
   
   it("Features", () => {
-    const header = `
-       @{%
-         const lexer = {
-           has(name) {
-             return true;
-           },
-         };
-       %}
-
-       @lexer lexer
-    `;
     let grammar = FeaturedNearley.compile(`
        main -> FOO[a=1] BAR[b=2].
        FOO[a=1] -> %word.
        BAR[b=2] -> %word.
-    `, header);
+    `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+    };
 
     let parser = new Nearley(grammar, "main");
 
@@ -438,10 +419,12 @@ A "f" token based on:
        DET[] -> NP[gap=-] %POSS.
        DET[] -> %a.
        DET[] -> %every.
-     `, `
-      @{% const lexer = { has(name) { return true; }, }; %}
-      @lexer lexer
-    `);
+     `);
+    grammar.Lexer = {
+      has(name) {
+        return true;
+      },
+    };
 
     let parser = new Nearley(grammar, "S_");    
     let result = [];

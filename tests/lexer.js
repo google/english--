@@ -410,14 +410,8 @@ describe("Lexer", function() {
 
        ADJ[] -> %word.
        N[num=1] -> %word.
-    `, `
-      @{%
-        ${Tokenizer.toString()}
-        const lexer = new Tokenizer(${JSON.stringify(tokens)});
-      %}
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
     `);
+    grammar.Lexer = new Tokenizer(tokens);
 
     let parser = new Nearley(grammar, "main");
 
@@ -455,14 +449,8 @@ describe("Lexer", function() {
 
        ADJ[] -> %word.
        N[num=1] -> %word.
-    `, `
-      @{%
-        ${Tokenizer.toString()}
-        const lexer = new Tokenizer(${JSON.stringify(tokens)});
-      %}
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
     `);
+    grammar.Lexer = new Tokenizer(tokens);
 
     let parser = new Nearley(grammar, "main");
 
@@ -515,13 +503,8 @@ describe("Lexer", function() {
        main -> ADJ. 
 
        ADJ[] -> %word.
-    `, `
-      @{%
-        const lexer = new Lexer(${JSON.stringify(tokens)});
-      %}
-       # Pass your lexer object using the @lexer option:
-       @lexer lexer
     `);
+    grammar.Lexer = new Tokenizer(tokens);
 
     let parser = new Nearley(grammar, "main");
 

@@ -129,6 +129,10 @@ function bind(type, types = {}, conditions = []) {
 }
 
 function ruleMeta(rule) {
+  if (rule.meta) {
+    return rule.meta;
+  }
+
   if (rule.action && rule.action.meta) {
     return rule.action.meta;
   }
