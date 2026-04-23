@@ -121,7 +121,7 @@ class Scope {
   }
 }
 
-class LogicRealizer {
+class LogicRenderer {
   constructor(dict) {
     this.lexicon = buildLexicon(dict || []);
   }
@@ -595,5 +595,5 @@ function sentence(text) {
 }
 
 module.exports = {
-  LogicRealizer,
+  LogicRenderer,
 };

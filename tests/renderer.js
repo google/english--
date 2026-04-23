@@ -17,36 +17,36 @@
 const Assert = require("assert");
 const {Console} = require("../src/console.js");
 const {Parser} = require("../src/parser.js");
-const {LogicRealizer} = require("../src/realizer.js");
+const {LogicRenderer} = require("../src/renderer.js");
 const {dict} = require("./dict.js");
 
-describe("LogicRealizer", () => {
+describe("LogicRenderer", () => {
   it("renders named unary facts", () => {
-    assertRealizes("Sam is happy.", "Sam is happy.");
+    assertRenders("Sam is happy.", "Sam is happy.");
   });
 
   it("groups unary facts for named referents", () => {
-    assertRealizes("Jones is a man. He is happy.", "Jones is a happy man.");
+    assertRenders("Jones is a man. He is happy.", "Jones is a happy man.");
   });
 
   it("groups unary facts for existential referents", () => {
-    assertRealizes("A man is happy.", "A man is happy.");
+    assertRenders("A man is happy.", "A man is happy.");
   });
 
   it("renders event predicates", () => {
-    assertRealizes("Jones loves Mary.", "Jones loves Mary.");
+    assertRenders("Jones loves Mary.", "Jones loves Mary.");
   });
 
   it("renders noun relations", () => {
-    assertRealizes("Brasilia is the capital of Brazil.", "Brasilia is the capital of Brazil.");
+    assertRenders("Brasilia is the capital of Brazil.", "Brasilia is the capital of Brazil.");
   });
 
   it("renders prepositional relations", () => {
-    assertRealizes("Jones is from Brazil.", "Jones is from Brazil.");
+    assertRenders("Jones is from Brazil.", "Jones is from Brazil.");
   });
 
   it("renders simple universal rules", () => {
-    assertRealizes(
+    assertRenders(
       "Every person who is brazilian is happy about Brazil.",
       [
         "Every person who is brazilian is happy about Brazil.",
@@ -56,25 +56,25 @@ describe("LogicRealizer", () => {
   });
 
   it("uses existential body facts as noun phrases", () => {
-    assertRealizes("Every man owns a book.", "Every man owns a book.");
+    assertRenders("Every man owns a book.", "Every man owns a book.");
   });
 
   it("renders negated transitive events", () => {
-    assertRealizes("Jones does not own a porsche.", "Jones does not own a porsche.");
+    assertRenders("Jones does not own a porsche.", "Jones does not own a porsche.");
   });
 
   it("renders negated intransitive events", () => {
-    assertRealizes("A porsche does not stink.", "A porsche does not stink.");
+    assertRenders("A porsche does not stink.", "A porsche does not stink.");
   });
 
   it("does not render tense metadata as a sentence", () => {
-    assertRealizes("Smith will not kiss Mary.", "Smith does not kiss Mary.");
+    assertRenders("Smith will not kiss Mary.", "Smith does not kiss Mary.");
   });
 });
 
-function assertRealizes(english, expected) {
+function assertRenders(english, expected) {
   const logic = new Console(dict).transpile(english);
-  const actual = new LogicRealizer(dict).render(logic);
+  const actual = new LogicRenderer(dict).render(logic);
   Assert.equal(actual, expected);
   assertParses(actual);
 }
