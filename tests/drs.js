@@ -1252,6 +1252,16 @@ describe("DRS", function() {
     `);
   });
 
+  it("Smith will kiss Mary.", function() {
+    assertThat("Smith will kiss Mary.")
+     .equalsTo(`
+       Smith(a).
+       Mary(b).
+       s0 > __now__.
+       kiss(s0, a, b).
+    `);
+  });
+
   it("Smith will not kiss Mary.", function() {
     assertThat("Smith will not kiss Mary.")
      .equalsTo(`

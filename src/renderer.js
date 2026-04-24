@@ -138,6 +138,7 @@ class LogicRenderer {
   renderStatements(statements, parentScope) {
     const atoms = collectAtoms(statements);
     const scope = parentScope.withAtoms(atoms);
+    const tenses = this.collectTenses(atoms, scope);
     const rendered = [];
     const consumed = new Set();
 
@@ -149,7 +150,7 @@ class LogicRenderer {
       if (special[0] == "for") {
         rendered.push(...this.renderFor(special, scope));
       } else if (special[0] == "not") {
-        const result = this.renderNegation(special, scope);
+        const result = this.renderNegation(special, scope, tenses);
         if (result) {
           rendered.push(result.text);
           for (const arg of result.consumed) {
@@ -163,6 +164,7 @@ class LogicRenderer {
       const result = this.renderAtom(atom, scope, {
         consumed,
         negative: false,
+        tenses,
       });
       if (result) {
         rendered.push(result.text);
@@ -192,6 +194,7 @@ class LogicRenderer {
     const bodyAtoms = collectAtoms(body);
     const headScope = parentScope.withAtoms(headAtoms);
     const scope = headScope.withAtoms(bodyAtoms);
+    const tenses = this.collectTenses([...headAtoms, ...bodyAtoms], scope);
     const subject = this.describeQuantifiedNP(refName, quantifier, headScope);
     const overrides = new Map([[scope.canonical(refName), subject]]);
     for (const variable of vars || []) {
@@ -206,7 +209,7 @@ class LogicRenderer {
         rendered.push(...this.renderFor(special, scope));
       }
       if (special && special[0] == "not") {
-        const result = this.renderNegation(special, scope, overrides);
+        const result = this.renderNegation(special, scope, tenses, overrides);
         if (result) {
           rendered.push(result.text);
           for (const arg of result.consumed) {
@@ -221,6 +224,7 @@ class LogicRenderer {
         consumed,
         negative: false,
         overrides,
+        tenses,
       });
       if (result) {
         rendered.push(result.text);
@@ -242,16 +246,21 @@ class LogicRenderer {
     return rendered;
   }
 
-  renderNegation(form, parentScope, overrides) {
+  renderNegation(form, parentScope, tenses, overrides) {
     const [, expression] = form;
     const atoms = collectAtoms(expression);
     const scope = parentScope.withAtoms(atoms);
+    const localTenses = new Map(tenses || []);
+    for (const [key, value] of this.collectTenses(atoms, scope)) {
+      localTenses.set(key, value);
+    }
     const consumed = new Set();
     for (const atom of atoms) {
       const result = this.renderAtom(atom, scope, {
         consumed,
         negative: true,
         overrides,
+        tenses: localTenses,
       });
       if (result) {
         return result;
@@ -277,12 +286,10 @@ class LogicRenderer {
     if (isEventVariable(args[0])) {
       const subject = this.describeNP(eventArgs[0], scope, options);
       const object = eventArgs[1] ? this.describeNP(eventArgs[1], scope, options) : undefined;
-      const verb = options.negative
-        ? atom.name
-        : this.verbForm(atom.name, subject);
+      const future = options?.tenses?.get(args[0]) == "future";
       const text = options.negative
-        ? [subject.text, "does not", verb, object && object.text].filter(Boolean).join(" ")
-        : [subject.text, verb, object && object.text].filter(Boolean).join(" ");
+        ? [subject.text, future ? "will not" : "does not", atom.name, object && object.text].filter(Boolean).join(" ")
+        : [subject.text, future ? "will" : this.verbForm(atom.name, subject), future ? atom.name : undefined, object && object.text].filter(Boolean).join(" ");
       return {
         text: sentence(text),
         consumed: eventArgs,
@@ -294,6 +301,21 @@ class LogicRenderer {
       return undefined;
     }
     return relation;
+  }
+
+  collectTenses(atoms, scope) {
+    const tenses = new Map();
+    for (const atom of atoms) {
+      if (!COMPARISONS.has(atom.name) || atom.args.length != 2) {
+        continue;
+      }
+      const left = scope.canonical(atom.args[0]);
+      const right = scope.canonical(atom.args[1]);
+      if (atom.name == ">" && right == "__now__") {
+        tenses.set(left, "future");
+      }
+    }
+    return tenses;
   }
 
   renderRelation(name, args, scope, options) {

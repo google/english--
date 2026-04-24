@@ -1307,9 +1307,13 @@ class CRTENSE extends Rule {
     
     // node.tense = tense;
 
+    const aux = verb.children[0];
+    const auxWord = aux && aux.children && aux.children[0];
+    const hasNegation = verb.children.some((child) => child["@type"] == "%not");
     if (tense == "fut" &&
-        verb.children[0]["@type"] == "AUX" &&
-        verb.children[0].children[0] == "will") {
+        aux && aux["@type"] == "AUX" &&
+        auxWord && auxWord.value == "will" &&
+        !hasNegation) {
       // page 541: 
       //
       //   We face a minor technical complication in this case, 

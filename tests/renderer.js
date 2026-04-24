@@ -67,8 +67,12 @@ describe("LogicRenderer", () => {
     assertRenders("A porsche does not stink.", "A porsche does not stink.");
   });
 
-  it("does not render tense metadata as a sentence", () => {
-    assertRenders("Smith will not kiss Mary.", "Smith does not kiss Mary.");
+  it("renders future tense events", () => {
+    assertRenders("Smith will kiss Mary.", "Smith will kiss Mary.");
+  });
+
+  it("renders negated future tense events", () => {
+    assertRenders("Smith will not kiss Mary.", "Smith will not kiss Mary.");
   });
 });
 
