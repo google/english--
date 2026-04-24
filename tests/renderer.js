@@ -67,6 +67,28 @@ describe("LogicRenderer", () => {
     assertRenders("A porsche does not stink.", "A porsche does not stink.");
   });
 
+  it("renders event anaphora across sentences", () => {
+    assertRenders("Jones owns a book. It fascinates him.", "Jones owns a book.\nA book fascinates Jones.");
+  });
+
+  it("factors adjectives into a unary reduction", () => {
+    assertRenders("A porsche does not stink. It is fast.", "A fast porsche does not stink.");
+  });
+
+  it("renders conditionals", () => {
+    assertRenders(
+      "If Jones owns a book then Smith owns a porsche.",
+      "If Jones owns a book then Smith owns a porsche."
+    );
+  });
+
+  it("renders disjunctions", () => {
+    assertRenders(
+      "Either Jones owns a porsche or Jones owns a book.",
+      "Either Jones owns a porsche or Jones owns a book."
+    );
+  });
+
   it("renders future tense events", () => {
     assertRenders("Smith will kiss Mary.", "Smith will kiss Mary.");
   });

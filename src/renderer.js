@@ -149,6 +149,22 @@ class LogicRenderer {
       }
       if (special[0] == "for") {
         rendered.push(...this.renderFor(special, scope));
+      } else if (special[0] == "if") {
+        const result = this.renderConditional(special, scope);
+        if (result) {
+          rendered.push(result.text);
+          for (const arg of result.consumed) {
+            consumed.add(scope.canonical(arg));
+          }
+        }
+      } else if (special[0] == "either") {
+        const result = this.renderEither(special, scope);
+        if (result) {
+          rendered.push(result.text);
+          for (const arg of result.consumed) {
+            consumed.add(scope.canonical(arg));
+          }
+        }
       } else if (special[0] == "not") {
         const result = this.renderNegation(special, scope, tenses);
         if (result) {
@@ -246,6 +262,38 @@ class LogicRenderer {
     return rendered;
   }
 
+  renderConditional(form, parentScope) {
+    const [, , , head, body] = form;
+    const headAtoms = collectAtoms(head);
+    const bodyAtoms = collectAtoms(body);
+    const antecedentScope = parentScope.withAtoms(headAtoms);
+    const consequentScope = parentScope.withAtoms([...headAtoms, ...bodyAtoms]);
+    const antecedent = this.renderClause(head, antecedentScope);
+    const consequent = this.renderClause(body, consequentScope);
+    if (!antecedent || !consequent) {
+      return undefined;
+    }
+    return {
+      text: sentence(`if ${antecedent} then ${consequent}`),
+      consumed: [...headAtoms, ...bodyAtoms].flatMap((atom) => atom.args),
+    };
+  }
+
+  renderEither(form, parentScope) {
+    const [, , left, right] = form;
+    const leftAtoms = collectAtoms(left);
+    const rightAtoms = collectAtoms(right);
+    const leftText = this.renderClause(left, parentScope.withAtoms(leftAtoms));
+    const rightText = this.renderClause(right, parentScope.withAtoms(rightAtoms));
+    if (!leftText || !rightText) {
+      return undefined;
+    }
+    return {
+      text: sentence(`either ${leftText} or ${rightText}`),
+      consumed: [...leftAtoms, ...rightAtoms].flatMap((atom) => atom.args),
+    };
+  }
+
   renderNegation(form, parentScope, tenses, overrides) {
     const [, expression] = form;
     const atoms = collectAtoms(expression);
@@ -316,6 +364,16 @@ class LogicRenderer {
       }
     }
     return tenses;
+  }
+
+  renderClause(statements, scope) {
+    const rendered = this.renderStatements(statements, scope)
+      .map((text) => text.endsWith(".") ? text.slice(0, -1) : text)
+      .filter(Boolean);
+    if (rendered.length == 0) {
+      return undefined;
+    }
+    return rendered.join(" and ");
   }
 
   renderRelation(name, args, scope, options) {
